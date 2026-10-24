@@ -1,6 +1,9 @@
 packages:
   - "apps/companion"
+  - "apps/server"
   - "packages/*"
+allowBuilds:
+  esbuild: set this to true or false
 minimumReleaseAgeExclude:
   - "@expo/cli@58.1.15"
   - "@expo/config@58.0.8"
