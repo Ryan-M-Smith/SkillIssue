@@ -1,4 +1,11 @@
-import { ScrollView, StyleSheet, Text, View, Pressable, Platform } from "react-native";
+import {
+	ScrollView,
+	StyleSheet,
+	Text,
+	View,
+	Pressable,
+	Platform
+} from "react-native";
 
 import type { AveragedMotion, RawMotion } from "@/types/motion";
 import { useMotionControl } from "@/hooks/use-motion-control";
@@ -135,7 +142,7 @@ function OutputCard({ motion }: { motion: MotionDebuggerProps }) {
 function AveragedMotionCard({ motion }: { motion: AveragedMotion }) {
     return (
         <View style={styles.card}>
-            <Text style={styles.heading}>Averaged Motion (10 samples)</Text>
+            <Text style={styles.heading}>Sensor Data (Rolling Average)</Text>
             <DataRow label="Gyroscope" value={motion.gyro.format()} />
             <DataRow label="Acceleration" value={motion.accel.format()} />
         </View>
