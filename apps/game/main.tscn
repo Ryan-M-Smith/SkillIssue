@@ -62,10 +62,13 @@ grow_vertical = 2
 [node name="TeamAHud" parent="HUD/TeamHuds" unique_id=1140202963 instance=ExtResource("3_h2yge")]
 layout_mode = 2
 size_flags_horizontal = 3
+team_color = Color(0.9987584, 0.25847447, 0.48737574, 1)
 
 [node name="TeamBHud" parent="HUD/TeamHuds" unique_id=331556203 instance=ExtResource("3_h2yge")]
 layout_mode = 2
 size_flags_horizontal = 3
+team = 1
+team_color = Color(0.40220565, 0.9023378, 0.19864151, 1)
 
 [node name="MatchInfo" type="Control" parent="HUD" unique_id=1260178751]
 layout_mode = 3
