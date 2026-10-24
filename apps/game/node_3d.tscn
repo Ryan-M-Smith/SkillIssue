@@ -1,6 +1,7 @@
 [gd_scene format=3 uid="uid://dwl5s4vl8fw74"]
 
 [ext_resource type="Script" uid="uid://cek53ng3g4dyi" path="res://PlayerMovement.gd" id="1_a202f"]
+[ext_resource type="Script" uid="uid://csbdw8l7igulq" path="res://PlayerHealthArmor.gd" id="2_noarx"]
 
 [sub_resource type="Environment" id="Environment_g4v7s"]
 background_mode = 2
@@ -72,3 +73,6 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.7, -0.5)
 
 [node name="Camera3D" type="Camera3D" parent="CharacterBody3D/head" unique_id=1932303875]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.18581116)
+
+[node name="HealthSystem" type="Node3D" parent="CharacterBody3D" unique_id=1960714520]
+script = ExtResource("2_noarx")
