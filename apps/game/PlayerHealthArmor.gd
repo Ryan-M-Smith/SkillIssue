@@ -1,4 +1,4 @@
-extends CharacterBody3D
+extends Node3D
 
 var health = 100
 var armor = 0
