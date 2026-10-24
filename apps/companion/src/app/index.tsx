@@ -1,25 +1,20 @@
-import * as Device from "expo-device";
-import { Platform, StyleSheet } from "react-native";
+import { StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import MotionTest from "@/components/motion-test";
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
-import { BottomTabInset, MaxContentWidth, Spacing } from "@/constants/theme";
+import { MaxContentWidth, Spacing } from "@/constants/theme";
 
 export default function HomeScreen() {
-	console.log(`Device: ${Device.modelName} (${Platform.OS})`);
-	
 	return (
 		<ThemedView style={styles.container}>
 			<SafeAreaView style={styles.safeArea}>
-				<ThemedView>
-					<ThemedText type="title" style={styles.title}>
-						Companion App
-					</ThemedText>
-				</ThemedView>
+				<ThemedText type="title" style={styles.title}>
+					Companion App
+				</ThemedText>
 
-				<MotionTest/>
+				<MotionTest />
 			</SafeAreaView>
 		</ThemedView>
 	);
@@ -37,15 +32,10 @@ const styles = StyleSheet.create({
 		paddingHorizontal: Spacing.four,
 		alignItems: "center",
 		gap: Spacing.three,
-		paddingBottom: BottomTabInset + Spacing.three,
 		maxWidth: MaxContentWidth,
 	},
 
 	title: {
 		textAlign: "center",
-	},
-
-	code: {
-		textTransform: "uppercase",
 	}
 });

@@ -5,7 +5,7 @@ import {
     Gyroscope,
     GyroscopeMeasurement
 } from "expo-sensors";
-import { StyleSheet } from "react-native";
+import { Platform, StyleSheet } from "react-native";
 
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
@@ -16,6 +16,11 @@ export default function MotionTest() {
     const [accel, setAccel] = useState<Vector3>(vec3Zero);
 
     useEffect(() => {
+        if (Platform.OS === "web") {
+            console.warn("Motion sensors are not supported on web.");
+            return;
+        }
+        
         Gyroscope.setUpdateInterval(16);
         Accelerometer.setUpdateInterval(16);
 
