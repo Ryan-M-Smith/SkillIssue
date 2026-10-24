@@ -1,0 +1,28 @@
+[gd_scene format=3 uid="uid://bxe5hwqwlf5om"]
+
+[ext_resource type="Script" uid="uid://k0ric8471u0d" path="res://match.gd" id="1_ig7tw"]
+[ext_resource type="PackedScene" uid="uid://bhv1do6hy4esa" path="res://arena_box.tscn" id="2_0xm2m"]
+
+[node name="Main" type="Node" unique_id=447622581]
+
+[node name="Match" type="Node" parent="." unique_id=1893754674]
+script = ExtResource("1_ig7tw")
+
+[node name="World" type="Node3D" parent="." unique_id=891396000]
+
+[node name="ArenaBox" parent="World" unique_id=2005310880 instance=ExtResource("2_0xm2m")]
+
+[node name="Entities" type="Node3D" parent="World" unique_id=1423816043]
+
+[node name="Screens" type="HBoxContainer" parent="." unique_id=1896957829]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="TeamAView" type="SubViewportContainer" parent="Screens" unique_id=2133918588]
+layout_mode = 2
+size_flags_horizontal = 3
+stretch = true
+stretch_shrink = 2

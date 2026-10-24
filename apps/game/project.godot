@@ -11,7 +11,7 @@ config_version=5
 [application]
 
 config/name="2vs2SkillIssue"
-run/main_scene="uid://dwl5s4vl8fw74"
+run/main_scene="uid://bxe5hwqwlf5om"
 config/features=PackedStringArray("4.7", "GL Compatibility")
 config/icon="res://icon.svg"
 
