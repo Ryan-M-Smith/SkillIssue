@@ -46,3 +46,29 @@ The server accepts that request only from the registered game host and only when
 Controllers send `motion` or `environment` messages without a trusted sender field. The server derives `sender` from the authenticated WebSocket connection and forwards authorized input only to Godot. Input sent before `playing` is rejected with a structured error.
 
 When a controller disconnects, the server sends `controller_disconnected` to the game, removes the slot, and returns the lobby to `waiting`. If the game host disconnects, the session is invalidated and controller connections are closed.
+
+## Godot client
+
+Implemented in `apps/game` against this server (`apps/server/index.ts`) and `packages/protocol/events.ts`.
+
+| File | Autoload | Job |
+| --- | --- | --- |
+| `scripts/network/network_client.gd` | `NetworkClient` | Socket lifecycle, reconnect with backoff, JSON validation, stats. URL: `network/server_url` Project Setting or `-- --server=ws://host:port`, default `ws://127.0.0.1:8080` |
+| `scripts/game_session.gd` | `GameSession` | Pairing code, lobby state, controller table rebuilt from `lobby_state.assignments` |
+| `scripts/input_router.gd` | `InputRouter` | Routes `motion` / `environment` by the server-stamped `sender`, enforces role ownership, feeds `PhoneDuoController` |
+| `scripts/network/motion_interpreter.gd` | (none) | `MotionReading` to move/aim. Tilt from `accelerometer` (needs gravity included), aim from `gyroscope` (rad/s assumed); tune axes here |
+| `scripts/network/sim_controllers.gd` | (none) | Four simulated phones for testing without a server |
+
+How Godot reads the server's messages:
+
+- Teams `1` / `2` become game teams `0` (blue, left screen) / `1` (red, right screen). Roles `movement` / `aim` become `mover` / `gunner` internally.
+- `lobby_state` is the source of truth for assignments; `controller_disconnected` clears that controller's held input immediately.
+- Input from a `sender` that isn't in the current assignments is dropped. So is input a role doesn't own: the aim phone can't `jump`, the movement phone can't `shoot`.
+- `pressed` on `environment` drives held controls (`shoot`, `crouch`). `jump` fires on press only. `sprint`, `reload` and `interact` are accepted but not implemented in the game yet.
+- A message with an unknown `type` or invalid JSON is counted and ignored.
+
+### Proposed additions (not in the server yet)
+
+- **Phone feedback.** `PhoneDuoController` wants to send health/weapon state and a hit vibration to each team's phones. The server currently rejects unknown types, so Godot keeps this off (`InputRouter.feedback_enabled = false`). Proposal: Godot sends `{"type":"to_controller","controllerId":"...","message":{...}}`, the server forwards `message` to that controller.
+- **`scope` and `weapon` actions** for the aim phone (`weapon` with a `slot` number: 0 pistol, 1 shotgun, 2 sniper). Godot already accepts them.
+- **`controls`** in the motion payload (`moveX`, `moveY`, `lookX`, `lookY`, each −1..1) if the companion prefers to send its own computed values. Godot uses them over raw readings when present.

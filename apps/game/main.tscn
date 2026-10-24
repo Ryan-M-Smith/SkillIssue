@@ -3,6 +3,8 @@
 [ext_resource type="Script" uid="uid://k0ric8471u0d" path="res://match.gd" id="1_ig7tw"]
 [ext_resource type="PackedScene" uid="uid://bhv1do6hy4esa" path="res://arena_box.tscn" id="2_0xm2m"]
 [ext_resource type="PackedScene" uid="uid://6wg13r27yo3w" path="res://team_hud.tscn" id="3_h2yge"]
+[ext_resource type="Resource" path="res://data/teams/team_blue.tres" id="4_teamblue"]
+[ext_resource type="Resource" path="res://data/teams/team_red.tres" id="5_teamred"]
 
 [node name="Main" type="Node" unique_id=447622581]
 
@@ -62,13 +64,12 @@ grow_vertical = 2
 [node name="TeamAHud" parent="HUD/TeamHuds" unique_id=1140202963 instance=ExtResource("3_h2yge")]
 layout_mode = 2
 size_flags_horizontal = 3
-team_color = Color(0.9987584, 0.25847447, 0.48737574, 1)
+team_data = ExtResource("4_teamblue")
 
 [node name="TeamBHud" parent="HUD/TeamHuds" unique_id=331556203 instance=ExtResource("3_h2yge")]
 layout_mode = 2
 size_flags_horizontal = 3
-team = 1
-team_color = Color(0.40220565, 0.9023378, 0.19864151, 1)
+team_data = ExtResource("5_teamred")
 
 [node name="MatchInfo" type="Control" parent="HUD" unique_id=1260178751]
 layout_mode = 3

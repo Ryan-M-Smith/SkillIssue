@@ -1,7 +1,7 @@
 ## Combines a team's two phones (mover + gunner) into one Duo's input.
 ## Also sends state back (health, guns owned, scope) and buzzes phones on hits.
-## Talks to the NetworkBridge autoload only if it provides `phone_message` / `send_to`,
-## so this works with any NetworkBridge implementation (or a placeholder) without errors.
+## Talks to the InputRouter autoload (scripts/input_router.gd) only if it provides
+## `phone_message` / `send_to`, so it also runs without networking, without errors.
 class_name PhoneDuoController
 extends DuoController
 
@@ -25,7 +25,7 @@ func _init(team_id: int = 0) -> void:
 
 
 func _ready() -> void:
-	_bridge = get_node_or_null("/root/NetworkBridge")
+	_bridge = get_node_or_null("/root/InputRouter")
 	if _bridge == null:
 		return
 	if _bridge.has_signal("phone_message"):
