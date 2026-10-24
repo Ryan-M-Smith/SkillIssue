@@ -5,7 +5,8 @@
 	"main": "index.js",
 	"scripts": {
 		"test": "echo \"Error: no test specified\" && exit 1",
-		"companion:start": "pnpm --filter companion exec expo start --tunnel"
+		"companion:start": "npm --prefix apps/companion run start -- --tunnel",
+		"companion:start:pnpm": "pnpm --filter companion run start -- --tunnel"
 	},
 
 	"keywords": [],
