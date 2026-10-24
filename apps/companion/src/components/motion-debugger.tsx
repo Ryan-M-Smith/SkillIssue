@@ -1,6 +1,7 @@
 import { ScrollView, StyleSheet, Text, View, Pressable } from "react-native";
 
-import { type AveragedMotion, type RawMotion, useMotionControl } from "@/service/useMotionControl";
+import type { AveragedMotion, RawMotion } from "@/types/motion";
+import { useMotionControl } from "@/hooks/use-motion-control";
 
 const fmt = (value: number) => value.toFixed(2);
 

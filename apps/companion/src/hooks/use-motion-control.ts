@@ -4,32 +4,19 @@ import { DeviceMotion } from "expo-sensors";
 
 import { average } from "@/lib/math/sensors";
 import { Vector3, vec3Zero } from "@/lib/math/vector3";
+import type {
+    Action,
+    AveragedMotion,
+    Counts,
+    RawMotion,
+    Role,
+} from "@/types/motion";
 import {
-    EMPTY_CONTROLS,
+    emptyControls,
     MotionController,
-    type Action,
-    type Role,
-} from "./motionControlService";
+} from "../service/motion-control-service";
 
 const MAX_MOTION_SAMPLES = 10;
-
-type Counts = Record<Exclude<Action, null>, number>;
-
-export type RawMotion = {
-    alpha: number;
-    beta: number;
-    gamma: number;
-    yawRate: number;
-    pitchRate: number;
-    accX: number;
-    accY: number;
-    accZ: number;
-};
-
-export type AveragedMotion = {
-    gyro: Vector3;
-    accel: Vector3;
-};
 
 function addSample(samples: Vector3[], sample: Vector3): Vector3[] {
     return [...samples, sample].slice(-MAX_MOTION_SAMPLES);
@@ -57,7 +44,7 @@ export function useMotionControl(initialRole: Role = "movement") {
     const [running, setRunning] = useState(false);
     const [starting, setStarting] = useState(false);
     const [status, setStatus] = useState("Not started");
-    const [controls, setControls] = useState({ ...EMPTY_CONTROLS });
+    const [controls, setControls] = useState({ ...emptyControls });
     const [lastAction, setLastAction] = useState("None");
     const [counts, setCounts] = useState<Counts>({ ...EMPTY_COUNTS });
     const [raw, setRaw] = useState<RawMotion>({ ...EMPTY_RAW });
@@ -84,7 +71,7 @@ export function useMotionControl(initialRole: Role = "movement") {
         resetSamples();
         setRunning(false);
         setStatus("Stopped");
-        setControls({ ...EMPTY_CONTROLS });
+        setControls({ ...emptyControls });
     }
 
     async function start() {
@@ -104,7 +91,7 @@ export function useMotionControl(initialRole: Role = "movement") {
 
             controllerRef.current = new MotionController(role);
             resetSamples();
-            setControls({ ...EMPTY_CONTROLS });
+            setControls({ ...emptyControls });
             setLastAction("None");
             setRaw({ ...EMPTY_RAW });
             setStatus("Calibrating...");
@@ -181,7 +168,7 @@ export function useMotionControl(initialRole: Role = "movement") {
 
     function recalibrate() {
         controllerRef.current.reset();
-        setControls({ ...EMPTY_CONTROLS });
+        setControls({ ...emptyControls });
         setLastAction("None");
         setStatus("Recalibrating...");
     }
