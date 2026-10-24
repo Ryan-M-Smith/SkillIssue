@@ -309,9 +309,7 @@ export class MotionController {
 		}
 
 		// STEP 5: GUNNER CAMERA CONTROLS
-		else if (
-			gyro &&
-			now >= this.aimFrozenUntil
+		else if (gyro && now >= this.aimFrozenUntil
 		) {
 			output.lookX = gyroToMovement(
 				axes.gunnerYawSign * gyro.gamma
