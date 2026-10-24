@@ -1,8 +1,11 @@
 extends Control
 ## One team's HUD. Display only: shows what GameEvents reports and owns no game rules.
 
-@export var team := 0
-@export var team_color := Color.GREEN
+## Same TeamData resource the Duo uses (data/teams/), so team id and color are set in one place.
+@export var team_data: TeamData
+
+var team: int:
+	get: return team_data.id if team_data else 0
 
 @onready var health_bar: ProgressBar = %HealthBar
 @onready var kill_label: Label = %KillCounter
@@ -10,10 +13,11 @@ extends Control
 
 
 func _ready() -> void:
-	crosshair.color = team_color
+	var color := team_data.color if team_data else Color.WHITE
+	crosshair.color = color
 	var fill := health_bar.get_theme_stylebox("fill").duplicate() as StyleBoxFlat
 	if fill:
-		fill.bg_color = team_color
+		fill.bg_color = color
 		health_bar.add_theme_stylebox_override("fill", fill)
 	GameEvents.health_changed.connect(_on_health_changed)
 	GameEvents.score_changed.connect(_on_score_changed)
