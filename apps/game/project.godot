@@ -15,6 +15,12 @@ run/main_scene="uid://bxe5hwqwlf5om"
 config/features=PackedStringArray("4.7", "GL Compatibility")
 config/icon="res://icon.svg"
 
+[autoload]
+
+GameEvents="*res://game_events.gd"
+NetworkBridge="*uid://c846bcx4iaxtl"
+PlayerRegistry="*uid://cqdi22myh03h4"
+
 [display]
 
 window/stretch/mode="canvas_items"

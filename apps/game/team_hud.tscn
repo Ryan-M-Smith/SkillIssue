@@ -1,0 +1,22 @@
+[gd_scene format=3 uid="uid://6wg13r27yo3w"]
+
+[ext_resource type="Script" uid="uid://0u1yw0vjpc5c" path="res://crosshair.gd" id="1_hlm1q"]
+
+[node name="Control" type="Control" unique_id=334126104]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Crosshair" type="Control" parent="." unique_id=550802302]
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+script = ExtResource("1_hlm1q")
+
+[node name="Healthbar" type="ProgressBar" parent="." unique_id=1323195186]
+layout_mode = 0
+offset_right = 4.0
+offset_bottom = 27.0
