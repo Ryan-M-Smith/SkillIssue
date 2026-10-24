@@ -16,19 +16,19 @@ import {
     MotionController,
 } from "../service/motion-control-service";
 
-const MAX_MOTION_SAMPLES = 10;
+const maxMotionSamples = 10;
 
 function addSample(samples: Vector3[], sample: Vector3): Vector3[] {
-    return [...samples, sample].slice(-MAX_MOTION_SAMPLES);
+    return [...samples, sample].slice(-maxMotionSamples);
 }
 
-const EMPTY_COUNTS: Counts = {
+const emptyCounts: Counts = {
     jump: 0,
     crouch: 0,
     shoot: 0,
 };
 
-const EMPTY_RAW: RawMotion = {
+const emptyRaw: RawMotion = {
     alpha: 0,
     beta: 0,
     gamma: 0,
@@ -46,8 +46,8 @@ export function useMotionControl(initialRole: Role = "movement") {
     const [status, setStatus] = useState("Not started");
     const [controls, setControls] = useState({ ...emptyControls });
     const [lastAction, setLastAction] = useState("None");
-    const [counts, setCounts] = useState<Counts>({ ...EMPTY_COUNTS });
-    const [raw, setRaw] = useState<RawMotion>({ ...EMPTY_RAW });
+    const [counts, setCounts] = useState<Counts>({ ...emptyCounts });
+    const [raw, setRaw] = useState<RawMotion>({ ...emptyRaw });
     const [averagedMotion, setAveragedMotion] = useState<AveragedMotion>({
         gyro: vec3Zero,
         accel: vec3Zero,
@@ -93,7 +93,7 @@ export function useMotionControl(initialRole: Role = "movement") {
             resetSamples();
             setControls({ ...emptyControls });
             setLastAction("None");
-            setRaw({ ...EMPTY_RAW });
+            setRaw({ ...emptyRaw });
             setStatus("Calibrating...");
             lastDisplayRef.current = 0;
 
@@ -174,7 +174,7 @@ export function useMotionControl(initialRole: Role = "movement") {
     }
 
     function resetCounts() {
-        setCounts({ ...EMPTY_COUNTS });
+        setCounts({ ...emptyCounts });
         setLastAction("None");
     }
 
