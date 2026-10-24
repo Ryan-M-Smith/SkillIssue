@@ -22,12 +22,15 @@ var _shoot_timer := 0.0
 func _ready() -> void:
 	if not enabled:
 		return
-	_inject("game_registered", "server", {"gameId": "sim_game", "pairingCode": "000000", "state": "waiting"})
+	# Same flat messages apps/server sends the game.
+	NetworkClient.inject_event({"type": "game_registered", "protocolVersion": 1,
+		"gameId": "sim_game", "pairingCode": "000000", "state": "waiting"})
+	var assignments := []
 	for i in IDS.size():
-		var team := 1 + i / 2
-		var role := "movement" if i % 2 == 0 else "aim"
-		_inject("controller_assigned", "server", {"controllerId": IDS[i], "teamId": team, "role": role})
-	_inject("broadcast", "server", {"state": "playing", "message": "simulated match"})
+		assignments.append({"controllerId": IDS[i], "teamId": 1 + i / 2,
+			"role": "movement" if i % 2 == 0 else "aim", "connected": true})
+	NetworkClient.inject_event({"type": "lobby_state", "state": "ready", "assignments": assignments})
+	NetworkClient.inject_event({"type": "broadcast", "state": "playing"})
 
 
 func _physics_process(delta: float) -> void:
@@ -51,12 +54,18 @@ func _physics_process(delta: float) -> void:
 	if _jump_timer <= 0.0:
 		_jump_timer = jump_every
 		for team in 2:
-			_inject("environment", IDS[team * 2], {"action": "jump"})
+			_inject("environment", IDS[team * 2], {"action": "jump", "pressed": true})
 	_shoot_timer -= delta
 	if _shoot_timer <= 0.0:
 		_shoot_timer = shoot_every
 		for team in 2:
-			_inject("environment", IDS[team * 2 + 1], {"action": "shoot"})
+			_inject("environment", IDS[team * 2 + 1], {"action": "shoot", "pressed": true})
+			_release_shot.call_deferred(IDS[team * 2 + 1])
+
+
+func _release_shot(id: String) -> void:
+	await get_tree().create_timer(0.1).timeout
+	_inject("environment", id, {"action": "shoot", "pressed": false})
 
 
 func _inject(type: String, sender: String, payload: Dictionary) -> void:

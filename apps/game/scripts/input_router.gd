@@ -25,6 +25,9 @@ const UNSUPPORTED_ACTIONS := ["sprint", "reload", "interact", "none"]
 const Motion := preload("res://scripts/network/motion_interpreter.gd")
 
 @export var only_during_play := false   ## drop gameplay input unless GameSession.is_playing()
+## Send PhoneDuoController's state / buzz messages to phones as `to_controller`. Off until
+## the server supports it: apps/server currently answers unknown types with an error.
+@export var feedback_enabled := false
 @export var tap_fire_seconds := 0.1     ## "shoot" with no `pressed` field holds fire this long
 @export var tap_crouch_seconds := 1.5   ## "crouch" with no `pressed` field (companion's crouch length)
 
@@ -46,9 +49,11 @@ func _ready() -> void:
 
 ## PhoneDuoController calls this to reach a team's phone (state, buzz).
 func send_to(team: int, role: String, msg: Dictionary) -> void:
+	if not feedback_enabled:
+		return
 	var id := GameSession.controller_at(team, role)
 	if not id.is_empty():
-		NetworkClient.send_event("to_controller", {"controllerId": id, "message": msg})
+		NetworkClient.send_message("to_controller", {"controllerId": id, "message": msg})
 
 
 ## The MotionInterpreter for a controller, to tune sensitivity / axes at runtime.

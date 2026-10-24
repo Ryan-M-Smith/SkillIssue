@@ -1,7 +1,7 @@
 ## Autoload `NetworkClient`: the WebSocket link to the Node.js server. Transport only:
 ## connect / reconnect, JSON decode, envelope validation, stats. It does not know about
 ## teams, roles or Duos. GameSession and InputRouter listen to `game_event_received`.
-## Protocol contract: docs/network-protocol.md (repo root).
+## Protocol contract: docs/network-protocol.md and packages/protocol/events.ts (repo root).
 extends Node
 
 signal connection_changed(connected: bool)
@@ -15,8 +15,8 @@ const URL_ARG := "--server="                ## optional command-line override: -
 
 ## Every type the server may send. Anything else is counted and dropped.
 const KNOWN_TYPES: PackedStringArray = [
-	"game_registered", "controller_assigned", "controller_disconnected",
-	"broadcast", "role", "motion", "environment",
+	"game_registered", "lobby_state", "controller_assigned", "controller_disconnected",
+	"join_rejected", "broadcast", "role", "motion", "environment",
 ]
 
 @export var auto_connect := true
@@ -66,17 +66,14 @@ func is_connected_to_server() -> bool:
 	return _connected
 
 
-## Sends one protocol envelope. Returns false if not connected.
-func send_event(type: String, payload: Dictionary = {}) -> bool:
+## Sends one message. Control messages are flat ({type, protocolVersion, ...fields}),
+## matching packages/protocol/events.ts. Returns false if not connected.
+func send_message(type: String, fields: Dictionary = {}) -> bool:
 	if not _connected:
 		return false
-	var envelope := {
-		"type": type,
-		"sender": "game",
-		"timestamp": int(Time.get_unix_time_from_system() * 1000.0),
-		"payload": payload,
-	}
-	return _ws.send_text(JSON.stringify(envelope)) == OK
+	var msg := {"type": type, "protocolVersion": PROTOCOL_VERSION}
+	msg.merge(fields)
+	return _ws.send_text(JSON.stringify(msg)) == OK
 
 
 ## Feeds an event through the same validation and signal path as a real packet.
@@ -106,7 +103,7 @@ func _process(delta: float) -> void:
 			if not _connected:
 				_set_connected(true)
 				_retry_delay = reconnect_delay
-				send_event("hello", {"protocolVersion": PROTOCOL_VERSION, "clientType": "game"})
+				send_message("hello", {"clientType": "game"})
 			while _ws.get_available_packet_count() > 0:
 				_handle_packet(_ws.get_packet())
 		WebSocketPeer.STATE_CLOSED:
@@ -169,9 +166,10 @@ func _handle_value(value: Variant) -> void:
 	game_event_received.emit(event)
 
 
-## Checks the envelope shape and returns a normalized copy, or {} if invalid.
-## Handshake messages may arrive flat (fields at the top level) or inside `payload`;
-## flat fields are folded into payload so handlers only look in one place.
+## Checks the message shape and returns a normalized copy, or {} if invalid.
+## Server control messages are flat (lobby_state.assignments, broadcast.state, ...) while
+## input keeps its fields in `payload`; flat fields are folded into payload so handlers
+## only look in one place.
 func _validate(value: Variant) -> Dictionary:
 	if typeof(value) != TYPE_DICTIONARY:
 		_reject("message is not a JSON object")
