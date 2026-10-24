@@ -36,6 +36,7 @@ const styles = StyleSheet.create({
 	},
 
 	title: {
+		marginTop: Spacing.four,
 		textAlign: "center",
 	}
 });

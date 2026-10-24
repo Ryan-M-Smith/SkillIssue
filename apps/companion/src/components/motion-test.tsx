@@ -58,5 +58,8 @@ const styles = StyleSheet.create({
         gap: 8,
         padding: 16,
         borderRadius: 16,
-    },
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "flex-start",
+    }
 });
