@@ -3,7 +3,7 @@ import { Alert } from "react-native";
 import { DeviceMotion } from "expo-sensors";
 
 import { average } from "@/lib/math/sensors";
-import { Vector3, vec3Zero } from "@/lib/math/vector3";
+import { Vector3 } from "@/lib/math/vector3";
 import type {
     Action,
     AveragedMotion,
@@ -49,8 +49,8 @@ export function useMotionControl(initialRole: Role = "movement") {
     const [counts, setCounts] = useState<Counts>({ ...emptyCounts });
     const [raw, setRaw] = useState<RawMotion>({ ...emptyRaw });
     const [averagedMotion, setAveragedMotion] = useState<AveragedMotion>({
-        gyro: vec3Zero,
-        accel: vec3Zero,
+        gyro: Vector3.zero(),
+        accel: Vector3.zero(),
     });
 
     const controllerRef = useRef(new MotionController(initialRole));
@@ -62,7 +62,7 @@ export function useMotionControl(initialRole: Role = "movement") {
     function resetSamples() {
         gyroSamplesRef.current = [];
         accelSamplesRef.current = [];
-        setAveragedMotion({ gyro: vec3Zero, accel: vec3Zero });
+        setAveragedMotion({ gyro: Vector3.zero(), accel: Vector3.zero() });
     }
 
     function stop() {

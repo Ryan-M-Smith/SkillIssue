@@ -1,4 +1,4 @@
-import { Vector3, vec3Zero } from "./vector3";
+import { Vector3 } from "./vector3";
 
 export function average(readings: Vector3[]): Vector3 {
 	const samples = readings.length || 1;
@@ -9,7 +9,7 @@ export function average(readings: Vector3[]): Vector3 {
 			acc.y + vec.y,
 			acc.z + vec.z
 		)
-	), vec3Zero);
+	), Vector3.zero());
 
 	return new Vector3(
 		sum.x / samples,
