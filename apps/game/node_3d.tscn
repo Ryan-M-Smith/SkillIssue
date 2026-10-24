@@ -5,6 +5,9 @@ background_mode = 2
 
 [sub_resource type="CameraAttributesPhysical" id="CameraAttributesPhysical_yf5fn"]
 
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_4xowi"]
+albedo_color = Color(0.69105, 0.37213653, 6.738305e-07, 1)
+
 [node name="Node3D" type="Node3D" unique_id=20531531]
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=1152273838]
@@ -14,7 +17,17 @@ camera_attributes = SubResource("CameraAttributesPhysical_yf5fn")
 [node name="CSGBox3D" type="CSGBox3D" parent="WorldEnvironment" unique_id=1271460449]
 size = Vector3(50, 1, 50)
 
-[node name="CSGBox3D2" type="CSGBox3D" parent="WorldEnvironment" unique_id=465196514]
+[node name="Cover1" type="CSGBox3D" parent="WorldEnvironment" unique_id=465196514]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5038874, 0)
 use_collision = true
 size = Vector3(2, 2, 0.5)
+material = SubResource("StandardMaterial3D_4xowi")
+
+[node name="Cover2" type="CSGBox3D" parent="WorldEnvironment" unique_id=1674806463]
+transform = Transform3D(0.7248956, 0, -0.6888587, 0, 1, 0, 0.6888587, 0, 0.7248956, 3.150265, 1.5038874, 3.8186865)
+use_collision = true
+size = Vector3(2, 2, 0.5)
+material = SubResource("StandardMaterial3D_4xowi")
+
+[node name="Camera3D" type="Camera3D" parent="." unique_id=1932303875]
+transform = Transform3D(-0.99932206, 0.0052925604, -0.036433104, 0, 0.98961276, 0.14375897, 0.036815517, 0.14366151, -0.98894185, 0, 4.6205983, -4.4521923)
