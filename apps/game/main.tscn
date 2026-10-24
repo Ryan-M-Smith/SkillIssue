@@ -26,3 +26,25 @@ layout_mode = 2
 size_flags_horizontal = 3
 stretch = true
 stretch_shrink = 2
+
+[node name="SubViewport" type="SubViewport" parent="Screens/TeamAView" unique_id=98524503]
+size = Vector2i(287, 324)
+
+[node name="TeamACamera" type="Camera3D" parent="Screens/TeamAView/SubViewport" unique_id=852137329]
+current = true
+
+[node name="TeamBView" type="SubViewportContainer" parent="Screens" unique_id=294268643]
+layout_mode = 2
+size_flags_horizontal = 3
+stretch = true
+stretch_shrink = 2
+
+[node name="SubViewport" type="SubViewport" parent="Screens/TeamBView" unique_id=823891378]
+handle_input_locally = false
+size = Vector2i(287, 324)
+render_target_update_mode = 4
+
+[node name="TeamBCamera" type="Camera3D" parent="Screens/TeamBView/SubViewport" unique_id=371316569]
+current = true
+
+[node name="HUD" type="CanvasLayer" parent="." unique_id=1084722513]
