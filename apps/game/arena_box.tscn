@@ -1,3 +1,72 @@
 [gd_scene format=3 uid="uid://bhv1do6hy4esa"]
 
+[ext_resource type="Material" uid="uid://dalrh4aoojdi7" path="res://spawnpoint_color.tres" id="1_yvyj0"]
+[ext_resource type="Material" uid="uid://dljsq8kc0c8nw" path="res://wallcolor.tres" id="2_2wrcj"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_yf5fn"]
+albedo_color = Color(0.39181867, 0.39181864, 0.39181864, 1)
+
 [node name="ArenaBox" type="Node3D" unique_id=2005310880]
+
+[node name="Terrain" type="CSGBox3D" parent="." unique_id=462048862]
+size = Vector3(50, 1, 50)
+
+[node name="Spawns" type="Node3D" parent="Terrain" unique_id=361325905]
+
+[node name="Spawn1" type="CSGCylinder3D" parent="Terrain/Spawns" unique_id=1905326114]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 20, 1.5, 20)
+material = ExtResource("1_yvyj0")
+
+[node name="Spawn2" type="CSGCylinder3D" parent="Terrain/Spawns" unique_id=718744134]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -20, 1.5, 20)
+material = ExtResource("1_yvyj0")
+
+[node name="Spawn3" type="CSGCylinder3D" parent="Terrain/Spawns" unique_id=711576396]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -20, 1.5, -20)
+material = ExtResource("1_yvyj0")
+
+[node name="Spawn4" type="CSGCylinder3D" parent="Terrain/Spawns" unique_id=1312921627]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 20, 1.5, -20)
+material = ExtResource("1_yvyj0")
+
+[node name="Cover" type="Node3D" parent="Terrain" unique_id=763078131]
+
+[node name="MedCover1" type="CSGBox3D" parent="Terrain/Cover" unique_id=701161921]
+transform = Transform3D(0.76604444, 0, 0.6427876, 0, 1, 0, -0.6427876, 0, 0.76604444, 18.3, 2, 18.3)
+size = Vector3(3, 3, 0.5)
+material = ExtResource("2_2wrcj")
+
+[node name="MedCover2" type="CSGBox3D" parent="Terrain/Cover" unique_id=1324723039]
+transform = Transform3D(0.7660444, 0, -0.6427875, 0, 1, 0, 0.6427875, 0, 0.7660444, -18.3, 2, 18.3)
+size = Vector3(3, 3, 0.5)
+material = ExtResource("2_2wrcj")
+
+[node name="MedCover3" type="CSGBox3D" parent="Terrain/Cover" unique_id=1117060112]
+transform = Transform3D(0.76604444, 0, 0.6427876, 0, 1, 0, -0.6427876, 0, 0.76604444, -18.3, 2, -18.3)
+size = Vector3(3, 3, 0.5)
+material = ExtResource("2_2wrcj")
+
+[node name="MedCover4" type="CSGBox3D" parent="Terrain/Cover" unique_id=1386671126]
+transform = Transform3D(0.76604444, 0, -0.6427876, 0, 1, 0, 0.6427876, 0, 0.76604444, 18.3, 2, -18.3)
+size = Vector3(3, 3, 0.5)
+material = ExtResource("2_2wrcj")
+
+[node name="BigCover1" type="CSGBox3D" parent="Terrain/Cover" unique_id=403165125]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 20, 2.45, -8)
+size = Vector3(6, 4, 0.5)
+material = SubResource("StandardMaterial3D_yf5fn")
+
+[node name="BigCover2" type="CSGBox3D" parent="Terrain/Cover" unique_id=1533379673]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 20, 2.45, 8)
+size = Vector3(6, 4, 0.5)
+material = SubResource("StandardMaterial3D_yf5fn")
+
+[node name="BigCover3" type="CSGBox3D" parent="Terrain/Cover" unique_id=231812572]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, -20, 2.45, -8)
+size = Vector3(6, 4, 0.5)
+material = SubResource("StandardMaterial3D_yf5fn")
+
+[node name="BigCover4" type="CSGBox3D" parent="Terrain/Cover" unique_id=1805670627]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, -20, 2.45, 8)
+size = Vector3(6, 4, 0.5)
+material = SubResource("StandardMaterial3D_yf5fn")
