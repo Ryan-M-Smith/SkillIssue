@@ -3,7 +3,10 @@
 [ext_resource type="Material" uid="uid://dalrh4aoojdi7" path="res://spawnpoint_color.tres" id="1_yvyj0"]
 [ext_resource type="Material" uid="uid://dljsq8kc0c8nw" path="res://wallcolor.tres" id="2_2wrcj"]
 [ext_resource type="Material" uid="uid://dgdel63js7ym4" path="res://healthpickup.tres" id="2_sija8"]
+[ext_resource type="Material" uid="uid://dyasjlxrj2kxd" path="res://shotgunpickupcolor.tres" id="3_tj2tj"]
 [ext_resource type="Script" uid="uid://cek53ng3g4dyi" path="res://PlayerMovement.gd" id="3_vrfma"]
+[ext_resource type="Material" uid="uid://7j42omtwv2j8" path="res://sniperpickupcolor.tres" id="4_reqvt"]
+[ext_resource type="Material" uid="uid://dkjvd2uu5plc4" path="res://bigcovercolor.tres" id="4_vrfma"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_sija8"]
 sky_horizon_color = Color(0.66224277, 0.6717428, 0.6867428, 1)
@@ -18,9 +21,6 @@ sky = SubResource("Sky_vrfma")
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_vrfma"]
 albedo_color = Color(0.54509807, 0.52156866, 0.73333335, 1)
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_yf5fn"]
-albedo_color = Color(0.39181867, 0.39181864, 0.39181864, 1)
 
 [sub_resource type="BoxMesh" id="BoxMesh_p1u0y"]
 size = Vector3(5, 4, 0.5)
@@ -47,61 +47,82 @@ size = Vector3(50, 1, 50)
 
 [node name="Spawns" type="Node3D" parent="Terrain" unique_id=361325905]
 
-[node name="Spawn1" type="CSGCylinder3D" parent="Terrain/Spawns" unique_id=1905326114]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 20, 1.5, 20)
-material = ExtResource("1_yvyj0")
+[node name="HealthPickups" type="Node" parent="Terrain/Spawns" unique_id=144472983]
 
-[node name="Spawn2" type="CSGCylinder3D" parent="Terrain/Spawns" unique_id=718744134]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -20, 1.5, 20)
-material = ExtResource("1_yvyj0")
-
-[node name="Spawn3" type="CSGCylinder3D" parent="Terrain/Spawns" unique_id=711576396]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -20, 1.5, -20)
-material = ExtResource("1_yvyj0")
-
-[node name="Spawn4" type="CSGCylinder3D" parent="Terrain/Spawns" unique_id=1312921627]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 20, 1.5, -20)
-material = ExtResource("1_yvyj0")
-
-[node name="HealthPickup" type="CSGSphere3D" parent="Terrain/Spawns" unique_id=1920780753]
+[node name="HealthPickup" type="CSGSphere3D" parent="Terrain/Spawns/HealthPickups" unique_id=1920780753]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 21.5, 1.5, 9)
 rings = 16
 material = ExtResource("2_sija8")
 
-[node name="ArmorPickup" type="CSGSphere3D" parent="Terrain/Spawns" unique_id=1261700422]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 21.5, 1.5, 7)
-rings = 16
-material = SubResource("StandardMaterial3D_vrfma")
-
-[node name="ArmorPickup2" type="CSGSphere3D" parent="Terrain/Spawns" unique_id=1406720118]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 21.5, 1.5, -7)
-rings = 16
-material = SubResource("StandardMaterial3D_vrfma")
-
-[node name="HealthPickup2" type="CSGSphere3D" parent="Terrain/Spawns" unique_id=222146989]
+[node name="HealthPickup2" type="CSGSphere3D" parent="Terrain/Spawns/HealthPickups" unique_id=222146989]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 21.5, 1.5, -9)
 rings = 16
 material = ExtResource("2_sija8")
 
-[node name="HealthPickup3" type="CSGSphere3D" parent="Terrain/Spawns" unique_id=2055309413]
+[node name="HealthPickup3" type="CSGSphere3D" parent="Terrain/Spawns/HealthPickups" unique_id=2055309413]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -21.5, 1.5, 9)
 rings = 16
 material = ExtResource("2_sija8")
 
-[node name="ArmorPickup3" type="CSGSphere3D" parent="Terrain/Spawns" unique_id=1354149820]
+[node name="HealthPickup4" type="CSGSphere3D" parent="Terrain/Spawns/HealthPickups" unique_id=1285807794]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -21.5, 1.5, -9)
+rings = 16
+material = ExtResource("2_sija8")
+
+[node name="ArmorPickups" type="Node" parent="Terrain/Spawns" unique_id=1459798194]
+
+[node name="ArmorPickup" type="CSGSphere3D" parent="Terrain/Spawns/ArmorPickups" unique_id=1261700422]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 21.5, 1.5, 7)
+rings = 16
+material = SubResource("StandardMaterial3D_vrfma")
+
+[node name="ArmorPickup2" type="CSGSphere3D" parent="Terrain/Spawns/ArmorPickups" unique_id=1406720118]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 21.5, 1.5, -7)
+rings = 16
+material = SubResource("StandardMaterial3D_vrfma")
+
+[node name="ArmorPickup3" type="CSGSphere3D" parent="Terrain/Spawns/ArmorPickups" unique_id=1354149820]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -21.5, 1.5, 7)
 rings = 16
 material = SubResource("StandardMaterial3D_vrfma")
 
-[node name="ArmorPickup4" type="CSGSphere3D" parent="Terrain/Spawns" unique_id=1145489696]
+[node name="ArmorPickup4" type="CSGSphere3D" parent="Terrain/Spawns/ArmorPickups" unique_id=1145489696]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -21.5, 1.5, -7)
 rings = 16
 material = SubResource("StandardMaterial3D_vrfma")
 
-[node name="HealthPickup4" type="CSGSphere3D" parent="Terrain/Spawns" unique_id=1285807794]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -21.5, 1.5, -9)
+[node name="PlayerSpawns" type="Node" parent="Terrain/Spawns" unique_id=876395034]
+
+[node name="Spawn1" type="CSGCylinder3D" parent="Terrain/Spawns/PlayerSpawns" unique_id=1905326114]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 20, 1.5, 20)
+material = ExtResource("1_yvyj0")
+
+[node name="Spawn2" type="CSGCylinder3D" parent="Terrain/Spawns/PlayerSpawns" unique_id=718744134]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -20, 1.5, 20)
+material = ExtResource("1_yvyj0")
+
+[node name="Spawn3" type="CSGCylinder3D" parent="Terrain/Spawns/PlayerSpawns" unique_id=711576396]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -20, 1.5, -20)
+material = ExtResource("1_yvyj0")
+
+[node name="Spawn4" type="CSGCylinder3D" parent="Terrain/Spawns/PlayerSpawns" unique_id=1312921627]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 20, 1.5, -20)
+material = ExtResource("1_yvyj0")
+
+[node name="ShotgunSpawn" type="CSGSphere3D" parent="Terrain/Spawns" unique_id=2100700433]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, -16)
 rings = 16
-material = ExtResource("2_sija8")
+material = ExtResource("3_tj2tj")
+
+[node name="ShotgunSpawn2" type="CSGSphere3D" parent="Terrain/Spawns" unique_id=448019255]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 16)
+rings = 16
+material = ExtResource("3_tj2tj")
+
+[node name="SniperSpawn" type="CSGSphere3D" parent="Terrain/Spawns" unique_id=1151756044]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.6, 0)
+rings = 16
+material = ExtResource("4_reqvt")
 
 [node name="Cover" type="Node3D" parent="Terrain" unique_id=763078131]
 
@@ -133,25 +154,25 @@ material = ExtResource("2_2wrcj")
 transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 20, 2.45, -8)
 use_collision = true
 size = Vector3(6, 4, 0.5)
-material = SubResource("StandardMaterial3D_yf5fn")
+material = ExtResource("4_vrfma")
 
 [node name="BigCover2" type="CSGBox3D" parent="Terrain/Cover" unique_id=1533379673]
 transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 20, 2.45, 8)
 use_collision = true
 size = Vector3(6, 4, 0.5)
-material = SubResource("StandardMaterial3D_yf5fn")
+material = ExtResource("4_vrfma")
 
 [node name="BigCover3" type="CSGBox3D" parent="Terrain/Cover" unique_id=231812572]
 transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, -20, 2.45, -8)
 use_collision = true
 size = Vector3(6, 4, 0.5)
-material = SubResource("StandardMaterial3D_yf5fn")
+material = ExtResource("4_vrfma")
 
 [node name="BigCover4" type="CSGBox3D" parent="Terrain/Cover" unique_id=1805670627]
 transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, -20, 2.45, 8)
 use_collision = true
 size = Vector3(6, 4, 0.5)
-material = SubResource("StandardMaterial3D_yf5fn")
+material = ExtResource("4_vrfma")
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="Terrain" unique_id=2131164514]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.5, 14)
@@ -175,6 +196,7 @@ shape = SubResource("BoxShape3D_2wrcj")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5177579, 0)
 use_collision = true
 size = Vector3(2, 2, 2)
+material = ExtResource("4_vrfma")
 
 [node name="CharacterBody3D" type="CharacterBody3D" parent="." unique_id=1564791814]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.342, 1.5, 0)
