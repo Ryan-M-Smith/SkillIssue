@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="WeaponData" format=3]
+
+[ext_resource type="Script" path="res://data/weapons/weapon_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+display_name = "Pistol"
+damage = 22.0
+fire_interval = 0.28
+spread_degrees = 0.6
+color = Color(0.75, 0.75, 0.8, 1)
+tracer_color = Color(1, 0.92, 0.55, 1)
+model_size = Vector3(0.07, 0.12, 0.28)
