@@ -1,0 +1,29 @@
+## One frame of intent for a Duo. Controllers write into it; components only read it.
+## The Duo resets it every physics frame and then lets each controller add its share,
+## so phones and keyboard can drive the same Duo at the same time.
+class_name DuoInput
+extends RefCounted
+
+# --- mover (lower body)
+var move := Vector2.ZERO        ## x = right, y = forward, length 0..1
+var jump := false               ## pressed this frame
+var crouch := false             ## held
+# --- gunner (upper body)
+var aim_delta := Vector2.ZERO   ## radians this frame; x = turn right, y = look up
+var fire := false               ## held
+var scope_toggle := false       ## pressed this frame
+var weapon_slot := -1           ## requested slot this frame, -1 = none
+
+
+func reset() -> void:
+	move = Vector2.ZERO
+	jump = false
+	crouch = false
+	aim_delta = Vector2.ZERO
+	fire = false
+	scope_toggle = false
+	weapon_slot = -1
+
+
+func clamp_values() -> void:
+	move = move.limit_length(1.0)

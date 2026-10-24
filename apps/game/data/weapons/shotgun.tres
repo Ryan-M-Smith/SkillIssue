@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="WeaponData" format=3]
+
+[ext_resource type="Script" path="res://data/weapons/weapon_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+display_name = "Shotgun"
+damage = 11.0
+pellets = 9
+spread_degrees = 6.0
+fire_interval = 0.85
+max_range = 28.0
+headshot_multiplier = 1.5
+color = Color(0.85, 0.45, 0.15, 1)
+tracer_color = Color(1, 0.6, 0.25, 1)
+model_size = Vector3(0.1, 0.12, 0.6)
