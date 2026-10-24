@@ -1,6 +1,7 @@
 ## Autoload `GameSession`: lobby / match state and the server-authorized controller table.
-## The server owns pairing and assignments; this node mirrors what the server reports and
-## answers "which controller is team T's mover?" for InputRouter. No gameplay here.
+## The server owns pairing and assignments; this node mirrors what the server reports
+## (lobby_state.assignments, controller_disconnected, broadcast) and answers
+## "which controller is team T's mover?" for InputRouter. No gameplay here.
 extends Node
 
 signal registered(game_id: String, pairing_code: String)
@@ -63,9 +64,10 @@ func is_playing() -> bool:
 	return state == "playing"
 
 
-## Asks the server to start the match. The server validates it and broadcasts the new state.
+## Asks the server to start the match. The server accepts it only when all four slots are
+## filled, then broadcasts state "playing"; otherwise it replies with join_rejected.
 func request_start() -> bool:
-	return NetworkClient.send_event("start_game", {"gameId": game_id})
+	return NetworkClient.send_message("start_game")
 
 
 ## Marks a controller ready (from its "ready" action). Purely lobby display state.
@@ -87,8 +89,21 @@ func _on_game_event(event: Dictionary) -> void:
 			pairing_code = str(p.get("pairingCode", ""))
 			registered.emit(game_id, pairing_code)
 			_set_state(str(p.get("state", "waiting")))
+		"lobby_state":
+			# The server's full assignment list; the game learns assignments from this.
+			_sync_assignments(p.get("assignments"))
+			if p.has("state"):
+				_set_state(str(p.state))
 		"controller_assigned":
-			_assign(str(p.get("controllerId", "")), p.get("teamId"), str(p.get("role", "")))
+			# The server sends this to the phone; accepted here too, nested or flat.
+			var a: Variant = p.get("assignment", p)
+			if typeof(a) == TYPE_DICTIONARY:
+				_assign(str(a.get("controllerId", "")), a.get("teamId"), str(a.get("role", "")))
+		"join_rejected":
+			# The server reports errors to the game this way too (e.g. start before ready).
+			var err := "%s: %s" % [p.get("code", "error"), p.get("message", "")]
+			server_error.emit(err)
+			push_warning("GameSession: server rejected a request: %s" % err)
 		"role":
 			# Legacy role event. controller_assigned is authoritative; `role` only changes
 			# the role of a controller the server already assigned (sender = controller id).
@@ -125,6 +140,28 @@ func _assign(id: String, server_team: Variant, raw_role: String) -> void:
 		_remove(previous)
 	_controllers[id] = {"team": team, "role": role, "ready": false}
 	controller_assigned.emit(id, team, role)
+
+
+## Makes the controller table match the server's list: drops controllers that are gone or
+## disconnected, adds new ones, reassigns any whose team or role changed.
+func _sync_assignments(list: Variant) -> void:
+	if typeof(list) != TYPE_ARRAY:
+		return
+	var seen := {}
+	for a in list:
+		if typeof(a) != TYPE_DICTIONARY or a.get("connected", true) == false:
+			continue
+		var id := str(a.get("controllerId", ""))
+		var role := normalize_role(str(a.get("role", "")))
+		seen[id] = true
+		var current := controller_info(id)
+		var team_v: Variant = a.get("teamId")
+		var team := int(team_v) - server_team_offset if typeof(team_v) in [TYPE_INT, TYPE_FLOAT] else -1
+		if current.is_empty() or current.team != team or current.role != role:
+			_assign(id, team_v, str(a.get("role", "")))
+	for id in _controllers.keys():
+		if not seen.has(id):
+			_remove(id)
 
 
 func _remove(id: String) -> void:

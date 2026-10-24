@@ -4,8 +4,8 @@
 ## Two input paths, checked in this order:
 ##   1. payload.controls {moveX, moveY, lookX, lookY} in -1..1: the companion app already
 ##      computes these on the phone (calibration, deadzones). Proposed protocol extension.
-##   2. payload.readings: tilt from `accelerometer` (must include gravity) for the mover,
-##      rotation rate from `gyroscope` for the gunner.
+##   2. The MotionReading fields (packages/protocol/events.ts): tilt from `accelerometer`
+##      (must include gravity) for the mover, rotation rate from `gyroscope` for the gunner.
 ## AR fields (arPosition / arOrientation) are not used yet, so `trackingStatus` doesn't gate
 ## anything here. Axis directions and units still need confirming on real phones.
 ## Loaded by path (InputRouter preloads it) rather than by class_name.
@@ -55,7 +55,9 @@ func feed(payload: Dictionary, role: String, now_msec: int) -> bool:
 	var controls: Variant = payload.get("controls")
 	if typeof(controls) == TYPE_DICTIONARY:
 		return _feed_controls(controls, role, now_msec)
-	var readings: Variant = payload.get("readings")
+	# packages/protocol MotionReading puts the sensor fields directly in the payload;
+	# an older draft nested them under `readings`. Accept both.
+	var readings: Variant = payload.get("readings", payload)
 	if typeof(readings) != TYPE_DICTIONARY:
 		return false
 	if role == "mover":
