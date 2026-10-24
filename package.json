@@ -1,21 +1,23 @@
 {
-  "name": "SkillIssue",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "devEngines": {
-    "packageManager": {
-      "name": "pnpm",
-      "version": "12.15.0",
-      "onFail": "download"
-    }
-  },
-  "packageManager": "pnpm@12.15.0",
-  "type": "module"
+	"name": "SkillIssue",
+	"version": "1.0.0",
+	"description": "",
+	"main": "index.js",
+	"scripts": {
+		"test": "echo \"Error: no test specified\" && exit 1",
+		"companion:start": "pnpm --filter companion exec expo start --tunnel"
+	},
+
+	"keywords": [],
+	"author": "",
+	"license": "ISC",
+	"devEngines": {
+		"packageManager": {
+			"name": "pnpm",
+			"version": "12.15.0",
+			"onFail": "download"
+		}
+	},
+	"packageManager": "pnpm@12.15.0",
+	"type": "module"
 }
