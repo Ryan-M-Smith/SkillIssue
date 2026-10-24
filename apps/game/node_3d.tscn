@@ -1,0 +1,20 @@
+[gd_scene format=3 uid="uid://dwl5s4vl8fw74"]
+
+[sub_resource type="Environment" id="Environment_g4v7s"]
+background_mode = 2
+
+[sub_resource type="CameraAttributesPhysical" id="CameraAttributesPhysical_yf5fn"]
+
+[node name="Node3D" type="Node3D" unique_id=20531531]
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=1152273838]
+environment = SubResource("Environment_g4v7s")
+camera_attributes = SubResource("CameraAttributesPhysical_yf5fn")
+
+[node name="CSGBox3D" type="CSGBox3D" parent="WorldEnvironment" unique_id=1271460449]
+size = Vector3(50, 1, 50)
+
+[node name="CSGBox3D2" type="CSGBox3D" parent="WorldEnvironment" unique_id=465196514]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5038874, 0)
+use_collision = true
+size = Vector3(2, 2, 0.5)
