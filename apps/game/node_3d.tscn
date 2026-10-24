@@ -29,5 +29,19 @@ use_collision = true
 size = Vector3(2, 2, 0.5)
 material = SubResource("StandardMaterial3D_4xowi")
 
+[node name="CSGPolygon3D" type="CSGPolygon3D" parent="WorldEnvironment" unique_id=1939305452]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.2110007, 3.2464633)
+mode = 1
+spin_degrees = 180.0
+spin_sides = 3
+
+[node name="ramp" type="CSGBox3D" parent="WorldEnvironment" unique_id=480671960]
+transform = Transform3D(1, 0, 0, 0, 0.90630776, -0.42261827, 0, 0.42261827, 0.90630776, -21.906214, 1.449528, 12.034275)
+size = Vector3(1.5, 0.25, 5)
+
+[node name="CSGBox3D" type="CSGBox3D" parent="WorldEnvironment/ramp" unique_id=1779155297]
+transform = Transform3D(1, 0, 0, 0, 0.9063082, 0.42261848, 0, -0.42261848, 0.9063082, 0, -0.97205496, -1.5694399)
+size = Vector3(1, 1.5, 1)
+
 [node name="Camera3D" type="Camera3D" parent="." unique_id=1932303875]
 transform = Transform3D(-0.99932206, 0.0052925604, -0.036433104, 0, 0.98961276, 0.14375897, 0.036815517, 0.14366151, -0.98894185, 0, 4.6205983, -4.4521923)
