@@ -27,18 +27,26 @@ export default function MotionTest() {
 
         const gyroSub = Gyroscope.addListener((data: GyroscopeMeasurement) => {
             setGyro((prev) => {
-                if (prev.length < 100) {
-                    // Keep adding new entries until we reach 100
+                if (prev.length < 10) {
+                    // Keep adding new samples until we reach 10
                     return [...prev, new Vector3(data.x, data.y, data.z)];
                 } else {
-                    // Remove the oldest entry and add the new one
+                    // Remove the oldest sample and add the new one
                     return [...prev.slice(1), new Vector3(data.x, data.y, data.z)];
                 }
             });
         });
 
         const accelSub = Accelerometer.addListener((data: AccelerometerMeasurement) => {
-            setAccel(prev => [...prev, new Vector3(data.x, data.y, data.z)]);
+            setAccel((prev) => {
+                if (prev.length < 10) {
+                    // Keep adding new samples until we reach 10
+                    return [...prev, new Vector3(data.x, data.y, data.z)];
+                } else {
+                    // Remove the oldest sample and add the new one
+                    return [...prev.slice(1), new Vector3(data.x, data.y, data.z)];
+                }
+            });
         });
 
         return () => {
