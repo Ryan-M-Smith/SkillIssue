@@ -1,5 +1,7 @@
 [gd_scene format=3 uid="uid://dwl5s4vl8fw74"]
 
+[ext_resource type="Script" uid="uid://cek53ng3g4dyi" path="res://PlayerMovement.gd" id="1_a202f"]
+
 [sub_resource type="Environment" id="Environment_g4v7s"]
 background_mode = 2
 
@@ -19,6 +21,7 @@ environment = SubResource("Environment_g4v7s")
 camera_attributes = SubResource("CameraAttributesPhysical_yf5fn")
 
 [node name="CSGBox3D" type="CSGBox3D" parent="WorldEnvironment" unique_id=1271460449]
+use_collision = true
 size = Vector3(50, 1, 50)
 
 [node name="Cover1" type="CSGBox3D" parent="WorldEnvironment" unique_id=465196514]
@@ -28,7 +31,7 @@ size = Vector3(2, 2, 0.5)
 material = SubResource("StandardMaterial3D_4xowi")
 
 [node name="Cover2" type="CSGBox3D" parent="WorldEnvironment" unique_id=1674806463]
-transform = Transform3D(0.7248956, 0, -0.6888587, 0, 1, 0, 0.6888587, 0, 0.7248956, 3.150265, 1.5038874, 3.8186865)
+transform = Transform3D(0.7248956, 0, -0.6888587, 0, 1, 0, 0.6888587, 0, 0.7248956, 3.150265, 1.5038874, -3.3975134)
 use_collision = true
 size = Vector3(2, 2, 0.5)
 material = SubResource("StandardMaterial3D_4xowi")
@@ -48,8 +51,15 @@ size = Vector3(1.5, 0.25, 5)
 transform = Transform3D(1, 0, 0, 0, 0.9063082, 0.42261848, 0, -0.42261848, 0.9063082, 0, -0.97205496, -1.5694399)
 size = Vector3(1, 1.5, 1)
 
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="WorldEnvironment" unique_id=1591153491]
+transform = Transform3D(1, 0, 0, 0, -0.29120493, 0.95666075, 0, -0.95666075, -0.29120493, 0, 14.251036, -13.559303)
+
+[node name="DirectionalLight3D2" type="DirectionalLight3D" parent="WorldEnvironment" unique_id=1856771458]
+transform = Transform3D(1, 0, 0, 0, 0.8634891, 0.50436753, 0, -0.50436753, 0.8634891, 0, 6.3151674, 18.187904)
+
 [node name="CharacterBody3D" type="CharacterBody3D" parent="." unique_id=851539408]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.342, 1.5, 0)
+script = ExtResource("1_a202f")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="CharacterBody3D" unique_id=235974021]
 shape = SubResource("CapsuleShape3D_57qmd")
@@ -57,5 +67,8 @@ shape = SubResource("CapsuleShape3D_57qmd")
 [node name="MeshInstance3D" type="MeshInstance3D" parent="CharacterBody3D" unique_id=1249059377]
 mesh = SubResource("CapsuleMesh_g4v7s")
 
-[node name="Camera3D" type="Camera3D" parent="CharacterBody3D" unique_id=1932303875]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.06807709, 0.70661163, -0.48678732)
+[node name="head" type="Node3D" parent="CharacterBody3D" unique_id=2051926789]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.7, -0.5)
+
+[node name="Camera3D" type="Camera3D" parent="CharacterBody3D/head" unique_id=1932303875]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.18581116)
