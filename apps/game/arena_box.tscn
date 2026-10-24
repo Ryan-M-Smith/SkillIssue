@@ -5,6 +5,17 @@
 [ext_resource type="Material" uid="uid://dgdel63js7ym4" path="res://healthpickup.tres" id="2_sija8"]
 [ext_resource type="Script" uid="uid://cek53ng3g4dyi" path="res://PlayerMovement.gd" id="3_vrfma"]
 
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_sija8"]
+sky_horizon_color = Color(0.66224277, 0.6717428, 0.6867428, 1)
+ground_horizon_color = Color(0.66224277, 0.6717428, 0.6867428, 1)
+
+[sub_resource type="Sky" id="Sky_vrfma"]
+sky_material = SubResource("ProceduralSkyMaterial_sija8")
+
+[sub_resource type="Environment" id="Environment_b11el"]
+background_mode = 2
+sky = SubResource("Sky_vrfma")
+
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_vrfma"]
 albedo_color = Color(0.54509807, 0.52156866, 0.73333335, 1)
 
@@ -22,6 +33,13 @@ size = Vector3(5, 4, 0.5)
 [sub_resource type="CapsuleMesh" id="CapsuleMesh_0x5ac"]
 
 [node name="ArenaBox" type="Node3D" unique_id=2005310880]
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=440610900]
+environment = SubResource("Environment_b11el")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=1042988972]
+transform = Transform3D(-0.8660254, -0.43301278, 0.25, 0, 0.49999997, 0.86602545, -0.50000006, 0.75, -0.43301266, 0, 0, 0)
+shadow_enabled = true
 
 [node name="Terrain" type="CSGBox3D" parent="." unique_id=462048862]
 use_collision = true
@@ -155,7 +173,8 @@ shape = SubResource("BoxShape3D_2wrcj")
 
 [node name="CSGBox3D" type="CSGBox3D" parent="." unique_id=242228093]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5177579, 0)
-size = Vector3(2, 0.5, 2)
+use_collision = true
+size = Vector3(2, 2, 2)
 
 [node name="CharacterBody3D" type="CharacterBody3D" parent="." unique_id=1564791814]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.342, 1.5, 0)
