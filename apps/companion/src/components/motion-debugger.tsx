@@ -1,4 +1,4 @@
-import { ScrollView, StyleSheet, Text, View, Pressable } from "react-native";
+import { ScrollView, StyleSheet, Text, View, Pressable, Platform } from "react-native";
 
 import type { AveragedMotion, RawMotion } from "@/types/motion";
 import { useMotionControl } from "@/hooks/use-motion-control";
@@ -175,16 +175,24 @@ function RawMotionCard({ raw }: { raw: RawMotion }) {
 }
 
 export default function MotionDebugger(motion: MotionDebuggerProps) {
-    return (
+    return Platform.OS === "web"? (
+		<ScrollView style={styles.screen} contentContainerStyle={styles.container}>
+			<Text style={styles.title}> Motion Controller Debugger </Text>
+			<Text style={styles.subtitle}>
+				Motion sensors are not supported on web. Please open this
+				app on a mobile device to test motion-based game controls.
+			</Text>
+		</ScrollView>
+	) : (
         <ScrollView style={styles.screen} contentContainerStyle={styles.container}>
-            <Text style={styles.title}>Motion Controller Debugger</Text>
-            <Text style={styles.subtitle}>Test your phone's motion-based game controls</Text>
-            <RoleCard motion={motion} />
-            <StatusCard motion={motion} />
-            <OutputCard motion={motion} />
-            <AveragedMotionCard motion={motion.averagedMotion} />
-            <GestureCard motion={motion} />
-            <RawMotionCard raw={motion.raw} />
+            <Text style={styles.title}> Motion Controller Debugger </Text>
+            <Text style={styles.subtitle}> Test your phone's motion-based game controls </Text>
+            <RoleCard motion={motion}/>
+            <StatusCard motion={motion}/>
+            <OutputCard motion={motion}/>
+            <AveragedMotionCard motion={motion.averagedMotion}/>
+            <GestureCard motion={motion}/>
+            <RawMotionCard raw={motion.raw}/>
             <Text style={styles.footer}>
                 Hold your phone still to calibrate. Test movement and gunner separately.
             </Text>
