@@ -7,13 +7,14 @@ import {
 } from "expo-sensors";
 import { Platform, StyleSheet } from "react-native";
 
+import { average } from "@/lib/math/sensors";
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
-import { Vector3, vec3Zero } from "@/lib/math/vector3";
+import { Vector3 } from "@/lib/math/vector3";
 
 export default function MotionTest() {
-    const [gyro, setGyro] = useState<Vector3>(vec3Zero);
-    const [accel, setAccel] = useState<Vector3>(vec3Zero);
+    const [gyro, setGyro] = useState<Vector3[]>([] satisfies Vector3[]);
+    const [accel, setAccel] = useState<Vector3[]>([] satisfies Vector3[]);
 
     useEffect(() => {
         if (Platform.OS === "web") {
@@ -25,11 +26,19 @@ export default function MotionTest() {
         Accelerometer.setUpdateInterval(16);
 
         const gyroSub = Gyroscope.addListener((data: GyroscopeMeasurement) => {
-            setGyro(new Vector3(data.x, data.y, data.z));
+            setGyro((prev) => {
+                if (prev.length < 100) {
+                    // Keep adding new entries until we reach 100
+                    return [...prev, new Vector3(data.x, data.y, data.z)];
+                } else {
+                    // Remove the oldest entry and add the new one
+                    return [...prev.slice(1), new Vector3(data.x, data.y, data.z)];
+                }
+            });
         });
 
         const accelSub = Accelerometer.addListener((data: AccelerometerMeasurement) => {
-            setAccel(new Vector3(data.x, data.y, data.z));
+            setAccel(prev => [...prev, new Vector3(data.x, data.y, data.z)]);
         });
 
         return () => {
@@ -38,16 +47,11 @@ export default function MotionTest() {
         };
     }, []);
 
-    useEffect(() => {
-        console.log(`Gyro: ${gyro.format()}`);
-        console.log(`Accel: ${accel.format()}`);
-    }, [gyro, accel]);
-
     return (
         <ThemedView style={styles.container} type="backgroundElement">
-            <ThemedText type="subtitle">Motion data</ThemedText>
-            <ThemedText type="code">Gyro: {gyro.format()}</ThemedText>
-            <ThemedText type="code">Accel: {accel.format()}</ThemedText>
+            <ThemedText type="subtitle"> Motion data </ThemedText>
+            <ThemedText type="code"> Gyro: {average(gyro).format()} </ThemedText>
+            <ThemedText type="code"> Accel: {average(accel).format()} </ThemedText>
         </ThemedView>
     );
 }
