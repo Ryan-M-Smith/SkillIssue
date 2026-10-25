@@ -42,7 +42,8 @@ Hold the phone sideways, screen toward you, at a comfortable tilted angle. It ca
 | Runner | Gentle forward/back tilt; tip either end down | Walk and strafe |
 | Runner | Twist about 30 degrees like a wheel, then return to center | Toggle sprint |
 | Runner | Quick flick away / toward you | Toggle crouch / jump or stand |
-| Gunner | Turn the phone left / right / up / down | Camera follows (not inverted) |
+| Gunner | Turn the phone left / right / up / down | Camera follows (not inverted); a quick snap turns up to 3×, so a 180° is a ~60° flick |
+| Gunner | Hold the left or right end dipped past ~15° | Keep turning that way (full speed at 40°); level out to stop |
 | Gunner | Hold **FIRE** | Shoot |
 | Gunner | Tap **AIM** | Aim down sights / sniper scope |
 | Gunner | Tap **RELOAD** | Reload |

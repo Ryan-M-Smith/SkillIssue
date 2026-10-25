@@ -1,4 +1,4 @@
-import { gyroAim } from "@/lib/math/gyro-aim";
+import { edgeTurn, gyroAim } from "@/lib/math/gyro-aim";
 import type {
 	Action,
 	GameControls,
@@ -52,9 +52,10 @@ export type { GameControls, MotionDebug, Role } from "@/types/motion";
  *
  * GUNNER PHONE
  *
- * Only aims: the gyroscope turns the camera. `lookDX`/`lookDY` carry the exact
- * camera degrees this sample after mouse-style sensitivity; `lookX`
- * and `lookY` are the same as rates (1 = 130°/s) for older games.
+ * Only aims: the gyroscope turns the camera (quick turns go up to 3×, so a 180°
+ * is a ~60° flick), and holding one end dipped past 15° keeps turning that way.
+ * `lookDX`/`lookDY` carry the exact camera degrees this sample after mouse-style
+ * sensitivity; `lookX` and `lookY` are the same as rates (1 = 130°/s) for older games.
  */
 
 const settings = {
@@ -628,7 +629,10 @@ export class MotionController {
 				axes.gunnerYawSign * dot(gyro, scale(gravity, -1)),
 				axes.gunnerPitchSign * dot(gyro, right),
 			);
-			const yaw = aim.x;
+			// Holding an end dipped keeps turning that way, so a full turn needs no spinning.
+			// Dipping an end rolls about the level away axis, so it never moves the gyro aim.
+			const roll = axes.rightSign * rotationAbout(frame.down, gravity, frame.away);
+			const yaw = aim.x + edgeTurn(roll);
 			const pitch = aim.y;
 			output.lookX = clamp(yaw / settings.aimMaxRate);
 			output.lookY = clamp(pitch / settings.aimMaxRate);

@@ -138,7 +138,8 @@ func _build_how_to_play() -> Control:
 	cols.add_theme_constant_override("separation", 28)
 	box.add_child(cols)
 	cols.add_child(_how_column("GUNNER · AIM PHONE", UiKit.RED, [
-		["Turn the phone", "Look around (camera follows)"],
+		["Turn the phone", "Look around (quick snaps turn 3x)"],
+		["Hold an end dipped", "Keep turning that way"],
 		["Hold FIRE", "Shoot"],
 		["Tap AIM", "Aim down sights / scope"],
 		["Tap RELOAD", "Reload"],
