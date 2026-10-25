@@ -1,0 +1,1560 @@
+[gd_scene format=3]
+
+[ext_resource type="Shader" path="res://maps/grid_surface.gdshader" id="1_grid"]
+
+[sub_resource type="ShaderMaterial" id="m_floor"]
+shader = ExtResource("1_grid")
+shader_parameter/base_color = Color(0.34, 0.34, 0.36, 1)
+
+[sub_resource type="ShaderMaterial" id="m_pitwall"]
+shader = ExtResource("1_grid")
+shader_parameter/base_color = Color(0.5, 0.5, 0.52, 1)
+
+[sub_resource type="ShaderMaterial" id="m_ring"]
+shader = ExtResource("1_grid")
+shader_parameter/base_color = Color(0.55, 0.55, 0.57, 1)
+
+[sub_resource type="ShaderMaterial" id="m_wall"]
+shader = ExtResource("1_grid")
+shader_parameter/base_color = Color(0.62, 0.62, 0.64, 1)
+
+[sub_resource type="ShaderMaterial" id="m_porch"]
+shader = ExtResource("1_grid")
+shader_parameter/base_color = Color(0.47, 0.47, 0.49, 1)
+
+[sub_resource type="ShaderMaterial" id="m_pillar"]
+shader = ExtResource("1_grid")
+shader_parameter/base_color = Color(0.4, 0.4, 0.42, 1)
+
+[sub_resource type="ShaderMaterial" id="m_stairs"]
+shader = ExtResource("1_grid")
+shader_parameter/base_color = Color(0.58, 0.58, 0.6, 1)
+
+[sub_resource type="StandardMaterial3D" id="m_trim"]
+albedo_color = Color(0.78, 0.78, 0.8, 1)
+roughness = 0.9
+
+[sub_resource type="StandardMaterial3D" id="m_rail"]
+albedo_color = Color(0.28, 0.28, 0.3, 1)
+roughness = 0.9
+
+[sub_resource type="ShaderMaterial" id="m_crate"]
+shader = ExtResource("1_grid")
+shader_parameter/base_color = Color(0.45, 0.45, 0.47, 1)
+
+[sub_resource type="ShaderMaterial" id="m_container"]
+shader = ExtResource("1_grid")
+shader_parameter/base_color = Color(0.38, 0.38, 0.4, 1)
+
+[sub_resource type="ShaderMaterial" id="m_container2"]
+shader = ExtResource("1_grid")
+shader_parameter/base_color = Color(0.42, 0.42, 0.44, 1)
+
+[sub_resource type="StandardMaterial3D" id="m_plinth"]
+albedo_color = Color(0.22, 0.22, 0.24, 1)
+roughness = 0.9
+
+[sub_resource type="StandardMaterial3D" id="m_edge"]
+albedo_color = Color(0.18, 0.18, 0.2, 1)
+roughness = 0.9
+
+[sub_resource type="ProceduralSkyMaterial" id="sky_mat"]
+sky_top_color = Color(0.42, 0.44, 0.48, 1)
+sky_horizon_color = Color(0.62, 0.63, 0.66, 1)
+ground_bottom_color = Color(0.2, 0.2, 0.22, 1)
+ground_horizon_color = Color(0.62, 0.63, 0.66, 1)
+
+[sub_resource type="Sky" id="sky"]
+sky_material = SubResource("sky_mat")
+
+[sub_resource type="Environment" id="env"]
+background_mode = 2
+sky = SubResource("sky")
+ambient_light_source = 2
+ambient_light_color = Color(0.6, 0.6, 0.64, 1)
+ambient_light_energy = 0.9
+
+[sub_resource type="BoxShape3D" id="ramp_1"]
+size = Vector3(7.2498, 0.3, 2)
+
+[sub_resource type="BoxShape3D" id="ramp_2"]
+size = Vector3(7.2498, 0.3, 2)
+
+[sub_resource type="BoxShape3D" id="ramp_3"]
+size = Vector3(7.2498, 0.3, 2)
+
+[sub_resource type="BoxShape3D" id="ramp_4"]
+size = Vector3(7.2498, 0.3, 2)
+
+[sub_resource type="BoxShape3D" id="ramp_5"]
+size = Vector3(9.8433, 0.3, 3)
+
+[sub_resource type="BoxShape3D" id="ramp_6"]
+size = Vector3(9.8433, 0.3, 3)
+
+[sub_resource type="BoxShape3D" id="ramp_7"]
+size = Vector3(9.8433, 0.3, 3)
+
+[sub_resource type="BoxShape3D" id="ramp_8"]
+size = Vector3(9.8433, 0.3, 3)
+
+[node name="ThePit" type="Node3D"]
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("env")
+
+[node name="Sun" type="DirectionalLight3D" parent="."]
+transform = Transform3D(0.866, 0.25, 0.433, 0, 0.866, -0.5, -0.5, 0.433, 0.75, 0, 20, 0)
+light_color = Color(1, 1, 1, 1)
+shadow_enabled = true
+
+[node name="Shell" type="Node3D" parent="."]
+
+[node name="Floor" type="CSGBox3D" parent="Shell"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0)
+use_collision = true
+size = Vector3(46, 1, 46)
+material = SubResource("m_floor")
+
+[node name="Wall0" type="CSGBox3D" parent="Shell"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 5.25, 22.5)
+use_collision = true
+size = Vector3(46, 10.5, 1)
+material = SubResource("m_wall")
+
+[node name="WallTrim0" type="CSGBox3D" parent="Shell"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 8.175, 22.5)
+use_collision = true
+size = Vector3(46, 0.15, 1)
+material = SubResource("m_trim")
+
+[node name="Wall1" type="CSGBox3D" parent="Shell"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 5.25, -22.5)
+use_collision = true
+size = Vector3(46, 10.5, 1)
+material = SubResource("m_wall")
+
+[node name="WallTrim1" type="CSGBox3D" parent="Shell"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 8.175, -22.5)
+use_collision = true
+size = Vector3(46, 0.15, 1)
+material = SubResource("m_trim")
+
+[node name="Wall2" type="CSGBox3D" parent="Shell"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 22.5, 5.25, 0)
+use_collision = true
+size = Vector3(1, 10.5, 44)
+material = SubResource("m_wall")
+
+[node name="WallTrim2" type="CSGBox3D" parent="Shell"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 22.5, 8.175, 0)
+use_collision = true
+size = Vector3(1, 0.15, 44)
+material = SubResource("m_trim")
+
+[node name="Wall3" type="CSGBox3D" parent="Shell"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -22.5, 5.25, 0)
+use_collision = true
+size = Vector3(1, 10.5, 44)
+material = SubResource("m_wall")
+
+[node name="WallTrim3" type="CSGBox3D" parent="Shell"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -22.5, 8.175, 0)
+use_collision = true
+size = Vector3(1, 0.15, 44)
+material = SubResource("m_trim")
+
+[node name="BaseRing0" type="CSGBox3D" parent="Shell"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.09, 21.96)
+use_collision = true
+size = Vector3(44, 0.18, 0.08)
+material = SubResource("m_edge")
+
+[node name="BasePorch0" type="CSGBox3D" parent="Shell"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 6.59, 21.96)
+use_collision = true
+size = Vector3(44, 0.18, 0.08)
+material = SubResource("m_edge")
+
+[node name="BaseRing1" type="CSGBox3D" parent="Shell"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.09, -21.96)
+use_collision = true
+size = Vector3(44, 0.18, 0.08)
+material = SubResource("m_edge")
+
+[node name="BasePorch1" type="CSGBox3D" parent="Shell"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 6.59, -21.96)
+use_collision = true
+size = Vector3(44, 0.18, 0.08)
+material = SubResource("m_edge")
+
+[node name="BaseRing2" type="CSGBox3D" parent="Shell"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 21.96, 3.09, 0)
+use_collision = true
+size = Vector3(0.08, 0.18, 44)
+material = SubResource("m_edge")
+
+[node name="BasePorch2" type="CSGBox3D" parent="Shell"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 21.96, 6.59, 0)
+use_collision = true
+size = Vector3(0.08, 0.18, 44)
+material = SubResource("m_edge")
+
+[node name="BaseRing3" type="CSGBox3D" parent="Shell"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -21.96, 3.09, 0)
+use_collision = true
+size = Vector3(0.08, 0.18, 44)
+material = SubResource("m_edge")
+
+[node name="BasePorch3" type="CSGBox3D" parent="Shell"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -21.96, 6.59, 0)
+use_collision = true
+size = Vector3(0.08, 0.18, 44)
+material = SubResource("m_edge")
+
+[node name="CornerPost0" type="CSGBox3D" parent="Shell"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 22, 5.25, 22)
+use_collision = true
+size = Vector3(0.24, 10.5, 0.24)
+material = SubResource("m_edge")
+
+[node name="CornerPost1" type="CSGBox3D" parent="Shell"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -22, 5.25, 22)
+use_collision = true
+size = Vector3(0.24, 10.5, 0.24)
+material = SubResource("m_edge")
+
+[node name="CornerPost2" type="CSGBox3D" parent="Shell"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 22, 5.25, -22)
+use_collision = true
+size = Vector3(0.24, 10.5, 0.24)
+material = SubResource("m_edge")
+
+[node name="CornerPost3" type="CSGBox3D" parent="Shell"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -22, 5.25, -22)
+use_collision = true
+size = Vector3(0.24, 10.5, 0.24)
+material = SubResource("m_edge")
+
+[node name="Ring" type="Node3D" parent="."]
+
+[node name="BlockNorth" type="CSGBox3D" parent="Ring"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 15.5)
+use_collision = true
+size = Vector3(44, 3, 13)
+material = SubResource("m_pitwall")
+
+[node name="PitBaseNorth" type="CSGBox3D" parent="Ring"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.09, 8.98)
+use_collision = true
+size = Vector3(18, 0.18, 0.08)
+material = SubResource("m_edge")
+
+[node name="EdgeTrimNorth" type="CSGBox3D" parent="Ring"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.945, 9.06)
+use_collision = true
+size = Vector3(18, 0.13, 0.12)
+material = SubResource("m_trim")
+
+[node name="BlockSouth" type="CSGBox3D" parent="Ring"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, -15.5)
+use_collision = true
+size = Vector3(44, 3, 13)
+material = SubResource("m_pitwall")
+
+[node name="PitBaseSouth" type="CSGBox3D" parent="Ring"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.09, -8.98)
+use_collision = true
+size = Vector3(18, 0.18, 0.08)
+material = SubResource("m_edge")
+
+[node name="EdgeTrimSouth" type="CSGBox3D" parent="Ring"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.945, -9.06)
+use_collision = true
+size = Vector3(18, 0.13, 0.12)
+material = SubResource("m_trim")
+
+[node name="DeckEast" type="CSGBox3D" parent="Ring"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15.5, 2.775, 0)
+use_collision = true
+size = Vector3(13, 0.45, 18)
+material = SubResource("m_ring")
+
+[node name="PillarEast0" type="CSGBox3D" parent="Ring"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9.6, 1.275, 6)
+use_collision = true
+size = Vector3(0.9, 2.55, 0.9)
+material = SubResource("m_pillar")
+
+[node name="PillarEast1" type="CSGBox3D" parent="Ring"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9.6, 1.275, 0)
+use_collision = true
+size = Vector3(0.9, 2.55, 0.9)
+material = SubResource("m_pillar")
+
+[node name="PillarEast2" type="CSGBox3D" parent="Ring"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9.6, 1.275, -6)
+use_collision = true
+size = Vector3(0.9, 2.55, 0.9)
+material = SubResource("m_pillar")
+
+[node name="PillarEast3" type="CSGBox3D" parent="Ring"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 16, 1.275, 6)
+use_collision = true
+size = Vector3(0.9, 2.55, 0.9)
+material = SubResource("m_pillar")
+
+[node name="PillarEast4" type="CSGBox3D" parent="Ring"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 16, 1.275, -6)
+use_collision = true
+size = Vector3(0.9, 2.55, 0.9)
+material = SubResource("m_pillar")
+
+[node name="DeckWest" type="CSGBox3D" parent="Ring"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -15.5, 2.775, 0)
+use_collision = true
+size = Vector3(13, 0.45, 18)
+material = SubResource("m_ring")
+
+[node name="PillarWest0" type="CSGBox3D" parent="Ring"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9.6, 1.275, -6)
+use_collision = true
+size = Vector3(0.9, 2.55, 0.9)
+material = SubResource("m_pillar")
+
+[node name="PillarWest1" type="CSGBox3D" parent="Ring"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9.6, 1.275, 0)
+use_collision = true
+size = Vector3(0.9, 2.55, 0.9)
+material = SubResource("m_pillar")
+
+[node name="PillarWest2" type="CSGBox3D" parent="Ring"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9.6, 1.275, 6)
+use_collision = true
+size = Vector3(0.9, 2.55, 0.9)
+material = SubResource("m_pillar")
+
+[node name="PillarWest3" type="CSGBox3D" parent="Ring"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -16, 1.275, -6)
+use_collision = true
+size = Vector3(0.9, 2.55, 0.9)
+material = SubResource("m_pillar")
+
+[node name="PillarWest4" type="CSGBox3D" parent="Ring"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -16, 1.275, 6)
+use_collision = true
+size = Vector3(0.9, 2.55, 0.9)
+material = SubResource("m_pillar")
+
+[node name="Rails" type="Node3D" parent="."]
+
+[node name="PitRail00" type="CSGBox3D" parent="Rails"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.3, 3.5, 9.075)
+use_collision = true
+size = Vector3(5.4, 1, 0.15)
+material = SubResource("m_rail")
+
+[node name="PitRail01" type="CSGBox3D" parent="Rails"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.8, 3.5, 9.075)
+use_collision = true
+size = Vector3(8.4, 1, 0.15)
+material = SubResource("m_rail")
+
+[node name="PitRail10" type="CSGBox3D" parent="Rails"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9.075, 3.5, 6.3)
+use_collision = true
+size = Vector3(0.15, 1, 5.4)
+material = SubResource("m_rail")
+
+[node name="PitRail11" type="CSGBox3D" parent="Rails"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9.075, 3.5, -4.8)
+use_collision = true
+size = Vector3(0.15, 1, 8.4)
+material = SubResource("m_rail")
+
+[node name="PitRail20" type="CSGBox3D" parent="Rails"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.3, 3.5, -9.075)
+use_collision = true
+size = Vector3(5.4, 1, 0.15)
+material = SubResource("m_rail")
+
+[node name="PitRail21" type="CSGBox3D" parent="Rails"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.8, 3.5, -9.075)
+use_collision = true
+size = Vector3(8.4, 1, 0.15)
+material = SubResource("m_rail")
+
+[node name="PitRail30" type="CSGBox3D" parent="Rails"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9.075, 3.5, -6.3)
+use_collision = true
+size = Vector3(0.15, 1, 5.4)
+material = SubResource("m_rail")
+
+[node name="PitRail31" type="CSGBox3D" parent="Rails"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9.075, 3.5, 4.8)
+use_collision = true
+size = Vector3(0.15, 1, 8.4)
+material = SubResource("m_rail")
+
+[node name="Stairs" type="Node3D" parent="."]
+
+[node name="PitStairs0" type="Node3D" parent="Stairs"]
+
+[node name="Step0" type="CSGBox3D" parent="Stairs/PitStairs0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.3, 0.15, 8)
+use_collision = true
+size = Vector3(6.6, 0.3, 2)
+material = SubResource("m_stairs")
+
+[node name="Step1" type="CSGBox3D" parent="Stairs/PitStairs0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.97, 0.2995, 8)
+use_collision = true
+size = Vector3(5.94, 0.6, 2)
+material = SubResource("m_stairs")
+
+[node name="Step2" type="CSGBox3D" parent="Stairs/PitStairs0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.64, 0.449, 8)
+use_collision = true
+size = Vector3(5.28, 0.9, 2)
+material = SubResource("m_stairs")
+
+[node name="Step3" type="CSGBox3D" parent="Stairs/PitStairs0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.31, 0.5985, 8)
+use_collision = true
+size = Vector3(4.62, 1.2, 2)
+material = SubResource("m_stairs")
+
+[node name="Step4" type="CSGBox3D" parent="Stairs/PitStairs0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.98, 0.748, 8)
+use_collision = true
+size = Vector3(3.96, 1.5, 2)
+material = SubResource("m_stairs")
+
+[node name="Step5" type="CSGBox3D" parent="Stairs/PitStairs0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.65, 0.8975, 8)
+use_collision = true
+size = Vector3(3.3, 1.8, 2)
+material = SubResource("m_stairs")
+
+[node name="Step6" type="CSGBox3D" parent="Stairs/PitStairs0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.32, 1.047, 8)
+use_collision = true
+size = Vector3(2.64, 2.1, 2)
+material = SubResource("m_stairs")
+
+[node name="Step7" type="CSGBox3D" parent="Stairs/PitStairs0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.99, 1.1965, 8)
+use_collision = true
+size = Vector3(1.98, 2.4, 2)
+material = SubResource("m_stairs")
+
+[node name="Step8" type="CSGBox3D" parent="Stairs/PitStairs0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.66, 1.346, 8)
+use_collision = true
+size = Vector3(1.32, 2.7, 2)
+material = SubResource("m_stairs")
+
+[node name="Step9" type="CSGBox3D" parent="Stairs/PitStairs0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.33, 1.4955, 8)
+use_collision = true
+size = Vector3(0.66, 3, 2)
+material = SubResource("m_stairs")
+
+[node name="Walk" type="StaticBody3D" parent="Stairs/PitStairs0"]
+
+[node name="Shape" type="CollisionShape3D" parent="Stairs/PitStairs0/Walk"]
+transform = Transform3D(0.9104, -0.4138, 0, 0.4138, 0.9104, 0, 0, 0, -1, -4.8979, 1.3634, 8)
+shape = SubResource("ramp_1")
+
+[node name="PitStairs1" type="Node3D" parent="Stairs"]
+
+[node name="Step0" type="CSGBox3D" parent="Stairs/PitStairs1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8, 0.15, 4.3)
+use_collision = true
+size = Vector3(2, 0.3, 6.6)
+material = SubResource("m_stairs")
+
+[node name="Step1" type="CSGBox3D" parent="Stairs/PitStairs1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8, 0.2995, 3.97)
+use_collision = true
+size = Vector3(2, 0.6, 5.94)
+material = SubResource("m_stairs")
+
+[node name="Step2" type="CSGBox3D" parent="Stairs/PitStairs1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8, 0.449, 3.64)
+use_collision = true
+size = Vector3(2, 0.9, 5.28)
+material = SubResource("m_stairs")
+
+[node name="Step3" type="CSGBox3D" parent="Stairs/PitStairs1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8, 0.5985, 3.31)
+use_collision = true
+size = Vector3(2, 1.2, 4.62)
+material = SubResource("m_stairs")
+
+[node name="Step4" type="CSGBox3D" parent="Stairs/PitStairs1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8, 0.748, 2.98)
+use_collision = true
+size = Vector3(2, 1.5, 3.96)
+material = SubResource("m_stairs")
+
+[node name="Step5" type="CSGBox3D" parent="Stairs/PitStairs1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8, 0.8975, 2.65)
+use_collision = true
+size = Vector3(2, 1.8, 3.3)
+material = SubResource("m_stairs")
+
+[node name="Step6" type="CSGBox3D" parent="Stairs/PitStairs1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8, 1.047, 2.32)
+use_collision = true
+size = Vector3(2, 2.1, 2.64)
+material = SubResource("m_stairs")
+
+[node name="Step7" type="CSGBox3D" parent="Stairs/PitStairs1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8, 1.1965, 1.99)
+use_collision = true
+size = Vector3(2, 2.4, 1.98)
+material = SubResource("m_stairs")
+
+[node name="Step8" type="CSGBox3D" parent="Stairs/PitStairs1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8, 1.346, 1.66)
+use_collision = true
+size = Vector3(2, 2.7, 1.32)
+material = SubResource("m_stairs")
+
+[node name="Step9" type="CSGBox3D" parent="Stairs/PitStairs1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8, 1.4955, 1.33)
+use_collision = true
+size = Vector3(2, 3, 0.66)
+material = SubResource("m_stairs")
+
+[node name="Walk" type="StaticBody3D" parent="Stairs/PitStairs1"]
+
+[node name="Shape" type="CollisionShape3D" parent="Stairs/PitStairs1/Walk"]
+transform = Transform3D(0, 0, -1, 0.4138, 0.9104, 0, -0.9104, 0.4138, 0, 8, 1.3634, 4.8979)
+shape = SubResource("ramp_2")
+
+[node name="PitStairs2" type="Node3D" parent="Stairs"]
+
+[node name="Step0" type="CSGBox3D" parent="Stairs/PitStairs2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.3, 0.15, -8)
+use_collision = true
+size = Vector3(6.6, 0.3, 2)
+material = SubResource("m_stairs")
+
+[node name="Step1" type="CSGBox3D" parent="Stairs/PitStairs2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.97, 0.2995, -8)
+use_collision = true
+size = Vector3(5.94, 0.6, 2)
+material = SubResource("m_stairs")
+
+[node name="Step2" type="CSGBox3D" parent="Stairs/PitStairs2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.64, 0.449, -8)
+use_collision = true
+size = Vector3(5.28, 0.9, 2)
+material = SubResource("m_stairs")
+
+[node name="Step3" type="CSGBox3D" parent="Stairs/PitStairs2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.31, 0.5985, -8)
+use_collision = true
+size = Vector3(4.62, 1.2, 2)
+material = SubResource("m_stairs")
+
+[node name="Step4" type="CSGBox3D" parent="Stairs/PitStairs2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.98, 0.748, -8)
+use_collision = true
+size = Vector3(3.96, 1.5, 2)
+material = SubResource("m_stairs")
+
+[node name="Step5" type="CSGBox3D" parent="Stairs/PitStairs2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.65, 0.8975, -8)
+use_collision = true
+size = Vector3(3.3, 1.8, 2)
+material = SubResource("m_stairs")
+
+[node name="Step6" type="CSGBox3D" parent="Stairs/PitStairs2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.32, 1.047, -8)
+use_collision = true
+size = Vector3(2.64, 2.1, 2)
+material = SubResource("m_stairs")
+
+[node name="Step7" type="CSGBox3D" parent="Stairs/PitStairs2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.99, 1.1965, -8)
+use_collision = true
+size = Vector3(1.98, 2.4, 2)
+material = SubResource("m_stairs")
+
+[node name="Step8" type="CSGBox3D" parent="Stairs/PitStairs2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.66, 1.346, -8)
+use_collision = true
+size = Vector3(1.32, 2.7, 2)
+material = SubResource("m_stairs")
+
+[node name="Step9" type="CSGBox3D" parent="Stairs/PitStairs2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.33, 1.4955, -8)
+use_collision = true
+size = Vector3(0.66, 3, 2)
+material = SubResource("m_stairs")
+
+[node name="Walk" type="StaticBody3D" parent="Stairs/PitStairs2"]
+
+[node name="Shape" type="CollisionShape3D" parent="Stairs/PitStairs2/Walk"]
+transform = Transform3D(-0.9104, 0.4138, 0, 0.4138, 0.9104, 0, 0, 0, 1, 4.8979, 1.3634, -8)
+shape = SubResource("ramp_3")
+
+[node name="PitStairs3" type="Node3D" parent="Stairs"]
+
+[node name="Step0" type="CSGBox3D" parent="Stairs/PitStairs3"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 0.15, -4.3)
+use_collision = true
+size = Vector3(2, 0.3, 6.6)
+material = SubResource("m_stairs")
+
+[node name="Step1" type="CSGBox3D" parent="Stairs/PitStairs3"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 0.2995, -3.97)
+use_collision = true
+size = Vector3(2, 0.6, 5.94)
+material = SubResource("m_stairs")
+
+[node name="Step2" type="CSGBox3D" parent="Stairs/PitStairs3"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 0.449, -3.64)
+use_collision = true
+size = Vector3(2, 0.9, 5.28)
+material = SubResource("m_stairs")
+
+[node name="Step3" type="CSGBox3D" parent="Stairs/PitStairs3"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 0.5985, -3.31)
+use_collision = true
+size = Vector3(2, 1.2, 4.62)
+material = SubResource("m_stairs")
+
+[node name="Step4" type="CSGBox3D" parent="Stairs/PitStairs3"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 0.748, -2.98)
+use_collision = true
+size = Vector3(2, 1.5, 3.96)
+material = SubResource("m_stairs")
+
+[node name="Step5" type="CSGBox3D" parent="Stairs/PitStairs3"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 0.8975, -2.65)
+use_collision = true
+size = Vector3(2, 1.8, 3.3)
+material = SubResource("m_stairs")
+
+[node name="Step6" type="CSGBox3D" parent="Stairs/PitStairs3"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 1.047, -2.32)
+use_collision = true
+size = Vector3(2, 2.1, 2.64)
+material = SubResource("m_stairs")
+
+[node name="Step7" type="CSGBox3D" parent="Stairs/PitStairs3"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 1.1965, -1.99)
+use_collision = true
+size = Vector3(2, 2.4, 1.98)
+material = SubResource("m_stairs")
+
+[node name="Step8" type="CSGBox3D" parent="Stairs/PitStairs3"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 1.346, -1.66)
+use_collision = true
+size = Vector3(2, 2.7, 1.32)
+material = SubResource("m_stairs")
+
+[node name="Step9" type="CSGBox3D" parent="Stairs/PitStairs3"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 1.4955, -1.33)
+use_collision = true
+size = Vector3(2, 3, 0.66)
+material = SubResource("m_stairs")
+
+[node name="Walk" type="StaticBody3D" parent="Stairs/PitStairs3"]
+
+[node name="Shape" type="CollisionShape3D" parent="Stairs/PitStairs3/Walk"]
+transform = Transform3D(0, 0, 1, 0.4138, 0.9104, 0, 0.9104, -0.4138, 0, -8, 1.3634, -4.8979)
+shape = SubResource("ramp_4")
+
+[node name="Porches" type="Node3D" parent="."]
+
+[node name="PorchNorth" type="CSGBox3D" parent="Porches"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 6.3, 20.25)
+use_collision = true
+size = Vector3(16, 0.4, 3.5)
+material = SubResource("m_porch")
+
+[node name="PorchRailNorth" type="CSGBox3D" parent="Porches"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 7, 18.575)
+use_collision = true
+size = Vector3(16, 1, 0.15)
+material = SubResource("m_rail")
+
+[node name="PorchTrimNorth" type="CSGBox3D" parent="Porches"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 6.125, 18.575)
+use_collision = true
+size = Vector3(16, 0.15, 0.15)
+material = SubResource("m_trim")
+
+[node name="PorchPillarNorth0" type="CSGBox3D" parent="Porches"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7.4, 4.55, 18.9)
+use_collision = true
+size = Vector3(0.7, 3.1, 0.7)
+material = SubResource("m_pillar")
+
+[node name="PorchPillarNorth1" type="CSGBox3D" parent="Porches"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4.55, 18.9)
+use_collision = true
+size = Vector3(0.7, 3.1, 0.7)
+material = SubResource("m_pillar")
+
+[node name="PorchPillarNorth2" type="CSGBox3D" parent="Porches"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7.4, 4.55, 18.9)
+use_collision = true
+size = Vector3(0.7, 3.1, 0.7)
+material = SubResource("m_pillar")
+
+[node name="PorchStairsNorth" type="Node3D" parent="Stairs"]
+
+[node name="Step0" type="CSGBox3D" parent="Stairs/PorchStairsNorth"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.6, 3.1458, 20.5)
+use_collision = true
+size = Vector3(9.2, 0.2917, 3)
+material = SubResource("m_stairs")
+
+[node name="Step1" type="CSGBox3D" parent="Stairs/PorchStairsNorth"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.2167, 3.2912, 20.5)
+use_collision = true
+size = Vector3(8.4333, 0.5833, 3)
+material = SubResource("m_stairs")
+
+[node name="Step2" type="CSGBox3D" parent="Stairs/PorchStairsNorth"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.8333, 3.4365, 20.5)
+use_collision = true
+size = Vector3(7.6667, 0.875, 3)
+material = SubResource("m_stairs")
+
+[node name="Step3" type="CSGBox3D" parent="Stairs/PorchStairsNorth"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.45, 3.5818, 20.5)
+use_collision = true
+size = Vector3(6.9, 1.1667, 3)
+material = SubResource("m_stairs")
+
+[node name="Step4" type="CSGBox3D" parent="Stairs/PorchStairsNorth"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.0667, 3.7272, 20.5)
+use_collision = true
+size = Vector3(6.1333, 1.4583, 3)
+material = SubResource("m_stairs")
+
+[node name="Step5" type="CSGBox3D" parent="Stairs/PorchStairsNorth"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10.6833, 3.8725, 20.5)
+use_collision = true
+size = Vector3(5.3667, 1.75, 3)
+material = SubResource("m_stairs")
+
+[node name="Step6" type="CSGBox3D" parent="Stairs/PorchStairsNorth"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10.3, 4.0178, 20.5)
+use_collision = true
+size = Vector3(4.6, 2.0417, 3)
+material = SubResource("m_stairs")
+
+[node name="Step7" type="CSGBox3D" parent="Stairs/PorchStairsNorth"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9.9167, 4.1632, 20.5)
+use_collision = true
+size = Vector3(3.8333, 2.3333, 3)
+material = SubResource("m_stairs")
+
+[node name="Step8" type="CSGBox3D" parent="Stairs/PorchStairsNorth"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9.5333, 4.3085, 20.5)
+use_collision = true
+size = Vector3(3.0667, 2.625, 3)
+material = SubResource("m_stairs")
+
+[node name="Step9" type="CSGBox3D" parent="Stairs/PorchStairsNorth"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9.15, 4.4538, 20.5)
+use_collision = true
+size = Vector3(2.3, 2.9167, 3)
+material = SubResource("m_stairs")
+
+[node name="Step10" type="CSGBox3D" parent="Stairs/PorchStairsNorth"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8.7667, 4.5992, 20.5)
+use_collision = true
+size = Vector3(1.5333, 3.2083, 3)
+material = SubResource("m_stairs")
+
+[node name="Step11" type="CSGBox3D" parent="Stairs/PorchStairsNorth"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8.3833, 4.7445, 20.5)
+use_collision = true
+size = Vector3(0.7667, 3.5, 3)
+material = SubResource("m_stairs")
+
+[node name="Walk" type="StaticBody3D" parent="Stairs/PorchStairsNorth"]
+
+[node name="Shape" type="CollisionShape3D" parent="Stairs/PorchStairsNorth/Walk"]
+transform = Transform3D(-0.9346, 0.3556, 0, 0.3556, 0.9346, 0, 0, 0, 1, 13.3133, 4.6098, 20.5)
+shape = SubResource("ramp_5")
+
+[node name="PorchEast" type="CSGBox3D" parent="Porches"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 20.25, 6.3, 0)
+use_collision = true
+size = Vector3(3.5, 0.4, 16)
+material = SubResource("m_porch")
+
+[node name="PorchRailEast" type="CSGBox3D" parent="Porches"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 18.575, 7, 0)
+use_collision = true
+size = Vector3(0.15, 1, 16)
+material = SubResource("m_rail")
+
+[node name="PorchTrimEast" type="CSGBox3D" parent="Porches"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 18.575, 6.125, 0)
+use_collision = true
+size = Vector3(0.15, 0.15, 16)
+material = SubResource("m_trim")
+
+[node name="PorchPillarEast0" type="CSGBox3D" parent="Porches"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 18.9, 4.55, 7.4)
+use_collision = true
+size = Vector3(0.7, 3.1, 0.7)
+material = SubResource("m_pillar")
+
+[node name="PorchPillarEast1" type="CSGBox3D" parent="Porches"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 18.9, 4.55, 0)
+use_collision = true
+size = Vector3(0.7, 3.1, 0.7)
+material = SubResource("m_pillar")
+
+[node name="PorchPillarEast2" type="CSGBox3D" parent="Porches"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 18.9, 4.55, -7.4)
+use_collision = true
+size = Vector3(0.7, 3.1, 0.7)
+material = SubResource("m_pillar")
+
+[node name="PorchStairsEast" type="Node3D" parent="Stairs"]
+
+[node name="Step0" type="CSGBox3D" parent="Stairs/PorchStairsEast"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 20.5, 3.1458, -12.6)
+use_collision = true
+size = Vector3(3, 0.2917, 9.2)
+material = SubResource("m_stairs")
+
+[node name="Step1" type="CSGBox3D" parent="Stairs/PorchStairsEast"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 20.5, 3.2912, -12.2167)
+use_collision = true
+size = Vector3(3, 0.5833, 8.4333)
+material = SubResource("m_stairs")
+
+[node name="Step2" type="CSGBox3D" parent="Stairs/PorchStairsEast"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 20.5, 3.4365, -11.8333)
+use_collision = true
+size = Vector3(3, 0.875, 7.6667)
+material = SubResource("m_stairs")
+
+[node name="Step3" type="CSGBox3D" parent="Stairs/PorchStairsEast"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 20.5, 3.5818, -11.45)
+use_collision = true
+size = Vector3(3, 1.1667, 6.9)
+material = SubResource("m_stairs")
+
+[node name="Step4" type="CSGBox3D" parent="Stairs/PorchStairsEast"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 20.5, 3.7272, -11.0667)
+use_collision = true
+size = Vector3(3, 1.4583, 6.1333)
+material = SubResource("m_stairs")
+
+[node name="Step5" type="CSGBox3D" parent="Stairs/PorchStairsEast"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 20.5, 3.8725, -10.6833)
+use_collision = true
+size = Vector3(3, 1.75, 5.3667)
+material = SubResource("m_stairs")
+
+[node name="Step6" type="CSGBox3D" parent="Stairs/PorchStairsEast"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 20.5, 4.0178, -10.3)
+use_collision = true
+size = Vector3(3, 2.0417, 4.6)
+material = SubResource("m_stairs")
+
+[node name="Step7" type="CSGBox3D" parent="Stairs/PorchStairsEast"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 20.5, 4.1632, -9.9167)
+use_collision = true
+size = Vector3(3, 2.3333, 3.8333)
+material = SubResource("m_stairs")
+
+[node name="Step8" type="CSGBox3D" parent="Stairs/PorchStairsEast"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 20.5, 4.3085, -9.5333)
+use_collision = true
+size = Vector3(3, 2.625, 3.0667)
+material = SubResource("m_stairs")
+
+[node name="Step9" type="CSGBox3D" parent="Stairs/PorchStairsEast"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 20.5, 4.4538, -9.15)
+use_collision = true
+size = Vector3(3, 2.9167, 2.3)
+material = SubResource("m_stairs")
+
+[node name="Step10" type="CSGBox3D" parent="Stairs/PorchStairsEast"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 20.5, 4.5992, -8.7667)
+use_collision = true
+size = Vector3(3, 3.2083, 1.5333)
+material = SubResource("m_stairs")
+
+[node name="Step11" type="CSGBox3D" parent="Stairs/PorchStairsEast"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 20.5, 4.7445, -8.3833)
+use_collision = true
+size = Vector3(3, 3.5, 0.7667)
+material = SubResource("m_stairs")
+
+[node name="Walk" type="StaticBody3D" parent="Stairs/PorchStairsEast"]
+
+[node name="Shape" type="CollisionShape3D" parent="Stairs/PorchStairsEast/Walk"]
+transform = Transform3D(0, 0, 1, 0.3556, 0.9346, 0, 0.9346, -0.3556, 0, 20.5, 4.6098, -13.3133)
+shape = SubResource("ramp_6")
+
+[node name="PorchSouth" type="CSGBox3D" parent="Porches"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 6.3, -20.25)
+use_collision = true
+size = Vector3(16, 0.4, 3.5)
+material = SubResource("m_porch")
+
+[node name="PorchRailSouth" type="CSGBox3D" parent="Porches"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 7, -18.575)
+use_collision = true
+size = Vector3(16, 1, 0.15)
+material = SubResource("m_rail")
+
+[node name="PorchTrimSouth" type="CSGBox3D" parent="Porches"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 6.125, -18.575)
+use_collision = true
+size = Vector3(16, 0.15, 0.15)
+material = SubResource("m_trim")
+
+[node name="PorchPillarSouth0" type="CSGBox3D" parent="Porches"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7.4, 4.55, -18.9)
+use_collision = true
+size = Vector3(0.7, 3.1, 0.7)
+material = SubResource("m_pillar")
+
+[node name="PorchPillarSouth1" type="CSGBox3D" parent="Porches"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4.55, -18.9)
+use_collision = true
+size = Vector3(0.7, 3.1, 0.7)
+material = SubResource("m_pillar")
+
+[node name="PorchPillarSouth2" type="CSGBox3D" parent="Porches"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7.4, 4.55, -18.9)
+use_collision = true
+size = Vector3(0.7, 3.1, 0.7)
+material = SubResource("m_pillar")
+
+[node name="PorchStairsSouth" type="Node3D" parent="Stairs"]
+
+[node name="Step0" type="CSGBox3D" parent="Stairs/PorchStairsSouth"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12.6, 3.1458, -20.5)
+use_collision = true
+size = Vector3(9.2, 0.2917, 3)
+material = SubResource("m_stairs")
+
+[node name="Step1" type="CSGBox3D" parent="Stairs/PorchStairsSouth"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12.2167, 3.2912, -20.5)
+use_collision = true
+size = Vector3(8.4333, 0.5833, 3)
+material = SubResource("m_stairs")
+
+[node name="Step2" type="CSGBox3D" parent="Stairs/PorchStairsSouth"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -11.8333, 3.4365, -20.5)
+use_collision = true
+size = Vector3(7.6667, 0.875, 3)
+material = SubResource("m_stairs")
+
+[node name="Step3" type="CSGBox3D" parent="Stairs/PorchStairsSouth"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -11.45, 3.5818, -20.5)
+use_collision = true
+size = Vector3(6.9, 1.1667, 3)
+material = SubResource("m_stairs")
+
+[node name="Step4" type="CSGBox3D" parent="Stairs/PorchStairsSouth"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -11.0667, 3.7272, -20.5)
+use_collision = true
+size = Vector3(6.1333, 1.4583, 3)
+material = SubResource("m_stairs")
+
+[node name="Step5" type="CSGBox3D" parent="Stairs/PorchStairsSouth"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10.6833, 3.8725, -20.5)
+use_collision = true
+size = Vector3(5.3667, 1.75, 3)
+material = SubResource("m_stairs")
+
+[node name="Step6" type="CSGBox3D" parent="Stairs/PorchStairsSouth"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10.3, 4.0178, -20.5)
+use_collision = true
+size = Vector3(4.6, 2.0417, 3)
+material = SubResource("m_stairs")
+
+[node name="Step7" type="CSGBox3D" parent="Stairs/PorchStairsSouth"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9.9167, 4.1632, -20.5)
+use_collision = true
+size = Vector3(3.8333, 2.3333, 3)
+material = SubResource("m_stairs")
+
+[node name="Step8" type="CSGBox3D" parent="Stairs/PorchStairsSouth"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9.5333, 4.3085, -20.5)
+use_collision = true
+size = Vector3(3.0667, 2.625, 3)
+material = SubResource("m_stairs")
+
+[node name="Step9" type="CSGBox3D" parent="Stairs/PorchStairsSouth"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9.15, 4.4538, -20.5)
+use_collision = true
+size = Vector3(2.3, 2.9167, 3)
+material = SubResource("m_stairs")
+
+[node name="Step10" type="CSGBox3D" parent="Stairs/PorchStairsSouth"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8.7667, 4.5992, -20.5)
+use_collision = true
+size = Vector3(1.5333, 3.2083, 3)
+material = SubResource("m_stairs")
+
+[node name="Step11" type="CSGBox3D" parent="Stairs/PorchStairsSouth"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8.3833, 4.7445, -20.5)
+use_collision = true
+size = Vector3(0.7667, 3.5, 3)
+material = SubResource("m_stairs")
+
+[node name="Walk" type="StaticBody3D" parent="Stairs/PorchStairsSouth"]
+
+[node name="Shape" type="CollisionShape3D" parent="Stairs/PorchStairsSouth/Walk"]
+transform = Transform3D(0.9346, -0.3556, 0, 0.3556, 0.9346, 0, 0, 0, -1, -13.3133, 4.6098, -20.5)
+shape = SubResource("ramp_7")
+
+[node name="PorchWest" type="CSGBox3D" parent="Porches"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -20.25, 6.3, 0)
+use_collision = true
+size = Vector3(3.5, 0.4, 16)
+material = SubResource("m_porch")
+
+[node name="PorchRailWest" type="CSGBox3D" parent="Porches"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -18.575, 7, 0)
+use_collision = true
+size = Vector3(0.15, 1, 16)
+material = SubResource("m_rail")
+
+[node name="PorchTrimWest" type="CSGBox3D" parent="Porches"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -18.575, 6.125, 0)
+use_collision = true
+size = Vector3(0.15, 0.15, 16)
+material = SubResource("m_trim")
+
+[node name="PorchPillarWest0" type="CSGBox3D" parent="Porches"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -18.9, 4.55, -7.4)
+use_collision = true
+size = Vector3(0.7, 3.1, 0.7)
+material = SubResource("m_pillar")
+
+[node name="PorchPillarWest1" type="CSGBox3D" parent="Porches"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -18.9, 4.55, 0)
+use_collision = true
+size = Vector3(0.7, 3.1, 0.7)
+material = SubResource("m_pillar")
+
+[node name="PorchPillarWest2" type="CSGBox3D" parent="Porches"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -18.9, 4.55, 7.4)
+use_collision = true
+size = Vector3(0.7, 3.1, 0.7)
+material = SubResource("m_pillar")
+
+[node name="PorchStairsWest" type="Node3D" parent="Stairs"]
+
+[node name="Step0" type="CSGBox3D" parent="Stairs/PorchStairsWest"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -20.5, 3.1458, 12.6)
+use_collision = true
+size = Vector3(3, 0.2917, 9.2)
+material = SubResource("m_stairs")
+
+[node name="Step1" type="CSGBox3D" parent="Stairs/PorchStairsWest"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -20.5, 3.2912, 12.2167)
+use_collision = true
+size = Vector3(3, 0.5833, 8.4333)
+material = SubResource("m_stairs")
+
+[node name="Step2" type="CSGBox3D" parent="Stairs/PorchStairsWest"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -20.5, 3.4365, 11.8333)
+use_collision = true
+size = Vector3(3, 0.875, 7.6667)
+material = SubResource("m_stairs")
+
+[node name="Step3" type="CSGBox3D" parent="Stairs/PorchStairsWest"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -20.5, 3.5818, 11.45)
+use_collision = true
+size = Vector3(3, 1.1667, 6.9)
+material = SubResource("m_stairs")
+
+[node name="Step4" type="CSGBox3D" parent="Stairs/PorchStairsWest"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -20.5, 3.7272, 11.0667)
+use_collision = true
+size = Vector3(3, 1.4583, 6.1333)
+material = SubResource("m_stairs")
+
+[node name="Step5" type="CSGBox3D" parent="Stairs/PorchStairsWest"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -20.5, 3.8725, 10.6833)
+use_collision = true
+size = Vector3(3, 1.75, 5.3667)
+material = SubResource("m_stairs")
+
+[node name="Step6" type="CSGBox3D" parent="Stairs/PorchStairsWest"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -20.5, 4.0178, 10.3)
+use_collision = true
+size = Vector3(3, 2.0417, 4.6)
+material = SubResource("m_stairs")
+
+[node name="Step7" type="CSGBox3D" parent="Stairs/PorchStairsWest"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -20.5, 4.1632, 9.9167)
+use_collision = true
+size = Vector3(3, 2.3333, 3.8333)
+material = SubResource("m_stairs")
+
+[node name="Step8" type="CSGBox3D" parent="Stairs/PorchStairsWest"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -20.5, 4.3085, 9.5333)
+use_collision = true
+size = Vector3(3, 2.625, 3.0667)
+material = SubResource("m_stairs")
+
+[node name="Step9" type="CSGBox3D" parent="Stairs/PorchStairsWest"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -20.5, 4.4538, 9.15)
+use_collision = true
+size = Vector3(3, 2.9167, 2.3)
+material = SubResource("m_stairs")
+
+[node name="Step10" type="CSGBox3D" parent="Stairs/PorchStairsWest"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -20.5, 4.5992, 8.7667)
+use_collision = true
+size = Vector3(3, 3.2083, 1.5333)
+material = SubResource("m_stairs")
+
+[node name="Step11" type="CSGBox3D" parent="Stairs/PorchStairsWest"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -20.5, 4.7445, 8.3833)
+use_collision = true
+size = Vector3(3, 3.5, 0.7667)
+material = SubResource("m_stairs")
+
+[node name="Walk" type="StaticBody3D" parent="Stairs/PorchStairsWest"]
+
+[node name="Shape" type="CollisionShape3D" parent="Stairs/PorchStairsWest/Walk"]
+transform = Transform3D(0, 0, -1, 0.3556, 0.9346, 0, -0.9346, 0.3556, 0, -20.5, 4.6098, 13.3133)
+shape = SubResource("ramp_8")
+
+[node name="Cover" type="Node3D" parent="."]
+
+[node name="ContainerA" type="CSGBox3D" parent="Cover"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.5, 1.3, -2.5)
+use_collision = true
+size = Vector3(2.4, 2.6, 6)
+material = SubResource("m_container")
+
+[node name="ContainerB" type="CSGBox3D" parent="Cover"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.5, 1.3, 2.5)
+use_collision = true
+size = Vector3(2.4, 2.6, 6)
+material = SubResource("m_container2")
+
+[node name="PitCrate0" type="CSGBox3D" parent="Cover"]
+transform = Transform3D(0.9397, 0, 0.342, 0, 1, 0, -0.342, 0, 0.9397, -4.2, 1, -5)
+use_collision = true
+size = Vector3(2, 2, 2)
+material = SubResource("m_crate")
+
+[node name="PitCrate1" type="CSGBox3D" parent="Cover"]
+transform = Transform3D(0.9397, 0, 0.342, 0, 1, 0, -0.342, 0, 0.9397, 4.2, 1, 5)
+use_collision = true
+size = Vector3(2, 2, 2)
+material = SubResource("m_crate")
+
+[node name="SniperPlinth" type="CSGBox3D" parent="Cover"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.2, 0)
+use_collision = true
+size = Vector3(1.6, 0.4, 1.6)
+material = SubResource("m_plinth")
+
+[node name="Ring0_0" type="CSGBox3D" parent="Cover"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -14.5, 4, 13.5)
+use_collision = true
+size = Vector3(2, 2, 2)
+material = SubResource("m_crate")
+
+[node name="Ring0_1" type="CSGBox3D" parent="Cover"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14.5, 3.8, 12)
+use_collision = true
+size = Vector3(1.6, 1.6, 1.6)
+material = SubResource("m_crate")
+
+[node name="Ring0_2" type="CSGBox3D" parent="Cover"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.5, 3.55, 15)
+use_collision = true
+size = Vector3(4, 1.1, 0.6)
+material = SubResource("m_pitwall")
+
+[node name="Ring2_0" type="CSGBox3D" parent="Cover"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14.5, 4, -13.5)
+use_collision = true
+size = Vector3(2, 2, 2)
+material = SubResource("m_crate")
+
+[node name="Ring2_1" type="CSGBox3D" parent="Cover"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -14.5, 3.8, -12)
+use_collision = true
+size = Vector3(1.6, 1.6, 1.6)
+material = SubResource("m_crate")
+
+[node name="Ring2_2" type="CSGBox3D" parent="Cover"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.5, 3.55, -15)
+use_collision = true
+size = Vector3(4, 1.1, 0.6)
+material = SubResource("m_pitwall")
+
+[node name="DeckWall1" type="CSGBox3D" parent="Cover"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.8, 3.55, 0)
+use_collision = true
+size = Vector3(0.6, 1.1, 5)
+material = SubResource("m_pitwall")
+
+[node name="DeckWall3" type="CSGBox3D" parent="Cover"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.8, 3.55, 0)
+use_collision = true
+size = Vector3(0.6, 1.1, 5)
+material = SubResource("m_pitwall")
+
+[node name="PorchCrate0" type="CSGBox3D" parent="Cover"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.5, 7.2, 20.4)
+use_collision = true
+size = Vector3(1.4, 1.4, 1.4)
+material = SubResource("m_crate")
+
+[node name="PorchCrate1" type="CSGBox3D" parent="Cover"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 20.4, 7.2, 4.5)
+use_collision = true
+size = Vector3(1.4, 1.4, 1.4)
+material = SubResource("m_crate")
+
+[node name="PorchCrate2" type="CSGBox3D" parent="Cover"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.5, 7.2, -20.4)
+use_collision = true
+size = Vector3(1.4, 1.4, 1.4)
+material = SubResource("m_crate")
+
+[node name="PorchCrate3" type="CSGBox3D" parent="Cover"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -20.4, 7.2, -4.5)
+use_collision = true
+size = Vector3(1.4, 1.4, 1.4)
+material = SubResource("m_crate")
+
+[node name="PorchEndWall0" type="CSGBox3D" parent="Cover"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7.6, 7.05, 19.9)
+use_collision = true
+size = Vector3(0.5, 1.1, 2.4)
+material = SubResource("m_pitwall")
+
+[node name="PorchColumn0" type="CSGBox3D" parent="Cover"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.2, 7.6, 20.9)
+use_collision = true
+size = Vector3(0.8, 2.2, 0.8)
+material = SubResource("m_pillar")
+
+[node name="PorchCrateB0" type="CSGBox3D" parent="Cover"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.2, 7, 21.3)
+use_collision = true
+size = Vector3(1, 1, 1)
+material = SubResource("m_crate")
+
+[node name="PorchEndWall1" type="CSGBox3D" parent="Cover"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 19.9, 7.05, 7.6)
+use_collision = true
+size = Vector3(2.4, 1.1, 0.5)
+material = SubResource("m_pitwall")
+
+[node name="PorchColumn1" type="CSGBox3D" parent="Cover"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 20.9, 7.6, -2.2)
+use_collision = true
+size = Vector3(0.8, 2.2, 0.8)
+material = SubResource("m_pillar")
+
+[node name="PorchCrateB1" type="CSGBox3D" parent="Cover"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 21.3, 7, -5.2)
+use_collision = true
+size = Vector3(1, 1, 1)
+material = SubResource("m_crate")
+
+[node name="PorchEndWall2" type="CSGBox3D" parent="Cover"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7.6, 7.05, -19.9)
+use_collision = true
+size = Vector3(0.5, 1.1, 2.4)
+material = SubResource("m_pitwall")
+
+[node name="PorchColumn2" type="CSGBox3D" parent="Cover"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.2, 7.6, -20.9)
+use_collision = true
+size = Vector3(0.8, 2.2, 0.8)
+material = SubResource("m_pillar")
+
+[node name="PorchCrateB2" type="CSGBox3D" parent="Cover"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.2, 7, -21.3)
+use_collision = true
+size = Vector3(1, 1, 1)
+material = SubResource("m_crate")
+
+[node name="PorchEndWall3" type="CSGBox3D" parent="Cover"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -19.9, 7.05, -7.6)
+use_collision = true
+size = Vector3(2.4, 1.1, 0.5)
+material = SubResource("m_pitwall")
+
+[node name="PorchColumn3" type="CSGBox3D" parent="Cover"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -20.9, 7.6, 2.2)
+use_collision = true
+size = Vector3(0.8, 2.2, 0.8)
+material = SubResource("m_pillar")
+
+[node name="PorchCrateB3" type="CSGBox3D" parent="Cover"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -21.3, 7, 5.2)
+use_collision = true
+size = Vector3(1, 1, 1)
+material = SubResource("m_crate")
+
+[node name="RingPillar0" type="CSGBox3D" parent="Cover"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6, 4.2, 12)
+use_collision = true
+size = Vector3(1, 2.4, 1)
+material = SubResource("m_pillar")
+
+[node name="RingLowWall0" type="CSGBox3D" parent="Cover"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.5, 3.55, 16)
+use_collision = true
+size = Vector3(3, 1.1, 0.6)
+material = SubResource("m_pitwall")
+
+[node name="RingCrateA0" type="CSGBox3D" parent="Cover"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10.5, 3.8, 17.5)
+use_collision = true
+size = Vector3(1.6, 1.6, 1.6)
+material = SubResource("m_crate")
+
+[node name="RingCrateB0" type="CSGBox3D" parent="Cover"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9, 3.5, 18.4)
+use_collision = true
+size = Vector3(1, 1, 1)
+material = SubResource("m_crate")
+
+[node name="RingPillarB0" type="CSGBox3D" parent="Cover"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 4.2, 12.5)
+use_collision = true
+size = Vector3(1, 2.4, 1)
+material = SubResource("m_pillar")
+
+[node name="RingPillar2" type="CSGBox3D" parent="Cover"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6, 4.2, -12)
+use_collision = true
+size = Vector3(1, 2.4, 1)
+material = SubResource("m_pillar")
+
+[node name="RingLowWall2" type="CSGBox3D" parent="Cover"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -11.5, 3.55, -16)
+use_collision = true
+size = Vector3(3, 1.1, 0.6)
+material = SubResource("m_pitwall")
+
+[node name="RingCrateA2" type="CSGBox3D" parent="Cover"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10.5, 3.8, -17.5)
+use_collision = true
+size = Vector3(1.6, 1.6, 1.6)
+material = SubResource("m_crate")
+
+[node name="RingCrateB2" type="CSGBox3D" parent="Cover"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9, 3.5, -18.4)
+use_collision = true
+size = Vector3(1, 1, 1)
+material = SubResource("m_crate")
+
+[node name="RingPillarB2" type="CSGBox3D" parent="Cover"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 4.2, -12.5)
+use_collision = true
+size = Vector3(1, 2.4, 1)
+material = SubResource("m_pillar")
+
+[node name="DeckCrateA1" type="CSGBox3D" parent="Cover"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 17.5, 3.8, 6)
+use_collision = true
+size = Vector3(1.6, 1.6, 1.6)
+material = SubResource("m_crate")
+
+[node name="DeckCrateB1" type="CSGBox3D" parent="Cover"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.5, 3.7, -6)
+use_collision = true
+size = Vector3(1.4, 1.4, 1.4)
+material = SubResource("m_crate")
+
+[node name="DeckLowWall1" type="CSGBox3D" parent="Cover"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 16.5, 3.55, -5.5)
+use_collision = true
+size = Vector3(0.6, 1.1, 3)
+material = SubResource("m_pitwall")
+
+[node name="DeckPillar1" type="CSGBox3D" parent="Cover"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.8, 4.2, 5)
+use_collision = true
+size = Vector3(1, 2.4, 1)
+material = SubResource("m_pillar")
+
+[node name="DeckCrateA3" type="CSGBox3D" parent="Cover"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -17.5, 3.8, -6)
+use_collision = true
+size = Vector3(1.6, 1.6, 1.6)
+material = SubResource("m_crate")
+
+[node name="DeckCrateB3" type="CSGBox3D" parent="Cover"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -11.5, 3.7, 6)
+use_collision = true
+size = Vector3(1.4, 1.4, 1.4)
+material = SubResource("m_crate")
+
+[node name="DeckLowWall3" type="CSGBox3D" parent="Cover"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -16.5, 3.55, 5.5)
+use_collision = true
+size = Vector3(0.6, 1.1, 3)
+material = SubResource("m_pitwall")
+
+[node name="DeckPillar3" type="CSGBox3D" parent="Cover"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -11.8, 4.2, -5)
+use_collision = true
+size = Vector3(1, 2.4, 1)
+material = SubResource("m_pillar")
+
+[node name="Lamp0" type="OmniLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 8.6, 15.5)
+light_color = Color(1, 1, 1, 1)
+light_energy = 1.4
+omni_range = 16.0
+
+[node name="Lamp1" type="OmniLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15.5, 8.6, 0)
+light_color = Color(1, 1, 1, 1)
+light_energy = 1.4
+omni_range = 16.0
+
+[node name="Lamp2" type="OmniLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 8.6, -15.5)
+light_color = Color(1, 1, 1, 1)
+light_energy = 1.4
+omni_range = 16.0
+
+[node name="Lamp3" type="OmniLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -15.5, 8.6, 0)
+light_color = Color(1, 1, 1, 1)
+light_energy = 1.4
+omni_range = 16.0
+
+[node name="Spawns" type="Node3D" parent="."]
+
+[node name="SpawnRooms" type="Node3D" parent="."]
+
+[node name="BlueWallFront" type="CSGBox3D" parent="SpawnRooms"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 18.3, 4.3, 16.4)
+use_collision = true
+size = Vector3(4.2, 2.6, 0.4)
+material = SubResource("m_pitwall")
+
+[node name="BlueWallSide" type="CSGBox3D" parent="SpawnRooms"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 16.4, 4.3, 17.45)
+use_collision = true
+size = Vector3(0.4, 2.6, 2.5)
+material = SubResource("m_pitwall")
+
+[node name="BlueRoof" type="CSGBox3D" parent="SpawnRooms"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 19.1, 5.75, 19.1)
+use_collision = true
+size = Vector3(5.8, 0.3, 5.8)
+material = SubResource("m_porch")
+
+[node name="BlueRoofTrim" type="CSGBox3D" parent="SpawnRooms"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 19.1, 5.735, 16.275)
+use_collision = true
+size = Vector3(5.8, 0.37, 0.15)
+material = SubResource("m_trim")
+
+[node name="BlueDoorCrate" type="CSGBox3D" parent="SpawnRooms"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 18.6, 3.6, 14.6)
+use_collision = true
+size = Vector3(1.2, 1.2, 1.2)
+material = SubResource("m_crate")
+
+[node name="BlueSpawn0" type="Marker3D" parent="Spawns" groups=["spawn_team_a"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 17.6, 3.1, 17.4)
+metadata/face_yaw = 151.9
+
+[node name="BlueSpawn1" type="Marker3D" parent="Spawns" groups=["spawn_team_a"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 19, 3.1, 18.1)
+metadata/face_yaw = 127.5
+
+[node name="RedWallFront" type="CSGBox3D" parent="SpawnRooms"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -18.3, 4.3, -16.4)
+use_collision = true
+size = Vector3(4.2, 2.6, 0.4)
+material = SubResource("m_pitwall")
+
+[node name="RedWallSide" type="CSGBox3D" parent="SpawnRooms"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -16.4, 4.3, -17.45)
+use_collision = true
+size = Vector3(0.4, 2.6, 2.5)
+material = SubResource("m_pitwall")
+
+[node name="RedRoof" type="CSGBox3D" parent="SpawnRooms"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -19.1, 5.75, -19.1)
+use_collision = true
+size = Vector3(5.8, 0.3, 5.8)
+material = SubResource("m_porch")
+
+[node name="RedRoofTrim" type="CSGBox3D" parent="SpawnRooms"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -19.1, 5.735, -16.275)
+use_collision = true
+size = Vector3(5.8, 0.37, 0.15)
+material = SubResource("m_trim")
+
+[node name="RedDoorCrate" type="CSGBox3D" parent="SpawnRooms"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -18.6, 3.6, -14.6)
+use_collision = true
+size = Vector3(1.2, 1.2, 1.2)
+material = SubResource("m_crate")
+
+[node name="RedSpawn0" type="Marker3D" parent="Spawns" groups=["spawn_team_b"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -17.6, 3.1, -17.4)
+metadata/face_yaw = -28.1
+
+[node name="RedSpawn1" type="Marker3D" parent="Spawns" groups=["spawn_team_b"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -19, 3.1, -18.1)
+metadata/face_yaw = -52.5
+
+[node name="CornerCrate1" type="CSGBox3D" parent="Cover"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 19.5, 3.9, -19.5)
+use_collision = true
+size = Vector3(1.8, 1.8, 1.8)
+material = SubResource("m_crate")
+
+[node name="CornerCrateSmall1" type="CSGBox3D" parent="Cover"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 17, 3.5, -20.6)
+use_collision = true
+size = Vector3(1, 1, 1)
+material = SubResource("m_crate")
+
+[node name="CornerCrate3" type="CSGBox3D" parent="Cover"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -19.5, 3.9, 19.5)
+use_collision = true
+size = Vector3(1.8, 1.8, 1.8)
+material = SubResource("m_crate")
+
+[node name="CornerCrateSmall3" type="CSGBox3D" parent="Cover"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -17, 3.5, 20.6)
+use_collision = true
+size = Vector3(1, 1, 1)
+material = SubResource("m_crate")
+
+[node name="GunSpots" type="Node3D" parent="."]
+
+[node name="SniperSpot" type="Area3D" parent="GunSpots"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.05, 0)
+
+[node name="ShotgunSpotBlue" type="Area3D" parent="GunSpots"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 7.2, 20.3)
+
+[node name="ShotgunSpotRed" type="Area3D" parent="GunSpots"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 7.2, -20.3)

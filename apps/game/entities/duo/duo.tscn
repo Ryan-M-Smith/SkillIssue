@@ -17,6 +17,7 @@
 [ext_resource type="Script" path="res://entities/duo/duo_legs_animator.gd" id="15_legs"]
 [ext_resource type="Script" path="res://components/hitbox_component.gd" id="16_hitbox"]
 [ext_resource type="Resource" path="res://data/hitboxes/default_hitboxes.tres" id="17_hbprofile"]
+[ext_resource type="Script" path="res://entities/duo/duo_fx.gd" id="18_fx"]
 
 [sub_resource type="CapsuleShape3D" id="body_shape"]
 resource_local_to_scene = true
@@ -96,424 +97,825 @@ emission_enabled = true
 emission = Color(0.55, 0.8, 1.0, 1)
 emission_energy_multiplier = 0.3
 
+[sub_resource type="StandardMaterial3D" id="rc_fur_light"]
+albedo_color = Color(0.72, 0.73, 0.76, 1)
+roughness = 0.85
+
+[sub_resource type="StandardMaterial3D" id="rc_feather"]
+albedo_color = Color(0.95, 0.92, 0.85, 1)
+roughness = 0.85
+
 [sub_resource type="CylinderMesh" id="rc_mesh_1"]
 top_radius = 0.05
-bottom_radius = 0.06
-height = 0.3
+bottom_radius = 0.062
+height = 0.28
 radial_segments = 6
 rings = 0
 
 [sub_resource type="CylinderMesh" id="rc_mesh_2"]
 top_radius = 0.05
-bottom_radius = 0.065
+bottom_radius = 0.066
 height = 0.06
 radial_segments = 6
 rings = 0
 
-[sub_resource type="CylinderMesh" id="rc_mesh_3"]
+[sub_resource type="BoxMesh" id="rc_mesh_3"]
+size = Vector3(0.025, 0.03, 0.04)
+
+[sub_resource type="BoxMesh" id="rc_mesh_4"]
+size = Vector3(0.025, 0.03, 0.04)
+
+[sub_resource type="BoxMesh" id="rc_mesh_5"]
+size = Vector3(0.025, 0.03, 0.04)
+
+[sub_resource type="CylinderMesh" id="rc_mesh_6"]
 top_radius = 0.05
-bottom_radius = 0.06
-height = 0.3
+bottom_radius = 0.062
+height = 0.28
 radial_segments = 6
 rings = 0
 
-[sub_resource type="CylinderMesh" id="rc_mesh_4"]
+[sub_resource type="CylinderMesh" id="rc_mesh_7"]
 top_radius = 0.05
-bottom_radius = 0.065
+bottom_radius = 0.066
 height = 0.06
 radial_segments = 6
 rings = 0
 
-[sub_resource type="CylinderMesh" id="rc_mesh_5"]
+[sub_resource type="BoxMesh" id="rc_mesh_8"]
+size = Vector3(0.025, 0.03, 0.04)
+
+[sub_resource type="BoxMesh" id="rc_mesh_9"]
+size = Vector3(0.025, 0.03, 0.04)
+
+[sub_resource type="BoxMesh" id="rc_mesh_10"]
+size = Vector3(0.025, 0.03, 0.04)
+
+[sub_resource type="CylinderMesh" id="rc_mesh_11"]
 top_radius = 0.3
-bottom_radius = 0.41
+bottom_radius = 0.42
 height = 0.79
 radial_segments = 6
 rings = 0
 
-[sub_resource type="BoxMesh" id="rc_mesh_6"]
-size = Vector3(1, 1, 0.012)
-
-[sub_resource type="BoxMesh" id="rc_mesh_7"]
-size = Vector3(0.321547594742265, 0.05, 0.035)
-
-[sub_resource type="BoxMesh" id="rc_mesh_8"]
-size = Vector3(0.29154759474226505, 0.014, 0.02)
-
-[sub_resource type="BoxMesh" id="rc_mesh_9"]
-size = Vector3(0.321547594742265, 0.05, 0.035)
-
-[sub_resource type="BoxMesh" id="rc_mesh_10"]
-size = Vector3(0.29154759474226505, 0.014, 0.02)
-
-[sub_resource type="BoxMesh" id="rc_mesh_11"]
-size = Vector3(0.321547594742265, 0.05, 0.035)
-
-[sub_resource type="BoxMesh" id="rc_mesh_12"]
-size = Vector3(0.29154759474226505, 0.014, 0.02)
-
-[sub_resource type="BoxMesh" id="rc_mesh_13"]
-size = Vector3(0.321547594742265, 0.05, 0.035)
-
-[sub_resource type="BoxMesh" id="rc_mesh_14"]
-size = Vector3(0.29154759474226505, 0.014, 0.02)
-
-[sub_resource type="SphereMesh" id="rc_mesh_15"]
-radius = 0.15
-height = 0.3
-radial_segments = 7
-rings = 4
-
-[sub_resource type="BoxMesh" id="rc_mesh_16"]
-size = Vector3(0.24, 0.06, 0.032)
-
-[sub_resource type="BoxMesh" id="rc_mesh_17"]
-size = Vector3(0.048, 0.032, 0.02)
-
-[sub_resource type="BoxMesh" id="rc_mesh_18"]
-size = Vector3(0.016, 0.0272, 0.01)
-
-[sub_resource type="BoxMesh" id="rc_mesh_19"]
-size = Vector3(0.048, 0.032, 0.02)
-
-[sub_resource type="BoxMesh" id="rc_mesh_20"]
-size = Vector3(0.016, 0.0272, 0.01)
-
-[sub_resource type="CylinderMesh" id="rc_mesh_21"]
-top_radius = 0.009600000000000001
-bottom_radius = 0.068
-height = 0.128
-radial_segments = 4
-rings = 0
-
-[sub_resource type="SphereMesh" id="rc_mesh_22"]
-radius = 0.0176
-height = 0.0352
-radial_segments = 6
-rings = 3
-
-[sub_resource type="SphereMesh" id="rc_mesh_23"]
-radius = 0.018
-height = 0.036
-radial_segments = 6
-rings = 3
-
-[sub_resource type="SphereMesh" id="rc_mesh_24"]
-radius = 0.045
-height = 0.09
-radial_segments = 6
-rings = 3
-
-[sub_resource type="SphereMesh" id="rc_mesh_25"]
-radius = 0.045
-height = 0.09
-radial_segments = 6
-rings = 3
-
-[sub_resource type="CylinderMesh" id="rc_mesh_26"]
-top_radius = 0.312
-bottom_radius = 0.312
+[sub_resource type="CylinderMesh" id="rc_mesh_12"]
+top_radius = 0.428
+bottom_radius = 0.432
 height = 0.06
 radial_segments = 6
 rings = 0
 
+[sub_resource type="BoxMesh" id="rc_mesh_13"]
+size = Vector3(0.016, 0.08999999999999986, 0.02)
+
+[sub_resource type="BoxMesh" id="rc_mesh_14"]
+size = Vector3(0.05, 0.08999999999999986, 0.012)
+
+[sub_resource type="BoxMesh" id="rc_mesh_15"]
+size = Vector3(0.025, 0.09, 0.02)
+
+[sub_resource type="BoxMesh" id="rc_mesh_16"]
+size = Vector3(0.025, 0.09, 0.02)
+
+[sub_resource type="BoxMesh" id="rc_mesh_17"]
+size = Vector3(0.02, 0.32, 0.02)
+
+[sub_resource type="BoxMesh" id="rc_mesh_18"]
+size = Vector3(0.14, 0.045, 0.03)
+
+[sub_resource type="BoxMesh" id="rc_mesh_19"]
+size = Vector3(0.14, 0.045, 0.03)
+
+[sub_resource type="BoxMesh" id="rc_mesh_20"]
+size = Vector3(1, 1, 0.012)
+
+[sub_resource type="BoxMesh" id="rc_mesh_21"]
+size = Vector3(0.335286750449475, 0.055, 0.035)
+
+[sub_resource type="BoxMesh" id="rc_mesh_22"]
+size = Vector3(0.30528675044947495, 0.014, 0.02)
+
+[sub_resource type="BoxMesh" id="rc_mesh_23"]
+size = Vector3(0.335286750449475, 0.055, 0.035)
+
+[sub_resource type="BoxMesh" id="rc_mesh_24"]
+size = Vector3(0.30528675044947495, 0.014, 0.02)
+
+[sub_resource type="BoxMesh" id="rc_mesh_25"]
+size = Vector3(0.335286750449475, 0.055, 0.035)
+
+[sub_resource type="BoxMesh" id="rc_mesh_26"]
+size = Vector3(0.30528675044947495, 0.014, 0.02)
+
 [sub_resource type="BoxMesh" id="rc_mesh_27"]
-size = Vector3(0.08, 0.06, 0.02)
+size = Vector3(0.335286750449475, 0.055, 0.035)
 
-[sub_resource type="CylinderMesh" id="rc_mesh_28"]
-top_radius = 0.069
-bottom_radius = 0.075
-height = 0.125
+[sub_resource type="BoxMesh" id="rc_mesh_28"]
+size = Vector3(0.30528675044947495, 0.014, 0.02)
+
+[sub_resource type="SphereMesh" id="rc_mesh_29"]
+radius = 0.16
+height = 0.32
+radial_segments = 7
+rings = 4
+
+[sub_resource type="PrismMesh" id="rc_mesh_30"]
+left_to_right = 0.5
+size = Vector3(0.07, 0.07, 0.08)
+
+[sub_resource type="PrismMesh" id="rc_mesh_31"]
+left_to_right = 0.5
+size = Vector3(0.07, 0.07, 0.08)
+
+[sub_resource type="BoxMesh" id="rc_mesh_32"]
+size = Vector3(0.1275, 0.06375, 0.034)
+
+[sub_resource type="BoxMesh" id="rc_mesh_33"]
+size = Vector3(0.102, 0.0204, 0.0255)
+
+[sub_resource type="BoxMesh" id="rc_mesh_34"]
+size = Vector3(0.051, 0.034, 0.02)
+
+[sub_resource type="BoxMesh" id="rc_mesh_35"]
+size = Vector3(0.017, 0.028900000000000002, 0.01)
+
+[sub_resource type="BoxMesh" id="rc_mesh_36"]
+size = Vector3(0.1275, 0.06375, 0.034)
+
+[sub_resource type="BoxMesh" id="rc_mesh_37"]
+size = Vector3(0.102, 0.0204, 0.0255)
+
+[sub_resource type="BoxMesh" id="rc_mesh_38"]
+size = Vector3(0.051, 0.034, 0.02)
+
+[sub_resource type="BoxMesh" id="rc_mesh_39"]
+size = Vector3(0.017, 0.028900000000000002, 0.01)
+
+[sub_resource type="BoxMesh" id="rc_mesh_40"]
+size = Vector3(0.0425, 0.034, 0.029750000000000002)
+
+[sub_resource type="PrismMesh" id="rc_mesh_41"]
+left_to_right = 0.5
+size = Vector3(0.051, 0.068, 0.02)
+
+[sub_resource type="CylinderMesh" id="rc_mesh_42"]
+top_radius = 0.0102
+bottom_radius = 0.07225000000000001
+height = 0.136
+radial_segments = 4
+rings = 0
+
+[sub_resource type="SphereMesh" id="rc_mesh_43"]
+radius = 0.0204
+height = 0.0408
+radial_segments = 6
+rings = 3
+
+[sub_resource type="BoxMesh" id="rc_mesh_44"]
+size = Vector3(0.0425, 0.006, 0.01)
+
+[sub_resource type="BoxMesh" id="rc_mesh_45"]
+size = Vector3(0.0102, 0.0102, 0.004)
+
+[sub_resource type="BoxMesh" id="rc_mesh_46"]
+size = Vector3(0.102, 0.004, 0.004)
+
+[sub_resource type="BoxMesh" id="rc_mesh_47"]
+size = Vector3(0.102, 0.004, 0.004)
+
+[sub_resource type="BoxMesh" id="rc_mesh_48"]
+size = Vector3(0.0102, 0.0102, 0.004)
+
+[sub_resource type="BoxMesh" id="rc_mesh_49"]
+size = Vector3(0.102, 0.004, 0.004)
+
+[sub_resource type="BoxMesh" id="rc_mesh_50"]
+size = Vector3(0.102, 0.004, 0.004)
+
+[sub_resource type="CylinderMesh" id="rc_mesh_51"]
+top_radius = 0.003
+bottom_radius = 0.05
+height = 0.1
+radial_segments = 4
+rings = 0
+
+[sub_resource type="CylinderMesh" id="rc_mesh_52"]
+top_radius = 0.002
+bottom_radius = 0.026
+height = 0.06
+radial_segments = 4
+rings = 0
+
+[sub_resource type="CylinderMesh" id="rc_mesh_53"]
+top_radius = 0.003
+bottom_radius = 0.05
+height = 0.1
+radial_segments = 4
+rings = 0
+
+[sub_resource type="CylinderMesh" id="rc_mesh_54"]
+top_radius = 0.002
+bottom_radius = 0.026
+height = 0.06
+radial_segments = 4
+rings = 0
+
+[sub_resource type="SphereMesh" id="rc_mesh_55"]
+radius = 0.02
+height = 0.04
+radial_segments = 6
+rings = 3
+
+[sub_resource type="SphereMesh" id="rc_mesh_56"]
+radius = 0.014
+height = 0.028
+radial_segments = 6
+rings = 3
+
+[sub_resource type="SphereMesh" id="rc_mesh_57"]
+radius = 0.0456
+height = 0.0912
+radial_segments = 6
+rings = 3
+
+[sub_resource type="BoxMesh" id="rc_mesh_58"]
+size = Vector3(0.017099999999999997, 0.019, 0.028499999999999998)
+
+[sub_resource type="BoxMesh" id="rc_mesh_59"]
+size = Vector3(0.017099999999999997, 0.019, 0.028499999999999998)
+
+[sub_resource type="BoxMesh" id="rc_mesh_60"]
+size = Vector3(0.017099999999999997, 0.019, 0.028499999999999998)
+
+[sub_resource type="SphereMesh" id="rc_mesh_61"]
+radius = 0.0456
+height = 0.0912
+radial_segments = 6
+rings = 3
+
+[sub_resource type="BoxMesh" id="rc_mesh_62"]
+size = Vector3(0.017099999999999997, 0.019, 0.028499999999999998)
+
+[sub_resource type="BoxMesh" id="rc_mesh_63"]
+size = Vector3(0.017099999999999997, 0.019, 0.028499999999999998)
+
+[sub_resource type="BoxMesh" id="rc_mesh_64"]
+size = Vector3(0.017099999999999997, 0.019, 0.028499999999999998)
+
+[sub_resource type="CylinderMesh" id="rc_mesh_65"]
+top_radius = 0.314
+bottom_radius = 0.314
+height = 0.065
 radial_segments = 6
 rings = 0
 
-[sub_resource type="CylinderMesh" id="rc_mesh_29"]
-top_radius = 0.063
-bottom_radius = 0.069
-height = 0.125
+[sub_resource type="BoxMesh" id="rc_mesh_66"]
+size = Vector3(0.085, 0.07, 0.02)
+
+[sub_resource type="BoxMesh" id="rc_mesh_67"]
+size = Vector3(0.05, 0.035, 0.022)
+
+[sub_resource type="BoxMesh" id="rc_mesh_68"]
+size = Vector3(0.09, 0.05, 0.02)
+
+[sub_resource type="BoxMesh" id="rc_mesh_69"]
+size = Vector3(0.09, 0.05, 0.02)
+
+[sub_resource type="CylinderMesh" id="rc_mesh_70"]
+top_radius = 0.07508408188399972
+bottom_radius = 0.05669960642282255
+height = 0.116
 radial_segments = 6
 rings = 0
 
-[sub_resource type="CylinderMesh" id="rc_mesh_30"]
-top_radius = 0.056999999999999995
-bottom_radius = 0.063
-height = 0.125
+[sub_resource type="CylinderMesh" id="rc_mesh_71"]
+top_radius = 0.08915495022742982
+bottom_radius = 0.07508408188399972
+height = 0.116
 radial_segments = 6
 rings = 0
 
-[sub_resource type="CylinderMesh" id="rc_mesh_31"]
-top_radius = 0.051
-bottom_radius = 0.056999999999999995
-height = 0.125
+[sub_resource type="CylinderMesh" id="rc_mesh_72"]
+top_radius = 0.09677004930056475
+bottom_radius = 0.08915495022742982
+height = 0.116
 radial_segments = 6
 rings = 0
 
-[sub_resource type="CylinderMesh" id="rc_mesh_32"]
-top_radius = 0.045
-bottom_radius = 0.051
-height = 0.125
+[sub_resource type="CylinderMesh" id="rc_mesh_73"]
+top_radius = 0.09677004930056475
+bottom_radius = 0.09677004930056475
+height = 0.116
 radial_segments = 6
 rings = 0
 
-[sub_resource type="CylinderMesh" id="rc_mesh_33"]
-top_radius = 0.039
-bottom_radius = 0.045
-height = 0.125
+[sub_resource type="CylinderMesh" id="rc_mesh_74"]
+top_radius = 0.08915495022742984
+bottom_radius = 0.09677004930056475
+height = 0.116
 radial_segments = 6
 rings = 0
 
-[sub_resource type="CylinderMesh" id="rc_mesh_34"]
-top_radius = 0.005
-bottom_radius = 0.04125
-height = 0.12
+[sub_resource type="CylinderMesh" id="rc_mesh_75"]
+top_radius = 0.07508408188399972
+bottom_radius = 0.08915495022742984
+height = 0.116
 radial_segments = 6
 rings = 0
 
-[sub_resource type="CylinderMesh" id="rc_mesh_35"]
-top_radius = 0.27
+[sub_resource type="CylinderMesh" id="rc_mesh_76"]
+top_radius = 0.05669960642282256
+bottom_radius = 0.07508408188399972
+height = 0.116
+radial_segments = 6
+rings = 0
+
+[sub_resource type="CylinderMesh" id="rc_mesh_77"]
+top_radius = 0.006
+bottom_radius = 0.05669960642282256
+height = 0.13
+radial_segments = 6
+rings = 0
+
+[sub_resource type="SphereMesh" id="rc_mesh_78"]
+radius = 0.06520454738624593
+height = 0.13040909477249185
+radial_segments = 6
+rings = 3
+
+[sub_resource type="CylinderMesh" id="rc_mesh_79"]
+top_radius = 0.26
 bottom_radius = 0.3
 height = 0.46
 radial_segments = 6
 rings = 0
 
-[sub_resource type="CylinderMesh" id="rc_mesh_36"]
-top_radius = 0.17
-bottom_radius = 0.3
+[sub_resource type="CylinderMesh" id="rc_mesh_80"]
+top_radius = 0.16
+bottom_radius = 0.29
 height = 0.1
 radial_segments = 6
 rings = 0
 
-[sub_resource type="PrismMesh" id="rc_mesh_37"]
+[sub_resource type="PrismMesh" id="rc_mesh_81"]
 left_to_right = 0.5
-size = Vector3(0.2, 0.26, 0.01)
+size = Vector3(0.2, 0.27, 0.01)
 
-[sub_resource type="PrismMesh" id="rc_mesh_38"]
+[sub_resource type="PrismMesh" id="rc_mesh_82"]
 left_to_right = 0.5
-size = Vector3(0.05, 0.22, 0.012)
+size = Vector3(0.055, 0.23, 0.012)
 
-[sub_resource type="BoxMesh" id="rc_mesh_39"]
+[sub_resource type="BoxMesh" id="rc_mesh_83"]
 size = Vector3(0.05, 0.04, 0.02)
 
-[sub_resource type="PrismMesh" id="rc_mesh_40"]
+[sub_resource type="PrismMesh" id="rc_mesh_84"]
 left_to_right = 1
-size = Vector3(0.08, 0.3, 0.03)
+size = Vector3(0.1, 0.32, 0.03)
 
-[sub_resource type="PrismMesh" id="rc_mesh_41"]
+[sub_resource type="PrismMesh" id="rc_mesh_85"]
+left_to_right = 0.5
+size = Vector3(0.07, 0.07, 0.03)
+
+[sub_resource type="PrismMesh" id="rc_mesh_86"]
 left_to_right = 0
-size = Vector3(0.08, 0.3, 0.03)
+size = Vector3(0.1, 0.32, 0.03)
 
-[sub_resource type="CylinderMesh" id="rc_mesh_42"]
+[sub_resource type="PrismMesh" id="rc_mesh_87"]
+left_to_right = 0.5
+size = Vector3(0.07, 0.07, 0.03)
+
+[sub_resource type="CylinderMesh" id="rc_mesh_88"]
 top_radius = 0.016
 bottom_radius = 0.016
+height = 0.012
+radial_segments = 6
+rings = 0
+
+[sub_resource type="CylinderMesh" id="rc_mesh_89"]
+top_radius = 0.016
+bottom_radius = 0.016
+height = 0.012
+radial_segments = 6
+rings = 0
+
+[sub_resource type="CylinderMesh" id="rc_mesh_90"]
+top_radius = 0.016
+bottom_radius = 0.016
+height = 0.012
+radial_segments = 6
+rings = 0
+
+[sub_resource type="CylinderMesh" id="rc_mesh_91"]
+top_radius = 0.016
+bottom_radius = 0.016
+height = 0.012
+radial_segments = 6
+rings = 0
+
+[sub_resource type="CylinderMesh" id="rc_mesh_92"]
+top_radius = 0.016
+bottom_radius = 0.016
+height = 0.012
+radial_segments = 6
+rings = 0
+
+[sub_resource type="CylinderMesh" id="rc_mesh_93"]
+top_radius = 0.016
+bottom_radius = 0.016
+height = 0.012
+radial_segments = 6
+rings = 0
+
+[sub_resource type="BoxMesh" id="rc_mesh_94"]
+size = Vector3(0.11, 0.035, 0.02)
+
+[sub_resource type="BoxMesh" id="rc_mesh_95"]
+size = Vector3(0.2, 0.16, 0.025)
+
+[sub_resource type="BoxMesh" id="rc_mesh_96"]
+size = Vector3(0.18, 0.025, 0.08)
+
+[sub_resource type="CylinderMesh" id="rc_mesh_97"]
+top_radius = 0.012
+bottom_radius = 0.012
 height = 0.01
 radial_segments = 6
 rings = 0
 
-[sub_resource type="CylinderMesh" id="rc_mesh_43"]
-top_radius = 0.016
-bottom_radius = 0.016
+[sub_resource type="PrismMesh" id="rc_mesh_98"]
+left_to_right = 0.5
+size = Vector3(0.15, 0.24, 0.03)
+
+[sub_resource type="BoxMesh" id="rc_mesh_99"]
+size = Vector3(0.18, 0.025, 0.08)
+
+[sub_resource type="CylinderMesh" id="rc_mesh_100"]
+top_radius = 0.012
+bottom_radius = 0.012
 height = 0.01
 radial_segments = 6
 rings = 0
 
-[sub_resource type="PrismMesh" id="rc_mesh_44"]
+[sub_resource type="PrismMesh" id="rc_mesh_101"]
 left_to_right = 0.5
-size = Vector3(0.14, 0.2, 0.03)
+size = Vector3(0.15, 0.24, 0.03)
 
-[sub_resource type="PrismMesh" id="rc_mesh_45"]
-left_to_right = 0.5
-size = Vector3(0.14, 0.2, 0.03)
+[sub_resource type="SphereMesh" id="rc_mesh_102"]
+radius = 0.095
+height = 0.19
+radial_segments = 7
+rings = 4
 
-[sub_resource type="CylinderMesh" id="rc_mesh_46"]
-top_radius = 0.068
-bottom_radius = 0.075
-height = 0.24289915602982237
+[sub_resource type="SphereMesh" id="rc_mesh_103"]
+radius = 0.095
+height = 0.19
+radial_segments = 7
+rings = 4
+
+[sub_resource type="BoxMesh" id="rc_mesh_104"]
+size = Vector3(0.4, 0.15, 0.014)
+
+[sub_resource type="BoxMesh" id="rc_mesh_105"]
+size = Vector3(0.4, 0.01, 0.016)
+
+[sub_resource type="SphereMesh" id="rc_mesh_106"]
+radius = 0.072
+height = 0.144
+radial_segments = 7
+rings = 4
+
+[sub_resource type="CylinderMesh" id="rc_mesh_107"]
+top_radius = 0.07
+bottom_radius = 0.078
+height = 0.24515301344262522
 radial_segments = 6
 rings = 0
 
-[sub_resource type="CylinderMesh" id="rc_mesh_47"]
-top_radius = 0.06
-bottom_radius = 0.068
+[sub_resource type="CylinderMesh" id="rc_mesh_108"]
+top_radius = 0.064
+bottom_radius = 0.07
 height = 0.20808652046684814
 radial_segments = 6
 rings = 0
 
-[sub_resource type="SphereMesh" id="rc_mesh_48"]
-radius = 0.05
-height = 0.1
-radial_segments = 6
-rings = 3
-
-[sub_resource type="CylinderMesh" id="rc_mesh_49"]
-top_radius = 0.068
-bottom_radius = 0.075
-height = 0.3818376618407357
+[sub_resource type="CylinderMesh" id="rc_mesh_109"]
+top_radius = 0.072
+bottom_radius = 0.072
+height = 0.060000000000000005
 radial_segments = 6
 rings = 0
 
-[sub_resource type="CylinderMesh" id="rc_mesh_50"]
-top_radius = 0.06
-bottom_radius = 0.068
+[sub_resource type="BoxMesh" id="rc_mesh_110"]
+size = Vector3(0.03, 0.03, 0.012)
+
+[sub_resource type="SphereMesh" id="rc_mesh_111"]
+radius = 0.048
+height = 0.096
+radial_segments = 6
+rings = 3
+
+[sub_resource type="BoxMesh" id="rc_mesh_112"]
+size = Vector3(0.018, 0.02, 0.03)
+
+[sub_resource type="BoxMesh" id="rc_mesh_113"]
+size = Vector3(0.018, 0.02, 0.03)
+
+[sub_resource type="BoxMesh" id="rc_mesh_114"]
+size = Vector3(0.018, 0.02, 0.03)
+
+[sub_resource type="SphereMesh" id="rc_mesh_115"]
+radius = 0.072
+height = 0.144
+radial_segments = 7
+rings = 4
+
+[sub_resource type="CylinderMesh" id="rc_mesh_116"]
+top_radius = 0.07
+bottom_radius = 0.078
+height = 0.38013155617496425
+radial_segments = 6
+rings = 0
+
+[sub_resource type="CylinderMesh" id="rc_mesh_117"]
+top_radius = 0.064
+bottom_radius = 0.07
 height = 0.4993996395673509
 radial_segments = 6
 rings = 0
 
-[sub_resource type="SphereMesh" id="rc_mesh_51"]
-radius = 0.05
-height = 0.1
+[sub_resource type="CylinderMesh" id="rc_mesh_118"]
+top_radius = 0.072
+bottom_radius = 0.072
+height = 0.059999999999999984
+radial_segments = 6
+rings = 0
+
+[sub_resource type="BoxMesh" id="rc_mesh_119"]
+size = Vector3(0.03, 0.03, 0.012)
+
+[sub_resource type="SphereMesh" id="rc_mesh_120"]
+radius = 0.048
+height = 0.096
 radial_segments = 6
 rings = 3
 
-[sub_resource type="CylinderMesh" id="rc_mesh_52"]
-top_radius = 0.069
-bottom_radius = 0.075
-height = 0.125
+[sub_resource type="BoxMesh" id="rc_mesh_121"]
+size = Vector3(0.018, 0.02, 0.03)
+
+[sub_resource type="BoxMesh" id="rc_mesh_122"]
+size = Vector3(0.018, 0.02, 0.03)
+
+[sub_resource type="BoxMesh" id="rc_mesh_123"]
+size = Vector3(0.018, 0.02, 0.03)
+
+[sub_resource type="CylinderMesh" id="rc_mesh_124"]
+top_radius = 0.07508408188399972
+bottom_radius = 0.05669960642282255
+height = 0.116
 radial_segments = 6
 rings = 0
 
-[sub_resource type="CylinderMesh" id="rc_mesh_53"]
-top_radius = 0.063
-bottom_radius = 0.069
-height = 0.125
+[sub_resource type="CylinderMesh" id="rc_mesh_125"]
+top_radius = 0.08915495022742982
+bottom_radius = 0.07508408188399972
+height = 0.116
 radial_segments = 6
 rings = 0
 
-[sub_resource type="CylinderMesh" id="rc_mesh_54"]
-top_radius = 0.056999999999999995
-bottom_radius = 0.063
-height = 0.125
+[sub_resource type="CylinderMesh" id="rc_mesh_126"]
+top_radius = 0.09677004930056475
+bottom_radius = 0.08915495022742982
+height = 0.116
 radial_segments = 6
 rings = 0
 
-[sub_resource type="CylinderMesh" id="rc_mesh_55"]
-top_radius = 0.051
-bottom_radius = 0.056999999999999995
-height = 0.125
+[sub_resource type="CylinderMesh" id="rc_mesh_127"]
+top_radius = 0.09677004930056475
+bottom_radius = 0.09677004930056475
+height = 0.116
 radial_segments = 6
 rings = 0
 
-[sub_resource type="CylinderMesh" id="rc_mesh_56"]
-top_radius = 0.045
-bottom_radius = 0.051
-height = 0.125
+[sub_resource type="CylinderMesh" id="rc_mesh_128"]
+top_radius = 0.08915495022742984
+bottom_radius = 0.09677004930056475
+height = 0.116
 radial_segments = 6
 rings = 0
 
-[sub_resource type="CylinderMesh" id="rc_mesh_57"]
-top_radius = 0.039
-bottom_radius = 0.045
-height = 0.125
+[sub_resource type="CylinderMesh" id="rc_mesh_129"]
+top_radius = 0.07508408188399972
+bottom_radius = 0.08915495022742984
+height = 0.116
 radial_segments = 6
 rings = 0
 
-[sub_resource type="CylinderMesh" id="rc_mesh_58"]
-top_radius = 0.005
-bottom_radius = 0.04125
-height = 0.12
+[sub_resource type="CylinderMesh" id="rc_mesh_130"]
+top_radius = 0.05669960642282256
+bottom_radius = 0.07508408188399972
+height = 0.116
 radial_segments = 6
 rings = 0
 
-[sub_resource type="SphereMesh" id="rc_mesh_59"]
+[sub_resource type="CylinderMesh" id="rc_mesh_131"]
+top_radius = 0.006
+bottom_radius = 0.05669960642282256
+height = 0.13
+radial_segments = 6
+rings = 0
+
+[sub_resource type="SphereMesh" id="rc_mesh_132"]
+radius = 0.06520454738624593
+height = 0.13040909477249185
+radial_segments = 6
+rings = 3
+
+[sub_resource type="SphereMesh" id="rc_mesh_133"]
 radius = 0.2
 height = 0.4
 radial_segments = 8
 rings = 4
 
-[sub_resource type="PrismMesh" id="rc_mesh_60"]
+[sub_resource type="PrismMesh" id="rc_mesh_134"]
 left_to_right = 0.5
-size = Vector3(0.1, 0.12, 0.16)
+size = Vector3(0.11, 0.13, 0.17)
 
-[sub_resource type="PrismMesh" id="rc_mesh_61"]
+[sub_resource type="PrismMesh" id="rc_mesh_135"]
 left_to_right = 0.5
-size = Vector3(0.1, 0.12, 0.16)
+size = Vector3(0.08, 0.1, 0.14)
 
-[sub_resource type="BoxMesh" id="rc_mesh_62"]
-size = Vector3(0.3, 0.075, 0.04)
+[sub_resource type="CylinderMesh" id="rc_mesh_136"]
+top_radius = 0.004
+bottom_radius = 0.068
+height = 0.14
+radial_segments = 4
+rings = 0
 
-[sub_resource type="BoxMesh" id="rc_mesh_63"]
-size = Vector3(0.06, 0.02, 0.02)
+[sub_resource type="CylinderMesh" id="rc_mesh_137"]
+top_radius = 0.003
+bottom_radius = 0.036
+height = 0.085
+radial_segments = 4
+rings = 0
 
-[sub_resource type="BoxMesh" id="rc_mesh_64"]
-size = Vector3(0.02, 0.017, 0.01)
+[sub_resource type="CylinderMesh" id="rc_mesh_138"]
+top_radius = 0.004
+bottom_radius = 0.07
+height = 0.03
+radial_segments = 4
+rings = 0
 
-[sub_resource type="BoxMesh" id="rc_mesh_65"]
-size = Vector3(0.06, 0.02, 0.02)
+[sub_resource type="PrismMesh" id="rc_mesh_139"]
+left_to_right = 0.5
+size = Vector3(0.11, 0.13, 0.17)
 
-[sub_resource type="BoxMesh" id="rc_mesh_66"]
-size = Vector3(0.02, 0.017, 0.01)
+[sub_resource type="PrismMesh" id="rc_mesh_140"]
+left_to_right = 0.5
+size = Vector3(0.08, 0.1, 0.14)
 
-[sub_resource type="CylinderMesh" id="rc_mesh_67"]
+[sub_resource type="CylinderMesh" id="rc_mesh_141"]
+top_radius = 0.004
+bottom_radius = 0.068
+height = 0.14
+radial_segments = 4
+rings = 0
+
+[sub_resource type="CylinderMesh" id="rc_mesh_142"]
+top_radius = 0.003
+bottom_radius = 0.036
+height = 0.085
+radial_segments = 4
+rings = 0
+
+[sub_resource type="CylinderMesh" id="rc_mesh_143"]
+top_radius = 0.004
+bottom_radius = 0.07
+height = 0.03
+radial_segments = 4
+rings = 0
+
+[sub_resource type="SphereMesh" id="rc_mesh_144"]
+radius = 0.07
+height = 0.14
+radial_segments = 6
+rings = 3
+
+[sub_resource type="BoxMesh" id="rc_mesh_145"]
+size = Vector3(0.15, 0.075, 0.04)
+
+[sub_resource type="BoxMesh" id="rc_mesh_146"]
+size = Vector3(0.12, 0.024, 0.03)
+
+[sub_resource type="BoxMesh" id="rc_mesh_147"]
+size = Vector3(0.06, 0.018, 0.02)
+
+[sub_resource type="BoxMesh" id="rc_mesh_148"]
+size = Vector3(0.02, 0.015299999999999998, 0.01)
+
+[sub_resource type="BoxMesh" id="rc_mesh_149"]
+size = Vector3(0.15, 0.075, 0.04)
+
+[sub_resource type="BoxMesh" id="rc_mesh_150"]
+size = Vector3(0.12, 0.024, 0.03)
+
+[sub_resource type="BoxMesh" id="rc_mesh_151"]
+size = Vector3(0.06, 0.018, 0.02)
+
+[sub_resource type="BoxMesh" id="rc_mesh_152"]
+size = Vector3(0.02, 0.015299999999999998, 0.01)
+
+[sub_resource type="BoxMesh" id="rc_mesh_153"]
+size = Vector3(0.05, 0.04, 0.035)
+
+[sub_resource type="PrismMesh" id="rc_mesh_154"]
+left_to_right = 0.5
+size = Vector3(0.06, 0.08, 0.02)
+
+[sub_resource type="CylinderMesh" id="rc_mesh_155"]
 top_radius = 0.012
 bottom_radius = 0.085
 height = 0.16
 radial_segments = 4
 rings = 0
 
-[sub_resource type="SphereMesh" id="rc_mesh_68"]
-radius = 0.022
-height = 0.044
+[sub_resource type="SphereMesh" id="rc_mesh_156"]
+radius = 0.024
+height = 0.048
 radial_segments = 6
 rings = 3
 
-[sub_resource type="CylinderMesh" id="rc_mesh_69"]
+[sub_resource type="BoxMesh" id="rc_mesh_157"]
+size = Vector3(0.05, 0.006, 0.01)
+
+[sub_resource type="BoxMesh" id="rc_mesh_158"]
+size = Vector3(0.012, 0.012, 0.004)
+
+[sub_resource type="BoxMesh" id="rc_mesh_159"]
+size = Vector3(0.12, 0.004, 0.004)
+
+[sub_resource type="BoxMesh" id="rc_mesh_160"]
+size = Vector3(0.12, 0.004, 0.004)
+
+[sub_resource type="BoxMesh" id="rc_mesh_161"]
+size = Vector3(0.012, 0.012, 0.004)
+
+[sub_resource type="BoxMesh" id="rc_mesh_162"]
+size = Vector3(0.12, 0.004, 0.004)
+
+[sub_resource type="BoxMesh" id="rc_mesh_163"]
+size = Vector3(0.12, 0.004, 0.004)
+
+[sub_resource type="CylinderMesh" id="rc_mesh_164"]
 top_radius = 0.005
 bottom_radius = 0.005
-height = 0.15
+height = 0.16
 radial_segments = 4
 rings = 0
 
-[sub_resource type="CylinderMesh" id="rc_mesh_70"]
-top_radius = 0.004
-bottom_radius = 0.065
-height = 0.13
-radial_segments = 4
+[sub_resource type="CylinderMesh" id="rc_mesh_165"]
+top_radius = 0.27
+bottom_radius = 0.26
+height = 0.022
+radial_segments = 10
 rings = 0
 
-[sub_resource type="CylinderMesh" id="rc_mesh_71"]
-top_radius = 0.003
-bottom_radius = 0.035
-height = 0.08
-radial_segments = 4
+[sub_resource type="CylinderMesh" id="rc_mesh_166"]
+top_radius = 0.272
+bottom_radius = 0.272
+height = 0.008
+radial_segments = 10
 rings = 0
 
-[sub_resource type="CylinderMesh" id="rc_mesh_72"]
-top_radius = 0.004
-bottom_radius = 0.065
-height = 0.13
-radial_segments = 4
-rings = 0
+[sub_resource type="BoxMesh" id="rc_mesh_167"]
+size = Vector3(0.09, 0.02, 0.38)
 
-[sub_resource type="CylinderMesh" id="rc_mesh_73"]
-top_radius = 0.003
-bottom_radius = 0.035
-height = 0.08
-radial_segments = 4
-rings = 0
+[sub_resource type="BoxMesh" id="rc_mesh_168"]
+size = Vector3(0.09, 0.02, 0.38)
 
-[sub_resource type="CylinderMesh" id="rc_mesh_74"]
-top_radius = 0.31
-bottom_radius = 0.3
-height = 0.025
-radial_segments = 8
-rings = 0
-
-[sub_resource type="CylinderMesh" id="rc_mesh_75"]
-top_radius = 0.15
-bottom_radius = 0.18
+[sub_resource type="CylinderMesh" id="rc_mesh_169"]
+top_radius = 0.14
+bottom_radius = 0.175
 height = 0.2
 radial_segments = 6
 rings = 0
 
-[sub_resource type="PrismMesh" id="rc_mesh_76"]
+[sub_resource type="PrismMesh" id="rc_mesh_170"]
 left_to_right = 0.5
-size = Vector3(0.24, 0.04, 0.24)
+size = Vector3(0.24, 0.045, 0.25)
 
-[sub_resource type="CylinderMesh" id="rc_mesh_77"]
-top_radius = 0.183
-bottom_radius = 0.183
+[sub_resource type="CylinderMesh" id="rc_mesh_171"]
+top_radius = 0.178
+bottom_radius = 0.178
 height = 0.05
 radial_segments = 6
 rings = 0
+
+[sub_resource type="PrismMesh" id="rc_mesh_172"]
+left_to_right = 0.5
+size = Vector3(0.028, 0.11, 0.012)
+
+[sub_resource type="BoxMesh" id="rc_mesh_173"]
+size = Vector3(0.005, 0.1, 0.014)
 
 [node name="Duo" type="CharacterBody3D"]
 collision_layer = 2
@@ -539,26 +941,56 @@ pelvis = NodePath("Pelvis")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.12, 0.36, 0)
 
 [node name="Leg" type="MeshInstance3D" parent="Legs/Model/LeftHip" groups=["no_tint"]]
-transform = Transform3D(1, 0, 0, 0, -1, 0, 0, 0, -1, 0, -0.15, 0)
+transform = Transform3D(1, 0, 0, 0, -1, 0, 0, 0, -1, 0, -0.14, 0)
 mesh = SubResource("rc_mesh_1")
-surface_material_override/0 = SubResource("rc_fur")
+surface_material_override/0 = SubResource("rc_fur_dark")
 
 [node name="Foot" type="MeshInstance3D" parent="Legs/Model/LeftHip" groups=["no_tint"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1.7, 0, -0.33, -0.05)
 mesh = SubResource("rc_mesh_2")
 surface_material_override/0 = SubResource("rc_paw")
 
+[node name="Toe0" type="MeshInstance3D" parent="Legs/Model/LeftHip" groups=["no_tint"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.035, -0.345, -0.16)
+mesh = SubResource("rc_mesh_3")
+surface_material_override/0 = SubResource("rc_paw")
+
+[node name="Toe1" type="MeshInstance3D" parent="Legs/Model/LeftHip" groups=["no_tint"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.345, -0.16)
+mesh = SubResource("rc_mesh_4")
+surface_material_override/0 = SubResource("rc_paw")
+
+[node name="Toe2" type="MeshInstance3D" parent="Legs/Model/LeftHip" groups=["no_tint"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.035, -0.345, -0.16)
+mesh = SubResource("rc_mesh_5")
+surface_material_override/0 = SubResource("rc_paw")
+
 [node name="RightHip" type="Node3D" parent="Legs/Model"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.12, 0.36, 0)
 
 [node name="Leg" type="MeshInstance3D" parent="Legs/Model/RightHip" groups=["no_tint"]]
-transform = Transform3D(1, 0, 0, 0, -1, 0, 0, 0, -1, 0, -0.15, 0)
-mesh = SubResource("rc_mesh_3")
-surface_material_override/0 = SubResource("rc_fur")
+transform = Transform3D(1, 0, 0, 0, -1, 0, 0, 0, -1, 0, -0.14, 0)
+mesh = SubResource("rc_mesh_6")
+surface_material_override/0 = SubResource("rc_fur_dark")
 
 [node name="Foot" type="MeshInstance3D" parent="Legs/Model/RightHip" groups=["no_tint"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1.7, 0, -0.33, -0.05)
-mesh = SubResource("rc_mesh_4")
+mesh = SubResource("rc_mesh_7")
+surface_material_override/0 = SubResource("rc_paw")
+
+[node name="Toe0" type="MeshInstance3D" parent="Legs/Model/RightHip" groups=["no_tint"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.035, -0.345, -0.16)
+mesh = SubResource("rc_mesh_8")
+surface_material_override/0 = SubResource("rc_paw")
+
+[node name="Toe1" type="MeshInstance3D" parent="Legs/Model/RightHip" groups=["no_tint"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.345, -0.16)
+mesh = SubResource("rc_mesh_9")
+surface_material_override/0 = SubResource("rc_paw")
+
+[node name="Toe2" type="MeshInstance3D" parent="Legs/Model/RightHip" groups=["no_tint"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.035, -0.345, -0.16)
+mesh = SubResource("rc_mesh_10")
 surface_material_override/0 = SubResource("rc_paw")
 
 [node name="Pelvis" type="Node3D" parent="Legs/Model"]
@@ -566,178 +998,365 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.95, 0)
 
 [node name="Skirt" type="MeshInstance3D" parent="Legs/Model/Pelvis"]
 transform = Transform3D(0.866, 0, 0.5, 0, 1, 0, -0.36, 0, 0.6235, 0, -0.325, 0)
-mesh = SubResource("rc_mesh_5")
-
-[node name="Opening" type="Node3D" parent="Legs/Model/Pelvis"]
-transform = Transform3D(1, 0, 0, 0, 0.9963, 0.0865, 0, -0.0865, 0.9963, 0, -0.27, -0.2166)
-
-[node name="Lining" type="MeshInstance3D" parent="Legs/Model/Pelvis/Opening" groups=["no_tint"]]
-transform = Transform3D(0.175, -0.175, 0, 0.275, 0.275, 0, 0, 0, 1, 0, 0, -0.004)
-mesh = SubResource("rc_mesh_6")
-surface_material_override/0 = SubResource("rc_lining")
-
-[node name="FlapUL" type="MeshInstance3D" parent="Legs/Model/Pelvis/Opening"]
-transform = Transform3D(0.5145, -0.8575, 0, 0.8575, 0.5145, 0, 0, 0, 1, -0.0904, 0.136, -0.02)
-mesh = SubResource("rc_mesh_7")
-
-[node name="FlapULEdge" type="MeshInstance3D" parent="Legs/Model/Pelvis/Opening" groups=["no_tint"]]
-transform = Transform3D(0.5145, -0.8575, 0, 0.8575, 0.5145, 0, 0, 0, 1, -0.069, 0.115, -0.03)
-mesh = SubResource("rc_mesh_8")
-surface_material_override/0 = SubResource("rc_lining")
-
-[node name="FlapUR" type="MeshInstance3D" parent="Legs/Model/Pelvis/Opening"]
-transform = Transform3D(0.5145, 0.8575, 0, -0.8575, 0.5145, 0, 0, 0, 1, 0.0904, 0.136, -0.02)
-mesh = SubResource("rc_mesh_9")
-
-[node name="FlapUREdge" type="MeshInstance3D" parent="Legs/Model/Pelvis/Opening" groups=["no_tint"]]
-transform = Transform3D(0.5145, 0.8575, 0, -0.8575, 0.5145, 0, 0, 0, 1, 0.069, 0.115, -0.03)
-mesh = SubResource("rc_mesh_10")
-surface_material_override/0 = SubResource("rc_lining")
-
-[node name="FlapLL" type="MeshInstance3D" parent="Legs/Model/Pelvis/Opening"]
-transform = Transform3D(0.5145, 0.8575, 0, -0.8575, 0.5145, 0, 0, 0, 1, -0.0904, -0.136, -0.02)
 mesh = SubResource("rc_mesh_11")
 
-[node name="FlapLLEdge" type="MeshInstance3D" parent="Legs/Model/Pelvis/Opening" groups=["no_tint"]]
-transform = Transform3D(0.5145, 0.8575, 0, -0.8575, 0.5145, 0, 0, 0, 1, -0.069, -0.115, -0.03)
+[node name="Hem" type="MeshInstance3D" parent="Legs/Model/Pelvis" groups=["team_dark"]]
+transform = Transform3D(0.866, 0, 0.5, 0, 1, 0, -0.36, 0, 0.6235, 0, -0.69, 0)
 mesh = SubResource("rc_mesh_12")
+
+[node name="FrontSeam" type="MeshInstance3D" parent="Legs/Model/Pelvis" groups=["no_tint"]]
+transform = Transform3D(1, 0, 0, 0, 0.9955, 0.0943, 0, -0.0943, 0.9955, 0.012, -0.605, -0.255)
+mesh = SubResource("rc_mesh_13")
 surface_material_override/0 = SubResource("rc_lining")
 
-[node name="FlapLR" type="MeshInstance3D" parent="Legs/Model/Pelvis/Opening"]
-transform = Transform3D(0.5145, -0.8575, 0, 0.8575, 0.5145, 0, 0, 0, 1, 0.0904, -0.136, -0.02)
-mesh = SubResource("rc_mesh_13")
+[node name="FrontPanel" type="MeshInstance3D" parent="Legs/Model/Pelvis"]
+transform = Transform3D(1, 0, 0, 0, 0.9955, 0.0943, 0, -0.0943, 0.9955, -0.02, -0.605, -0.259)
+mesh = SubResource("rc_mesh_14")
+
+[node name="BeltLoop0" type="MeshInstance3D" parent="Legs/Model/Pelvis" groups=["team_dark"]]
+transform = Transform3D(0.766, 0, 0.6428, 0, 1, 0, -0.6428, 0, 0.766, -0.21, 0.035, -0.128)
+mesh = SubResource("rc_mesh_15")
+
+[node name="BeltLoop1" type="MeshInstance3D" parent="Legs/Model/Pelvis" groups=["team_dark"]]
+transform = Transform3D(0.766, 0, -0.6428, 0, 1, 0, 0.6428, 0, 0.766, 0.21, 0.035, -0.128)
+mesh = SubResource("rc_mesh_16")
+
+[node name="BackVent" type="MeshInstance3D" parent="Legs/Model/Pelvis" groups=["no_tint"]]
+transform = Transform3D(1, 0, 0, 0, 0.9955, -0.0943, 0, 0.0943, 0.9955, 0, -0.55, 0.2508)
+mesh = SubResource("rc_mesh_17")
+surface_material_override/0 = SubResource("rc_lining")
+
+[node name="PocketL" type="MeshInstance3D" parent="Legs/Model/Pelvis" groups=["team_dark"]]
+transform = Transform3D(0.6157, 0, 0.788, 0, 1, 0, -0.788, 0, 0.6157, -0.2, -0.2, -0.1526)
+mesh = SubResource("rc_mesh_18")
+
+[node name="PocketR" type="MeshInstance3D" parent="Legs/Model/Pelvis" groups=["team_dark"]]
+transform = Transform3D(0.6157, 0, -0.788, 0, 1, 0, 0.788, 0, 0.6157, 0.2, -0.2, -0.1526)
+mesh = SubResource("rc_mesh_19")
+
+[node name="Opening" type="Node3D" parent="Legs/Model/Pelvis"]
+transform = Transform3D(1, 0, 0, 0, 0.9955, 0.0943, 0, -0.0943, 0.9955, 0, -0.27, -0.2193)
+
+[node name="Lining" type="MeshInstance3D" parent="Legs/Model/Pelvis/Opening" groups=["no_tint"]]
+transform = Transform3D(0.185, -0.185, 0, 0.285, 0.285, 0, 0, 0, 1, 0, 0, -0.004)
+mesh = SubResource("rc_mesh_20")
+surface_material_override/0 = SubResource("rc_lining")
+
+[node name="FlapUL" type="MeshInstance3D" parent="Legs/Model/Pelvis/Opening" groups=["team_dark"]]
+transform = Transform3D(0.5241, -0.8517, 0, 0.8517, 0.5241, 0, 0, 0, 1, -0.0954, 0.141, -0.02)
+mesh = SubResource("rc_mesh_21")
+
+[node name="FlapULEdge" type="MeshInstance3D" parent="Legs/Model/Pelvis/Opening" groups=["no_tint"]]
+transform = Transform3D(0.5241, -0.8517, 0, 0.8517, 0.5241, 0, 0, 0, 1, -0.0736, 0.1196, -0.03)
+mesh = SubResource("rc_mesh_22")
+surface_material_override/0 = SubResource("rc_lining")
+
+[node name="FlapUR" type="MeshInstance3D" parent="Legs/Model/Pelvis/Opening" groups=["team_dark"]]
+transform = Transform3D(0.5241, 0.8517, 0, -0.8517, 0.5241, 0, 0, 0, 1, 0.0954, 0.141, -0.02)
+mesh = SubResource("rc_mesh_23")
+
+[node name="FlapUREdge" type="MeshInstance3D" parent="Legs/Model/Pelvis/Opening" groups=["no_tint"]]
+transform = Transform3D(0.5241, 0.8517, 0, -0.8517, 0.5241, 0, 0, 0, 1, 0.0736, 0.1196, -0.03)
+mesh = SubResource("rc_mesh_24")
+surface_material_override/0 = SubResource("rc_lining")
+
+[node name="FlapLL" type="MeshInstance3D" parent="Legs/Model/Pelvis/Opening" groups=["team_dark"]]
+transform = Transform3D(0.5241, 0.8517, 0, -0.8517, 0.5241, 0, 0, 0, 1, -0.0954, -0.141, -0.02)
+mesh = SubResource("rc_mesh_25")
+
+[node name="FlapLLEdge" type="MeshInstance3D" parent="Legs/Model/Pelvis/Opening" groups=["no_tint"]]
+transform = Transform3D(0.5241, 0.8517, 0, -0.8517, 0.5241, 0, 0, 0, 1, -0.0736, -0.1196, -0.03)
+mesh = SubResource("rc_mesh_26")
+surface_material_override/0 = SubResource("rc_lining")
+
+[node name="FlapLR" type="MeshInstance3D" parent="Legs/Model/Pelvis/Opening" groups=["team_dark"]]
+transform = Transform3D(0.5241, -0.8517, 0, 0.8517, 0.5241, 0, 0, 0, 1, 0.0954, -0.141, -0.02)
+mesh = SubResource("rc_mesh_27")
 
 [node name="FlapLREdge" type="MeshInstance3D" parent="Legs/Model/Pelvis/Opening" groups=["no_tint"]]
-transform = Transform3D(0.5145, -0.8575, 0, 0.8575, 0.5145, 0, 0, 0, 1, 0.069, -0.115, -0.03)
-mesh = SubResource("rc_mesh_14")
+transform = Transform3D(0.5241, -0.8517, 0, 0.8517, 0.5241, 0, 0, 0, 1, 0.0736, -0.1196, -0.03)
+mesh = SubResource("rc_mesh_28")
 surface_material_override/0 = SubResource("rc_lining")
 
 [node name="Bottom" type="Node3D" parent="Legs/Model/Pelvis/Opening"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.02, -0.02)
 
 [node name="Head" type="MeshInstance3D" parent="Legs/Model/Pelvis/Opening/Bottom" groups=["no_tint"]]
-transform = Transform3D(1, 0, 0, 0, 0.9, 0, 0, 0, 0.8, 0, 0, 0.06)
-mesh = SubResource("rc_mesh_15")
+transform = Transform3D(1.05, 0, 0, 0, 0.9, 0, 0, 0, 0.8, 0, 0, 0.06)
+mesh = SubResource("rc_mesh_29")
 surface_material_override/0 = SubResource("rc_fur")
 
-[node name="Face" type="Node3D" parent="Legs/Model/Pelvis/Opening/Bottom"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.035)
+[node name="CheekL" type="MeshInstance3D" parent="Legs/Model/Pelvis/Opening/Bottom" groups=["no_tint"]]
+transform = Transform3D(0, 1, 0, -1, 0, 0, 0, 0, 1, -0.12, -0.05, 0)
+mesh = SubResource("rc_mesh_30")
+surface_material_override/0 = SubResource("rc_fur_light")
 
-[node name="Mask" type="MeshInstance3D" parent="Legs/Model/Pelvis/Opening/Bottom/Face" groups=["no_tint"]]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.024, -0.005)
-mesh = SubResource("rc_mesh_16")
+[node name="CheekR" type="MeshInstance3D" parent="Legs/Model/Pelvis/Opening/Bottom" groups=["no_tint"]]
+transform = Transform3D(0, -1, 0, 1, 0, 0, 0, 0, 1, 0.12, -0.05, 0)
+mesh = SubResource("rc_mesh_31")
+surface_material_override/0 = SubResource("rc_fur_light")
+
+[node name="Face" type="Node3D" parent="Legs/Model/Pelvis/Opening/Bottom"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.04)
+
+[node name="PatchL" type="MeshInstance3D" parent="Legs/Model/Pelvis/Opening/Bottom/Face" groups=["no_tint"]]
+transform = Transform3D(0.9781, -0.2079, 0, 0.2079, 0.9781, 0, 0, 0, 1, -0.0638, 0.0255, -0.004)
+mesh = SubResource("rc_mesh_32")
 surface_material_override/0 = SubResource("rc_mask")
 
+[node name="BrowL" type="MeshInstance3D" parent="Legs/Model/Pelvis/Opening/Bottom/Face" groups=["no_tint"]]
+transform = Transform3D(0.9903, -0.1392, 0, 0.1392, 0.9903, 0, 0, 0, 1, -0.068, 0.0706, -0.01)
+mesh = SubResource("rc_mesh_33")
+surface_material_override/0 = SubResource("rc_white")
+
 [node name="EyeL" type="MeshInstance3D" parent="Legs/Model/Pelvis/Opening/Bottom/Face" groups=["no_tint"]]
-transform = Transform3D(0.9903, 0.1392, 0, -0.1392, 0.9903, 0, 0, 0, 1, -0.06, 0.0264, -0.024)
-mesh = SubResource("rc_mesh_17")
+transform = Transform3D(0.9848, -0.1736, 0, 0.1736, 0.9848, 0, 0, 0, 1, -0.0638, 0.0272, -0.0255)
+mesh = SubResource("rc_mesh_34")
 surface_material_override/0 = SubResource("rc_eye")
 
 [node name="PupilL" type="MeshInstance3D" parent="Legs/Model/Pelvis/Opening/Bottom/Face" groups=["no_tint"]]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.048, 0.0264, -0.0328)
-mesh = SubResource("rc_mesh_18")
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.051, 0.0272, -0.0357)
+mesh = SubResource("rc_mesh_35")
 surface_material_override/0 = SubResource("rc_nose")
 
+[node name="PatchR" type="MeshInstance3D" parent="Legs/Model/Pelvis/Opening/Bottom/Face" groups=["no_tint"]]
+transform = Transform3D(0.9781, 0.2079, 0, -0.2079, 0.9781, 0, 0, 0, 1, 0.0638, 0.0255, -0.004)
+mesh = SubResource("rc_mesh_36")
+surface_material_override/0 = SubResource("rc_mask")
+
+[node name="BrowR" type="MeshInstance3D" parent="Legs/Model/Pelvis/Opening/Bottom/Face" groups=["no_tint"]]
+transform = Transform3D(0.9903, 0.1392, 0, -0.1392, 0.9903, 0, 0, 0, 1, 0.068, 0.0706, -0.01)
+mesh = SubResource("rc_mesh_37")
+surface_material_override/0 = SubResource("rc_white")
+
 [node name="EyeR" type="MeshInstance3D" parent="Legs/Model/Pelvis/Opening/Bottom/Face" groups=["no_tint"]]
-transform = Transform3D(0.9903, -0.1392, 0, 0.1392, 0.9903, 0, 0, 0, 1, 0.06, 0.0264, -0.024)
-mesh = SubResource("rc_mesh_19")
+transform = Transform3D(0.9848, 0.1736, 0, -0.1736, 0.9848, 0, 0, 0, 1, 0.0638, 0.0272, -0.0255)
+mesh = SubResource("rc_mesh_38")
 surface_material_override/0 = SubResource("rc_eye")
 
 [node name="PupilR" type="MeshInstance3D" parent="Legs/Model/Pelvis/Opening/Bottom/Face" groups=["no_tint"]]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.072, 0.0264, -0.0328)
-mesh = SubResource("rc_mesh_20")
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.051, 0.0272, -0.0357)
+mesh = SubResource("rc_mesh_39")
 surface_material_override/0 = SubResource("rc_nose")
 
+[node name="Bridge" type="MeshInstance3D" parent="Legs/Model/Pelvis/Opening/Bottom/Face" groups=["no_tint"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.017, -0.012)
+mesh = SubResource("rc_mesh_40")
+surface_material_override/0 = SubResource("rc_mask")
+
+[node name="Blaze" type="MeshInstance3D" parent="Legs/Model/Pelvis/Opening/Bottom/Face" groups=["no_tint"]]
+transform = Transform3D(-1, 0, 0, 0, -1, 0, 0, 0, 1, 0, 0.0935, -0.006)
+mesh = SubResource("rc_mesh_41")
+surface_material_override/0 = SubResource("rc_white")
+
 [node name="Snout" type="MeshInstance3D" parent="Legs/Model/Pelvis/Opening/Bottom/Face" groups=["no_tint"]]
-transform = Transform3D(0.7071, -0.7071, 0, 0, 0, 1, -0.7071, -0.7071, 0, 0, -0.036, -0.056)
-mesh = SubResource("rc_mesh_21")
+transform = Transform3D(0.7071, -0.7071, 0, 0, 0, 1, -0.7071, -0.7071, 0, 0, -0.0382, -0.0595)
+mesh = SubResource("rc_mesh_42")
 surface_material_override/0 = SubResource("rc_white")
 
 [node name="Nose" type="MeshInstance3D" parent="Legs/Model/Pelvis/Opening/Bottom/Face" groups=["no_tint"]]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.032, -0.12)
-mesh = SubResource("rc_mesh_22")
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.034, -0.1292)
+mesh = SubResource("rc_mesh_43")
 surface_material_override/0 = SubResource("rc_nose")
 
+[node name="Mouth" type="MeshInstance3D" parent="Legs/Model/Pelvis/Opening/Bottom/Face" groups=["no_tint"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.0723, -0.085)
+mesh = SubResource("rc_mesh_44")
+surface_material_override/0 = SubResource("rc_nose")
+
+[node name="GlintL" type="MeshInstance3D" parent="Legs/Model/Pelvis/Opening/Bottom/Face" groups=["no_tint"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.0527, 0.034, -0.0408)
+mesh = SubResource("rc_mesh_45")
+surface_material_override/0 = SubResource("rc_eye")
+
+[node name="WhiskerL0" type="MeshInstance3D" parent="Legs/Model/Pelvis/Opening/Bottom/Face" groups=["no_tint"]]
+transform = Transform3D(0.9305, 0.1308, 0.342, -0.1392, 0.9903, 0, -0.3387, -0.0476, 0.9397, -0.085, -0.0298, -0.0723)
+mesh = SubResource("rc_mesh_46")
+surface_material_override/0 = SubResource("rc_white")
+
+[node name="WhiskerL1" type="MeshInstance3D" parent="Legs/Model/Pelvis/Opening/Bottom/Face" groups=["no_tint"]]
+transform = Transform3D(0.9345, -0.0982, 0.342, 0.1045, 0.9945, 0, -0.3401, 0.0358, 0.9397, -0.085, -0.0425, -0.0723)
+mesh = SubResource("rc_mesh_47")
+surface_material_override/0 = SubResource("rc_white")
+
+[node name="GlintR" type="MeshInstance3D" parent="Legs/Model/Pelvis/Opening/Bottom/Face" groups=["no_tint"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0527, 0.034, -0.0408)
+mesh = SubResource("rc_mesh_48")
+surface_material_override/0 = SubResource("rc_eye")
+
+[node name="WhiskerR0" type="MeshInstance3D" parent="Legs/Model/Pelvis/Opening/Bottom/Face" groups=["no_tint"]]
+transform = Transform3D(0.9305, -0.1308, -0.342, 0.1392, 0.9903, 0, 0.3387, -0.0476, 0.9397, 0.085, -0.0298, -0.0723)
+mesh = SubResource("rc_mesh_49")
+surface_material_override/0 = SubResource("rc_white")
+
+[node name="WhiskerR1" type="MeshInstance3D" parent="Legs/Model/Pelvis/Opening/Bottom/Face" groups=["no_tint"]]
+transform = Transform3D(0.9345, 0.0982, -0.342, -0.1045, 0.9945, 0, 0.3401, 0.0358, 0.9397, 0.085, -0.0425, -0.0723)
+mesh = SubResource("rc_mesh_50")
+surface_material_override/0 = SubResource("rc_white")
+
+[node name="EarL" type="MeshInstance3D" parent="Legs/Model/Pelvis/Opening/Bottom" groups=["no_tint"]]
+transform = Transform3D(0.6556, -0.2649, 0.7071, 0.3746, 0.9272, 0, -0.6556, 0.2649, 0.7071, -0.085, 0.15, 0.05)
+mesh = SubResource("rc_mesh_51")
+surface_material_override/0 = SubResource("rc_fur")
+
+[node name="EarInL" type="MeshInstance3D" parent="Legs/Model/Pelvis/Opening/Bottom" groups=["no_tint"]]
+transform = Transform3D(0.6556, -0.2649, 0.7071, 0.3746, 0.9272, 0, -0.6556, 0.2649, 0.7071, -0.083, 0.145, 0.03)
+mesh = SubResource("rc_mesh_52")
+surface_material_override/0 = SubResource("rc_fur_dark")
+
+[node name="EarR" type="MeshInstance3D" parent="Legs/Model/Pelvis/Opening/Bottom" groups=["no_tint"]]
+transform = Transform3D(0.6556, 0.2649, 0.7071, -0.3746, 0.9272, 0, -0.6556, -0.2649, 0.7071, 0.085, 0.15, 0.05)
+mesh = SubResource("rc_mesh_53")
+surface_material_override/0 = SubResource("rc_fur")
+
+[node name="EarInR" type="MeshInstance3D" parent="Legs/Model/Pelvis/Opening/Bottom" groups=["no_tint"]]
+transform = Transform3D(0.6556, 0.2649, 0.7071, -0.3746, 0.9272, 0, -0.6556, -0.2649, 0.7071, 0.083, 0.145, 0.03)
+mesh = SubResource("rc_mesh_54")
+surface_material_override/0 = SubResource("rc_fur_dark")
+
 [node name="Sweat" type="MeshInstance3D" parent="Legs/Model/Pelvis/Opening/Bottom" groups=["no_tint"]]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.12, 0.09, -0.04)
-mesh = SubResource("rc_mesh_23")
+transform = Transform3D(0.8, 0, 0, 0, 1.2, 0, 0, 0, 0.8, 0.13, 0.1, -0.045)
+mesh = SubResource("rc_mesh_55")
+surface_material_override/0 = SubResource("rc_sweat")
+
+[node name="Sweat2" type="MeshInstance3D" parent="Legs/Model/Pelvis/Opening/Bottom" groups=["no_tint"]]
+transform = Transform3D(0.8, 0, 0, 0, 1.2, 0, 0, 0, 0.8, -0.14, 0.06, -0.04)
+mesh = SubResource("rc_mesh_56")
 surface_material_override/0 = SubResource("rc_sweat")
 
 [node name="PawL" type="MeshInstance3D" parent="Legs/Model/Pelvis/Opening" groups=["no_tint"]]
-transform = Transform3D(1, 0, 0, 0, 0.8, 0, 0, 0, 1, -0.165, 0, -0.04)
-mesh = SubResource("rc_mesh_24")
+transform = Transform3D(1, 0, 0, 0, 0.85, 0, 0, 0, 1.1, -0.172, 0, -0.045)
+mesh = SubResource("rc_mesh_57")
+surface_material_override/0 = SubResource("rc_paw")
+
+[node name="PawLToe0" type="MeshInstance3D" parent="Legs/Model/Pelvis/Opening" groups=["no_tint"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.1958, -0.0095, -0.0877)
+mesh = SubResource("rc_mesh_58")
+surface_material_override/0 = SubResource("rc_paw")
+
+[node name="PawLToe1" type="MeshInstance3D" parent="Legs/Model/Pelvis/Opening" groups=["no_tint"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.172, -0.0095, -0.0877)
+mesh = SubResource("rc_mesh_59")
+surface_material_override/0 = SubResource("rc_paw")
+
+[node name="PawLToe2" type="MeshInstance3D" parent="Legs/Model/Pelvis/Opening" groups=["no_tint"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.1483, -0.0095, -0.0877)
+mesh = SubResource("rc_mesh_60")
 surface_material_override/0 = SubResource("rc_paw")
 
 [node name="PawR" type="MeshInstance3D" parent="Legs/Model/Pelvis/Opening" groups=["no_tint"]]
-transform = Transform3D(1, 0, 0, 0, 0.8, 0, 0, 0, 1, 0.165, 0, -0.04)
-mesh = SubResource("rc_mesh_25")
+transform = Transform3D(1, 0, 0, 0, 0.85, 0, 0, 0, 1.1, 0.172, 0, -0.045)
+mesh = SubResource("rc_mesh_61")
+surface_material_override/0 = SubResource("rc_paw")
+
+[node name="PawRToe0" type="MeshInstance3D" parent="Legs/Model/Pelvis/Opening" groups=["no_tint"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.1483, -0.0095, -0.0877)
+mesh = SubResource("rc_mesh_62")
+surface_material_override/0 = SubResource("rc_paw")
+
+[node name="PawRToe1" type="MeshInstance3D" parent="Legs/Model/Pelvis/Opening" groups=["no_tint"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.172, -0.0095, -0.0877)
+mesh = SubResource("rc_mesh_63")
+surface_material_override/0 = SubResource("rc_paw")
+
+[node name="PawRToe2" type="MeshInstance3D" parent="Legs/Model/Pelvis/Opening" groups=["no_tint"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.1958, -0.0095, -0.0877)
+mesh = SubResource("rc_mesh_64")
 surface_material_override/0 = SubResource("rc_paw")
 
 [node name="Belt" type="MeshInstance3D" parent="Legs/Model/Pelvis" groups=["no_tint"]]
 transform = Transform3D(0.866, 0, 0.5, 0, 1, 0, -0.36, 0, 0.6235, 0, 0.035, 0)
-mesh = SubResource("rc_mesh_26")
+mesh = SubResource("rc_mesh_65")
 surface_material_override/0 = SubResource("rc_belt")
 
 [node name="Buckle" type="MeshInstance3D" parent="Legs/Model/Pelvis" groups=["no_tint"]]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.035, -0.2071)
-mesh = SubResource("rc_mesh_27")
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.035, -0.2091)
+mesh = SubResource("rc_mesh_66")
 surface_material_override/0 = SubResource("rc_buckle")
 
+[node name="BuckleHole" type="MeshInstance3D" parent="Legs/Model/Pelvis" groups=["no_tint"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.035, -0.2111)
+mesh = SubResource("rc_mesh_67")
+surface_material_override/0 = SubResource("rc_belt")
+
+[node name="BeltTailL" type="MeshInstance3D" parent="Legs/Model/Pelvis" groups=["no_tint"]]
+transform = Transform3D(0.9063, -0.4226, 0, 0.4226, 0.9063, 0, 0, 0, 1, -0.08, 0.01, -0.2071)
+mesh = SubResource("rc_mesh_68")
+surface_material_override/0 = SubResource("rc_belt")
+
+[node name="BeltTailR" type="MeshInstance3D" parent="Legs/Model/Pelvis" groups=["no_tint"]]
+transform = Transform3D(0.9063, 0.4226, 0, -0.4226, 0.9063, 0, 0, 0, 1, 0.08, 0.01, -0.2071)
+mesh = SubResource("rc_mesh_69")
+surface_material_override/0 = SubResource("rc_belt")
+
 [node name="Tail" type="Node3D" parent="Legs/Model/Pelvis"]
-transform = Transform3D(0.8192, -0.2868, 0.4967, 0, 0.866, 0.5, -0.5736, -0.4096, 0.7094, 0.2, -0.55, 0.22)
+transform = Transform3D(0.8192, -0.2693, 0.5064, 0, 0.8829, 0.4695, -0.5736, -0.3846, 0.7233, 0.18, -0.55, 0.2)
 
 [node name="S0" type="Node3D" parent="Legs/Model/Pelvis/Tail"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
 
 [node name="M" type="MeshInstance3D" parent="Legs/Model/Pelvis/Tail/S0" groups=["no_tint"]]
-transform = Transform3D(1, 0, 0, 0, 0, -1, 0, 1, 0, 0, 0, 0.06)
-mesh = SubResource("rc_mesh_28")
+transform = Transform3D(1, 0, 0, 0, 0, -1, 0, 1, 0, 0, 0, 0.055)
+mesh = SubResource("rc_mesh_70")
 surface_material_override/0 = SubResource("rc_fur")
 
 [node name="S1" type="Node3D" parent="Legs/Model/Pelvis/Tail/S0"]
-transform = Transform3D(1, 0, 0, 0, 0.9744, -0.225, 0, 0.225, 0.9744, 0, 0, 0.12)
+transform = Transform3D(1, 0, 0, 0, 0.9781, -0.2079, 0, 0.2079, 0.9781, 0, 0, 0.11)
 
 [node name="M" type="MeshInstance3D" parent="Legs/Model/Pelvis/Tail/S0/S1" groups=["no_tint"]]
-transform = Transform3D(1, 0, 0, 0, 0, -1, 0, 1, 0, 0, 0, 0.06)
-mesh = SubResource("rc_mesh_29")
+transform = Transform3D(1, 0, 0, 0, 0, -1, 0, 1, 0, 0, 0, 0.055)
+mesh = SubResource("rc_mesh_71")
 surface_material_override/0 = SubResource("rc_fur_dark")
 
 [node name="S2" type="Node3D" parent="Legs/Model/Pelvis/Tail/S0/S1"]
-transform = Transform3D(1, 0, 0, 0, 0.9744, -0.225, 0, 0.225, 0.9744, 0, 0, 0.12)
+transform = Transform3D(1, 0, 0, 0, 0.9781, -0.2079, 0, 0.2079, 0.9781, 0, 0, 0.11)
 
 [node name="M" type="MeshInstance3D" parent="Legs/Model/Pelvis/Tail/S0/S1/S2" groups=["no_tint"]]
-transform = Transform3D(1, 0, 0, 0, 0, -1, 0, 1, 0, 0, 0, 0.06)
-mesh = SubResource("rc_mesh_30")
+transform = Transform3D(1, 0, 0, 0, 0, -1, 0, 1, 0, 0, 0, 0.055)
+mesh = SubResource("rc_mesh_72")
 surface_material_override/0 = SubResource("rc_fur")
 
 [node name="S3" type="Node3D" parent="Legs/Model/Pelvis/Tail/S0/S1/S2"]
-transform = Transform3D(1, 0, 0, 0, 0.9744, -0.225, 0, 0.225, 0.9744, 0, 0, 0.12)
+transform = Transform3D(1, 0, 0, 0, 0.9781, -0.2079, 0, 0.2079, 0.9781, 0, 0, 0.11)
 
 [node name="M" type="MeshInstance3D" parent="Legs/Model/Pelvis/Tail/S0/S1/S2/S3" groups=["no_tint"]]
-transform = Transform3D(1, 0, 0, 0, 0, -1, 0, 1, 0, 0, 0, 0.06)
-mesh = SubResource("rc_mesh_31")
+transform = Transform3D(1, 0, 0, 0, 0, -1, 0, 1, 0, 0, 0, 0.055)
+mesh = SubResource("rc_mesh_73")
 surface_material_override/0 = SubResource("rc_fur_dark")
 
 [node name="S4" type="Node3D" parent="Legs/Model/Pelvis/Tail/S0/S1/S2/S3"]
-transform = Transform3D(1, 0, 0, 0, 0.9744, -0.225, 0, 0.225, 0.9744, 0, 0, 0.12)
+transform = Transform3D(1, 0, 0, 0, 0.9781, -0.2079, 0, 0.2079, 0.9781, 0, 0, 0.11)
 
 [node name="M" type="MeshInstance3D" parent="Legs/Model/Pelvis/Tail/S0/S1/S2/S3/S4" groups=["no_tint"]]
-transform = Transform3D(1, 0, 0, 0, 0, -1, 0, 1, 0, 0, 0, 0.06)
-mesh = SubResource("rc_mesh_32")
+transform = Transform3D(1, 0, 0, 0, 0, -1, 0, 1, 0, 0, 0, 0.055)
+mesh = SubResource("rc_mesh_74")
 surface_material_override/0 = SubResource("rc_fur")
 
 [node name="S5" type="Node3D" parent="Legs/Model/Pelvis/Tail/S0/S1/S2/S3/S4"]
-transform = Transform3D(1, 0, 0, 0, 0.9744, -0.225, 0, 0.225, 0.9744, 0, 0, 0.12)
+transform = Transform3D(1, 0, 0, 0, 0.9781, -0.2079, 0, 0.2079, 0.9781, 0, 0, 0.11)
 
 [node name="M" type="MeshInstance3D" parent="Legs/Model/Pelvis/Tail/S0/S1/S2/S3/S4/S5" groups=["no_tint"]]
-transform = Transform3D(1, 0, 0, 0, 0, -1, 0, 1, 0, 0, 0, 0.06)
-mesh = SubResource("rc_mesh_33")
+transform = Transform3D(1, 0, 0, 0, 0, -1, 0, 1, 0, 0, 0, 0.055)
+mesh = SubResource("rc_mesh_75")
 surface_material_override/0 = SubResource("rc_fur_dark")
 
-[node name="Tip" type="MeshInstance3D" parent="Legs/Model/Pelvis/Tail/S0/S1/S2/S3/S4/S5" groups=["no_tint"]]
+[node name="S6" type="Node3D" parent="Legs/Model/Pelvis/Tail/S0/S1/S2/S3/S4/S5"]
+transform = Transform3D(1, 0, 0, 0, 0.9781, -0.2079, 0, 0.2079, 0.9781, 0, 0, 0.11)
+
+[node name="M" type="MeshInstance3D" parent="Legs/Model/Pelvis/Tail/S0/S1/S2/S3/S4/S5/S6" groups=["no_tint"]]
+transform = Transform3D(1, 0, 0, 0, 0, -1, 0, 1, 0, 0, 0, 0.055)
+mesh = SubResource("rc_mesh_76")
+surface_material_override/0 = SubResource("rc_fur")
+
+[node name="Tip" type="MeshInstance3D" parent="Legs/Model/Pelvis/Tail/S0/S1/S2/S3/S4/S5/S6" groups=["no_tint"]]
 transform = Transform3D(1, 0, 0, 0, 0, -1, 0, 1, 0, 0, 0, 0.17)
-mesh = SubResource("rc_mesh_34")
+mesh = SubResource("rc_mesh_77")
 surface_material_override/0 = SubResource("rc_fur_dark")
+
+[node name="Base" type="MeshInstance3D" parent="Legs/Model/Pelvis/Tail/S0/S1/S2/S3/S4/S5/S6" groups=["no_tint"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.01)
+mesh = SubResource("rc_mesh_78")
+surface_material_override/0 = SubResource("rc_fur")
 
 [node name="LegsHurtbox" type="Area3D" parent="Legs" node_paths=PackedStringArray("health")]
 collision_layer = 4
@@ -756,77 +1375,204 @@ multiplier = 0.75
 
 [node name="CoatChest" type="MeshInstance3D" parent="Torso/Model"]
 transform = Transform3D(0.866, 0, 0.5, 0, 1, 0, -0.36, 0, 0.6235, 0, 1.25, 0)
-mesh = SubResource("rc_mesh_35")
+mesh = SubResource("rc_mesh_79")
 
 [node name="Shoulders" type="MeshInstance3D" parent="Torso/Model"]
 transform = Transform3D(0.866, 0, 0.5, 0, 1, 0, -0.36, 0, 0.6235, 0, 1.53, 0)
-mesh = SubResource("rc_mesh_36")
+mesh = SubResource("rc_mesh_80")
 
 [node name="Shirt" type="MeshInstance3D" parent="Torso/Model" groups=["no_tint"]]
 transform = Transform3D(-1, 0, 0, 0, -1, 0, 0, 0, 1, 0, 1.36, -0.1714)
-mesh = SubResource("rc_mesh_37")
+mesh = SubResource("rc_mesh_81")
 surface_material_override/0 = SubResource("rc_shirt")
 
 [node name="Tie" type="MeshInstance3D" parent="Torso/Model" groups=["no_tint"]]
 transform = Transform3D(-1, 0, 0, 0, -1, 0, 0, 0, 1, 0, 1.35, -0.1784)
-mesh = SubResource("rc_mesh_38")
+mesh = SubResource("rc_mesh_82")
 surface_material_override/0 = SubResource("rc_tie")
 
 [node name="TieKnot" type="MeshInstance3D" parent="Torso/Model" groups=["no_tint"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.47, -0.1804)
-mesh = SubResource("rc_mesh_39")
+mesh = SubResource("rc_mesh_83")
 surface_material_override/0 = SubResource("rc_tie")
 
-[node name="LapelL" type="MeshInstance3D" parent="Torso/Model"]
-transform = Transform3D(-1, 0, 0, 0, -1, 0, 0, 0, 1, -0.085, 1.34, -0.1804)
-mesh = SubResource("rc_mesh_40")
+[node name="LapelL" type="MeshInstance3D" parent="Torso/Model" groups=["team_dark"]]
+transform = Transform3D(-1, 0, 0, 0, -1, 0, 0, 0, 1, -0.09, 1.33, -0.1824)
+mesh = SubResource("rc_mesh_84")
 
-[node name="LapelR" type="MeshInstance3D" parent="Torso/Model"]
-transform = Transform3D(-1, 0, 0, 0, -1, 0, 0, 0, 1, 0.085, 1.34, -0.1804)
-mesh = SubResource("rc_mesh_41")
+[node name="LapelNotchL" type="MeshInstance3D" parent="Torso/Model" groups=["team_dark"]]
+transform = Transform3D(0.8192, 0.5736, 0, -0.5736, 0.8192, 0, 0, 0, 1, -0.15, 1.46, -0.1804)
+mesh = SubResource("rc_mesh_85")
 
-[node name="Button0" type="MeshInstance3D" parent="Torso/Model" groups=["no_tint"]]
-transform = Transform3D(1, 0, 0, 0, 0, -1, 0, 1, 0, 0.05, 1.18, -0.1784)
-mesh = SubResource("rc_mesh_42")
+[node name="LapelR" type="MeshInstance3D" parent="Torso/Model" groups=["team_dark"]]
+transform = Transform3D(-1, 0, 0, 0, -1, 0, 0, 0, 1, 0.09, 1.33, -0.1824)
+mesh = SubResource("rc_mesh_86")
+
+[node name="LapelNotchR" type="MeshInstance3D" parent="Torso/Model" groups=["team_dark"]]
+transform = Transform3D(0.8192, -0.5736, 0, 0.5736, 0.8192, 0, 0, 0, 1, 0.15, 1.46, -0.1804)
+mesh = SubResource("rc_mesh_87")
+
+[node name="ButtonL0" type="MeshInstance3D" parent="Torso/Model" groups=["no_tint"]]
+transform = Transform3D(1, 0, 0, 0, 0, -1, 0, 1, 0, -0.075, 1.19, -0.1786)
+mesh = SubResource("rc_mesh_88")
 surface_material_override/0 = SubResource("rc_nose")
 
-[node name="Button1" type="MeshInstance3D" parent="Torso/Model" groups=["no_tint"]]
-transform = Transform3D(1, 0, 0, 0, 0, -1, 0, 1, 0, 0.05, 1.08, -0.1784)
-mesh = SubResource("rc_mesh_43")
+[node name="ButtonR0" type="MeshInstance3D" parent="Torso/Model" groups=["no_tint"]]
+transform = Transform3D(1, 0, 0, 0, 0, -1, 0, 1, 0, 0.075, 1.19, -0.1786)
+mesh = SubResource("rc_mesh_89")
 surface_material_override/0 = SubResource("rc_nose")
 
-[node name="CollarL" type="MeshInstance3D" parent="Torso/Model"]
-transform = Transform3D(0.9848, -0.1736, 0, 0.1699, 0.9633, 0.2079, -0.0361, -0.2048, 0.9781, -0.13, 1.6, 0.06)
-mesh = SubResource("rc_mesh_44")
+[node name="ButtonL1" type="MeshInstance3D" parent="Torso/Model" groups=["no_tint"]]
+transform = Transform3D(1, 0, 0, 0, 0, -1, 0, 1, 0, -0.075, 1.1, -0.1759)
+mesh = SubResource("rc_mesh_90")
+surface_material_override/0 = SubResource("rc_nose")
 
-[node name="CollarR" type="MeshInstance3D" parent="Torso/Model"]
-transform = Transform3D(0.9848, 0.1736, 0, -0.1699, 0.9633, 0.2079, 0.0361, -0.2048, 0.9781, 0.13, 1.6, 0.06)
-mesh = SubResource("rc_mesh_45")
+[node name="ButtonR1" type="MeshInstance3D" parent="Torso/Model" groups=["no_tint"]]
+transform = Transform3D(1, 0, 0, 0, 0, -1, 0, 1, 0, 0.075, 1.1, -0.1759)
+mesh = SubResource("rc_mesh_91")
+surface_material_override/0 = SubResource("rc_nose")
+
+[node name="ButtonL2" type="MeshInstance3D" parent="Torso/Model" groups=["no_tint"]]
+transform = Transform3D(1, 0, 0, 0, 0, -1, 0, 1, 0, -0.075, 1.01, -0.1732)
+mesh = SubResource("rc_mesh_92")
+surface_material_override/0 = SubResource("rc_nose")
+
+[node name="ButtonR2" type="MeshInstance3D" parent="Torso/Model" groups=["no_tint"]]
+transform = Transform3D(1, 0, 0, 0, 0, -1, 0, 1, 0, 0.075, 1.01, -0.1732)
+mesh = SubResource("rc_mesh_93")
+surface_material_override/0 = SubResource("rc_nose")
+
+[node name="ChestPocket" type="MeshInstance3D" parent="Torso/Model" groups=["team_dark"]]
+transform = Transform3D(0.9063, 0, 0.4226, 0, 1, 0, -0.4226, 0, 0.9063, -0.15, 1.3, -0.1584)
+mesh = SubResource("rc_mesh_94")
+
+[node name="StormFlap" type="MeshInstance3D" parent="Torso/Model" groups=["team_dark"]]
+transform = Transform3D(0.9063, -0.0588, 0.4185, 0, 0.9903, 0.1392, -0.4226, -0.1261, 0.8975, 0.17, 1.44, -0.1384)
+mesh = SubResource("rc_mesh_95")
+
+[node name="EpauletL" type="MeshInstance3D" parent="Torso/Model" groups=["team_dark"]]
+transform = Transform3D(0.9781, -0.2079, 0, 0.2079, 0.9781, 0, 0, 0, 1, -0.22, 1.585, 0)
+mesh = SubResource("rc_mesh_96")
+
+[node name="EpauletButtonL" type="MeshInstance3D" parent="Torso/Model" groups=["no_tint"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.14, 1.6, -0.02)
+mesh = SubResource("rc_mesh_97")
+surface_material_override/0 = SubResource("rc_nose")
+
+[node name="CollarL" type="MeshInstance3D" parent="Torso/Model" groups=["team_dark"]]
+transform = Transform3D(0.9781, -0.2079, 0, 0.2017, 0.9491, 0.2419, -0.0503, -0.2366, 0.9703, -0.13, 1.63, 0.07)
+mesh = SubResource("rc_mesh_98")
+
+[node name="EpauletR" type="MeshInstance3D" parent="Torso/Model" groups=["team_dark"]]
+transform = Transform3D(0.9781, 0.2079, 0, -0.2079, 0.9781, 0, 0, 0, 1, 0.22, 1.585, 0)
+mesh = SubResource("rc_mesh_99")
+
+[node name="EpauletButtonR" type="MeshInstance3D" parent="Torso/Model" groups=["no_tint"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.14, 1.6, -0.02)
+mesh = SubResource("rc_mesh_100")
+surface_material_override/0 = SubResource("rc_nose")
+
+[node name="CollarR" type="MeshInstance3D" parent="Torso/Model" groups=["team_dark"]]
+transform = Transform3D(0.9781, 0.2079, 0, -0.2017, 0.9491, 0.2419, 0.0503, -0.2366, 0.9703, 0.13, 1.63, 0.07)
+mesh = SubResource("rc_mesh_101")
+
+[node name="ShoulderCapL" type="MeshInstance3D" parent="Torso/Model"]
+transform = Transform3D(1, 0, 0, 0, 0.8, 0, 0, 0, 1, -0.29, 1.5, 0)
+mesh = SubResource("rc_mesh_102")
+
+[node name="ShoulderCapR" type="MeshInstance3D" parent="Torso/Model"]
+transform = Transform3D(1, 0, 0, 0, 0.8, 0, 0, 0, 1, 0.29, 1.5, 0)
+mesh = SubResource("rc_mesh_103")
+
+[node name="BackYoke" type="MeshInstance3D" parent="Torso/Model" groups=["team_dark"]]
+transform = Transform3D(1, 0, 0, 0, 0.9945, -0.1045, 0, 0.1045, 0.9945, 0, 1.45, 0.178)
+mesh = SubResource("rc_mesh_104")
+
+[node name="BackYokeHem" type="MeshInstance3D" parent="Torso/Model" groups=["no_tint"]]
+transform = Transform3D(1, 0, 0, 0, 0.9945, -0.1045, 0, 0.1045, 0.9945, 0, 1.375, 0.183)
+mesh = SubResource("rc_mesh_105")
+surface_material_override/0 = SubResource("rc_lining")
+
+[node name="RightElbow" type="MeshInstance3D" parent="Torso/Model"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.36, 1.27, -0.06)
+mesh = SubResource("rc_mesh_106")
 
 [node name="RightUpper" type="MeshInstance3D" parent="Torso/Model"]
-transform = Transform3D(0.9772, 0.2058, -0.0525, 0.2124, -0.9469, 0.2414, 0, -0.247, -0.969, 0.335, 1.385, -0.03)
-mesh = SubResource("rc_mesh_46")
+transform = Transform3D(0.9676, 0.2447, -0.0618, 0.2524, -0.9382, 0.2368, 0, -0.2447, -0.9696, 0.33, 1.385, -0.03)
+mesh = SubResource("rc_mesh_107")
 
 [node name="RightLower" type="MeshInstance3D" parent="Torso/Model"]
 transform = Transform3D(0, -0.2883, -0.9575, 0.9536, -0.2883, 0.0868, -0.3011, -0.9131, 0.275, 0.33, 1.24, -0.155)
-mesh = SubResource("rc_mesh_47")
+mesh = SubResource("rc_mesh_108")
+
+[node name="RightCuff" type="MeshInstance3D" parent="Torso/Model" groups=["team_dark"]]
+transform = Transform3D(0, -0.2883, -0.9575, 0.9536, -0.2883, 0.0868, -0.3011, -0.9131, 0.275, 0.3087, 1.2187, -0.2226)
+mesh = SubResource("rc_mesh_109")
+
+[node name="RightCuffBuckle" type="MeshInstance3D" parent="Torso/Model" groups=["no_tint"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.3087, 1.2887, -0.2226)
+mesh = SubResource("rc_mesh_110")
+surface_material_override/0 = SubResource("rc_buckle")
 
 [node name="RightPaw" type="MeshInstance3D" parent="Torso/Model" groups=["no_tint"]]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.3, 1.21, -0.25)
-mesh = SubResource("rc_mesh_48")
+transform = Transform3D(1, 0, 0, 0, 0.85, 0, 0, 0, 1.1, 0.3, 1.21, -0.25)
+mesh = SubResource("rc_mesh_111")
 surface_material_override/0 = SubResource("rc_paw")
 
+[node name="RightPawToe0" type="MeshInstance3D" parent="Torso/Model" groups=["no_tint"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.275, 1.2, -0.295)
+mesh = SubResource("rc_mesh_112")
+surface_material_override/0 = SubResource("rc_paw")
+
+[node name="RightPawToe1" type="MeshInstance3D" parent="Torso/Model" groups=["no_tint"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.3, 1.2, -0.295)
+mesh = SubResource("rc_mesh_113")
+surface_material_override/0 = SubResource("rc_paw")
+
+[node name="RightPawToe2" type="MeshInstance3D" parent="Torso/Model" groups=["no_tint"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.325, 1.2, -0.295)
+mesh = SubResource("rc_mesh_114")
+surface_material_override/0 = SubResource("rc_paw")
+
+[node name="LeftElbow" type="MeshInstance3D" parent="Torso/Model"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.24, 1.25, -0.28)
+mesh = SubResource("rc_mesh_115")
+
 [node name="LeftUpper" type="MeshInstance3D" parent="Torso/Model"]
-transform = Transform3D(0.963, 0.1833, -0.1977, 0.2696, -0.6547, 0.7061, 0, -0.7333, -0.6799, -0.275, 1.375, -0.14)
-mesh = SubResource("rc_mesh_49")
+transform = Transform3D(0.9724, 0.1578, -0.1719, 0.2334, -0.6577, 0.7162, 0, -0.7366, -0.6763, -0.27, 1.375, -0.14)
+mesh = SubResource("rc_mesh_116")
 
 [node name="LeftLower" type="MeshInstance3D" parent="Torso/Model"]
 transform = Transform3D(0.0238, 0.841, -0.5405, 0.9997, -0.02, 0.0129, 0, -0.5406, -0.8412, -0.03, 1.245, -0.415)
-mesh = SubResource("rc_mesh_50")
+mesh = SubResource("rc_mesh_117")
+
+[node name="LeftCuff" type="MeshInstance3D" parent="Torso/Model" groups=["team_dark"]]
+transform = Transform3D(0.0238, 0.841, -0.5405, 0.9997, -0.02, 0.0129, 0, -0.5406, -0.8412, 0.1548, 1.2406, -0.5338)
+mesh = SubResource("rc_mesh_118")
+
+[node name="LeftCuffBuckle" type="MeshInstance3D" parent="Torso/Model" groups=["no_tint"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.1548, 1.3106, -0.5338)
+mesh = SubResource("rc_mesh_119")
+surface_material_override/0 = SubResource("rc_buckle")
 
 [node name="LeftPaw" type="MeshInstance3D" parent="Torso/Model" groups=["no_tint"]]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.18, 1.24, -0.55)
-mesh = SubResource("rc_mesh_51")
+transform = Transform3D(1, 0, 0, 0, 0.85, 0, 0, 0, 1.1, 0.18, 1.24, -0.55)
+mesh = SubResource("rc_mesh_120")
+surface_material_override/0 = SubResource("rc_paw")
+
+[node name="LeftPawToe0" type="MeshInstance3D" parent="Torso/Model" groups=["no_tint"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.155, 1.23, -0.595)
+mesh = SubResource("rc_mesh_121")
+surface_material_override/0 = SubResource("rc_paw")
+
+[node name="LeftPawToe1" type="MeshInstance3D" parent="Torso/Model" groups=["no_tint"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.18, 1.23, -0.595)
+mesh = SubResource("rc_mesh_122")
+surface_material_override/0 = SubResource("rc_paw")
+
+[node name="LeftPawToe2" type="MeshInstance3D" parent="Torso/Model" groups=["no_tint"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.205, 1.23, -0.595)
+mesh = SubResource("rc_mesh_123")
 surface_material_override/0 = SubResource("rc_paw")
 
 [node name="Tail" type="Node3D" parent="Torso/Model"]
@@ -836,54 +1582,67 @@ transform = Transform3D(0.766, 0.3687, -0.5265, 0, 0.8192, 0.5736, 0.6428, -0.43
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
 
 [node name="M" type="MeshInstance3D" parent="Torso/Model/Tail/S0" groups=["no_tint"]]
-transform = Transform3D(1, 0, 0, 0, 0, -1, 0, 1, 0, 0, 0, 0.06)
-mesh = SubResource("rc_mesh_52")
+transform = Transform3D(1, 0, 0, 0, 0, -1, 0, 1, 0, 0, 0, 0.055)
+mesh = SubResource("rc_mesh_124")
 surface_material_override/0 = SubResource("rc_fur")
 
 [node name="S1" type="Node3D" parent="Torso/Model/Tail/S0"]
-transform = Transform3D(1, 0, 0, 0, 0.9744, -0.225, 0, 0.225, 0.9744, 0, 0, 0.12)
+transform = Transform3D(1, 0, 0, 0, 0.9781, -0.2079, 0, 0.2079, 0.9781, 0, 0, 0.11)
 
 [node name="M" type="MeshInstance3D" parent="Torso/Model/Tail/S0/S1" groups=["no_tint"]]
-transform = Transform3D(1, 0, 0, 0, 0, -1, 0, 1, 0, 0, 0, 0.06)
-mesh = SubResource("rc_mesh_53")
+transform = Transform3D(1, 0, 0, 0, 0, -1, 0, 1, 0, 0, 0, 0.055)
+mesh = SubResource("rc_mesh_125")
 surface_material_override/0 = SubResource("rc_fur_dark")
 
 [node name="S2" type="Node3D" parent="Torso/Model/Tail/S0/S1"]
-transform = Transform3D(1, 0, 0, 0, 0.9744, -0.225, 0, 0.225, 0.9744, 0, 0, 0.12)
+transform = Transform3D(1, 0, 0, 0, 0.9781, -0.2079, 0, 0.2079, 0.9781, 0, 0, 0.11)
 
 [node name="M" type="MeshInstance3D" parent="Torso/Model/Tail/S0/S1/S2" groups=["no_tint"]]
-transform = Transform3D(1, 0, 0, 0, 0, -1, 0, 1, 0, 0, 0, 0.06)
-mesh = SubResource("rc_mesh_54")
+transform = Transform3D(1, 0, 0, 0, 0, -1, 0, 1, 0, 0, 0, 0.055)
+mesh = SubResource("rc_mesh_126")
 surface_material_override/0 = SubResource("rc_fur")
 
 [node name="S3" type="Node3D" parent="Torso/Model/Tail/S0/S1/S2"]
-transform = Transform3D(1, 0, 0, 0, 0.9744, -0.225, 0, 0.225, 0.9744, 0, 0, 0.12)
+transform = Transform3D(1, 0, 0, 0, 0.9781, -0.2079, 0, 0.2079, 0.9781, 0, 0, 0.11)
 
 [node name="M" type="MeshInstance3D" parent="Torso/Model/Tail/S0/S1/S2/S3" groups=["no_tint"]]
-transform = Transform3D(1, 0, 0, 0, 0, -1, 0, 1, 0, 0, 0, 0.06)
-mesh = SubResource("rc_mesh_55")
+transform = Transform3D(1, 0, 0, 0, 0, -1, 0, 1, 0, 0, 0, 0.055)
+mesh = SubResource("rc_mesh_127")
 surface_material_override/0 = SubResource("rc_fur_dark")
 
 [node name="S4" type="Node3D" parent="Torso/Model/Tail/S0/S1/S2/S3"]
-transform = Transform3D(1, 0, 0, 0, 0.9744, -0.225, 0, 0.225, 0.9744, 0, 0, 0.12)
+transform = Transform3D(1, 0, 0, 0, 0.9781, -0.2079, 0, 0.2079, 0.9781, 0, 0, 0.11)
 
 [node name="M" type="MeshInstance3D" parent="Torso/Model/Tail/S0/S1/S2/S3/S4" groups=["no_tint"]]
-transform = Transform3D(1, 0, 0, 0, 0, -1, 0, 1, 0, 0, 0, 0.06)
-mesh = SubResource("rc_mesh_56")
+transform = Transform3D(1, 0, 0, 0, 0, -1, 0, 1, 0, 0, 0, 0.055)
+mesh = SubResource("rc_mesh_128")
 surface_material_override/0 = SubResource("rc_fur")
 
 [node name="S5" type="Node3D" parent="Torso/Model/Tail/S0/S1/S2/S3/S4"]
-transform = Transform3D(1, 0, 0, 0, 0.9744, -0.225, 0, 0.225, 0.9744, 0, 0, 0.12)
+transform = Transform3D(1, 0, 0, 0, 0.9781, -0.2079, 0, 0.2079, 0.9781, 0, 0, 0.11)
 
 [node name="M" type="MeshInstance3D" parent="Torso/Model/Tail/S0/S1/S2/S3/S4/S5" groups=["no_tint"]]
-transform = Transform3D(1, 0, 0, 0, 0, -1, 0, 1, 0, 0, 0, 0.06)
-mesh = SubResource("rc_mesh_57")
+transform = Transform3D(1, 0, 0, 0, 0, -1, 0, 1, 0, 0, 0, 0.055)
+mesh = SubResource("rc_mesh_129")
 surface_material_override/0 = SubResource("rc_fur_dark")
 
-[node name="Tip" type="MeshInstance3D" parent="Torso/Model/Tail/S0/S1/S2/S3/S4/S5" groups=["no_tint"]]
+[node name="S6" type="Node3D" parent="Torso/Model/Tail/S0/S1/S2/S3/S4/S5"]
+transform = Transform3D(1, 0, 0, 0, 0.9781, -0.2079, 0, 0.2079, 0.9781, 0, 0, 0.11)
+
+[node name="M" type="MeshInstance3D" parent="Torso/Model/Tail/S0/S1/S2/S3/S4/S5/S6" groups=["no_tint"]]
+transform = Transform3D(1, 0, 0, 0, 0, -1, 0, 1, 0, 0, 0, 0.055)
+mesh = SubResource("rc_mesh_130")
+surface_material_override/0 = SubResource("rc_fur")
+
+[node name="Tip" type="MeshInstance3D" parent="Torso/Model/Tail/S0/S1/S2/S3/S4/S5/S6" groups=["no_tint"]]
 transform = Transform3D(1, 0, 0, 0, 0, -1, 0, 1, 0, 0, 0, 0.17)
-mesh = SubResource("rc_mesh_58")
+mesh = SubResource("rc_mesh_131")
 surface_material_override/0 = SubResource("rc_fur_dark")
+
+[node name="Base" type="MeshInstance3D" parent="Torso/Model/Tail/S0/S1/S2/S3/S4/S5/S6" groups=["no_tint"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.01)
+mesh = SubResource("rc_mesh_132")
+surface_material_override/0 = SubResource("rc_fur")
 
 [node name="BodyHurtbox" type="Area3D" parent="Torso" node_paths=PackedStringArray("health")]
 collision_layer = 4
@@ -902,101 +1661,208 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.6, 0)
 [node name="Model" type="Node3D" parent="Torso/Head"]
 
 [node name="Skull" type="MeshInstance3D" parent="Torso/Head/Model" groups=["no_tint"]]
-transform = Transform3D(1.05, 0, 0, 0, 0.85, 0, 0, 0, 0.95, 0, 0.03, 0.02)
-mesh = SubResource("rc_mesh_59")
+transform = Transform3D(1.1, 0, 0, 0, 0.85, 0, 0, 0, 0.95, 0, 0.03, 0.02)
+mesh = SubResource("rc_mesh_133")
 surface_material_override/0 = SubResource("rc_fur")
 
 [node name="CheekL" type="MeshInstance3D" parent="Torso/Head/Model" groups=["no_tint"]]
-transform = Transform3D(0, -1, 0, 1, 0, 0, 0, 0, 1, -0.17, -0.04, 0)
-mesh = SubResource("rc_mesh_60")
+transform = Transform3D(-0.1736, 0.9848, 0, -0.9848, -0.1736, 0, 0, 0, 1, -0.19, -0.04, -0.01)
+mesh = SubResource("rc_mesh_134")
 surface_material_override/0 = SubResource("rc_fur")
 
-[node name="CheekR" type="MeshInstance3D" parent="Torso/Head/Model" groups=["no_tint"]]
-transform = Transform3D(0, 1, 0, -1, 0, 0, 0, 0, 1, 0.17, -0.04, 0)
-mesh = SubResource("rc_mesh_61")
-surface_material_override/0 = SubResource("rc_fur")
-
-[node name="Face" type="Node3D" parent="Torso/Head/Model"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.165)
-
-[node name="Mask" type="MeshInstance3D" parent="Torso/Head/Model/Face" groups=["no_tint"]]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.03, -0.005)
-mesh = SubResource("rc_mesh_62")
-surface_material_override/0 = SubResource("rc_mask")
-
-[node name="EyeL" type="MeshInstance3D" parent="Torso/Head/Model/Face" groups=["no_tint"]]
-transform = Transform3D(0.9903, 0.1392, 0, -0.1392, 0.9903, 0, 0, 0, 1, -0.075, 0.033, -0.03)
-mesh = SubResource("rc_mesh_63")
-surface_material_override/0 = SubResource("rc_eye")
-
-[node name="PupilL" type="MeshInstance3D" parent="Torso/Head/Model/Face" groups=["no_tint"]]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.06, 0.033, -0.041)
-mesh = SubResource("rc_mesh_64")
-surface_material_override/0 = SubResource("rc_nose")
-
-[node name="EyeR" type="MeshInstance3D" parent="Torso/Head/Model/Face" groups=["no_tint"]]
-transform = Transform3D(0.9903, -0.1392, 0, 0.1392, 0.9903, 0, 0, 0, 1, 0.075, 0.033, -0.03)
-mesh = SubResource("rc_mesh_65")
-surface_material_override/0 = SubResource("rc_eye")
-
-[node name="PupilR" type="MeshInstance3D" parent="Torso/Head/Model/Face" groups=["no_tint"]]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.09, 0.033, -0.041)
-mesh = SubResource("rc_mesh_66")
-surface_material_override/0 = SubResource("rc_nose")
-
-[node name="Snout" type="MeshInstance3D" parent="Torso/Head/Model/Face" groups=["no_tint"]]
-transform = Transform3D(0.7071, -0.7071, 0, 0, 0, 1, -0.7071, -0.7071, 0, 0, -0.045, -0.07)
-mesh = SubResource("rc_mesh_67")
-surface_material_override/0 = SubResource("rc_white")
-
-[node name="Nose" type="MeshInstance3D" parent="Torso/Head/Model/Face" groups=["no_tint"]]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.04, -0.15)
-mesh = SubResource("rc_mesh_68")
-surface_material_override/0 = SubResource("rc_nose")
-
-[node name="Toothpick" type="MeshInstance3D" parent="Torso/Head/Model" groups=["no_tint"]]
-transform = Transform3D(0.866, 0.4924, 0.0868, 0, 0.1736, -0.9848, -0.5, 0.8529, 0.1504, 0.06, -0.09, -0.27)
-mesh = SubResource("rc_mesh_69")
-surface_material_override/0 = SubResource("rc_pick")
+[node name="CheekLowL" type="MeshInstance3D" parent="Torso/Head/Model" groups=["no_tint"]]
+transform = Transform3D(-0.5, 0.866, 0, -0.866, -0.5, 0, 0, 0, 1, -0.17, -0.1, -0.04)
+mesh = SubResource("rc_mesh_135")
+surface_material_override/0 = SubResource("rc_fur_light")
 
 [node name="EarL" type="MeshInstance3D" parent="Torso/Head/Model" groups=["no_tint"]]
-transform = Transform3D(0.6725, 0.2185, 0.7071, -0.309, 0.9511, 0, -0.6725, -0.2185, 0.7071, -0.13, 0.2, 0.06)
-mesh = SubResource("rc_mesh_70")
+transform = Transform3D(0.6725, -0.2185, 0.7071, 0.309, 0.9511, 0, -0.6725, 0.2185, 0.7071, -0.13, 0.2, 0.06)
+mesh = SubResource("rc_mesh_136")
 surface_material_override/0 = SubResource("rc_fur")
 
 [node name="EarInL" type="MeshInstance3D" parent="Torso/Head/Model" groups=["no_tint"]]
-transform = Transform3D(0.6725, 0.2185, 0.7071, -0.309, 0.9511, 0, -0.6725, -0.2185, 0.7071, -0.1261, 0.19, 0.035)
-mesh = SubResource("rc_mesh_71")
+transform = Transform3D(0.6725, -0.2185, 0.7071, 0.309, 0.9511, 0, -0.6725, 0.2185, 0.7071, -0.126, 0.19, 0.034)
+mesh = SubResource("rc_mesh_137")
 surface_material_override/0 = SubResource("rc_fur_dark")
 
+[node name="EarRimL" type="MeshInstance3D" parent="Torso/Head/Model" groups=["no_tint"]]
+transform = Transform3D(0.6725, -0.2185, 0.7071, 0.309, 0.9511, 0, -0.6725, 0.2185, 0.7071, -0.125, 0.15, 0.06)
+mesh = SubResource("rc_mesh_138")
+surface_material_override/0 = SubResource("rc_fur_light")
+
+[node name="CheekR" type="MeshInstance3D" parent="Torso/Head/Model" groups=["no_tint"]]
+transform = Transform3D(-0.1736, -0.9848, 0, 0.9848, -0.1736, 0, 0, 0, 1, 0.19, -0.04, -0.01)
+mesh = SubResource("rc_mesh_139")
+surface_material_override/0 = SubResource("rc_fur")
+
+[node name="CheekLowR" type="MeshInstance3D" parent="Torso/Head/Model" groups=["no_tint"]]
+transform = Transform3D(-0.5, -0.866, 0, 0.866, -0.5, 0, 0, 0, 1, 0.17, -0.1, -0.04)
+mesh = SubResource("rc_mesh_140")
+surface_material_override/0 = SubResource("rc_fur_light")
+
 [node name="EarR" type="MeshInstance3D" parent="Torso/Head/Model" groups=["no_tint"]]
-transform = Transform3D(0.6725, -0.2185, 0.7071, 0.309, 0.9511, 0, -0.6725, 0.2185, 0.7071, 0.13, 0.2, 0.06)
-mesh = SubResource("rc_mesh_72")
+transform = Transform3D(0.6725, 0.2185, 0.7071, -0.309, 0.9511, 0, -0.6725, -0.2185, 0.7071, 0.13, 0.2, 0.06)
+mesh = SubResource("rc_mesh_141")
 surface_material_override/0 = SubResource("rc_fur")
 
 [node name="EarInR" type="MeshInstance3D" parent="Torso/Head/Model" groups=["no_tint"]]
-transform = Transform3D(0.6725, -0.2185, 0.7071, 0.309, 0.9511, 0, -0.6725, 0.2185, 0.7071, 0.1261, 0.19, 0.035)
-mesh = SubResource("rc_mesh_73")
+transform = Transform3D(0.6725, 0.2185, 0.7071, -0.309, 0.9511, 0, -0.6725, -0.2185, 0.7071, 0.126, 0.19, 0.034)
+mesh = SubResource("rc_mesh_142")
 surface_material_override/0 = SubResource("rc_fur_dark")
 
+[node name="EarRimR" type="MeshInstance3D" parent="Torso/Head/Model" groups=["no_tint"]]
+transform = Transform3D(0.6725, 0.2185, 0.7071, -0.309, 0.9511, 0, -0.6725, -0.2185, 0.7071, 0.125, 0.15, 0.06)
+mesh = SubResource("rc_mesh_143")
+surface_material_override/0 = SubResource("rc_fur_light")
+
+[node name="Chin" type="MeshInstance3D" parent="Torso/Head/Model" groups=["no_tint"]]
+transform = Transform3D(1.2, 0, 0, 0, 0.6, 0, 0, 0, 1, 0, -0.11, -0.1)
+mesh = SubResource("rc_mesh_144")
+surface_material_override/0 = SubResource("rc_fur_light")
+
+[node name="Face" type="Node3D" parent="Torso/Head/Model"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.17)
+
+[node name="PatchL" type="MeshInstance3D" parent="Torso/Head/Model/Face" groups=["no_tint"]]
+transform = Transform3D(0.9781, -0.2079, 0, 0.2079, 0.9781, 0, 0, 0, 1, -0.075, 0.03, -0.004)
+mesh = SubResource("rc_mesh_145")
+surface_material_override/0 = SubResource("rc_mask")
+
+[node name="BrowL" type="MeshInstance3D" parent="Torso/Head/Model/Face" groups=["no_tint"]]
+transform = Transform3D(0.9903, -0.1392, 0, 0.1392, 0.9903, 0, 0, 0, 1, -0.08, 0.083, -0.01)
+mesh = SubResource("rc_mesh_146")
+surface_material_override/0 = SubResource("rc_white")
+
+[node name="EyeL" type="MeshInstance3D" parent="Torso/Head/Model/Face" groups=["no_tint"]]
+transform = Transform3D(0.9848, -0.1736, 0, 0.1736, 0.9848, 0, 0, 0, 1, -0.075, 0.032, -0.03)
+mesh = SubResource("rc_mesh_147")
+surface_material_override/0 = SubResource("rc_eye")
+
+[node name="PupilL" type="MeshInstance3D" parent="Torso/Head/Model/Face" groups=["no_tint"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.06, 0.032, -0.042)
+mesh = SubResource("rc_mesh_148")
+surface_material_override/0 = SubResource("rc_nose")
+
+[node name="PatchR" type="MeshInstance3D" parent="Torso/Head/Model/Face" groups=["no_tint"]]
+transform = Transform3D(0.9781, 0.2079, 0, -0.2079, 0.9781, 0, 0, 0, 1, 0.075, 0.03, -0.004)
+mesh = SubResource("rc_mesh_149")
+surface_material_override/0 = SubResource("rc_mask")
+
+[node name="BrowR" type="MeshInstance3D" parent="Torso/Head/Model/Face" groups=["no_tint"]]
+transform = Transform3D(0.9903, 0.1392, 0, -0.1392, 0.9903, 0, 0, 0, 1, 0.08, 0.083, -0.01)
+mesh = SubResource("rc_mesh_150")
+surface_material_override/0 = SubResource("rc_white")
+
+[node name="EyeR" type="MeshInstance3D" parent="Torso/Head/Model/Face" groups=["no_tint"]]
+transform = Transform3D(0.9848, 0.1736, 0, -0.1736, 0.9848, 0, 0, 0, 1, 0.075, 0.032, -0.03)
+mesh = SubResource("rc_mesh_151")
+surface_material_override/0 = SubResource("rc_eye")
+
+[node name="PupilR" type="MeshInstance3D" parent="Torso/Head/Model/Face" groups=["no_tint"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.06, 0.032, -0.042)
+mesh = SubResource("rc_mesh_152")
+surface_material_override/0 = SubResource("rc_nose")
+
+[node name="Bridge" type="MeshInstance3D" parent="Torso/Head/Model/Face" groups=["no_tint"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.02, -0.012)
+mesh = SubResource("rc_mesh_153")
+surface_material_override/0 = SubResource("rc_mask")
+
+[node name="Blaze" type="MeshInstance3D" parent="Torso/Head/Model/Face" groups=["no_tint"]]
+transform = Transform3D(-1, 0, 0, 0, -1, 0, 0, 0, 1, 0, 0.11, -0.006)
+mesh = SubResource("rc_mesh_154")
+surface_material_override/0 = SubResource("rc_white")
+
+[node name="Snout" type="MeshInstance3D" parent="Torso/Head/Model/Face" groups=["no_tint"]]
+transform = Transform3D(0.7071, -0.7071, 0, 0, 0, 1, -0.7071, -0.7071, 0, 0, -0.045, -0.07)
+mesh = SubResource("rc_mesh_155")
+surface_material_override/0 = SubResource("rc_white")
+
+[node name="Nose" type="MeshInstance3D" parent="Torso/Head/Model/Face" groups=["no_tint"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.04, -0.152)
+mesh = SubResource("rc_mesh_156")
+surface_material_override/0 = SubResource("rc_nose")
+
+[node name="Mouth" type="MeshInstance3D" parent="Torso/Head/Model/Face" groups=["no_tint"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.085, -0.1)
+mesh = SubResource("rc_mesh_157")
+surface_material_override/0 = SubResource("rc_nose")
+
+[node name="GlintL" type="MeshInstance3D" parent="Torso/Head/Model/Face" groups=["no_tint"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.062, 0.04, -0.048)
+mesh = SubResource("rc_mesh_158")
+surface_material_override/0 = SubResource("rc_eye")
+
+[node name="WhiskerL0" type="MeshInstance3D" parent="Torso/Head/Model/Face" groups=["no_tint"]]
+transform = Transform3D(0.9305, 0.1308, 0.342, -0.1392, 0.9903, 0, -0.3387, -0.0476, 0.9397, -0.1, -0.035, -0.085)
+mesh = SubResource("rc_mesh_159")
+surface_material_override/0 = SubResource("rc_white")
+
+[node name="WhiskerL1" type="MeshInstance3D" parent="Torso/Head/Model/Face" groups=["no_tint"]]
+transform = Transform3D(0.9345, -0.0982, 0.342, 0.1045, 0.9945, 0, -0.3401, 0.0358, 0.9397, -0.1, -0.05, -0.085)
+mesh = SubResource("rc_mesh_160")
+surface_material_override/0 = SubResource("rc_white")
+
+[node name="GlintR" type="MeshInstance3D" parent="Torso/Head/Model/Face" groups=["no_tint"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.062, 0.04, -0.048)
+mesh = SubResource("rc_mesh_161")
+surface_material_override/0 = SubResource("rc_eye")
+
+[node name="WhiskerR0" type="MeshInstance3D" parent="Torso/Head/Model/Face" groups=["no_tint"]]
+transform = Transform3D(0.9305, -0.1308, -0.342, 0.1392, 0.9903, 0, 0.3387, -0.0476, 0.9397, 0.1, -0.035, -0.085)
+mesh = SubResource("rc_mesh_162")
+surface_material_override/0 = SubResource("rc_white")
+
+[node name="WhiskerR1" type="MeshInstance3D" parent="Torso/Head/Model/Face" groups=["no_tint"]]
+transform = Transform3D(0.9345, 0.0982, -0.342, -0.1045, 0.9945, 0, 0.3401, 0.0358, 0.9397, 0.1, -0.05, -0.085)
+mesh = SubResource("rc_mesh_163")
+surface_material_override/0 = SubResource("rc_white")
+
+[node name="Toothpick" type="MeshInstance3D" parent="Torso/Head/Model" groups=["no_tint"]]
+transform = Transform3D(0.848, 0.5183, 0.1102, 0, 0.2079, -0.9781, -0.5299, 0.8295, 0.1763, 0.07, -0.09, -0.29)
+mesh = SubResource("rc_mesh_164")
+surface_material_override/0 = SubResource("rc_pick")
+
 [node name="Fedora" type="Node3D" parent="Torso/Head/Model"]
-transform = Transform3D(1, 0, 0, 0, 0.9925, 0.1219, 0, -0.1219, 0.9925, 0, 0.2, 0)
+transform = Transform3D(1, 0, 0, 0, 0.9903, 0.1392, 0, -0.1392, 0.9903, 0, 0.2, 0)
 
 [node name="Brim" type="MeshInstance3D" parent="Torso/Head/Model/Fedora"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 0.9, 0, 0, 0)
-mesh = SubResource("rc_mesh_74")
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 0.95, 0, 0, 0)
+mesh = SubResource("rc_mesh_165")
+
+[node name="BrimEdge" type="MeshInstance3D" parent="Torso/Head/Model/Fedora" groups=["team_dark"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 0.95, 0, -0.014, 0)
+mesh = SubResource("rc_mesh_166")
+
+[node name="BrimSideL" type="MeshInstance3D" parent="Torso/Head/Model/Fedora"]
+transform = Transform3D(0.9511, 0.309, 0, -0.309, 0.9511, 0, 0, 0, 1, -0.2928, 0.0139, 0)
+mesh = SubResource("rc_mesh_167")
+
+[node name="BrimSideR" type="MeshInstance3D" parent="Torso/Head/Model/Fedora"]
+transform = Transform3D(0.9511, -0.309, 0, 0.309, 0.9511, 0, 0, 0, 1, 0.2928, 0.0139, 0)
+mesh = SubResource("rc_mesh_168")
 
 [node name="Crown" type="MeshInstance3D" parent="Torso/Head/Model/Fedora"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 0.85, 0, 0.11, 0)
-mesh = SubResource("rc_mesh_75")
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 0.85, 0, 0.11, 0.01)
+mesh = SubResource("rc_mesh_169")
 
 [node name="Pinch" type="MeshInstance3D" parent="Torso/Head/Model/Fedora"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.22, 0)
-mesh = SubResource("rc_mesh_76")
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.22, 0.01)
+mesh = SubResource("rc_mesh_170")
 
 [node name="Band" type="MeshInstance3D" parent="Torso/Head/Model/Fedora" groups=["no_tint"]]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 0.85, 0, 0.035, 0)
-mesh = SubResource("rc_mesh_77")
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 0.85, 0, 0.035, 0.01)
+mesh = SubResource("rc_mesh_171")
+surface_material_override/0 = SubResource("rc_band")
+
+[node name="Feather" type="MeshInstance3D" parent="Torso/Head/Model/Fedora" groups=["no_tint"]]
+transform = Transform3D(0.2289, 0.2542, 0.9397, -0.7431, 0.6691, 0, -0.6288, -0.6983, 0.342, 0.175, 0.085, 0.06)
+mesh = SubResource("rc_mesh_172")
+surface_material_override/0 = SubResource("rc_feather")
+
+[node name="FeatherSpine" type="MeshInstance3D" parent="Torso/Head/Model/Fedora" groups=["no_tint"]]
+transform = Transform3D(0.2289, 0.2542, 0.9397, -0.7431, 0.6691, 0, -0.6288, -0.6983, 0.342, 0.177, 0.082, 0.06)
+mesh = SubResource("rc_mesh_173")
 surface_material_override/0 = SubResource("rc_band")
 
 [node name="ThirdPersonGun" type="MeshInstance3D" parent="Torso/Head/Model" groups=["no_tint"]]
@@ -1062,6 +1928,10 @@ team = ExtResource("14_team")
 legs = NodePath("../../Legs")
 torso = NodePath("../../Torso")
 view_model_root = NodePath("../../Torso/Head/ViewModel")
+
+[node name="Fx" type="Node" parent="Components" node_paths=PackedStringArray("duo")]
+script = ExtResource("18_fx")
+duo = NodePath("../..")
 
 [node name="Hitboxes" type="Node" parent="Components" node_paths=PackedStringArray("head", "body", "legs", "movement", "team")]
 script = ExtResource("16_hitbox")

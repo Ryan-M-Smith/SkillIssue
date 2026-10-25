@@ -1,0 +1,383 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://maps/arena_v2.gd" id="1_script"]
+[ext_resource type="PackedScene" path="res://arena_box.tscn" id="2_base"]
+
+[sub_resource type="StandardMaterial3D" id="m_deck"]
+albedo_color = Color(0.42, 0.45, 0.52, 1)
+roughness = 0.9
+
+[sub_resource type="StandardMaterial3D" id="m_ramp"]
+albedo_color = Color(0.33, 0.35, 0.41, 1)
+roughness = 0.9
+
+[sub_resource type="StandardMaterial3D" id="m_concrete"]
+albedo_color = Color(0.57, 0.58, 0.62, 1)
+roughness = 0.9
+
+[sub_resource type="StandardMaterial3D" id="m_pillar"]
+albedo_color = Color(0.36, 0.37, 0.42, 1)
+roughness = 0.9
+
+[sub_resource type="StandardMaterial3D" id="m_crate"]
+albedo_color = Color(0.52, 0.34, 0.18, 1)
+roughness = 0.9
+
+[sub_resource type="StandardMaterial3D" id="m_trim"]
+albedo_color = Color(0.9, 0.7, 0.18, 1)
+roughness = 0.9
+
+[sub_resource type="StandardMaterial3D" id="m_nest"]
+albedo_color = Color(0.3, 0.32, 0.38, 1)
+roughness = 0.9
+
+[node name="ArenaV2" type="Node3D"]
+script = ExtResource("1_script")
+
+[node name="Base" parent="." instance=ExtResource("2_base")]
+
+[node name="Additions" type="Node3D" parent="."]
+
+[node name="Center" type="Node3D" parent="Additions"]
+
+[node name="Deck" type="CSGBox3D" parent="Additions/Center"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.3, 0)
+use_collision = true
+size = Vector3(10.0, 0.4, 10.0)
+material = SubResource("m_deck")
+
+[node name="Pillar0" type="CSGBox3D" parent="Additions/Center"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.4, 1.8, -4.4)
+use_collision = true
+size = Vector3(0.9, 2.6, 0.9)
+material = SubResource("m_pillar")
+
+[node name="Pillar1" type="CSGBox3D" parent="Additions/Center"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.4, 1.8, -4.4)
+use_collision = true
+size = Vector3(0.9, 2.6, 0.9)
+material = SubResource("m_pillar")
+
+[node name="Pillar2" type="CSGBox3D" parent="Additions/Center"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.4, 1.8, 4.4)
+use_collision = true
+size = Vector3(0.9, 2.6, 0.9)
+material = SubResource("m_pillar")
+
+[node name="Pillar3" type="CSGBox3D" parent="Additions/Center"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.4, 1.8, 4.4)
+use_collision = true
+size = Vector3(0.9, 2.6, 0.9)
+material = SubResource("m_pillar")
+
+[node name="ParapetBlue" type="CSGBox3D" parent="Additions/Center"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3, 3.95, 4.85)
+use_collision = true
+size = Vector3(3.8, 0.9, 0.3)
+material = SubResource("m_concrete")
+
+[node name="ParapetRed" type="CSGBox3D" parent="Additions/Center"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 3.95, -4.85)
+use_collision = true
+size = Vector3(3.8, 0.9, 0.3)
+material = SubResource("m_concrete")
+
+[node name="Column" type="CSGBox3D" parent="Additions/Center"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4.55, 0)
+use_collision = true
+size = Vector3(2.2, 2.1, 2.2)
+material = SubResource("m_pillar")
+
+[node name="Nest" type="CSGBox3D" parent="Additions/Center"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 5.8, 0)
+use_collision = true
+size = Vector3(3.2, 0.4, 3.2)
+material = SubResource("m_nest")
+
+[node name="NestTrim" type="CSGBox3D" parent="Additions/Center"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 5.98, 0)
+use_collision = true
+size = Vector3(3.2, 0.05, 3.2)
+material = SubResource("m_trim")
+
+[node name="NestRampBlue" type="CSGBox3D" parent="Additions/Center"]
+transform = Transform3D(0, 0, -1, -0.6156, 0.788, 0, 0.788, 0.6156, 0, 0, 4.5197, 3.2105)
+use_collision = true
+size = Vector3(4.3607881008493905, 0.35, 1.6)
+material = SubResource("m_ramp")
+
+[node name="NestRampRed" type="CSGBox3D" parent="Additions/Center"]
+transform = Transform3D(0, 0, 1, -0.6156, 0.788, 0, -0.788, -0.6156, 0, 0, 4.5197, -3.2105)
+use_collision = true
+size = Vector3(4.3607881008493905, 0.35, 1.6)
+material = SubResource("m_ramp")
+
+[node name="NestLipE" type="CSGBox3D" parent="Additions/Center"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.48, 6.3, 0)
+use_collision = true
+size = Vector3(0.25, 0.6, 3.2)
+material = SubResource("m_concrete")
+
+[node name="NestLipW" type="CSGBox3D" parent="Additions/Center"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.48, 6.3, 0)
+use_collision = true
+size = Vector3(0.25, 0.6, 3.2)
+material = SubResource("m_concrete")
+
+[node name="RampBlue" type="CSGBox3D" parent="Additions/Center"]
+transform = Transform3D(0, 0, -1, -0.3162, 0.9487, 0, 0.9487, 0.3162, 0, 3.9, 1.7865, 9.587)
+use_collision = true
+size = Vector3(9.786832980505139, 0.35, 2.4)
+material = SubResource("m_ramp")
+
+[node name="RampRed" type="CSGBox3D" parent="Additions/Center"]
+transform = Transform3D(0, 0, 1, -0.3162, 0.9487, 0, -0.9487, -0.3162, 0, -3.9, 1.7865, -9.587)
+use_collision = true
+size = Vector3(9.786832980505139, 0.35, 2.4)
+material = SubResource("m_ramp")
+
+[node name="UnderCrateA" type="CSGBox3D" parent="Additions/Center"]
+transform = Transform3D(0.9659, 0, 0.2588, 0, 1, 0, -0.2588, 0, 0.9659, 2.6, 1.3, -2.4)
+use_collision = true
+size = Vector3(1.6, 1.6, 1.6)
+material = SubResource("m_crate")
+
+[node name="UnderCrateB" type="CSGBox3D" parent="Additions/Center"]
+transform = Transform3D(0.9659, 0, 0.2588, 0, 1, 0, -0.2588, 0, 0.9659, -2.6, 1.3, 2.4)
+use_collision = true
+size = Vector3(1.6, 1.6, 1.6)
+material = SubResource("m_crate")
+
+[node name="DeckTrimN" type="CSGBox3D" parent="Additions/Center"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.48, 4.95)
+use_collision = true
+size = Vector3(10.0, 0.05, 0.09999999999999964)
+material = SubResource("m_trim")
+
+[node name="DeckTrimS" type="CSGBox3D" parent="Additions/Center"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.48, -4.95)
+use_collision = true
+size = Vector3(10.0, 0.05, 0.09999999999999964)
+material = SubResource("m_trim")
+
+[node name="EastTower" type="Node3D" parent="Additions"]
+
+[node name="Deck" type="CSGBox3D" parent="Additions/EastTower"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 17, 3.3, 0)
+use_collision = true
+size = Vector3(5.0, 0.4, 8)
+material = SubResource("m_deck")
+
+[node name="Pillar0" type="CSGBox3D" parent="Additions/EastTower"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15, 1.8, -3.5)
+use_collision = true
+size = Vector3(0.9, 2.6, 0.9)
+material = SubResource("m_pillar")
+
+[node name="Pillar1" type="CSGBox3D" parent="Additions/EastTower"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 19, 1.8, -3.5)
+use_collision = true
+size = Vector3(0.9, 2.6, 0.9)
+material = SubResource("m_pillar")
+
+[node name="Pillar2" type="CSGBox3D" parent="Additions/EastTower"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15, 1.8, 3.5)
+use_collision = true
+size = Vector3(0.9, 2.6, 0.9)
+material = SubResource("m_pillar")
+
+[node name="Pillar3" type="CSGBox3D" parent="Additions/EastTower"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 19, 1.8, 3.5)
+use_collision = true
+size = Vector3(0.9, 2.6, 0.9)
+material = SubResource("m_pillar")
+
+[node name="UnderWallBack" type="CSGBox3D" parent="Additions/EastTower"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 19.3, 1.8, 0)
+use_collision = true
+size = Vector3(0.4, 2.6, 6)
+material = SubResource("m_concrete")
+
+[node name="UnderWallSide" type="CSGBox3D" parent="Additions/EastTower"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 17.8, 1.8, -2.5)
+use_collision = true
+size = Vector3(3.0, 2.6, 0.4)
+material = SubResource("m_concrete")
+
+[node name="TopCrate" type="CSGBox3D" parent="Additions/EastTower"]
+transform = Transform3D(0.9397, 0, 0.342, 0, 1, 0, -0.342, 0, 0.9397, 17.6, 4.2, -1.8)
+use_collision = true
+size = Vector3(1.4, 1.4, 1.4)
+material = SubResource("m_crate")
+
+[node name="TopWall" type="CSGBox3D" parent="Additions/EastTower"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14.65, 3.95, 2.3)
+use_collision = true
+size = Vector3(0.3, 0.9, 3.0)
+material = SubResource("m_concrete")
+
+[node name="Ramp" type="CSGBox3D" parent="Additions/EastTower"]
+transform = Transform3D(0, 0, -1, -0.3162, 0.9487, 0, 0.9487, 0.3162, 0, 17, 1.7865, 8.587)
+use_collision = true
+size = Vector3(9.786832980505139, 0.35, 2.4)
+material = SubResource("m_ramp")
+
+[node name="Bridge" type="CSGBox3D" parent="Additions/EastTower"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9.75, 3.35, 0)
+use_collision = true
+size = Vector3(9.5, 0.3, 2.2)
+material = SubResource("m_deck")
+
+[node name="BridgeRailN" type="CSGBox3D" parent="Additions/EastTower"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9.75, 3.75, 1.05)
+use_collision = true
+size = Vector3(9.5, 0.5, 0.15)
+material = SubResource("m_concrete")
+
+[node name="DeckTrim" type="CSGBox3D" parent="Additions/EastTower"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 17, 3.48, -3.95)
+use_collision = true
+size = Vector3(5.0, 0.05, 0.10000000000000009)
+material = SubResource("m_trim")
+
+[node name="WestTower" type="Node3D" parent="Additions"]
+
+[node name="Deck" type="CSGBox3D" parent="Additions/WestTower"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -17, 3.3, 0)
+use_collision = true
+size = Vector3(5.0, 0.4, 8)
+material = SubResource("m_deck")
+
+[node name="Pillar0" type="CSGBox3D" parent="Additions/WestTower"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -19, 1.8, -3.5)
+use_collision = true
+size = Vector3(0.9, 2.6, 0.9)
+material = SubResource("m_pillar")
+
+[node name="Pillar1" type="CSGBox3D" parent="Additions/WestTower"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -15, 1.8, -3.5)
+use_collision = true
+size = Vector3(0.9, 2.6, 0.9)
+material = SubResource("m_pillar")
+
+[node name="Pillar2" type="CSGBox3D" parent="Additions/WestTower"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -19, 1.8, 3.5)
+use_collision = true
+size = Vector3(0.9, 2.6, 0.9)
+material = SubResource("m_pillar")
+
+[node name="Pillar3" type="CSGBox3D" parent="Additions/WestTower"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -15, 1.8, 3.5)
+use_collision = true
+size = Vector3(0.9, 2.6, 0.9)
+material = SubResource("m_pillar")
+
+[node name="UnderWallBack" type="CSGBox3D" parent="Additions/WestTower"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -19.3, 1.8, 0)
+use_collision = true
+size = Vector3(0.4, 2.6, 6)
+material = SubResource("m_concrete")
+
+[node name="UnderWallSide" type="CSGBox3D" parent="Additions/WestTower"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -17.8, 1.8, 2.5)
+use_collision = true
+size = Vector3(3.0, 2.6, 0.4)
+material = SubResource("m_concrete")
+
+[node name="TopCrate" type="CSGBox3D" parent="Additions/WestTower"]
+transform = Transform3D(0.9397, 0, 0.342, 0, 1, 0, -0.342, 0, 0.9397, -17.6, 4.2, 1.8)
+use_collision = true
+size = Vector3(1.4, 1.4, 1.4)
+material = SubResource("m_crate")
+
+[node name="TopWall" type="CSGBox3D" parent="Additions/WestTower"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -14.65, 3.95, -2.3)
+use_collision = true
+size = Vector3(0.3, 0.9, 3.0)
+material = SubResource("m_concrete")
+
+[node name="Ramp" type="CSGBox3D" parent="Additions/WestTower"]
+transform = Transform3D(0, 0, 1, -0.3162, 0.9487, 0, -0.9487, -0.3162, 0, -17, 1.7865, -8.587)
+use_collision = true
+size = Vector3(9.786832980505139, 0.35, 2.4)
+material = SubResource("m_ramp")
+
+[node name="Bridge" type="CSGBox3D" parent="Additions/WestTower"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9.75, 3.35, 0)
+use_collision = true
+size = Vector3(9.5, 0.3, 2.2)
+material = SubResource("m_deck")
+
+[node name="BridgeRailN" type="CSGBox3D" parent="Additions/WestTower"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9.75, 3.75, 1.05)
+use_collision = true
+size = Vector3(9.5, 0.5, 0.15)
+material = SubResource("m_concrete")
+
+[node name="DeckTrim" type="CSGBox3D" parent="Additions/WestTower"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -17, 3.48, -3.95)
+use_collision = true
+size = Vector3(5.0, 0.05, 0.10000000000000009)
+material = SubResource("m_trim")
+
+[node name="Ground" type="Node3D" parent="Additions"]
+
+[node name="CrateEB" type="CSGBox3D" parent="Additions/Ground"]
+transform = Transform3D(0.9397, 0, 0.342, 0, 1, 0, -0.342, 0, 0.9397, 9, 1.5, 7.5)
+use_collision = true
+size = Vector3(2, 2, 2)
+material = SubResource("m_crate")
+
+[node name="PillarEB" type="CSGBox3D" parent="Additions/Ground"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8.5, 2.1, 12.5)
+use_collision = true
+size = Vector3(1.2, 3.2, 1.2)
+material = SubResource("m_concrete")
+
+[node name="CrateER" type="CSGBox3D" parent="Additions/Ground"]
+transform = Transform3D(0.9397, 0, -0.342, 0, 1, 0, 0.342, 0, 0.9397, 9, 1.5, -7.5)
+use_collision = true
+size = Vector3(2, 2, 2)
+material = SubResource("m_crate")
+
+[node name="PillarER" type="CSGBox3D" parent="Additions/Ground"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8.5, 2.1, -12.5)
+use_collision = true
+size = Vector3(1.2, 3.2, 1.2)
+material = SubResource("m_concrete")
+
+[node name="LowWallE" type="CSGBox3D" parent="Additions/Ground"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10.5, 1.05, 0)
+use_collision = true
+size = Vector3(0.6, 1.1, 4)
+material = SubResource("m_concrete")
+
+[node name="CrateWB" type="CSGBox3D" parent="Additions/Ground"]
+transform = Transform3D(0.9397, 0, -0.342, 0, 1, 0, 0.342, 0, 0.9397, -9, 1.5, 7.5)
+use_collision = true
+size = Vector3(2, 2, 2)
+material = SubResource("m_crate")
+
+[node name="PillarWB" type="CSGBox3D" parent="Additions/Ground"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8.5, 2.1, 12.5)
+use_collision = true
+size = Vector3(1.2, 3.2, 1.2)
+material = SubResource("m_concrete")
+
+[node name="CrateWR" type="CSGBox3D" parent="Additions/Ground"]
+transform = Transform3D(0.9397, 0, 0.342, 0, 1, 0, -0.342, 0, 0.9397, -9, 1.5, -7.5)
+use_collision = true
+size = Vector3(2, 2, 2)
+material = SubResource("m_crate")
+
+[node name="PillarWR" type="CSGBox3D" parent="Additions/Ground"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8.5, 2.1, -12.5)
+use_collision = true
+size = Vector3(1.2, 3.2, 1.2)
+material = SubResource("m_concrete")
+
+[node name="LowWallW" type="CSGBox3D" parent="Additions/Ground"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10.5, 1.05, 0)
+use_collision = true
+size = Vector3(0.6, 1.1, 4)
+material = SubResource("m_concrete")

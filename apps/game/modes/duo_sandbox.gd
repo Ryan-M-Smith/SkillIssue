@@ -30,6 +30,10 @@ class_name DuoSandbox
 extends Node
 
 @export var duo_scene: PackedScene = preload("res://entities/duo/duo.tscn")
+## Which arena to fight in. Replaces main.tscn's World/ArenaBox at runtime (main.tscn itself is
+## not edited). Options: maps/the_pit.tscn (default), maps/arena_v2.tscn, or clear the field to play
+## on Brian's original arena_box.tscn.
+@export var map_scene: PackedScene = preload("res://maps/the_pit.tscn")
 @export var teams: Array[TeamData] = [
 	preload("res://data/teams/team_blue.tres"),
 	preload("res://data/teams/team_red.tres"),
@@ -102,6 +106,8 @@ func _ready() -> void:
 func _setup() -> void:
 	GraphicsSettings.register_screens(get_node(screens_path))
 	var world := get_node(world_path) as Node3D
+	if map_scene:
+		_swap_map(world)
 	if make_map_csg_solid:
 		_make_csg_solid(world)
 	if build_test_arena_if_empty and not _has_geometry(world):
@@ -122,7 +128,7 @@ func _setup() -> void:
 		var cam := get_node(camera_paths[i]) as Camera3D
 		_bind_camera(duo, cam)
 		_cameras.append(cam)
-		duo.respawn(_spawn_transform(i))
+		duo.respawn(_spawn_transform(i), false)   # no spawn protection at kick-off
 		duos.append(duo)
 		var team_huds := get_node_or_null("../HUD/TeamHuds")
 		if team_huds and i < team_huds.get_child_count():
@@ -251,8 +257,12 @@ func _spawn_transform(team: int) -> Transform3D:
 	var pos := Vector3.ZERO
 	var group := "spawn_team_a" if team == 0 else "spawn_team_b"
 	var points := get_tree().get_nodes_in_group(group)
+	var facing = null   # a spawn point can say which way to face (metadata "face_yaw", degrees)
 	if not points.is_empty():
-		pos = (points.pick_random() as Node3D).global_position + Vector3.UP * 0.1
+		var point := points.pick_random() as Node3D
+		pos = point.global_position + Vector3.UP * 0.1
+		if point.has_meta("face_yaw"):
+			facing = deg_to_rad(float(point.get_meta("face_yaw")))
 	else:
 		var pads := _map_spawn_pads()
 		if pads.size() >= 2:
@@ -264,7 +274,9 @@ func _spawn_transform(team: int) -> Transform3D:
 		else:
 			pos = fallback_spawns[team % fallback_spawns.size()]
 	var to_center := -Vector3(pos.x, 0, pos.z)
-	var yaw := atan2(-to_center.x, -to_center.z) if to_center.length() > 0.01 else 0.0
+	var yaw: float = atan2(-to_center.x, -to_center.z) if to_center.length() > 0.01 else 0.0
+	if facing != null:
+		yaw = facing
 	return Transform3D(Basis(Vector3.UP, yaw), pos)
 
 
@@ -298,7 +310,8 @@ func _on_duo_killed(victim_team: int, killer_team: int) -> void:
 	_update_score()
 	await get_tree().create_timer(respawn_delay).timeout
 	if _running and is_instance_valid(v) and not v.alive:
-		v.respawn(_spawn_transform(v.team_id))
+		# spawn protection after a death; skipped when respawns are near-instant (test setups)
+		v.respawn(_spawn_transform(v.team_id), respawn_delay >= 1.0)
 
 
 # ---------------------------------------------------------------- HUD (built at runtime)
@@ -587,6 +600,22 @@ func _let_input_through(node: Node) -> void:
 		_let_input_through(c)
 
 
+## Swap main.tscn's arena for `map_scene` (runtime only).
+func _swap_map(world: Node3D) -> void:
+	var old := world.get_node_or_null("ArenaBox")
+	var arena := map_scene.instantiate()
+	arena.name = "Arena"
+	if old:
+		var idx := old.get_index()
+		world.remove_child(old)
+		old.queue_free()
+		world.add_child(arena)
+		world.move_child(arena, idx)
+	else:
+		world.add_child(arena)
+		world.move_child(arena, 0)
+
+
 func _has_geometry(root: Node) -> bool:
 	for n in root.find_children("*", "", true, false):
 		if n is CSGShape3D or (n is CollisionObject3D and not n is Duo):
@@ -599,7 +628,7 @@ func _make_csg_solid(root: Node) -> void:
 	var changed := 0
 	for n in root.find_children("*", "CSGShape3D", true, false):
 		var csg := n as CSGShape3D
-		if csg.is_root_shape() and not csg.use_collision and not _is_spawn_pad(csg):
+		if csg.is_root_shape() and not csg.use_collision and not _is_spawn_pad(csg) and not csg.is_in_group("visual_only"):
 			csg.use_collision = true
 			changed += 1
 	if changed > 0:

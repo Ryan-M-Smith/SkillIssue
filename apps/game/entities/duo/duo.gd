@@ -19,6 +19,9 @@ signal killed(killer: Node, weapon_name: String)
 @onready var hitboxes: HitboxComponent = $Components/Hitboxes
 @onready var controllers: Node = $Controllers
 
+## Seconds of spawn protection after respawning (not at kick-off). Firing ends it early.
+@export var spawn_protection := 2.0
+
 var input := DuoInput.new()
 var alive := true
 var team_id: int:
@@ -38,6 +41,7 @@ func _ready() -> void:
 		rids.append(h.get_rid())
 	weapons.set_excluded(rids)
 	health.died.connect(_on_died)
+	weapons.fired.connect(func(_data: WeaponData): health.protect(0.0))
 	# Report to the team's GameEvents bus (owned by the structure teammate).
 	health.health_changed.connect(func(hp: float, max_hp: float): GameEvents.health_changed.emit(team_id, hp, max_hp))
 	health.damaged.connect(func(_amount: float, _source: Node): team.flash())
@@ -82,13 +86,15 @@ func _on_died(killer: Node) -> void:
 	GameEvents.duo_killed.emit(team_id, killer_team)     # team bus: victim_team, killer_team
 
 
-func respawn(at: Transform3D) -> void:
+## protect: give spawn protection (the match mode turns it on for respawns after a death).
+func respawn(at: Transform3D, protect := false) -> void:
 	global_position = at.origin
 	var yaw := at.basis.get_euler().y
 	aim.face(yaw)
 	legs.rotation.y = yaw
 	movement.reset()
 	health.reset()
+	health.protect(spawn_protection if protect else 0.0)
 	weapons.reset_loadout()
 	alive = true
 	_set_present(true)

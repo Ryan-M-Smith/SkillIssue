@@ -6,6 +6,9 @@ extends Area3D
 
 enum Zone { HEAD, BODY, LEGS }
 
+## Emitted when this zone actually takes damage (not while the owner has spawn protection).
+signal hit_taken(amount: float, zone: Zone, source: Node)
+
 @export var health: HealthComponent
 @export var zone: Zone = Zone.BODY
 @export var multiplier := 1.0
@@ -30,10 +33,11 @@ func _ready() -> void:
 
 ## Returns the damage actually dealt.
 func take_hit(amount: float, headshot_multiplier: float, source: Node) -> float:
-	if health == null or health.dead:
+	if health == null or health.dead or health.is_protected():
 		return 0.0
 	var mult := headshot_multiplier if zone == Zone.HEAD else multiplier
 	var dmg := amount * mult
+	hit_taken.emit(dmg, zone, source)     # before the damage, so a killing headshot still pops the hat
 	health.apply_damage(dmg, source)
 	return dmg
 

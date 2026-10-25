@@ -9,6 +9,22 @@ signal died(killer: Node)
 
 var hp := 100.0
 var dead := false
+## Spawn protection: bullets do nothing while this is > 0 (seconds left). The Hurtbox checks it,
+## so other damage (falling off the map, scripted damage) still applies.
+var protected_left := 0.0
+
+
+func _process(delta: float) -> void:
+	if protected_left > 0.0:
+		protected_left = maxf(protected_left - delta, 0.0)
+
+
+func protect(seconds: float) -> void:
+	protected_left = maxf(seconds, 0.0)
+
+
+func is_protected() -> bool:
+	return protected_left > 0.0
 
 
 func _ready() -> void:
