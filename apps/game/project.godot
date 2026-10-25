@@ -23,6 +23,7 @@ GameSession="*res://scripts/game_session.gd"
 InputRouter="*res://scripts/input_router.gd"
 LobbyServer="*res://scripts/network/lobby_server.gd"
 MatchStats="*res://scripts/match_stats.gd"
+MvpService="*res://scripts/mvp_service.gd"
 GraphicsSettings="*res://scripts/graphics_settings.gd"
 
 [display]
