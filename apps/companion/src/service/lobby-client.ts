@@ -36,6 +36,16 @@ const reconnectDelaysMs = [500, 1000, 2000, 4000, 8000];
 /** Tries before a first join gives up (a lobby we were in keeps retrying). */
 const firstJoinAttempts = 3;
 
+/** The `type` of a message, for diagnostics ("not JSON" when it isn't one). */
+function messageType(text: string): string {
+	try {
+		const value = JSON.parse(text);
+		return typeof value?.type === "string" ? value.type.slice(0, 40) : "no type";
+	} catch {
+		return "not JSON";
+	}
+}
+
 function hostOf(url: string): string {
 	try {
 		return new URL(url).host || url;
@@ -114,15 +124,19 @@ export class LobbyClient {
 		// The connection is gone (closed, failed, or timed out): retry, unless the host ended it.
 		// Called from every path, since not every runtime fires close after an error.
 		let opened = false;
+		const heard: string[] = []; // message types this socket got before joining
+
 		const dropped = () => {
 			if (this.socket !== socket) return;
 			if (this.view.stage === "ended" && this.view.result?.reason === "host") { this.leave(); return; }
 			this.socket = null;
 			if (!this.joinedOnce) {
 				const host = hostOf(this.url);
-				this.scheduleReconnect(opened
-					? `Connected to ${host}, but it didn't answer the join. Retrying…`
-					: `Can't reach the game server (${host}). Retrying…`);
+				this.scheduleReconnect(!opened
+					? `Can't reach the game server (${host}). Retrying…`
+					: heard.length
+						? `${host} answered with "${[...new Set(heard)].slice(0, 3).join(", ")}" instead of joining. Retrying…`
+						: `Connected to ${host}, but it didn't answer the join. Retrying…`);
 				return;
 			}
 			this.scheduleReconnect(this.view.error ?? "Connection lost. Retrying...");
@@ -137,7 +151,11 @@ export class LobbyClient {
 			opened = true;
 			if (this.socket === socket) this.send({ type: "join_game", protocolVersion: 1, pairingCode: code.trim().toUpperCase(), name: name.trim().slice(0, 16) || "Player" });
 		};
-		socket.onmessage = (event) => { if (this.socket === socket) this.receive(String(event.data)); };
+		socket.onmessage = (event) => {
+			if (this.socket !== socket) return;
+			if (!this.joinedOnce && heard.length < 10) heard.push(messageType(String(event.data)));
+			this.receive(String(event.data));
+		};
 		let closing = false;
 		socket.onerror = () => {
 			// Closing a socket that's still connecting fires another error on web and Node;
