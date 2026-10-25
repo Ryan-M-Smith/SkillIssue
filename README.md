@@ -27,8 +27,6 @@ The landing page loads a Tiger Data leaderboard once on page load; use its reset
 
 Godot now asks `https://skillissue.vodka/api/games` to provision a game, then connects to the returned unique `/games/<gameId>` WSS route. The default can be overridden with `-- --control-plane=https://landing.example.com`. The relay still owns persistent WebSocket traffic; Vercel owns provisioning and metadata.
 
-Optional Gemini aim assistance is enabled by setting `GEMINI_API_KEY` in Vercel. It runs asynchronously against structured Godot target state and applies a small bounded correction; it is not in the phone's real-time motion loop.
-
 When deploying `apps/server` on Render, use `npm install` as the build command and `npm run server:start` as the start command. No pnpm or Corepack setup is required.
 
 Joining fails with a useful retry message after ten seconds. A wrong code says so right away. An HTTPS browser page needs a `wss://` host; the native app can connect directly to the local `ws://` game.

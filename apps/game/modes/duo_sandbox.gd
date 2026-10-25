@@ -37,8 +37,6 @@
 class_name DuoSandbox
 extends Node
 
-const GeminiAimAssist := preload("res://scripts/gemini_aim_assist.gd")
-
 @export var duo_scene: PackedScene = preload("res://entities/duo/duo.tscn")
 ## Which arena to fight in. Replaces main.tscn's World/ArenaBox at runtime (main.tscn itself is
 ## not edited). Options: maps/the_pit.tscn (default), maps/arena_v2.tscn, or clear the field to play
@@ -126,8 +124,6 @@ var _time_left := 0.0
 var _running := false
 var _status_timer := 0.0
 var _network_match := false
-var _aim_assist: Node
-var _aim_assist_timer := 0.0
 
 
 func _ready() -> void:
@@ -171,9 +167,6 @@ func _setup() -> void:
 	if place_arena_pickups:
 		_place_arena_pickups(world)
 	_add_scope_overlays()
-	_aim_assist = GeminiAimAssist.new()
-	add_child(_aim_assist)
-	_aim_assist.correction_ready.connect(_on_aim_assist_correction)
 	rng.randomize()
 	for duo in duos:
 		var team := duo.team_id
@@ -227,11 +220,6 @@ func _bind_camera(duo: Duo, cam: Camera3D) -> void:
 
 func _process(delta: float) -> void:
 	_tick_match(delta)
-	_aim_assist_timer -= delta
-	if _network_match and _aim_assist_timer <= 0.0:
-		_aim_assist_timer = 0.35
-		for team_id in mini(duos.size(), _cameras.size()):
-			_request_aim_assist(team_id)
 	for i in duos.size():
 		var duo := duos[i]
 		var w := duo.weapons
@@ -240,34 +228,6 @@ func _process(delta: float) -> void:
 			target = w.current_data().scope_fov
 		_cameras[i].fov = lerpf(_cameras[i].fov, target, clampf(delta * 18.0, 0.0, 1.0))
 		_update_half_hud(i, duo)
-
-
-func _request_aim_assist(team_id: int) -> void:
-	if _aim_assist == null or duos.size() < 2 or team_id < 0 or team_id >= _cameras.size():
-		return
-	var target := duos[1 - team_id]
-	var camera := _cameras[team_id]
-	var target_point := target.global_position + Vector3.UP * 1.1
-	var viewport_size := camera.get_viewport().get_visible_rect().size
-	if viewport_size.x <= 0.0 or viewport_size.y <= 0.0:
-		return
-	var projected := camera.unproject_position(target_point)
-	_aim_assist.request(team_id, Vector2(0.5, 0.5), [{
-		"id": target.name,
-		"x": projected.x / viewport_size.x,
-		"y": projected.y / viewport_size.y,
-		"visible": not camera.is_position_behind(target_point) and target.alive,
-		"distance": camera.global_position.distance_to(target_point),
-		"health": target.health.hp if target.alive else 0.0,
-	}])
-
-
-func _on_aim_assist_correction(team_id: int, degrees_per_second: Vector2) -> void:
-	if team_id < 0 or team_id >= duos.size():
-		return
-	for controller in duos[team_id].controllers.get_children():
-		if controller is PhoneDuoController:
-			(controller as PhoneDuoController).set_aim_assist_rate(degrees_per_second)
 
 
 func _physics_process(_delta: float) -> void:
