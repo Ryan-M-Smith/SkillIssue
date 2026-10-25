@@ -18,8 +18,6 @@ config/icon="res://icon.svg"
 [autoload]
 
 GameEvents="*res://game_events.gd"
-NetworkBridge="*uid://c846bcx4iaxtl"
-PlayerRegistry="*uid://cqdi22myh03h4"
 NetworkClient="*res://scripts/network/network_client.gd"
 GameSession="*res://scripts/game_session.gd"
 InputRouter="*res://scripts/input_router.gd"
