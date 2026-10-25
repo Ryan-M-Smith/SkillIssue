@@ -181,12 +181,12 @@ static func button(text: String, primary := false) -> Button:
 	return b
 
 
-## "SKILL ISSUE" with the words in the two team colors.
+## "Skill Issue" with the words in the two team colors.
 static func wordmark(size := 120) -> HBoxContainer:
 	var row := HBoxContainer.new()
 	row.add_theme_constant_override("separation", int(size * 0.22))
-	row.add_child(display("SKILL", size, BLUE))
-	row.add_child(display("ISSUE", size, RED))
+	row.add_child(display("Skill", size, BLUE))
+	row.add_child(display("Issue", size, RED))
 	return row
 
 

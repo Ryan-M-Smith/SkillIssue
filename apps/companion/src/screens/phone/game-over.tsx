@@ -48,7 +48,7 @@ export function GameOver({
 				</View>
 				<Body size={14} color={ui.muted}>{winner === null ? "Nobody blinked." : `Team ${winner === 1 ? "Blue" : "Red"} takes it.`}</Body>
 				<View style={styles.buttons}>
-					<SlantButton label={waiting ? "WAITING FOR HOST…" : "PLAY AGAIN"} primary disabled={waiting} onPress={onPlayAgain} />
+					{r?.reason !== "host" && <SlantButton label={waiting ? "WAITING FOR HOST…" : "PLAY AGAIN"} primary disabled={waiting} onPress={onPlayAgain} />}
 					<SlantButton label="MAIN MENU" onPress={onMenu} />
 				</View>
 			</View>

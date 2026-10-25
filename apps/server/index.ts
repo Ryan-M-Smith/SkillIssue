@@ -384,6 +384,7 @@ function endGame(socket: WebSocket, message: EndGameMessage) {
     session.state = "ended";
     const result: ServerMessage = {
         type: "match_ended",
+        reason: message.reason === "host" || message.reason === "kills" || message.reason === "time" ? message.reason : undefined,
         winningTeam: message.winningTeam === 1 || message.winningTeam === 2 ? message.winningTeam : null,
         scores: Array.isArray(message.scores) && message.scores.length === 2
             ? [Number(message.scores[0]) || 0, Number(message.scores[1]) || 0]
@@ -781,7 +782,7 @@ if (Number.isInteger(parentPid) && parentPid > 0) {
         }
     }, 2000).unref();
 }
-console.log(`SkillIssue WebSocket server listening on ws://localhost:${port}`);
+console.log(`Skill Issue WebSocket server listening on ws://localhost:${port}`);
 if (minControllers < controllerSlots.length) {
     console.log(`  matches can start with ${minControllers} controller(s) (MIN_CONTROLLERS)`);
 }

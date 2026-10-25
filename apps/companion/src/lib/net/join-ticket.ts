@@ -27,7 +27,7 @@ export function parseJoinTicket(input: string, fallbackUrl = ""): JoinTarget {
 			url.hash = "";
 			address = url.toString();
 		} else {
-			throw new Error("Use a lobby ticket from SkillIssue.");
+			throw new Error("Use a lobby ticket from Skill Issue.");
 		}
 	}
 	if (!codePattern.test(code)) throw new Error("The lobby code must contain six letters or numbers.");

@@ -28,8 +28,8 @@ export function MainMenu({
 			<View style={styles.left}>
 				<Eyebrow>2 v 2 · hold your phone sideways</Eyebrow>
 				<View style={styles.wordmark}>
-					<Title size={58} color={ui.blue}>SKILL</Title>
-					<Title size={58} color={ui.red}>ISSUE</Title>
+					<Title size={58} color={ui.blue}>Skill</Title>
+					<Title size={58} color={ui.red}>Issue</Title>
 				</View>
 				<Body size={16} color={ui.ink}>One of you moves. One of you shoots.</Body>
 				{!!notice && <Body size={14} color={ui.gold}>{notice}</Body>}

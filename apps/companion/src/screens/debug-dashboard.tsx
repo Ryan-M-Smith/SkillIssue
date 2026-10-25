@@ -253,7 +253,7 @@ export default function DebugDashboard() {
 		<ScrollView style={styles.screen} contentContainerStyle={styles.content}>
 			<View style={styles.header}>
 				<View style={{ flexShrink: 1 }}>
-					<Text style={styles.overline}>SKILLISSUE · WEB DEBUGGER</Text>
+					<Text style={styles.overline}>Skill Issue · WEB DEBUGGER</Text>
 					<Text style={styles.title}>Motion Debugger</Text>
 					<Text style={styles.hint}>What the phone’s motion model sees, live. Same code as the phone, fed with the phone’s own sensor stream.</Text>
 				</View>

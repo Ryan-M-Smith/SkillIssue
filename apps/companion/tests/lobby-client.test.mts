@@ -89,6 +89,17 @@ test("gunner gestures route reload, scope and only owned weapons", () => {
 	assert.equal(actions[2].slot, 2);
 	assert.equal(client.snapshot.feedback?.ammo, 5);
 });
+test("host-ended results return cleanly to the menu state when the host closes", () => {
+	for (const close of ["onclose", "onerror"] as const) {
+		const { client, socket } = connect();
+		socket.receive({ type: "match_ended", winningTeam: 1, scores: [4, 2], stats: [], reason: "host" });
+		assert.equal(client.snapshot.stage, "ended");
+		assert.equal(client.snapshot.result?.reason, "host");
+		socket[close]?.();
+		assert.equal(client.snapshot.stage, "idle");
+		assert.equal(client.snapshot.error, null);
+	}
+});
 test("a queued shot release cannot fire into the next connection", (t) => {
 	t.mock.timers.enable({ apis: ["setTimeout", "setInterval", "Date"], now: 1000 });
 	const { client } = connect();

@@ -87,10 +87,12 @@ export class LobbyClient {
 		};
 		socket.onmessage = (event) => { if (this.socket === socket) this.receive(String(event.data)); };
 		socket.onerror = () => {
+			if (this.socket === socket && this.view.stage === "ended" && this.view.result?.reason === "host") { this.leave(); return; }
 			if (this.socket === socket) this.fail("Can't reach this game. Keep its lobby open and paste its full ticket. Both devices must be on the same Wi-Fi.");
 		};
 		socket.onclose = () => {
 			if (this.socket !== socket) return;
+			if (this.view.stage === "ended" && this.view.result?.reason === "host") { this.leave(); return; }
 			this.fail(this.view.error ?? "Connection lost. Rejoin using the ticket in the game lobby.");
 		};
 		this.timer = setInterval(() => this.sendMotion(), 1000 / motionHz);
@@ -195,7 +197,7 @@ export class LobbyClient {
 				this.set({ ...this.view, status: { scores: message.scores, timeLeft: message.timeLeft, killTarget: message.killTarget } });
 				return;
 			case "match_ended":
-				this.set({ ...this.view, stage: "ended", result: { winningTeam: message.winningTeam, scores: message.scores, stats: message.stats } });
+				this.set({ ...this.view, stage: "ended", result: { winningTeam: message.winningTeam, scores: message.scores, stats: message.stats, reason: message.reason } });
 				return;
 			case "controller_feedback": {
 				const f = message.message;

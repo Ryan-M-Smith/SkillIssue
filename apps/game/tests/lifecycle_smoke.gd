@@ -5,10 +5,12 @@ extends SceneTree
 const LOBBY := "res://ui/lobby.tscn"
 const ARENA := "res://modes/duo_sandbox.tscn"
 const MENU := "res://ui/main_menu.tscn"
+const RESULTS := "res://ui/results.tscn"
 
 var _checks := 0
 var _finished := false
 var _phones: Array[WebSocketPeer] = []
+var _match_ended: Array[Dictionary] = []
 
 
 func _initialize() -> void:
@@ -29,7 +31,9 @@ func _poll_phones() -> void:
 	for phone in _phones:
 		phone.poll()
 		while phone.get_available_packet_count() > 0:
-			phone.get_packet()
+			var message = JSON.parse_string(phone.get_packet().get_string_from_utf8())
+			if message is Dictionary and message.get("type") == "match_ended":
+				_match_ended.append(message)
 
 
 func _wait_scene(path: String) -> bool:
@@ -95,6 +99,20 @@ func _run() -> void:
 	var mode = current_scene.get_node("DuoSandbox")
 	if not _check(mode._running and mode._network_match and session.is_playing(), "arena is tied to live network match"):
 		return
+	for duo in mode.duos:
+		for controller in duo.controllers.get_children():
+			if not _check(not controller is KeyboardDuoController, "live host cannot control either team by keyboard"):
+				return
+	var rogue := KeyboardDuoController.new()
+	rogue._mouse_accum = Vector2(2, 3)
+	var host_input := DuoInput.new()
+	rogue.poll(host_input, 0.1)
+	rogue.free()
+	if not _check(host_input.move == Vector2.ZERO and host_input.aim_delta == Vector2.ZERO and not host_input.fire,
+		"desktop gameplay controller ignores live host input defensively"):
+		return
+	if not _check(Input.mouse_mode == Input.MOUSE_MODE_VISIBLE, "live host retains clickable mouse cursor"):
+		return
 	# Simulate the transport losing its host session while gameplay is active.
 	paused = true
 	link.disconnect_from_server()
@@ -114,14 +132,33 @@ func _run() -> void:
 	mode = current_scene.get_node("DuoSandbox")
 	if not _check(mode._running and mode.scores == [0, 0] and session.is_playing(), "recovered match starts with reset scores"):
 		return
+	mode.scores[0] = 4
+	mode.scores[1] = 2
+	mode.end_banner_seconds = 0.01
+	var match_menu := current_scene.get_node("PauseMenu")
+	match_menu.open_menu()
+	match_menu._end_match()
+	if not _check(await _wait_scene(RESULTS), "host end shows normal match results"):
+		return
+	if not _check(stats.result.winner == 0 and stats.result.scores == [4, 2] and stats.result.reason == "host", "host end awards leading team and retains final scores"):
+		return
+	_poll_phones()
+	var deadline := Time.get_ticks_msec() + 1000
+	while _match_ended.is_empty() and Time.get_ticks_msec() < deadline:
+		await process_frame
+		_poll_phones()
+	if not _check(not _match_ended.is_empty(), "phones receive results before lobby closes"):
+		return
+	if not _check(int(_match_ended.back().winningTeam) == 1 and int(_match_ended.back().scores[0]) == 4 and int(_match_ended.back().scores[1]) == 2, "phone results contain the winning team and final scores"):
+		return
+	if not _check(_match_ended.back().get("reason") == "host", "phones know replay is unavailable after host ends early"):
+		return
+	if not _check(session.state == "ended" and link.is_connected_to_server(), "host end keeps lobby connected through results"):
+		return
+	current_scene._on_menu()
+	if not _check(await _wait_scene(MENU) and not paused and not link.is_connected_to_server(), "results main menu closes lobby and releases cursor"):
+		return
 	# Direct keyboard practice must remain independent of lobby state changes.
-	link.disconnect_from_server()
-	if not _check(await _wait_scene(LOBBY), "second host loss still recovers"):
-		return
-	session.leave_lobby()
-	change_scene_to_file(MENU)
-	if not _check(await _wait_scene(MENU), "main menu opens after recovery"):
-		return
 	change_scene_to_file(ARENA)
 	if not _check(await _wait_scene(ARENA), "keyboard practice opens without a lobby"):
 		return

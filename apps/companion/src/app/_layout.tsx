@@ -1,4 +1,5 @@
 import { DarkTheme, DefaultTheme, Slot, ThemeProvider } from "expo-router";
+import Head from "expo-router/head";
 import { useFonts } from "expo-font";
 import { useColorScheme } from "react-native";
 
@@ -15,6 +16,7 @@ export default function RootLayout() {
 
 	return (
 		<ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
+			<Head><title>Skill Issue</title></Head>
 			<Slot/>
 		</ThemeProvider>
 	);

@@ -127,6 +127,7 @@ export default function PhoneApp() {
 
 	// Synchronize the sensor model before the next reading reaches the game.
 	function onLobbyChange(next: LobbyView) {
+		if (next.stage === "idle" && stageRef.current === "ended") setScreen("menu");
 		const role = modelRole(next.me?.role);
 		if (role !== roleRef.current) {
 			roleRef.current = role;

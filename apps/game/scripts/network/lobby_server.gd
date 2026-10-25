@@ -631,12 +631,15 @@ func _end_game(msg: Dictionary) -> void:
 	var winner: Variant = msg.get("winningTeam")
 	var scores: Variant = msg.get("scores")
 	var stats: Variant = msg.get("stats")
-	_to_phones({
+	var result := {
 		"type": "match_ended",
 		"winningTeam": int(winner) if typeof(winner) in [TYPE_INT, TYPE_FLOAT] and int(winner) in [1, 2] else null,
 		"scores": [_num(scores[0]), _num(scores[1])] if typeof(scores) == TYPE_ARRAY and scores.size() == 2 else [0, 0],
 		"stats": (stats as Array).slice(0, 2) if typeof(stats) == TYPE_ARRAY else [],
-	})
+	}
+	if msg.get("reason") in ["kills", "time", "host"]:
+		result["reason"] = msg.reason
+	_to_phones(result)
 	_send_lobby_state()
 
 

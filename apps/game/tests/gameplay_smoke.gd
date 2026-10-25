@@ -44,6 +44,22 @@ func _wait_for_scene(path: String) -> bool:
 	return false
 
 
+func _click(button: Button) -> void:
+	await process_frame
+	await process_frame
+	var position := button.get_global_transform_with_canvas() * (button.size * 0.5)
+	var motion := InputEventMouseMotion.new()
+	motion.position = position
+	root.push_input(motion, true)
+	for pressed in [true, false]:
+		var event := InputEventMouseButton.new()
+		event.button_index = MOUSE_BUTTON_LEFT
+		event.position = position
+		event.pressed = pressed
+		root.push_input(event, true)
+	await process_frame
+
+
 func _run() -> void:
 	create_timer(15.0).timeout.connect(func():
 		if not _finished:
@@ -81,14 +97,16 @@ func _run() -> void:
 	var graphics_button := _find_button(current_scene, "GRAPHICS")
 	if not _check(graphics_button != null, "main menu exposes graphics"):
 		return
-	graphics_button.pressed.emit()
+	await _click(graphics_button)
 	if not _check(current_scene._graphics.is_open(), "main-menu graphics modal opens"):
 		return
-	current_scene._graphics.close_menu()
+	await _click(_find_button(current_scene._graphics, "BACK"))
+	if not _check(not current_scene._graphics.is_open(), "mouse closes graphics modal"):
+		return
 	var practice := _find_button(current_scene, "PRACTICE / KEYBOARD")
 	if not _check(practice != null, "main menu exposes practice"):
 		return
-	practice.pressed.emit()
+	await _click(practice)
 	if not _check(await _wait_for_scene(ARENA), "practice enters arena"):
 		return
 	await physics_frame
@@ -245,7 +263,7 @@ func _run() -> void:
 	var menu := _find_button(current_scene, "MAIN MENU")
 	if not _check(menu != null, "results offer return to menu"):
 		return
-	menu.pressed.emit()
+	await _click(menu)
 	if not _check(await _wait_for_scene(MENU), "results return to main menu"):
 		return
 	_find_button(current_scene, "PRACTICE / KEYBOARD").pressed.emit()
@@ -255,8 +273,20 @@ func _run() -> void:
 	leave_menu.open_menu()
 	if not _check(paused, "practice is paused before leaving"):
 		return
-	_find_button(leave_menu, "MAIN MENU").pressed.emit()
-	if not _check(await _wait_for_scene(MENU) and not paused, "leaving paused practice returns to usable main menu"):
+	var practice_mode = current_scene.get_node("DuoSandbox")
+	practice_mode.end_banner_seconds = 0.01
+	if not _check(_find_button(leave_menu, "MAIN MENU") == null, "match menu cannot bypass final results"):
+		return
+	await _click(_find_button(leave_menu, "END MATCH"))
+	if not _check(await _wait_for_scene(RESULTS) and not paused, "ending paused practice opens final results"):
+		return
+	if not _check(stats.result.reason == "host" and stats.result.winner == -1 and stats.result.scores == [0, 0], "early tied match ends in a draw"):
+		return
+	await process_frame
+	if not _check(_find_button(current_scene, "PLAY AGAIN") == null, "host-ended results only offer main menu"):
+		return
+	await _click(_find_button(current_scene, "MAIN MENU"))
+	if not _check(await _wait_for_scene(MENU) and not paused, "host-ended results return to usable main menu by mouse"):
 		return
 	print("GAMEPLAY_SMOKE_PASS ", _checks, " checks")
 	DirAccess.remove_absolute(ProjectSettings.globalize_path(GRAPHICS_TEST_CONFIG))

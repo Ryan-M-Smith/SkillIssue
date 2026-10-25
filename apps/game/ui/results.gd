@@ -87,8 +87,12 @@ func _ready() -> void:
 	again.custom_minimum_size.x = 320
 	again.pressed.connect(_on_again)
 	buttons.add_child(menu)
-	buttons.add_child(again)
-	again.grab_focus.call_deferred()
+	if r.get("reason", "") == "host":
+		again.queue_free()
+		menu.grab_focus.call_deferred()
+	else:
+		buttons.add_child(again)
+		again.grab_focus.call_deferred()
 	UiKit.fade_in(self)
 
 
@@ -98,6 +102,8 @@ func _reason_text(reason: String) -> String:
 			return "first to the kill target"
 		"time":
 			return "time's up"
+		"host":
+			return "ended by the host"
 	return "final whistle"
 
 

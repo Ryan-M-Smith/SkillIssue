@@ -21,6 +21,7 @@ var _loading := false
 
 
 func _ready() -> void:
+	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 	theme = UiKit.make_theme()
 	set_anchors_preset(Control.PRESET_FULL_RECT)
 	add_child(UiKit.background(0.5, 0.8))
@@ -84,7 +85,7 @@ func _build() -> void:
 	code_text.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	code_text.alignment = BoxContainer.ALIGNMENT_CENTER
 	code_text.add_child(UiKit.eyebrow("Join code"))
-	code_text.add_child(UiKit.label("Open the SkillIssue app → Join a Lobby → enter this code.", 22))
+	code_text.add_child(UiKit.label("Open the Skill Issue app → Join a Lobby → enter this code.", 22))
 	_address = UiKit.label("", 20, UiKit.BODY, UiKit.MUTED)
 	_address.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	code_text.add_child(_address)

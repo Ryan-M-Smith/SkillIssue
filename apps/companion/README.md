@@ -1,6 +1,6 @@
-# SkillIssue companion
+# Skill Issue companion
 
-An Expo controller for SkillIssue. Each team uses a movement phone and a gunner phone, held sideways. The same app includes practice for both roles and a web motion debugger at `/debug`.
+An Expo controller for Skill Issue. Each team uses a movement phone and a gunner phone, held sideways. The same app includes practice for both roles and a web motion debugger at `/debug`.
 
 ## Start
 

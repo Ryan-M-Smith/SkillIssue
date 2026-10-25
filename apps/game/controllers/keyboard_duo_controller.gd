@@ -19,8 +19,17 @@ func _init(scheme_id: int = 0) -> void:
 	name = "KeyboardController%d" % scheme_id
 
 
+func _host_only() -> bool:
+	var tree := Engine.get_main_loop() as SceneTree
+	if tree == null:
+		return false
+	var session := tree.root.get_node_or_null("GameSession")
+	var network := tree.root.get_node_or_null("NetworkClient")
+	return (session != null and session.is_playing()) or (network != null and network.is_connected_to_server())
+
+
 func _unhandled_input(event: InputEvent) -> void:
-	if scheme != 0:
+	if _host_only() or scheme != 0:
 		return
 	if event is InputEventMouseButton and event.pressed and Input.mouse_mode != Input.MOUSE_MODE_CAPTURED:
 		Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
@@ -41,6 +50,10 @@ func _pressed_once(id: String, now: bool) -> bool:
 
 
 func poll(input: DuoInput, delta: float) -> void:
+	if _host_only():
+		_mouse_accum = Vector2.ZERO
+		_prev.clear()
+		return
 	var mv := Vector2.ZERO
 	var captured := Input.mouse_mode == Input.MOUSE_MODE_CAPTURED
 	if scheme == 0:

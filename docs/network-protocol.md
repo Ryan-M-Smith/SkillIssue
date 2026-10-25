@@ -1,4 +1,4 @@
-# SkillIssue network protocol
+# Skill Issue network protocol
 
 Protocol version **1** is shared by the embedded Godot server, optional Node relay and Expo companion. Types are in `packages/protocol/events.ts`. The server owns pairing codes, controller IDs, slots and lobby state. Godot owns gameplay and match statistics.
 
@@ -43,6 +43,8 @@ Each phone joins, selects an exclusive team/role slot and readies up:
 `waiting` becomes `ready` when all required slots are taken and every slotted phone is ready. Normally four phones are required; use Godot's `-- --min-players=1` or the Node relay's `MIN_CONTROLLERS=1` for testing. The lobby counts down three seconds, then the host sends `start_game`. The server checks readiness again and broadcasts `playing`. Repeated starts and team changes during a match are rejected.
 
 The host sends `match_status` about once per second: two team scores, `timeLeft` and `killTarget`. At ten kills or five minutes, it sends `end_game` with `winningTeam` (or null), scores and team statistics. Phones receive `match_ended`; `lobby_state` becomes `ended`.
+
+`end_game` and `match_ended` optionally carry `reason`: `kills`, `time`, or `host`. **End Match** uses `host` and the current score, including a draw for tied scores. Host-ended results show Main Menu rather than Play Again on both screens. When the host closes that completed lobby, phones return to their menu without a connection-error screen.
 
 **Play Again** on the game sends `reset_lobby`: the same code and slots return to `waiting`, with ready flags cleared. Resetting a live match is rejected. A disconnected phone loses its slot and triggers `controller_disconnected`; a live match stays `playing`. Host disconnect closes the lobby and its phone sockets. Rejoining a closed lobby requires the current code; there is no automatic mid-match seat restoration.
 

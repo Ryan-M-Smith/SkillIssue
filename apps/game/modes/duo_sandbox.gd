@@ -105,7 +105,7 @@ func _setup() -> void:
 		entities.add_child(duo)
 		duo.setup(teams[i])
 		duo.add_controller(PhoneDuoController.new(i))
-		if keyboard_controls:
+		if keyboard_controls and not GameSession.is_playing() and not NetworkClient.is_connected_to_server():
 			duo.add_controller(KeyboardDuoController.new(i))
 		var cam := get_node(camera_paths[i]) as Camera3D
 		_bind_camera(duo, cam)
@@ -120,14 +120,16 @@ func _setup() -> void:
 	_update_score()
 	set_debug_view(debug_view)
 	_start_match()
-	get_parent().add_child(preload("res://ui/pause_menu.gd").new())
+	var match_menu := preload("res://ui/pause_menu.gd").new()
+	get_parent().add_child(match_menu)
+	match_menu.end_match_requested.connect(end_match_by_host)
 
 
 func _unhandled_input(event: InputEvent) -> void:
 	if event is InputEventKey and event.physical_keycode == KEY_TAB and not event.echo:
 		_details.visible = event.pressed
 		_update_details()
-	if event is InputEventKey and event.pressed and not event.echo and event.physical_keycode == KEY_F3:
+	if not _network_match and event is InputEventKey and event.pressed and not event.echo and event.physical_keycode == KEY_F3:
 		set_debug_view(not debug_view)
 
 
@@ -138,7 +140,10 @@ func set_debug_view(on: bool) -> void:
 		if d.hitboxes:
 			d.hitboxes.set_debug_visible(on)
 	if _hint_label:
-		_hint_label.text = "TAB  /  SCOREBOARD     F3  /  DEBUG ON" if on else "TAB  /  SCOREBOARD     F3  /  HITBOXES"
+		if _network_match:
+			_hint_label.text = "TAB  /  SCOREBOARD     ESC  /  HOST MENU"
+		else:
+			_hint_label.text = "TAB  /  SCOREBOARD     F3  /  DEBUG ON" if on else "TAB  /  SCOREBOARD     F3  /  HITBOXES"
 
 
 
@@ -316,6 +321,8 @@ func _start_match() -> void:
 	_time_left = match_seconds
 	_running = true
 	_network_match = NetworkClient.is_connected_to_server() and GameSession.is_playing()
+	set_debug_view(false if _network_match else debug_view)
+	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 	GameSession.state_changed.connect(_on_session_state_changed)
 	MatchStats.begin(duos)
 	_update_score()
@@ -359,16 +366,23 @@ func _send_status() -> void:
 		GameSession.send_match_status(scores, _time_left, kill_target)
 
 
+func end_match_by_host() -> void:
+	_end_match("host")
+
+
 func _end_match(reason: String) -> void:
 	if not _running:
 		return
 	_running = false
+	var match_menu := get_parent().get_node_or_null("PauseMenu")
+	if match_menu:
+		match_menu.finish()
 	var winner := -1
 	if scores[0] != scores[1]:
 		winner = 0 if scores[0] > scores[1] else 1
 	MatchStats.finish(winner, scores, reason)
 	if NetworkClient.is_connected_to_server() and GameSession.is_playing():
-		GameSession.end_match(winner, scores, MatchStats.to_protocol())
+		GameSession.end_match(winner, scores, MatchStats.to_protocol(), reason)
 	_show_banner(winner)
 	get_tree().paused = true
 	await get_tree().create_timer(end_banner_seconds, true).timeout

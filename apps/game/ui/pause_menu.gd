@@ -1,7 +1,7 @@
 extends CanvasLayer
 ## Shared match navigation. Practice pauses; live matches continue for the phones.
 
-const MENU_SCENE := "res://ui/main_menu.tscn"
+signal end_match_requested()
 
 var _shade: ColorRect
 var _resume_button: Button
@@ -11,6 +11,7 @@ var _paused_by_menu := false
 var _mouse_was_captured := false
 var _networked_match := false
 var _graphics: CanvasLayer
+var _finished := false
 
 
 func _ready() -> void:
@@ -44,7 +45,7 @@ func _ready() -> void:
 	var col := VBoxContainer.new()
 	col.add_theme_constant_override("separation", 16)
 	panel.add_child(col)
-	col.add_child(UiKit.eyebrow("SKILL ISSUE / MATCH", UiKit.GOLD))
+	col.add_child(UiKit.label("Skill Issue / MATCH", 18, UiKit.BODY_BOLD, UiKit.GOLD))
 	_title = UiKit.display("PAUSED", 60)
 	col.add_child(_title)
 	_note = UiKit.label("", 22, UiKit.BODY, UiKit.MUTED)
@@ -57,8 +58,8 @@ func _ready() -> void:
 	var graphics := UiKit.button("GRAPHICS")
 	graphics.pressed.connect(func(): _graphics.open_menu())
 	col.add_child(graphics)
-	var leave := UiKit.button("MAIN MENU")
-	leave.pressed.connect(return_to_menu)
+	var leave := UiKit.button("END MATCH")
+	leave.pressed.connect(_end_match)
 	col.add_child(leave)
 	_graphics = preload("res://ui/graphics_menu.gd").new()
 	add_child(_graphics)
@@ -66,7 +67,7 @@ func _ready() -> void:
 
 
 func _input(event: InputEvent) -> void:
-	if _graphics.is_open():
+	if _finished or _graphics.is_open():
 		return
 	if event.is_action_pressed("ui_cancel") and not event.is_echo():
 		if _shade.visible:
@@ -77,7 +78,7 @@ func _input(event: InputEvent) -> void:
 
 
 func open_menu() -> void:
-	if _shade.visible:
+	if _finished or _shade.visible:
 		return
 	_mouse_was_captured = Input.mouse_mode == Input.MOUSE_MODE_CAPTURED
 	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
@@ -85,7 +86,7 @@ func open_menu() -> void:
 	if _paused_by_menu:
 		get_tree().paused = true
 	_title.text = "MATCH MENU" if _networked_match else "PAUSED"
-	_note.text = "The live match keeps running. Main Menu closes the lobby." if _networked_match else "Practice is paused. Take a breath and jump back in."
+	_note.text = "The live match keeps running. Adjust graphics or end the match to see the final scores." if _networked_match else "Practice is paused. Adjust graphics or end the match to see the final scores."
 	_shade.visible = true
 	_resume_button.grab_focus()
 
@@ -96,15 +97,25 @@ func resume() -> void:
 		get_tree().paused = false
 	_paused_by_menu = false
 	get_viewport().gui_release_focus()
-	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED if _mouse_was_captured else Input.MOUSE_MODE_VISIBLE
+	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED if _mouse_was_captured and not _networked_match else Input.MOUSE_MODE_VISIBLE
 
 
-func return_to_menu() -> void:
+func _end_match() -> void:
+	if _finished:
+		return
+	finish()
+	end_match_requested.emit()
+
+
+func finish() -> void:
+	_finished = true
+	_shade.visible = false
+	if _graphics.is_open():
+		_graphics.close_menu()
+	visible = false
 	get_tree().paused = false
 	_paused_by_menu = false
 	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
-	GameSession.leave_lobby()
-	get_tree().change_scene_to_file.call_deferred(MENU_SCENE)
 
 
 func _exit_tree() -> void:

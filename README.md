@@ -1,4 +1,4 @@
-# SkillIssue
+# Skill Issue
 
 A 2v2 split-screen game where each team shares one character: one phone moves, the other aims and shoots. First to 10 kills wins, or the leading team after five minutes.
 
@@ -38,7 +38,9 @@ Hold the phone sideways, screen toward you, at a comfortable tilted angle. Hold 
 | Gunner | Short pull backward | Toggle sniper scope |
 | Gunner | Twist about 32 degrees, then center | Cycle owned weapons |
 
-Wheel gestures rearm below 12 degrees with a 350 ms debounce. **Practice Controls** in the companion teaches both roles without a lobby. **Practice / Keyboard** in the Godot menu enters a local match without phones. Keyboard controls are in [the Duo README](apps/game/entities/duo/README.md); `R` reloads blue's weapon and `O` reloads red's. Hold **Tab** for the live scoreboard and press **F3** for hitboxes and weapon spread.
+Wheel gestures rearm below 12 degrees with a 350 ms debounce. **Practice Controls** in the companion teaches both roles without a lobby. **Practice / Keyboard** in the Godot menu enters a local match without phones. Keyboard controls are in [the Duo README](apps/game/entities/duo/README.md); `R` reloads blue's weapon and `O` reloads red's. Hold **Tab** for the live scoreboard. **F3** shows hitboxes and weapon spread in keyboard practice.
+
+In phone matches, the desktop host cannot move, aim, or fire. The mouse stays visible for menu navigation. Open **Menu / Esc** to adjust **Graphics** or **End Match**; the live game continues while settings are open. Ending early awards the team leading on kills, or declares a draw on equal scores, sends the results to phones, and shows the normal results screen. Host-ended results offer **Main Menu** to close the lobby; they do not offer a replay shortcut.
 
 Weapons have real magazines: pistol **12 / 1.25 s reload**, shotgun **6 / 1.8 s**, sniper **5 / 2.2 s**. Empty magazines reload automatically. HUDs show live health, ammo and reload progress; kills build a streak that resets on death, with the best streak retained in results.
 

@@ -115,11 +115,12 @@ func send_match_status(scores: Array, time_left: float, kill_target: int) -> voi
 
 ## The match is over: the server moves to "ended" and shows the phones the result.
 ## `winning_team` is a game team (0/1), or -1 for a draw. `stats` are protocol TeamStats.
-func end_match(winning_team: int, scores: Array, stats: Array) -> void:
+func end_match(winning_team: int, scores: Array, stats: Array, reason := "") -> void:
 	NetworkClient.send_message("end_game", {
 		"winningTeam": null if winning_team < 0 else winning_team + server_team_offset,
 		"scores": [scores[0], scores[1]],
 		"stats": stats,
+		"reason": reason,
 	})
 
 

@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "companion",
+    "name": "Skill Issue",
     "slug": "companion",
     "version": "1.0.0",
     "orientation": "landscape",
@@ -10,7 +10,7 @@
     "ios": {
       "icon": "./assets/expo.icon",
       "infoPlist": {
-        "NSLocalNetworkUsageDescription": "Connect to the SkillIssue game on your Wi-Fi network."
+        "NSLocalNetworkUsageDescription": "Connect to the Skill Issue game on your Wi-Fi network."
       }
     },
     "android": {
@@ -31,7 +31,7 @@
       [
         "expo-sensors",
         {
-          "motionPermission": "Allow SkillIssue to use motion for movement and aiming."
+          "motionPermission": "Allow Skill Issue to use motion for movement and aiming."
         }
       ],
       [

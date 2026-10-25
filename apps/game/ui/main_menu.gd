@@ -67,7 +67,7 @@ func _ready() -> void:
 		holder.add_child(b)
 		left.add_child(holder)
 
-	var foot := UiKit.label("Phones: open the SkillIssue app and tap Join a Lobby.", 20, UiKit.BODY, UiKit.MUTED)
+	var foot := UiKit.label("Phones: open the Skill Issue app and tap Join a Lobby.", 20, UiKit.BODY, UiKit.MUTED)
 	left.add_child(foot)
 
 	# Right: the two teams, face to face

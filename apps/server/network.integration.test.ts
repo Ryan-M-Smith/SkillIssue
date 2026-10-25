@@ -148,8 +148,10 @@ test("relay preserves authenticated lobby, match, reset and disconnect lifecycle
         assert.equal((await host.next("controller_disconnected")).controllerId, ids[0]);
         const fewer = await host.next("lobby_state", (message) => message.assignments.length === 3 && message.state === "playing");
         assert.equal(fewer.state, "playing", "disconnect does not reset the live match");
-        host.send({ type: "end_game", protocolVersion: 1, winningTeam: 1, scores: [10, 4], stats: [] });
-        assert.deepEqual((await phones[1]!.next("match_ended")).scores, [10, 4]);
+        host.send({ type: "end_game", protocolVersion: 1, winningTeam: 1, scores: [10, 4], stats: [], reason: "host" });
+        const ended = await phones[1]!.next("match_ended");
+        assert.deepEqual(ended.scores, [10, 4]);
+        assert.equal(ended.reason, "host");
         host.send({ type: "reset_lobby", protocolVersion: 1 });
         const reset = await phones[1]!.next("lobby_state", (message) => message.state === "waiting" && message.players.length === 3 && message.players.every((player: Message) => player.ready === false));
         assert(reset.players.every((player: Message) => player.ready === false));

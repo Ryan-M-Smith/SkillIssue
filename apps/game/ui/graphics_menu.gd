@@ -91,6 +91,7 @@ func _add_row(parent: VBoxContainer, text: String, control: Control) -> void:
 
 
 func open_menu() -> void:
+	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 	_resolution.select(GraphicsSettings.RESOLUTIONS.find(GraphicsSettings.resolution))
 	_scale.select(GraphicsSettings.SCALES.find(GraphicsSettings.render_scale))
 	_mode.select(GraphicsSettings.window_mode)

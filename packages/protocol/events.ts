@@ -111,6 +111,7 @@ export type EndGameMessage = {
     winningTeam: TeamId | null;
     scores: [number, number];
     stats: TeamStats[];
+    reason?: "kills" | "time" | "host";
 };
 
 /** Game host: back to the lobby with the same code and players (Play Again). */
@@ -205,6 +206,7 @@ export type MatchEndedMessage = {
     winningTeam: TeamId | null;
     scores: [number, number];
     stats: TeamStats[];
+    reason?: "kills" | "time" | "host";
 };
 
 export type ControllerAssignedMessage = {
