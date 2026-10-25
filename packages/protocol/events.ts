@@ -11,12 +11,22 @@ export type MotionVector = {
     z: number;
 };
 
+/** Movement/aim the phone's own motion model computed, each -1..1. */
+export type MotionControls = {
+    moveX: number;
+    moveY: number;
+    lookX: number;
+    lookY: number;
+};
+
 export type MotionReading = {
     accelerometer: MotionVector;
     gyroscope: MotionVector;
     arPosition: MotionVector;
     arOrientation: MotionVector;
     trackingStatus: "tracking" | "limited" | "unavailable";
+    /** When present, the game uses these instead of interpreting the raw fields. */
+    controls?: MotionControls;
 };
 
 export type EnvironmentAction =

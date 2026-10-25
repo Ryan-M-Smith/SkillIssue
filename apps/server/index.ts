@@ -19,6 +19,9 @@ import {
 const port = Number(process.env.PORT ?? 8080);
 const heartbeatIntervalMs = 30_000;
 const pairingCodeLength = 6;
+// How many phones a match needs before it can start. Default: all four slots.
+// Set MIN_CONTROLLERS=1 to test with a single phone.
+const minControllers = Math.min(4, Math.max(1, Math.floor(Number(process.env.MIN_CONTROLLERS ?? 4)) || 4));
 const controllerSlots: ReadonlyArray<{ teamId: TeamId; role: ControllerRole }> = [
     { teamId: 1, role: "movement" },
     { teamId: 1, role: "aim" },
@@ -98,6 +101,9 @@ function assignmentsFor(session: Session): ControllerAssignment[] {
 }
 
 function isReady(session: Session) {
+    if (minControllers < controllerSlots.length) {
+        return session.controllers.size >= minControllers;
+    }
     return controllerSlots.every(({ teamId, role }) =>
         [...session.controllers.values()].some(
             (controller) => controller.teamId === teamId && controller.role === role
@@ -203,7 +209,13 @@ function startGame(socket: WebSocket) {
     }
 
     if (!isReady(context.session)) {
-        sendError(socket, "game_unavailable", "All four controller slots must be connected first.");
+        sendError(
+            socket,
+            "game_unavailable",
+            minControllers < controllerSlots.length
+                ? `At least ${minControllers} controller(s) must be connected first.`
+                : "All four controller slots must be connected first."
+        );
         return;
     }
 
@@ -458,6 +470,9 @@ const heartbeat = setInterval(() => {
 
 wss.on("close", () => clearInterval(heartbeat));
 console.log(`SkillIssue WebSocket server listening on ws://localhost:${port}`);
+if (minControllers < controllerSlots.length) {
+    console.log(`  matches can start with ${minControllers} controller(s) (MIN_CONTROLLERS)`);
+}
 for (const address of lanAddresses()) {
     console.log(`  on your network: ${address}`);
 }
