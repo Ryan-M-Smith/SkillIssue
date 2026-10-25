@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import styles from "./page.module.css";
 
 export default function Home() {
@@ -32,16 +33,8 @@ export default function Home() {
                     <div className={styles.arenaHorizon} />
                     <div className={styles.arenaSplit} />
                     <div className={styles.arenaCrosshair}><span /><span /></div>
-                    <div className={`${styles.fighter} ${styles.blueFighter}`}>
-                        <div className={styles.fighterHead} />
-                        <div className={styles.fighterBody} />
-                        <div className={styles.fighterArm} />
-                    </div>
-                    <div className={`${styles.fighter} ${styles.redFighter}`}>
-                        <div className={styles.fighterHead} />
-                        <div className={styles.fighterBody} />
-                        <div className={styles.fighterArm} />
-                    </div>
+                    <Image className={`${styles.characterArt} ${styles.blueCharacterArt}`} src="/hero-blue.png" alt="Blue trench-coat raccoon character" fill priority sizes="(max-width: 900px) 72vw, 38vw" />
+                    <Image className={`${styles.characterArt} ${styles.redCharacterArt}`} src="/hero-red.png" alt="Red trench-coat raccoon character" fill priority sizes="(max-width: 900px) 72vw, 38vw" />
                     <div className={`${styles.teamBadge} ${styles.badgeBlue}`}><b>BLUE</b><span>MOVE</span></div>
                     <div className={`${styles.teamBadge} ${styles.badgeRed}`}><b>RED</b><span>AIM</span></div>
                     <div className={styles.arenaCode}>MATCH / 02<br /><strong>READY</strong></div>

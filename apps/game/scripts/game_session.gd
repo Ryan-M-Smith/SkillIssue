@@ -48,6 +48,7 @@ var _controllers := {}
 func _ready() -> void:
 	NetworkClient.game_event_received.connect(_on_game_event)
 	NetworkClient.connection_changed.connect(_on_connection_changed)
+	NetworkClient.network_error.connect(func(message: String): server_error.emit(message))
 
 
 ## Controller id holding a team's role, or "" if the slot is empty.
