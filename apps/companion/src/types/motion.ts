@@ -14,11 +14,14 @@ export type MotionVector = {
 	z: number;
 };
 
+/** Sensor timestamp in seconds, as expo-sensors reports it (monotonic). */
+type Stamped = { timestamp?: number };
+
 export type MotionReading = {
-	rotation: MotionAngles;
-	rotationRate: MotionAngles | null;
-	acceleration: MotionVector | null;
-	accelerationIncludingGravity: MotionVector;
+	rotation: MotionAngles & Stamped;
+	rotationRate: (MotionAngles & Stamped) | null;
+	acceleration: (MotionVector & Stamped) | null;
+	accelerationIncludingGravity: MotionVector & Stamped;
 };
 
 /**
@@ -26,7 +29,7 @@ export type MotionReading = {
  * - jump:   quick flick back (top of the phone toward you)
  * - crouch: quick flick forward; toggles crouch on/off
  * - stand:  jump flick while crouched; stands up instead of jumping
- * - sprint: quick side-to-side shake; toggles sprint on/off
+ * - sprint: quick twist about the screen axis (Z); toggles sprint on/off
  * - shoot:  gunner forward jab
  */
 export type Action = "jump" | "crouch" | "stand" | "sprint" | "shoot" | null;
@@ -44,14 +47,20 @@ export type GameControls = {
 
 export type MotionDebug = {
 	calibration: "calibrating" | "ready";
+	/** Held tilt from neutral, degrees. + = top away (forward). */
 	pitchDeg: number;
+	/** Held tilt from neutral, degrees. + = right side down. */
 	sidePressDeg: number;
+	/** Gyroscope about the phone's X axis (pitch), deg/s. */
 	pitchRate: number;
+	/** Gyroscope about the phone's Y axis (left/right), deg/s. */
 	sidePressRate: number;
-	sprintPhase: "off" | "shaking" | "on";
+	/** Gyroscope about the phone's Z axis (twist), deg/s. */
+	twistRate: number;
+	/** Axis of the fast motion in progress, if any. */
+	burst: "none" | "pitch" | "side" | "twist";
+	sprintPhase: "off" | "on";
 	gesture: "armed" | "locked";
-	strafeMeters: number;
-	positionTracking: "missing" | "tracking";
 };
 
 export type Counts = Record<Exclude<Action, null>, number>;

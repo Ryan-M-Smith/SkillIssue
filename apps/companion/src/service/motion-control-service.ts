@@ -4,12 +4,13 @@ import type {
 	MotionAngles,
 	MotionDebug,
 	MotionReading,
+	MotionVector,
 	Role,
 } from "@/types/motion";
 import {
 	angleDiff,
-	angularMagnitude,
 	clamp,
+	deviceRotationRate,
 	magnitude,
 	radToDeg,
 } from "@/lib/math/motion";
@@ -17,57 +18,60 @@ import {
 export type { GameControls, MotionDebug, Role } from "@/types/motion";
 
 /*
- * MOVEMENT PHONE CONTROLS
+ * MOVEMENT PHONE
  *
- * The phone is held tilted, roughly 45° from flat, screen toward the player.
- * Whatever pose it is held still in at start becomes "neutral".
+ * Hold the phone at about 45°, screen toward you. The pose it is held still
+ * in at start is neutral. Each control lives on one of the phone's own axes:
  *
- *   Walk forward   slowly tilt the top away (toward flat) and hold
- *   Walk backward  slowly tilt the top toward you and hold
- *   Strafe         slowly press the right / left side down and hold
- *   Stop           bring the phone back to neutral
+ *   Pitch / X   slow tilt and hold    walk forward (top away) / back
+ *               quick flick forward   crouch, flick again to stand up
+ *               quick flick back      jump (while crouched: stand up)
+ *   Yaw / Y     slow tilt and hold    strafe right (right side down) / left
+ *   Roll / Z    quick twist           sprint on, twist again for off
  *
- *   Crouch         quick flick forward. Flick forward again to stand up.
- *   Jump           quick flick back. While crouched this only stands up.
- *   Sprint         quick side-to-side shake. Shake again to stop sprinting.
+ * HOW IT DETECTS THEM
  *
- * Slow tilts move, fast tilts are gestures. One gesture at a time: after one
- * fires, every gesture is locked for `eventLockMs` and until the phone has
- * settled again (back at neutral, or held still), and the motion of the
- * gesture itself never turns into walking.
+ * Held tilts come from the phone's fused orientation, relative to neutral.
  *
- * Crouch and sprint are exclusive stances. Changing from one to the other,
- * or jumping out of a crouch, goes through standing (neutral) first.
+ * Gestures come from the gyroscope. Any fast motion starts a "burst". During
+ * the burst the gyroscope's rotation is added up per axis (using the
+ * sensor's own timestamps, not the JS clock). As soon as one axis clearly
+ * dominates and has turned far and fast enough, that axis's gesture fires.
+ * A burst can fire at most once, so the swing back to neutral never counts
+ * as a second gesture. After a gesture there is a short lock, and the
+ * gesture's own motion never turns into walking.
+ *
+ * Crouch and sprint are exclusive stances; starting one ends the other.
  */
 
 // Adjustable settings
 const settings = {
-	calibrationMs: 900,
-	calibrationMaxLinear: 0.9,
-	calibrationMaxRotation: 13,
+	// Neutral: phone held still this long at start
+	calibrationMs: 700,
+	calibrationMaxRate: 15, // deg/s
 
-	// Walking: slow, held tilt away from neutral
+	// Walking: held tilt away from neutral
 	deadzoneDeg: 8,
-	maxWalkTiltDeg: 27,
-	walkMaxRate: 120, // deg/s; anything faster is a gesture, not walking
+	fullSpeedDeg: 25,
 
-	// Flick (pitch): forward = crouch toggle, back = jump
-	flickRate: 200, // deg/s the flick must peak at
-	flickMinDeg: 12, // degrees the flick must travel
-	flickWindowMs: 250,
+	// Bursts: a fast motion in progress
+	burstStartRate: 80, // deg/s
+	burstEndRate: 50, // deg/s
+	burstQuietMs: 80, // below burstEndRate this long ends the burst
+	burstMaxMs: 800,
+	dominance: 1.5, // winning axis must turn this many times more than the others
 
-	// Shake (side to side): sprint toggle
-	shakeRate: 150, // deg/s roll rate that counts as one swing
-	shakeAccel: 8, // m/s² sideways that counts as one swing
-	shakeSwings: 3, // alternating swings needed
-	shakeWindowMs: 700,
+	// Pitch flick (X): jump / crouch
+	flickRate: 150, // deg/s peak
+	flickMinDeg: 12,
 
-	// One event at a time
+	// Twist (Z): sprint
+	twistRate: 150, // deg/s peak
+	twistMinDeg: 20,
+
+	// One gesture at a time
 	eventLockMs: 1000,
-	settleRate: 40, // deg/s; slower than this is "still"
-	settleAccel: 1.5, // m/s²; less hand movement than this is "still"
-	settleNeutralMs: 150, // still at neutral this long re-arms
-	settleHeldMs: 400, // still anywhere else this long re-arms
+	afterGestureMs: 500, // no walking this long after a gesture, unless back at neutral
 
 	// Gunner
 	jabThreshold: 5.5,
@@ -81,18 +85,19 @@ const settings = {
 	aimDeadzone: 3,
 };
 
-// Change signs if motion directions are reversed.
-// DeviceMotion beta is 0° flat and 90° upright, so tilting the top away
-// (forward) lowers it: forward needs -1.
+// Flip a sign here if a direction comes out reversed on a real phone.
 const axes = {
-	moveForwardSign: -1,
-	moveRightSign: 1,
-	gunnerYawSign: 1,
-	gunnerPitchSign: -1,
+	// rotation.beta is 0° flat and 90° upright on iOS and Android, so tilting
+	// the top away (forward) lowers it; gyro X is negative for the same motion.
+	forwardSign: -1,
+	// rotation.gamma grows as the right side goes down.
+	rightSign: 1,
+	gunnerYawSign: 1, // lookX from gyro Y
+	gunnerPitchSign: -1, // lookY from gyro X
 	forwardJabZSign: -1,
 };
 
-// Convert tilt angle into WASD-style movement
+// Convert held tilt into WASD-style movement
 function tiltToMovement(degrees: number) {
 	if (Math.abs(degrees) < settings.deadzoneDeg) {
 		return 0;
@@ -100,7 +105,7 @@ function tiltToMovement(degrees: number) {
 
 	const intensity =
 		(Math.abs(degrees) - settings.deadzoneDeg) /
-		(settings.maxWalkTiltDeg - settings.deadzoneDeg);
+		(settings.fullSpeedDeg - settings.deadzoneDeg);
 
 	return Math.sign(degrees) * clamp(intensity);
 }
@@ -130,68 +135,38 @@ function emptyDebug(): MotionDebug {
 		sidePressDeg: 0,
 		pitchRate: 0,
 		sidePressRate: 0,
+		twistRate: 0,
+		burst: "none",
 		sprintPhase: "off",
 		gesture: "armed",
-		strafeMeters: 0,
-		positionTracking: "missing",
 	};
 }
 
-/** Counts back-and-forth swings of a signal within a time window. */
-class SwingCounter {
-	private times: number[] = [];
-	private lastSign = 0;
-
-	update(value: number, threshold: number, now: number, windowMs: number) {
-		this.times = this.times.filter((t) => now - t <= windowMs);
-
-		if (this.times.length === 0) {
-			this.lastSign = 0;
-		}
-
-		if (Math.abs(value) >= threshold) {
-			const sign = Math.sign(value);
-
-			if (sign !== this.lastSign) {
-				this.times.push(now);
-				this.lastSign = sign;
-			}
-		}
-
-		return this.times.length;
-	}
-
-	reset() {
-		this.times = [];
-		this.lastSign = 0;
-	}
-}
-
-type Flick = {
-	dir: 1 | -1; // +1 forward, -1 back
-	startDeg: number;
-	peakRate: number;
+type Burst = {
+	startedAt: number;
 	lastFastAt: number;
+	turned: MotionVector; // degrees turned about each axis during the burst
+	peak: MotionVector; // fastest rate about each axis, deg/s
+	moveBefore: { x: number; y: number };
+	fired: boolean;
 };
+
+type Move = { x: number; y: number };
+
+const still: Move = { x: 0, y: 0 };
 
 export class MotionController {
 	private calibrationSince: number | null = null;
 	private neutral: MotionAngles | null = null;
+	private lastSampleAt: number | null = null;
 
 	// Movement role
 	private crouching = false;
 	private sprinting = false;
+	private burst: Burst | null = null;
 	private lockedUntil = 0;
-	private settled = true;
-	private settleSince: number | null = null;
-	private last: { at: number; forwardDeg: number; rightDeg: number } | null =
-		null;
-	private forwardRate = 0;
-	private rightRate = 0;
-	private flick: Flick | null = null;
-	private rollSwings = new SwingCounter();
-	private sideSwings = new SwingCounter();
-	private lastMove = { x: 0, y: 0 };
+	private quietUntil = 0;
+	private lastMove: Move = still;
 
 	// Gunner role
 	private armed = false;
@@ -201,25 +176,28 @@ export class MotionController {
 
 	private debug: MotionDebug = emptyDebug();
 
-	constructor(private readonly role: Role) {}
+	/**
+	 * @param role     which phone this is
+	 * @param platform Platform.OS; expo-sensors orders the gyroscope
+	 *                 axes differently on each platform
+	 */
+	constructor(
+		private readonly role: Role,
+		private readonly platform: string = "ios"
+	) {}
 
 	// Recalibrate when necessary
 	reset() {
 		this.calibrationSince = null;
 		this.neutral = null;
+		this.lastSampleAt = null;
 
 		this.crouching = false;
 		this.sprinting = false;
+		this.burst = null;
 		this.lockedUntil = 0;
-		this.settled = true;
-		this.settleSince = null;
-		this.last = null;
-		this.forwardRate = 0;
-		this.rightRate = 0;
-		this.flick = null;
-		this.rollSwings.reset();
-		this.sideSwings.reset();
-		this.lastMove = { x: 0, y: 0 };
+		this.quietUntil = 0;
+		this.lastMove = still;
 
 		this.armed = false;
 		this.gunnerLockedUntil = 0;
@@ -234,26 +212,37 @@ export class MotionController {
 	}
 
 	process(reading: MotionReading, now = Date.now()): GameControls {
-		const linear = reading.acceleration;
-		const gyro = reading.rotationRate;
+		// Prefer the sensor's own clock: JS callbacks can arrive in bunches.
+		const stamp =
+			reading.rotationRate?.timestamp ?? reading.rotation.timestamp;
+		const t = typeof stamp === "number" ? stamp * 1000 : now;
+		const dt =
+			this.lastSampleAt === null
+				? 0
+				: clamp((t - this.lastSampleAt) / 1000, 0, 0.1);
+		this.lastSampleAt = t;
 
-		const linearMagnitude = linear ? magnitude(linear) : Infinity;
-		const angularSpeed = gyro ? angularMagnitude(gyro) : Infinity;
+		const gyro: MotionVector | null = reading.rotationRate
+			? deviceRotationRate(reading.rotationRate, this.platform)
+			: null;
+		const angularSpeed = gyro ? magnitude(gyro) : Infinity;
+
+		this.debug.pitchRate = gyro?.x ?? 0;
+		this.debug.sidePressRate = gyro?.y ?? 0;
+		this.debug.twistRate = gyro?.z ?? 0;
 
 		// STEP 1: AUTOMATIC CALIBRATION
-		// Phone must remain still before controls activate.
+		// Phone must be held still before controls activate.
 		if (!this.neutral) {
-			if (
-				linearMagnitude < settings.calibrationMaxLinear &&
-				angularSpeed < settings.calibrationMaxRotation
-			) {
+			if (angularSpeed < settings.calibrationMaxRate) {
 				if (this.calibrationSince === null) {
-					this.calibrationSince = now;
+					this.calibrationSince = t;
 				}
 
-				if (now - this.calibrationSince >= settings.calibrationMs) {
+				if (t - this.calibrationSince >= settings.calibrationMs) {
 					this.neutral = { ...reading.rotation };
 					this.armed = true;
+					this.debug.calibration = "ready";
 				}
 			} else {
 				this.calibrationSince = null;
@@ -265,11 +254,9 @@ export class MotionController {
 			};
 		}
 
-		this.debug.calibration = "ready";
-
 		return this.role === "movement"
-			? this.processMovement(reading, this.neutral, now, linearMagnitude)
-			: this.processGunner(reading, now, linearMagnitude, angularSpeed);
+			? this.processMovement(reading, this.neutral, gyro, t, dt)
+			: this.processGunner(reading, gyro, angularSpeed, t);
 	}
 
 	// -------------------- MOVEMENT PHONE --------------------
@@ -277,106 +264,53 @@ export class MotionController {
 	private processMovement(
 		reading: MotionReading,
 		neutral: MotionAngles,
-		now: number,
-		linearMagnitude: number
+		gyro: MotionVector | null,
+		t: number,
+		dt: number
 	): GameControls {
 		const forwardDeg =
-			axes.moveForwardSign *
+			axes.forwardSign *
 			radToDeg(angleDiff(reading.rotation.beta, neutral.beta));
 
 		const rightDeg =
-			axes.moveRightSign *
+			axes.rightSign *
 			radToDeg(angleDiff(reading.rotation.gamma, neutral.gamma));
 
-		const previousForwardDeg = this.last?.forwardDeg ?? forwardDeg;
-		this.updateRates(forwardDeg, rightDeg, now);
+		const atNeutral =
+			Math.abs(forwardDeg) < settings.deadzoneDeg &&
+			Math.abs(rightDeg) < settings.deadzoneDeg;
 
-		const fr = this.forwardRate;
-		const rr = this.rightRate;
-		const turning = Math.max(Math.abs(fr), Math.abs(rr));
-
-		this.updateSettled(forwardDeg, rightDeg, turning, linearMagnitude, now);
-		this.trackFlick(fr, rr, previousForwardDeg, now);
-
-		// Sideways shake: roll swings (only while roll dominates, so a
-		// pitch flick never counts) or sideways hand swings.
-		const rollSwings = this.rollSwings.update(
-			Math.abs(rr) > Math.abs(fr) ? rr : 0,
-			settings.shakeRate,
-			now,
-			settings.shakeWindowMs
-		);
-
-		const sideSwings = this.sideSwings.update(
-			reading.acceleration?.x ?? 0,
-			settings.shakeAccel,
-			now,
-			settings.shakeWindowMs
-		);
-
-		// STEP 2: ONE GESTURE AT A TIME
+		// STEP 2: GESTURES FROM GYROSCOPE BURSTS
 		let action: Action = null;
-		const armed = now >= this.lockedUntil && this.settled;
 
-		if (armed) {
-			const flick = this.flick;
-
-			if (
-				flick &&
-				flick.peakRate >= settings.flickRate &&
-				(forwardDeg - flick.startDeg) * flick.dir >= settings.flickMinDeg
-			) {
-				action = flick.dir > 0 ? this.toggleCrouch() : this.jump();
-			} else if (
-				rollSwings >= settings.shakeSwings ||
-				sideSwings >= settings.shakeSwings
-			) {
-				action = this.toggleSprint();
-			}
-
-			if (action) {
-				this.lockedUntil = now + settings.eventLockMs;
-				this.settled = false;
-				this.settleSince = null;
-				this.flick = null;
-				this.rollSwings.reset();
-				this.sideSwings.reset();
-			}
+		if (gyro) {
+			action = this.updateBurst(gyro, t, dt);
 		}
 
-		// STEP 3: WALK / STRAFE FROM SLOW, HELD TILT
-		let move = this.lastMove;
-		const shaking = Math.max(rollSwings, sideSwings) > 0;
+		// STEP 3: WALK / STRAFE FROM HELD TILT
+		let move: Move;
 
-		if (!this.settled) {
-			// The gesture and the swing back to neutral never walk.
-			move = { x: 0, y: 0 };
-		} else if (
-			turning < settings.walkMaxRate &&
-			!this.flick &&
-			!shaking
-		) {
+		if (this.burst) {
+			// Mid-motion: keep what we had until we know it isn't a gesture.
+			move = this.burst.fired ? still : this.burst.moveBefore;
+		} else if (t < this.quietUntil && !atNeutral) {
+			// Just after a gesture: the swing back to neutral never walks.
+			move = still;
+		} else {
+			this.quietUntil = 0;
 			move = {
 				x: tiltToMovement(rightDeg),
 				y: tiltToMovement(forwardDeg),
 			};
 		}
-		// Otherwise a fast motion is in progress: hold the last movement
-		// until we know whether it is a gesture.
 
 		this.lastMove = move;
 
 		this.debug.pitchDeg = forwardDeg;
 		this.debug.sidePressDeg = rightDeg;
-		this.debug.pitchRate = fr;
-		this.debug.sidePressRate = rr;
-		this.debug.gesture =
-			now >= this.lockedUntil && this.settled ? "armed" : "locked";
-		this.debug.sprintPhase = this.sprinting
-			? "on"
-			: shaking
-				? "shaking"
-				: "off";
+		this.debug.burst = this.burst ? dominantAxisName(this.burst.turned) : "none";
+		this.debug.gesture = t >= this.lockedUntil ? "armed" : "locked";
+		this.debug.sprintPhase = this.sprinting ? "on" : "off";
 
 		return {
 			...emptyControls,
@@ -389,91 +323,95 @@ export class MotionController {
 		};
 	}
 
-	// Rates come from the same fused angles that drive walking, so a flick's
-	// direction always agrees with the walking direction on every platform.
-	private updateRates(forwardDeg: number, rightDeg: number, now: number) {
-		if (this.last) {
-			const dt = clamp((now - this.last.at) / 1000, 0.01, 0.1);
-			const smoothing = 0.5;
+	private updateBurst(gyro: MotionVector, t: number, dt: number): Action {
+		const speed = magnitude(gyro);
 
-			this.forwardRate +=
-				smoothing *
-				((forwardDeg - this.last.forwardDeg) / dt - this.forwardRate);
-			this.rightRate +=
-				smoothing * ((rightDeg - this.last.rightDeg) / dt - this.rightRate);
-		}
-
-		this.last = { at: now, forwardDeg, rightDeg };
-	}
-
-	// After a gesture: re-arm once the phone is still at neutral, or held
-	// still somewhere else for a little longer (e.g. jumping while walking).
-	private updateSettled(
-		forwardDeg: number,
-		rightDeg: number,
-		turning: number,
-		linearMagnitude: number,
-		now: number
-	) {
-		if (this.settled) {
-			return;
-		}
-
-		if (
-			turning >= settings.settleRate ||
-			linearMagnitude >= settings.settleAccel
-		) {
-			this.settleSince = null;
-			return;
-		}
-
-		if (this.settleSince === null) {
-			this.settleSince = now;
-		}
-
-		const atNeutral =
-			Math.abs(forwardDeg) < settings.deadzoneDeg &&
-			Math.abs(rightDeg) < settings.deadzoneDeg;
-
-		const needed = atNeutral
-			? settings.settleNeutralMs
-			: settings.settleHeldMs;
-
-		if (now - this.settleSince >= needed) {
-			this.settled = true;
-			this.settleSince = null;
-			this.flick = null;
-			this.rollSwings.reset();
-			this.sideSwings.reset();
-		}
-	}
-
-	private trackFlick(
-		fr: number,
-		rr: number,
-		previousForwardDeg: number,
-		now: number
-	) {
-		if (Math.abs(fr) >= settings.walkMaxRate && Math.abs(fr) >= Math.abs(rr)) {
-			const dir = fr > 0 ? 1 : -1;
-
-			if (!this.flick || this.flick.dir !== dir) {
-				this.flick = {
-					dir,
-					startDeg: previousForwardDeg,
-					peakRate: 0,
-					lastFastAt: now,
-				};
+		if (!this.burst) {
+			if (speed < settings.burstStartRate) {
+				return null;
 			}
 
-			this.flick.peakRate = Math.max(this.flick.peakRate, Math.abs(fr));
-			this.flick.lastFastAt = now;
-		} else if (
-			this.flick &&
-			now - this.flick.lastFastAt > settings.flickWindowMs
-		) {
-			this.flick = null;
+			this.burst = {
+				startedAt: t,
+				lastFastAt: t,
+				turned: { x: 0, y: 0, z: 0 },
+				peak: { x: 0, y: 0, z: 0 },
+				moveBefore: this.lastMove,
+				fired: false,
+			};
 		}
+
+		const burst = this.burst;
+
+		burst.turned = {
+			x: burst.turned.x + gyro.x * dt,
+			y: burst.turned.y + gyro.y * dt,
+			z: burst.turned.z + gyro.z * dt,
+		};
+		burst.peak = {
+			x: Math.max(burst.peak.x, Math.abs(gyro.x)),
+			y: Math.max(burst.peak.y, Math.abs(gyro.y)),
+			z: Math.max(burst.peak.z, Math.abs(gyro.z)),
+		};
+
+		if (speed >= settings.burstEndRate) {
+			burst.lastFastAt = t;
+		}
+
+		let action: Action = null;
+
+		if (!burst.fired && t >= this.lockedUntil) {
+			action = this.classify(burst);
+
+			if (action) {
+				burst.fired = true;
+				this.lockedUntil = t + settings.eventLockMs;
+			}
+		}
+
+		const ended =
+			t - burst.lastFastAt >= settings.burstQuietMs ||
+			t - burst.startedAt >= settings.burstMaxMs;
+
+		if (ended) {
+			if (burst.fired) {
+				this.quietUntil = t + settings.afterGestureMs;
+			}
+
+			this.burst = null;
+		}
+
+		return action;
+	}
+
+	// Which gesture, if any, this burst is so far.
+	private classify(burst: Burst): Action {
+		const x = Math.abs(burst.turned.x);
+		const y = Math.abs(burst.turned.y);
+		const z = Math.abs(burst.turned.z);
+
+		// Pitch flick (X)
+		if (
+			x >= settings.flickMinDeg &&
+			burst.peak.x >= settings.flickRate &&
+			x >= settings.dominance * Math.max(y, z)
+		) {
+			// Gyro X is positive when the top comes toward you.
+			const forward = axes.forwardSign * burst.turned.x > 0;
+			return forward ? this.toggleCrouch() : this.jump();
+		}
+
+		// Twist (Z)
+		if (
+			z >= settings.twistMinDeg &&
+			burst.peak.z >= settings.twistRate &&
+			z >= settings.dominance * Math.max(x, y)
+		) {
+			return this.toggleSprint();
+		}
+
+		// A fast tilt about Y is just a quick strafe: no gesture.
+		return null;
 	}
 
 	private toggleCrouch(): Action {
@@ -509,31 +447,28 @@ export class MotionController {
 
 	private processGunner(
 		reading: MotionReading,
-		now: number,
-		linearMagnitude: number,
-		angularSpeed: number
+		gyro: MotionVector | null,
+		angularSpeed: number,
+		t: number
 	): GameControls {
 		const linear = reading.acceleration;
-		const gyro = reading.rotationRate;
-
-		this.debug.pitchRate = gyro?.beta ?? 0;
-		this.debug.sidePressRate = gyro?.gamma ?? 0;
+		const linearMagnitude = linear ? magnitude(linear) : Infinity;
 
 		let action: Action = null;
 
 		// Re-arm: prevent returning the phone from firing another shot.
 		if (!this.armed) {
 			const settled =
-				now >= this.gunnerLockedUntil &&
+				t >= this.gunnerLockedUntil &&
 				linearMagnitude < settings.rearmAcceleration &&
 				angularSpeed < settings.rearmRotation;
 
 			if (settled) {
 				if (this.stillSince === null) {
-					this.stillSince = now;
+					this.stillSince = t;
 				}
 
-				if (now - this.stillSince >= settings.rearmStillMs) {
+				if (t - this.stillSince >= settings.rearmStillMs) {
 					this.armed = true;
 				}
 			} else {
@@ -556,10 +491,10 @@ export class MotionController {
 				action = "shoot";
 
 				// Temporarily suppress camera jitter
-				this.aimFrozenUntil = now + settings.aimFreezeAfterShotMs;
+				this.aimFrozenUntil = t + settings.aimFreezeAfterShotMs;
 
 				this.armed = false;
-				this.gunnerLockedUntil = now + settings.gestureCooldownMs;
+				this.gunnerLockedUntil = t + settings.gestureCooldownMs;
 				this.stillSince = null;
 			}
 		}
@@ -572,11 +507,21 @@ export class MotionController {
 			action,
 		};
 
-		if (gyro && now >= this.aimFrozenUntil) {
-			output.lookX = gyroToMovement(axes.gunnerYawSign * gyro.gamma);
-			output.lookY = gyroToMovement(axes.gunnerPitchSign * gyro.beta);
+		if (gyro && t >= this.aimFrozenUntil) {
+			output.lookX = gyroToMovement(axes.gunnerYawSign * gyro.y);
+			output.lookY = gyroToMovement(axes.gunnerPitchSign * gyro.x);
 		}
 
 		return output;
 	}
+}
+
+function dominantAxisName(v: MotionVector): MotionDebug["burst"] {
+	const x = Math.abs(v.x);
+	const y = Math.abs(v.y);
+	const z = Math.abs(v.z);
+
+	if (x >= y && x >= z) return "pitch";
+	if (y >= z) return "side";
+	return "twist";
 }
