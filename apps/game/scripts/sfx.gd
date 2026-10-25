@@ -1,11 +1,28 @@
+## Autoload `Sfx`: short sound effects (button clicks, alerts) that can overlap.
+##   Sfx.play("click")
+## Each call makes a small AudioStreamPlayer that deletes itself when it finishes.
+## Plays on the "SFX" bus (default_bus_layout.tres), separate from music.
 extends Node
 
+const SOUNDS := {
+	"click": preload("res://audio/GUI_Sound_Effects_by_Lokif/click.wav"),
+	"hover": preload("res://audio/GUI_Sound_Effects_by_Lokif/misc_menu.wav"),
+	"positive": preload("res://audio/GUI_Sound_Effects_by_Lokif/positive.wav"),
+	"negative": preload("res://audio/GUI_Sound_Effects_by_Lokif/negative.wav"),
+}
 
-# Called when the node enters the scene tree for the first time.
+
 func _ready() -> void:
-	pass # Replace with function body.
+	process_mode = Node.PROCESS_MODE_ALWAYS   # menus still click while the game is paused
 
 
-# Called every frame. 'delta' is the elapsed time since the previous frame.
-func _process(delta: float) -> void:
-	pass
+func play(sound: String) -> void:
+	var stream: AudioStream = SOUNDS.get(sound)
+	if stream == null:
+		return
+	var p := AudioStreamPlayer.new()
+	p.stream = stream
+	p.bus = &"SFX"
+	add_child(p)
+	p.play()
+	p.finished.connect(p.queue_free)
