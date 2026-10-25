@@ -132,7 +132,7 @@ func _build_how_to_play() -> Control:
 	box.add_theme_constant_override("separation", 14)
 	panel.add_child(box)
 	box.add_child(UiKit.display("HOW TO PLAY", 52))
-	box.add_child(UiKit.label("Each team is one character driven by two phones held sideways like a controller. First team to 10 kills wins, or whoever leads when the 5-minute clock runs out.", 22))
+	box.add_child(UiKit.label("Each team is one character driven by two phones held sideways like a controller. First team to 10 kills wins, or whoever leads when the clock runs out (5 minutes by default; hosts can set 2 to 5 in Settings).", 22))
 
 	var cols := HBoxContainer.new()
 	cols.add_theme_constant_override("separation", 28)

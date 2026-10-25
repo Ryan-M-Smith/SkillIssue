@@ -103,6 +103,9 @@ func _run() -> void:
 	var count: HSlider = current_scene._graphics._players
 	if not _check(count != null and count.min_value == 1 and count.max_value == 4 and count.step == 1, "settings offer a player count slider (1-4)"):
 		return
+	var minutes: HSlider = current_scene._graphics._minutes
+	if not _check(minutes != null and minutes.min_value == 2 and minutes.max_value == 5 and minutes.step == 1, "settings offer a match length slider (2-5 minutes)"):
+		return
 	await _click(_find_button(current_scene._graphics, "BACK"))
 	if not _check(not current_scene._graphics.is_open(), "mouse closes graphics modal"):
 		return
@@ -119,6 +122,8 @@ func _run() -> void:
 	await physics_frame
 	var mode = current_scene.get_node("DuoSandbox")
 	if not _check(mode != null and mode.duos.size() == 2, "sandbox initializes both duos"):
+		return
+	if not _check(is_equal_approx(mode._time_left, root.get_node("GameSession").match_minutes * 60.0) or mode._time_left > root.get_node("GameSession").match_minutes * 60.0 - 5.0, "the match clock starts at the host's match length"):
 		return
 	var screen_view := current_scene.get_node("Screens/TeamAView/SubViewport") as SubViewport
 	if not _check(is_equal_approx(screen_view.scaling_3d_scale, 1.25) and screen_view.get_parent().stretch_shrink == 1, "new split-screen viewports inherit full-resolution graphics settings"):

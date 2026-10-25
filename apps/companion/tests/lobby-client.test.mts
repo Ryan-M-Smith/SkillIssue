@@ -309,3 +309,22 @@ test("gunner backpressure retains fresh turns and discards stale turns", (t) => 
  t.mock.timers.tick(50);
  assert.equal(socket.sent.filter(m => m.type === "motion").at(-1)!.payload.controls.lookDX, 0);
 });
+
+test("the game's buzz reaches the app during a match, not while paused", () => {
+	let buzzes = 0;
+	const client = new LobbyClient("ws://localhost:8080", "ios", () => {}, () => { buzzes++; });
+	clients.push(client);
+	client.join("ABC123", "Tester");
+	const socket = Socket.instances.at(-1)!;
+	socket.onopen?.();
+	socket.receive({ type: "lobby_joined", controllerId: "phone", pairingCode: "ABC123" });
+	const state = (s: string) => socket.receive({ type: "lobby_state", state: s, minPlayers: 4, players: [{ controllerId: "phone", name: "Tester", role: "aim", teamId: 1, connected: true, ready: true }] });
+	state("waiting");
+	socket.receive({ type: "controller_feedback", message: { t: "buzz", ms: 70 } });
+	state("playing");
+	socket.receive({ type: "controller_feedback", message: { t: "buzz", ms: 70 } });
+	state("paused");
+	socket.receive({ type: "controller_feedback", message: { t: "buzz", ms: 70 } });
+	assert.equal(buzzes, 1);
+	assert.equal(client.snapshot.feedback, null, "a buzz is not a state update");
+});

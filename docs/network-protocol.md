@@ -36,7 +36,7 @@ Each phone joins, selects an exclusive team/role slot and readies up:
 
 `waiting` becomes `ready` when all required slots are taken and every slotted phone is ready. The host decides how many phones are required (1-4, **Settings → Player Count**, default 4): the game sends it as `minPlayers` in `hello` and with `set_min_players` when it changes, and every `lobby_state` reports it. The Node relay's `MIN_CONTROLLERS` is only the default for a host that doesn't send one. The lobby counts down three seconds, then the host sends `start_game`. The server checks readiness again and broadcasts `playing`. Repeated starts and team changes during a match are rejected.
 
-The host sends `match_status` about once per second: two team scores, `timeLeft` and `killTarget`. Scores are **points**: a kill is 1, and a bounty (revenge) kill within 30 seconds of being killed is 2. Kill counts stay in the team statistics. At ten points or five minutes, it sends `end_game` with `winningTeam` (or null), scores and team statistics. Phones receive `match_ended`; `lobby_state` becomes `ended`.
+The host sends `match_status` about once per second: two team scores, `timeLeft` and `killTarget`. Scores are **points**: a kill is 1, and a bounty (revenge) kill within 30 seconds of being killed is 2. Kill counts stay in the team statistics. At ten points or the end of the match clock (**Settings → Match Length**, 2-5 minutes, default 5), it sends `end_game` with `winningTeam` (or null), scores and team statistics. Phones receive `match_ended`; `lobby_state` becomes `ended`.
 
 `end_game` and `match_ended` optionally carry `reason`: `kills`, `time`, or `host`. **End Match** uses `host` and the current score, including a draw for tied scores. Host-ended results show Main Menu rather than Play Again on both screens. When the host closes that completed lobby, phones return to their menu without a connection-error screen.
 
@@ -94,7 +94,7 @@ Feedback is implemented in both servers. The host sends:
 {"type":"to_controller","controllerId":"controller_...","message":{"t":"state","hp":75,"max_hp":100,"alive":true,"weapon":0,"owned":[true,false,false],"ammo":8,"magazine_size":12,"reloading":false,"reload_progress":0}}
 ```
 
-The server permits only host-originated `state` or `buzz` messages, limited to 4096 characters, addressed to a controller in that host's lobby. The phone receives `{"type":"controller_feedback","message":{...}}`. State includes health, ownership, scope, ammo and reload progress; phone HUDs consume it and weapon cycling skips unowned weapons. `buzz` is available on the transport; device vibration is not currently implemented.
+The server permits only host-originated `state` or `buzz` messages, limited to 4096 characters, addressed to a controller in that host's lobby. The phone receives `{"type":"controller_feedback","message":{...}}`. State includes health, ownership, scope, ammo and reload progress; phone HUDs consume it and weapon cycling skips unowned weapons. `buzz` makes the phone play a damage haptic (the app ignores it while paused).
 
 ## Practice and debugging
 

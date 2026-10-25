@@ -52,6 +52,8 @@ EXPO_PUBLIC_GAME_SERVER=wss://game.example.com npm run companion:start
 
 The Vercel app exposes the current public connection metadata at `/api/connection`. Godot or an admin surface can use that HTTP endpoint to discover the configured relay, but the actual motion stream must connect directly to the returned `wss://` URL.
 
+Optional aim assistance uses Gemini through `POST /api/aim-assist`. Configure `GEMINI_API_KEY` in Vercel and optionally `GEMINI_MODEL` (defaults to `gemini-2.5-flash`). Godot sends projected target state at a low frequency; phone aim remains local and immediate, while Gemini contributes only a bounded correction.
+
 Godot can provision a session by sending `POST /api/games`. The response contains a UUID `gameId` and a route such as `wss://game.example.com/games/<gameId>`. Godot connects to that route, receives the normal six-character pairing code, and shows just that code. Phones look up the same relay from `/api/connection` and join with the code. Set the Godot `network/control_plane_url` project setting or launch with `-- --control-plane=https://landing.example.com`.
 
 The companion retries transient socket failures with exponential backoff and replays its selected team, role, and ready state after reconnecting.

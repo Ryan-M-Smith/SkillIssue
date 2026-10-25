@@ -37,6 +37,8 @@
 class_name DuoSandbox
 extends Node
 
+const GeminiAimAssist := preload("res://scripts/gemini_aim_assist.gd")
+
 @export var duo_scene: PackedScene = preload("res://entities/duo/duo.tscn")
 ## Which arena to fight in. Replaces main.tscn's World/ArenaBox at runtime (main.tscn itself is
 ## not edited). Options: maps/the_pit.tscn (default), maps/arena_v2.tscn, or clear the field to play
@@ -49,7 +51,7 @@ extends Node
 @export var keyboard_controls := true
 @export_group("Match rules")
 @export var kill_target := 10
-@export var match_seconds := 300.0
+@export var match_seconds := 0.0   ## 0 = the host's Match Length setting (2-5 min, default 5)
 @export var results_scene := "res://ui/results.tscn"
 @export var end_banner_seconds := 2.5
 ## After you're killed, your team has this long to take revenge...
@@ -124,6 +126,8 @@ var _time_left := 0.0
 var _running := false
 var _status_timer := 0.0
 var _network_match := false
+var _aim_assist: Node
+var _aim_assist_timer := 0.0
 
 
 func _ready() -> void:
@@ -167,6 +171,9 @@ func _setup() -> void:
 	if place_arena_pickups:
 		_place_arena_pickups(world)
 	_add_scope_overlays()
+	_aim_assist = GeminiAimAssist.new()
+	add_child(_aim_assist)
+	_aim_assist.correction_ready.connect(_on_aim_assist_correction)
 	rng.randomize()
 	for duo in duos:
 		var team := duo.team_id
@@ -220,6 +227,11 @@ func _bind_camera(duo: Duo, cam: Camera3D) -> void:
 
 func _process(delta: float) -> void:
 	_tick_match(delta)
+	_aim_assist_timer -= delta
+	if _network_match and _aim_assist_timer <= 0.0:
+		_aim_assist_timer = 0.35
+		for team_id in mini(duos.size(), _cameras.size()):
+			_request_aim_assist(team_id)
 	for i in duos.size():
 		var duo := duos[i]
 		var w := duo.weapons
@@ -228,6 +240,34 @@ func _process(delta: float) -> void:
 			target = w.current_data().scope_fov
 		_cameras[i].fov = lerpf(_cameras[i].fov, target, clampf(delta * 18.0, 0.0, 1.0))
 		_update_half_hud(i, duo)
+
+
+func _request_aim_assist(team_id: int) -> void:
+	if _aim_assist == null or duos.size() < 2 or team_id < 0 or team_id >= _cameras.size():
+		return
+	var target := duos[1 - team_id]
+	var camera := _cameras[team_id]
+	var target_point := target.global_position + Vector3.UP * 1.1
+	var viewport_size := camera.get_viewport().get_visible_rect().size
+	if viewport_size.x <= 0.0 or viewport_size.y <= 0.0:
+		return
+	var projected := camera.unproject_position(target_point)
+	_aim_assist.request(team_id, Vector2(0.5, 0.5), [{
+		"id": target.name,
+		"x": projected.x / viewport_size.x,
+		"y": projected.y / viewport_size.y,
+		"visible": not camera.is_position_behind(target_point) and target.alive,
+		"distance": camera.global_position.distance_to(target_point),
+		"health": target.health.hp if target.alive else 0.0,
+	}])
+
+
+func _on_aim_assist_correction(team_id: int, degrees_per_second: Vector2) -> void:
+	if team_id < 0 or team_id >= duos.size():
+		return
+	for controller in duos[team_id].controllers.get_children():
+		if controller is PhoneDuoController:
+			(controller as PhoneDuoController).set_aim_assist_rate(degrees_per_second)
 
 
 func _physics_process(_delta: float) -> void:
@@ -521,7 +561,7 @@ func _update_score() -> void:
 func _start_match() -> void:
 	scores = [0, 0]
 	bounty_left = [0.0, 0.0]
-	_time_left = match_seconds
+	_time_left = match_seconds if match_seconds > 0.0 else GameSession.match_minutes * 60.0
 	_running = true
 	_network_match = NetworkClient.is_connected_to_server() and GameSession.is_playing()
 	set_debug_view(false if _network_match else debug_view)
@@ -615,7 +655,7 @@ func _build_scoreboard() -> Control:
 	center.custom_minimum_size.x = 154
 	var col := VBoxContainer.new()
 	col.add_theme_constant_override("separation", -2)
-	_clock = UiKit.display("5:00", 32)
+	_clock = UiKit.display("%d:00" % GameSession.match_minutes if match_seconds <= 0.0 else "%d:%02d" % [int(match_seconds) / 60, int(match_seconds) % 60], 32)
 	_clock.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	col.add_child(_clock)
 	var target := UiKit.label("FIRST TO %d PTS" % kill_target, 13, UiKit.BODY_BOLD, UiKit.MUTED)

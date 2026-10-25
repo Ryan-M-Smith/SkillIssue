@@ -11,6 +11,7 @@ import { defaultDebugServerUrl } from "@/lib/net/server-url";
 import { normalizeLobbyCode } from "@/lib/net/lobby-code";
 import { publicGameServer } from "@/lib/net/relay";
 import { useMotionAccess } from "@/lib/motion-permission";
+import { gestureCue, haptic, lobbyCues } from "@/lib/haptics";
 import type { GameControls, Role } from "@/types/motion";
 
 import { AimHud } from "./phone/aim-hud";
@@ -62,6 +63,8 @@ export default function PhoneApp() {
 	const tallyRef = useRef(new MotionTally());
 	const lastDrawRef = useRef(0);
 	const stageRef = useRef(view.stage);
+	const viewRef = useRef<LobbyView>(idleLobby);
+	const calibratedRef = useRef(false);
 	const gameStateRef = useRef(view.state);
 
 	useEffect(() => {
@@ -103,6 +106,11 @@ export default function PhoneApp() {
 					const output = controllerRef.current.process(reading, now);
 					if (roleRef.current === "movement") tallyRef.current.add(output, now);
 					clientRef.current?.update(output, reading);
+					// Feel each gesture land, and the moment the sensors are calibrated.
+					const cue = gestureCue(output.action);
+					if (cue) haptic(cue);
+					if (output.ready && !calibratedRef.current) haptic("calibrated");
+					calibratedRef.current = output.ready;
 					if (now - lastDrawRef.current >= redrawMs || output.action) {
 						lastDrawRef.current = now;
 						setControls(output);
@@ -123,7 +131,9 @@ export default function PhoneApp() {
 	useEffect(() => () => { clientRef.current?.leave(); }, []);
 
 	function recenter() {
+		haptic("tap");
 		controllerRef.current.reset();
+		calibratedRef.current = false;
 		// Browser motion permission must be requested directly from a user gesture.
 		void requestMotion().then((next) => {
 			if (next === "granted") { setNotice(null); setSensorSession((session) => session + 1); }
@@ -147,6 +157,8 @@ export default function PhoneApp() {
 			setState("Calibrating");
 		}
 		if (next.stage === "lobby") setWaitingAgain(false);
+		for (const cue of lobbyCues(viewRef.current, next)) haptic(cue);
+		viewRef.current = next;
 		stageRef.current = next.stage;
 		gameStateRef.current = next.state;
 		setView(next);
@@ -174,9 +186,10 @@ export default function PhoneApp() {
 			onLobbyChange(idleLobby);
 			setScreen("code");
 			setJoinError("Can't reach the Skill Issue servers. Check your internet connection and try again.");
+			haptic("failed");
 			return;
 		}
-		const client = new LobbyClient(relay, Platform.OS, onLobbyChange);
+		const client = new LobbyClient(relay, Platform.OS, onLobbyChange, () => haptic("hit"));
 		clientRef.current = client;
 		client.join(lobbyCode, name || "Player");
 	}
@@ -185,6 +198,7 @@ export default function PhoneApp() {
 		joinAttemptRef.current += 1;
 		clientRef.current?.leave();
 		clientRef.current = null;
+		viewRef.current = idleLobby;
 		setView(idleLobby);
 		setWaitingAgain(false);
 		setJoinError(null);
@@ -219,8 +233,8 @@ export default function PhoneApp() {
 		body = (
 			<TeamSelect
 				view={view}
-				onPick={(team: TeamId, role: ControllerRole) => clientRef.current?.selectSlot(team, role)}
-				onReady={(ready) => clientRef.current?.setReady(ready)}
+				onPick={(team: TeamId, role: ControllerRole) => { haptic("tap"); clientRef.current?.selectSlot(team, role); }}
+				onReady={(ready) => { haptic("tap"); clientRef.current?.setReady(ready); }}
 				onLeave={leave}
 			/>
 		);
@@ -232,10 +246,10 @@ export default function PhoneApp() {
 					controls={controls}
 					weapon={view.feedback?.weapon ?? 0}
 					firing={firing}
-					onFire={(down) => { setFiring(down); clientRef.current?.setFiring(down); }}
-					onAim={() => clientRef.current?.toggleAim()}
-					onReload={() => clientRef.current?.reload()}
-					onSwitch={() => clientRef.current?.nextWeapon()}
+					onFire={(down) => { if (down) haptic("fire"); setFiring(down); clientRef.current?.setFiring(down); }}
+					onAim={() => { haptic("select"); clientRef.current?.toggleAim(); }}
+					onReload={() => { haptic("tap"); clientRef.current?.reload(); }}
+					onSwitch={() => { haptic("select"); clientRef.current?.nextWeapon(); }}
 					onRecalibrate={recenter}
 				/>
 			) : (
