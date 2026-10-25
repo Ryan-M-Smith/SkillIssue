@@ -5,6 +5,7 @@
 	"main": "index.js",
 	"workspaces": [
 		"apps/companion",
+		"apps/landing",
 		"apps/server",
 		"packages/*"
 	],
@@ -15,9 +16,11 @@
 		"test:game": "node scripts/test-game.mjs",
 		"typecheck": "tsc --noEmit -p apps/companion/tsconfig.json && tsc --noEmit -p apps/server/tsconfig.json",
 		"lint": "npm --prefix apps/companion run lint -- --max-warnings 0",
+		"landing:dev": "pnpm --filter landing dev",
+		"landing:build": "pnpm --filter landing build",
+		"landing:lint": "pnpm --filter landing lint",
 		"companion:lan": "npm --prefix apps/companion run start -- --lan",
 		"companion:start": "npm --prefix apps/companion run start -- --tunnel",
-		"companion:web": "npm --prefix apps/companion run web",
 		"server:start": "npm --prefix apps/server run start"
 	},
 	"keywords": [],

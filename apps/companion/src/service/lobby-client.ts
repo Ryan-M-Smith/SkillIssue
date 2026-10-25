@@ -32,6 +32,7 @@ export const idleLobby: LobbyView = {
 
 const motionHz = 30;
 const tapMs = 120;
+const reconnectDelaysMs = [500, 1000, 2000, 4000, 8000];
 const zero = { x: 0, y: 0, z: 0 };
 const degToRad = Math.PI / 180;
 const gameStates = new Set<GameState>(["waiting", "ready", "playing", "paused", "ended"]);
@@ -55,6 +56,14 @@ export class LobbyClient {
 	private timer: ReturnType<typeof setInterval> | null = null;
 	private joinTimer: ReturnType<typeof setTimeout> | null = null;
 	private shotTimer: ReturnType<typeof setTimeout> | null = null;
+	private reconnectTimer: ReturnType<typeof setTimeout> | null = null;
+	private reconnectAttempt = 0;
+	private reconnecting = false;
+	private wanted = false;
+	private joinCode = "";
+	private joinName = "";
+	private desiredSlot: { teamId: TeamId; role: ControllerRole } | null = null;
+	private desiredReady = false;
 	private latest: GameControls | null = null;
 	private latestReading: MotionReading | null = null;
 	private latestAt = 0;
@@ -71,15 +80,25 @@ export class LobbyClient {
 	get snapshot(): LobbyView { return this.view; }
 
 	join(code: string, name: string) {
+		const wasReconnect = this.reconnecting;
+		this.reconnecting = false;
 		this.leave();
-		this.set({ ...idleLobby, stage: "connecting", code: code.trim().toUpperCase() });
+		this.wanted = true;
+		if (!wasReconnect) {
+			this.reconnectAttempt = 0;
+			this.desiredSlot = null;
+			this.desiredReady = false;
+		}
+		this.joinCode = code.trim().toUpperCase();
+		this.joinName = name.trim().slice(0, 16) || "Player";
+		this.set({ ...idleLobby, stage: "connecting", code: this.joinCode });
 		let socket: WebSocket;
 		try { socket = new WebSocket(this.url); }
 		catch { this.fail("Invalid host address. Paste the full lobby ticket from the game screen."); return; }
 		this.socket = socket;
 		this.joinTimer = setTimeout(() => {
 			if (this.socket === socket && this.view.stage === "connecting") {
-				this.fail("The game did not answer in time. Keep its lobby open, use the same Wi-Fi, and paste the full lobby ticket to retry.");
+				socket.close();
 			}
 		}, 10000);
 		socket.onopen = () => {
@@ -88,17 +107,21 @@ export class LobbyClient {
 		socket.onmessage = (event) => { if (this.socket === socket) this.receive(String(event.data)); };
 		socket.onerror = () => {
 			if (this.socket === socket && this.view.stage === "ended" && this.view.result?.reason === "host") { this.leave(); return; }
-			if (this.socket === socket) this.fail("Can't reach this game. Keep its lobby open and paste its full ticket. Both devices must be on the same Wi-Fi.");
+			if (this.socket === socket) socket.close();
 		};
 		socket.onclose = () => {
 			if (this.socket !== socket) return;
 			if (this.view.stage === "ended" && this.view.result?.reason === "host") { this.leave(); return; }
-			this.fail(this.view.error ?? "Connection lost. Rejoin using the ticket in the game lobby.");
+			this.socket = null;
+			this.scheduleReconnect(this.view.error ?? "Connection lost. Retrying...");
 		};
 		this.timer = setInterval(() => this.sendMotion(), 1000 / motionHz);
 	}
 
 	leave() {
+		this.wanted = false;
+		if (this.reconnectTimer) clearTimeout(this.reconnectTimer);
+		this.reconnectTimer = null;
 		this.stop();
 		const socket = this.socket;
 		this.socket = null;
@@ -106,8 +129,15 @@ export class LobbyClient {
 		this.set({ ...idleLobby });
 	}
 
-	selectSlot(teamId: TeamId, role: ControllerRole) { this.send({ type: "select_slot", teamId, role }); }
-	setReady(ready: boolean) { this.send({ type: "set_ready", ready }); }
+	selectSlot(teamId: TeamId, role: ControllerRole) {
+		this.desiredSlot = { teamId, role };
+		this.desiredReady = false;
+		this.send({ type: "select_slot", teamId, role });
+	}
+	setReady(ready: boolean) {
+		this.desiredReady = ready;
+		this.send({ type: "set_ready", ready });
+	}
 
 	update(controls: GameControls, reading: MotionReading) {
 		this.latest = controls;
@@ -180,7 +210,12 @@ export class LobbyClient {
 		switch (message.type) {
 			case "lobby_joined":
 				this.clearJoinTimer();
+				this.reconnectAttempt = 0;
 				this.set({ ...this.view, stage: "lobby", myId: message.controllerId, code: message.pairingCode, error: null });
+				if (this.desiredSlot) {
+					this.send({ type: "select_slot", ...this.desiredSlot });
+					if (this.desiredReady) this.send({ type: "set_ready", ready: true });
+				}
 				return;
 			case "lobby_state": {
 				if (!Array.isArray(message.players)) return;
@@ -242,6 +277,19 @@ export class LobbyClient {
 	}
 
 	private clearJoinTimer() { if (this.joinTimer) clearTimeout(this.joinTimer); this.joinTimer = null; }
+	private scheduleReconnect(error: string) {
+		if (!this.wanted || this.reconnectTimer) return;
+		this.clearJoinTimer();
+		this.stop();
+		const delay = reconnectDelaysMs[Math.min(this.reconnectAttempt, reconnectDelaysMs.length - 1)];
+		this.reconnectAttempt += 1;
+		this.set({ ...this.view, stage: "connecting", error });
+		this.reconnectTimer = setTimeout(() => {
+			this.reconnectTimer = null;
+			this.reconnecting = true;
+			this.join(this.joinCode, this.joinName);
+		}, delay);
+	}
 	private stop() {
 		this.clearJoinTimer();
 		if (this.timer) clearInterval(this.timer);

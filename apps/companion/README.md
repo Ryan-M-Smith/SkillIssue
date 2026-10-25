@@ -1,6 +1,6 @@
 # Skill Issue companion
 
-An Expo controller for Skill Issue. Each team uses a movement phone and a gunner phone, held sideways. The same app includes practice for both roles and a web motion debugger at `/debug`.
+An Expo controller for Skill Issue. Each team uses a movement phone and a gunner phone, held sideways. The app includes native practice for both roles.
 
 ## Start
 
@@ -11,7 +11,7 @@ npm install
 npm run companion:lan
 ```
 
-Open the app on your phone using the Expo instructions in the terminal. `npm run companion:start` uses an Expo tunnel when LAN delivery is unavailable. `npm run companion:web` opens the web app; its root is the regular controller menu.
+Open the app on your phone using the Expo instructions in the terminal. `npm run companion:start` uses an Expo tunnel when LAN delivery is unavailable. The Expo web entry is disabled for motion controls; use `apps/landing` for browser connection information.
 
 In Godot, open `apps/game` and press **F5** to launch the main menu, then **Create a Lobby**. Godot hosts the game server itself. **F6** runs the currently open scene and can bypass the menu.
 
@@ -54,7 +54,7 @@ Live health and weapon state come from the game. Magazines hold **12 pistol / 6 
 For the optional web debugger:
 
 1. Keep a Godot lobby open or run `npm run server:start`.
-2. Start `npm run companion:web` and open `/debug` on the computer.
+2. Use the native companion for motion controls. The browser-facing connection information is in `apps/landing`.
 3. Enable the debug stream in phone Practice; use the same server and room (`debug` by default).
 
 ## Check changes

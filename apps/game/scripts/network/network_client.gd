@@ -14,6 +14,8 @@ const protocolVersion := 1
 const DEFAULT_URL := "ws://127.0.0.1:8080"
 const URL_SETTING := "network/server_url"   ## optional Project Settings override
 const URL_ARG := "--server="                ## optional command-line override: -- --server=ws://...
+const CONTROL_PLANE_SETTING := "network/control_plane_url"
+const CONTROL_PLANE_ARG := "--control-plane="
 
 ## Every type the server may send. Anything else is counted and dropped.
 const KNOWN_TYPES: PackedStringArray = [
@@ -272,6 +274,15 @@ func configured_override() -> String:
 			return arg.substr(URL_ARG.length())
 	if ProjectSettings.has_setting(URL_SETTING):
 		return str(ProjectSettings.get_setting(URL_SETTING))
+	return ""
+
+
+func configured_control_plane_url() -> String:
+	for arg in OS.get_cmdline_user_args():
+		if arg.begins_with(CONTROL_PLANE_ARG):
+			return arg.substr(CONTROL_PLANE_ARG.length()).strip_edges()
+	if ProjectSettings.has_setting(CONTROL_PLANE_SETTING):
+		return str(ProjectSettings.get_setting(CONTROL_PLANE_SETTING)).strip_edges()
 	return ""
 
 

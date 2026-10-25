@@ -149,9 +149,6 @@ export default function PhoneApp() {
 	function join() {
 		try {
 			const target = parseJoinTicket(code, serverUrl);
-			if (Platform.OS === "web" && typeof window !== "undefined" && window.location.protocol === "https:" && target.serverUrl.startsWith("ws:")) {
-				throw new Error("This browser page uses HTTPS. Open the native phone app for a local lobby, or use a secure wss:// host.");
-			}
 			setJoinError(null);
 			recenter();
 			setServerUrl(target.serverUrl);
