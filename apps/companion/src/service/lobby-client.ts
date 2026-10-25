@@ -30,7 +30,13 @@ export const idleLobby: LobbyView = {
 	minPlayers: 4, status: null, result: null, feedback: null,
 };
 
-const motionHz = 30;
+/**
+ * Motion goes out as soon as a new sensor sample is processed, at most every
+ * `motionMinGapMs` (~60 Hz), so there is no wait for a fixed send tick. The interval
+ * timer is only a heartbeat that keeps the game's input fresh when sensors pause.
+ */
+const motionMinGapMs = 15;
+const heartbeatHz = 20;
 const reconnectDelaysMs = [500, 1000, 2000, 4000, 8000];
 /** Tries before a first join gives up (a lobby we were in keeps retrying). */
 const firstJoinAttempts = 3;
@@ -89,6 +95,10 @@ export class LobbyClient {
 	private latest: GameControls | null = null;
 	private latestReading: MotionReading | null = null;
 	private latestAt = 0;
+	private lastMotionAt = 0;
+	/** Gunner: degrees turned since the last motion message, sent so the game turns 1:1. */
+	private lookDX = 0;
+	private lookDY = 0;
 	private sentCrouch = false;
 	private sentSprint = false;
 	private weapon = 0;
@@ -166,7 +176,7 @@ export class LobbyClient {
 			dropped();
 		};
 		socket.onclose = dropped;
-		this.timer = setInterval(() => this.sendMotion(), 1000 / motionHz);
+		this.timer = setInterval(() => this.sendMotion(), 1000 / heartbeatHz);
 	}
 
 	leave() {
@@ -198,8 +208,12 @@ export class LobbyClient {
 		if (this.view.me?.role === "movement") {
 			if (controls.action === "jump") this.sendAction("jump", true);
 			this.syncHeld(controls);
+		} else {
+			// The gunner's phone only aims (sendMotion); its actions are buttons, below.
+			this.lookDX += controls.lookDX ?? 0;
+			this.lookDY += controls.lookDY ?? 0;
 		}
-		// The gunner's phone only aims (sendMotion); its actions are buttons, below.
+		if (Date.now() - this.lastMotionAt >= motionMinGapMs) this.sendMotion();
 	}
 
 	/** Gunner can act: in a running match, holding the aim role. */
@@ -263,9 +277,13 @@ export class LobbyClient {
 			gyroscope: { x: gyro.x * degToRad, y: gyro.y * degToRad, z: gyro.z * degToRad },
 			arPosition: zero, arOrientation: zero, trackingStatus: "unavailable",
 			controls: { moveX: movement && fresh ? c.moveX : 0, moveY: movement && fresh ? c.moveY : 0,
-				lookX: !movement && fresh ? c.lookX : 0, lookY: !movement && fresh ? c.lookY : 0 },
+				lookX: !movement && fresh ? c.lookX : 0, lookY: !movement && fresh ? c.lookY : 0,
+				...(movement ? {} : { lookDX: fresh ? this.lookDX : 0, lookDY: fresh ? this.lookDY : 0 }) },
 		};
-		this.send({ type: "motion", timestamp: Date.now(), payload });
+		this.lookDX = 0;
+		this.lookDY = 0;
+		this.lastMotionAt = Date.now();
+		this.send({ type: "motion", timestamp: this.lastMotionAt, payload });
 	}
 
 	private receive(text: string) {
@@ -338,6 +356,8 @@ export class LobbyClient {
 			// Lobby gestures and pre-pause readings must never move a fresh match.
 			this.latest = null;
 			this.latestReading = null;
+			this.lookDX = 0;
+			this.lookDY = 0;
 			this.firing = false;
 		}
 	}
@@ -370,6 +390,8 @@ export class LobbyClient {
 		this.sentSprint = false;
 		this.latest = null;
 		this.latestReading = null;
+		this.lookDX = 0;
+		this.lookDY = 0;
 	}
 	private fail(error: string) {
 		this.stop();

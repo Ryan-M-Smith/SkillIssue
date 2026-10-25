@@ -30,6 +30,9 @@ var stale_after_msec := 250
 
 var move := Vector2.ZERO
 var aim_rate := Vector2.ZERO
+## Gunner turn received since the last take_aim() (radians), from controls.lookDX/lookDY:
+## the phone's exact turn, so the camera follows it 1:1 however packets are spaced.
+var aim_delta := Vector2.ZERO
 
 var _neutral := Vector3.ZERO           ## gravity direction at calibration; zero = not yet
 var _last_msec := -1
@@ -44,7 +47,16 @@ func calibrate() -> void:
 func clear() -> void:
 	move = Vector2.ZERO
 	aim_rate = Vector2.ZERO
+	aim_delta = Vector2.ZERO
 	_last_msec = -1
+
+
+## The aim to apply this physics frame: the exact turn received, or rate × time for
+## phones that only send a rate. Clears what it returns.
+func take_aim(delta: float) -> Vector2:
+	var d := aim_delta + aim_rate * delta
+	aim_delta = Vector2.ZERO
+	return d
 
 
 func is_stale(now_msec: int) -> bool:
@@ -82,6 +94,11 @@ func _feed_controls(c: Dictionary, role: String, now_msec: int) -> bool:
 			return false
 	if role == "mover":
 		move = Vector2(_num(c.get("moveX")), _num(c.get("moveY"))).limit_length(1.0)
+	elif c.has("lookDX") or c.has("lookDY"):
+		# Exact degrees turned since the previous message: no rate to hold between packets.
+		aim_rate = Vector2.ZERO
+		var turned := Vector2(clampf(_num(c.get("lookDX")), -180.0, 180.0), clampf(_num(c.get("lookDY")), -180.0, 180.0))
+		aim_delta += turned * deg_to_rad(1.0) * aim_sensitivity
 	else:
 		var look := Vector2(clampf(_num(c.get("lookX")), -1.0, 1.0), clampf(_num(c.get("lookY")), -1.0, 1.0))
 		aim_rate = look * deg_to_rad(aim_max_rate_deg) * aim_sensitivity

@@ -6,6 +6,8 @@ import { MotionController, emptyControls } from "@/service/motion-control-servic
 import { DebugLink, idleLinkStatus, type DebugLinkStatus } from "@/service/debug-link";
 import { MotionTally, directionOf, zeroCounts, type Counts, type MovementState } from "@/lib/motion-summary";
 import { defaultDebugRoom } from "@/lib/net/server-url";
+import { useMotionAccess } from "@/lib/motion-permission";
+import { MotionAccessPrompt } from "./motion-access";
 import type { GameControls, Grip, Role } from "@/types/motion";
 import { Body, Eyebrow, Panel, SlantButton, SplitBackground, Title } from "./kit";
 import { fonts, ui } from "./theme";
@@ -13,7 +15,7 @@ import { fonts, ui } from "./theme";
 const movementGuide = [
 	["↕", "TILT TO MOVE", "Tilt 5–20° forward or back. Return to center to stop."],
 	["↔", "TIP TO STRAFE", "Tip one end down slightly to move sideways."],
-	["↻", "32° WHEEL TWIST", "Toggle sprint with a gentle twist. Center before twisting again."],
+	["↻", "30° WHEEL TWIST", "Toggle sprint with a gentle twist. Center before twisting again."],
 	["↑", "FLICK BACK", "A short, quick flick toward you jumps or stands up."],
 	["↓", "FLICK FORWARD", "A short flick away toggles crouch."],
 ];
@@ -53,16 +55,18 @@ export function Practice({ serverUrl, onBack }: { serverUrl: string; onBack: () 
 	const debugRef = useRef<DebugLink | null>(null);
 	const lastDrawRef = useRef(0);
 
+	const { access, request } = useMotionAccess(true);
+	const allowed = access === "granted";
+
 	useEffect(() => {
+		// Access is asked for explicitly (MotionAccessPrompt); sensors start once it's granted.
+		if (!allowed) return;
 		let subscription: ReturnType<typeof DeviceMotion.addListener> | null = null;
 		let cancelled = false;
 		(async () => {
 			try {
-				const permission = await DeviceMotion.requestPermissionsAsync();
-				if (!permission.granted) throw new Error("Allow motion access in your phone’s settings, then reopen practice.");
-				if (!(await DeviceMotion.isAvailableAsync())) throw new Error("This device has no motion sensors. Use a phone to practice.");
 				if (cancelled) return;
-				DeviceMotion.setUpdateInterval(20);
+				DeviceMotion.setUpdateInterval(16);
 				subscription = DeviceMotion.addListener((reading) => {
 					const now = Date.now();
 					const output = controllerRef.current.process(reading, now);
@@ -81,7 +85,7 @@ export function Practice({ serverUrl, onBack }: { serverUrl: string; onBack: () 
 			}
 		})();
 		return () => { cancelled = true; subscription?.remove(); };
-	}, [sensorSession]);
+	}, [allowed, sensorSession]);
 	useEffect(() => () => { debugRef.current?.close(); }, []);
 
 	function resetCounts() {
@@ -98,10 +102,9 @@ export function Practice({ serverUrl, onBack }: { serverUrl: string; onBack: () 
 		setGrip(null);
 		setLastAction("HOLD STILL FOR A MOMENT");
 		debugRef.current?.sendEvent("recalibrate");
-		void DeviceMotion.requestPermissionsAsync().then(permission => {
-			if (permission.granted) { setSensorError(""); setSensorSession(session => session + 1); }
-			else setSensorError("Allow motion access in your phone’s browser settings, then tap RECENTER.");
-		}).catch(() => setSensorError("Motion sensors are unavailable on this device."));
+		void request().then(next => {
+			if (next === "granted") { setSensorError(""); setSensorSession(session => session + 1); }
+		});
 	}
 	function pickRole(next: Role) {
 		if (next === role) return;
@@ -180,6 +183,7 @@ export function Practice({ serverUrl, onBack }: { serverUrl: string; onBack: () 
 					</View>}
 				</Panel>
 			</ScrollView>
+			{access !== "granted" && access !== "checking" && <MotionAccessPrompt access={access} onAllow={() => void request()} onBack={onBack} />}
 		</View>
 	);
 }

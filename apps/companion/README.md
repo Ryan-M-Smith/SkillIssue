@@ -27,13 +27,13 @@ Joining times out after ten seconds and offers a retry instead of waiting indefi
 
 ## Motion controls
 
-Hold still briefly at a comfortable angle to calibrate. Practice and the live match use the same model. Use **Recenter** when the neutral pose needs adjusting.
+Hold the phone at a comfortable angle; it calibrates in a moment, follows slow grip changes while resting, and re-calibrates by itself after a new grip, so **Recenter** is rarely needed. Practice and the live match use the same model. Both ask for motion access explicitly (**Allow Motion**) and, when it was denied, explain how to turn it on in Settings.
 
 | Role | Motion | Result |
 | --- | --- | --- |
 | Runner | Gentle forward/back tilt | Walk; 5-degree deadzone, full speed at 20 degrees |
 | Runner | Tip an end down | Strafe |
-| Runner | Twist 32 degrees, then center | Toggle sprint |
+| Runner | Twist 30 degrees, then center | Toggle sprint |
 | Runner | Quick flick away / toward you | Toggle crouch / jump or stand |
 | Gunner | Turn the phone left / right / up / down | Camera follows (not inverted) |
 | Gunner | Hold **FIRE** | Shoot |
