@@ -5,51 +5,76 @@ extends RefCounted
 
 const BLUE := Color(0.23, 0.55, 1.0)
 const RED := Color(1.0, 0.29, 0.29)
-const BG := Color(0.027, 0.035, 0.07)
-const PANEL := Color(0.06, 0.075, 0.13, 0.86)
-const INK := Color(0.95, 0.96, 1.0)
-const MUTED := Color(0.56, 0.6, 0.72)
-const LINE := Color(1, 1, 1, 0.14)
-const READY := Color(0.33, 0.93, 0.65)
-const GOLD := Color(1.0, 0.8, 0.32)
+# Film noir: black, grays and off-white like an old movie title card. Red and blue only as
+# small team marks (thin bars, team names, score digits).
+const BG := Color(0.03, 0.03, 0.03)
+const PANEL := Color(0.05, 0.05, 0.05, 0.88)
+const INK := Color(0.9, 0.89, 0.86)
+const MUTED := Color(0.55, 0.55, 0.54)
+const LINE := Color(1, 1, 1, 0.16)
+const READY := Color(0.92, 0.92, 0.9)
+const GOLD := Color(1.0, 0.97, 0.9)     # highlight: a hot white
 
-const DISPLAY := "res://ui/fonts/ChakraPetch-Bold.ttf"
-const DISPLAY_SEMI := "res://ui/fonts/ChakraPetch-SemiBold.ttf"
+const DISPLAY := "res://ui/fonts/BarlowSemiCondensed-Bold.ttf"
+const DISPLAY_SEMI := "res://ui/fonts/BarlowSemiCondensed-SemiBold.ttf"
 const BODY := "res://ui/fonts/BarlowSemiCondensed-Medium.ttf"
 const BODY_SEMI := "res://ui/fonts/BarlowSemiCondensed-SemiBold.ttf"
 const BODY_BOLD := "res://ui/fonts/BarlowSemiCondensed-Bold.ttf"
+const SCRIPT := "res://ui/fonts/TeXGyreChorus-MediumItalic.otf"   # title-card script ("presents", "vs.")
 
 const BACKGROUND_SHADER := """
 shader_type canvas_item;
+// Black-and-white film backdrop: a brick wall in a hard spotlight, drifting smoke,
+// film grain, flicker and the odd scratch. The only color is a
+// faint blue/red glow along the bottom edge.
 uniform vec4 blue : source_color = vec4(0.23, 0.55, 1.0, 1.0);
 uniform vec4 red : source_color = vec4(1.0, 0.29, 0.29, 1.0);
-uniform vec4 base : source_color = vec4(0.027, 0.035, 0.07, 1.0);
-uniform float split = 0.5;     // where the seam sits, 0..1 across the screen
-uniform float energy = 1.0;    // seam glow strength
+uniform float split = 0.5;     // where blue turns to red along the bottom, 0..1
+uniform float energy = 1.0;    // strength of that team glow
 uniform float aspect = 1.7778;
 
 float hash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
+float noise(vec2 p) {
+	vec2 i = floor(p); vec2 f = fract(p); vec2 u = f * f * (3.0 - 2.0 * f);
+	return mix(mix(hash(i), hash(i + vec2(1, 0)), u.x), mix(hash(i + vec2(0, 1)), hash(i + vec2(1, 1)), u.x), u.y);
+}
+float fbm(vec2 p) {
+	float v = 0.0; float a = 0.5;
+	for (int i = 0; i < 5; i++) { v += a * noise(p); p *= 2.02; a *= 0.5; }
+	return v;
+}
 
 void fragment() {
 	vec2 uv = UV;
 	float t = TIME;
-	// A tilted seam that breathes a little.
-	float seam = split + (uv.y - 0.5) * 0.28 + 0.025 * sin(uv.y * 4.0 + t * 0.8);
-	float side = smoothstep(seam - 0.002, seam + 0.002, uv.x);
-	vec3 team = mix(blue.rgb, red.rgb, side);
-	float d = abs(uv.x - seam) * aspect;
-	// Stripes that run away from the seam on each side.
-	float dir = side > 0.5 ? 1.0 : -1.0;
-	float lanes = fract((uv.x * aspect + uv.y * 0.55) * 9.0 - dir * t * 0.35);
-	float stripes = smoothstep(0.0, 0.05, lanes) * (1.0 - smoothstep(0.08, 0.13, lanes));
-	float near = exp(-d * 1.6);
-	vec3 col = base.rgb;
-	col += team * (0.16 * near + 0.07 * stripes * near);
-	col += team * exp(-d * 34.0) * 0.9 * energy;
-	col += vec3(1.0) * exp(-d * 260.0) * 0.55 * energy;
+	vec2 p = vec2(uv.x * aspect, uv.y);
+	// bricks
+	vec2 b = p / vec2(0.13, 0.05);
+	b.x += mod(floor(b.y), 2.0) * 0.5;
+	vec2 id = floor(b);
+	vec2 f = fract(b);
+	float mortar = smoothstep(0.0, 0.06, f.x) * smoothstep(1.0, 0.94, f.x) * smoothstep(0.0, 0.12, f.y) * smoothstep(1.0, 0.88, f.y);
+	float brick = mix(0.55, 0.85, hash(id)) * mix(0.85, 1.0, noise(p * 60.0));
+	float wall = mix(0.05, brick, mortar);
+	// light: one hard spotlight high on the wall
+	float spot = exp(-length((p - vec2(0.42 * aspect, 0.28)) * vec2(0.9, 1.3)) * 2.4);
+	float lit = 0.05 + spot * 0.34;
+	vec3 col = vec3(wall * lit);
+	// smoke, brighter where the light hits it
+	float smoke = fbm(p * 3.0 + vec2(t * 0.05, -t * 0.03));
+	smoke = smoothstep(0.45, 0.9, smoke);
+	col += vec3(0.85) * smoke * (0.04 + spot * 0.12);
+	// a faint team glow along the bottom edge
+	float side = smoothstep(split - 0.2, split + 0.2, uv.x);
+	col += mix(blue.rgb, red.rgb, side) * exp(-(1.0 - uv.y) * 14.0) * 0.12 * energy;
+	// film: flicker, grain, scratches, heavy vignette
+	col *= 0.96 + 0.04 * hash(vec2(floor(t * 14.0), 3.0));
+	col += (hash(uv * vec2(1920.0, 1080.0) + fract(t * 7.0)) - 0.5) * 0.07;
+	float lane = floor(uv.x * 420.0);
+	float scratch = step(0.9985, hash(vec2(lane, floor(t * 6.0)))) * step(abs(fract(uv.x * 420.0) - 0.5), 0.15);
+	col += vec3(0.35) * scratch;
 	vec2 c = uv - 0.5;
-	col *= 1.0 - dot(c, c) * 1.1;
-	col += (hash(uv * vec2(1280.0, 720.0) + fract(t)) - 0.5) * 0.025;
+	col *= clamp(1.0 - dot(c * vec2(1.0, 1.25), c * vec2(1.0, 1.25)) * 2.1, 0.0, 1.0);
 	COLOR = vec4(col, 1.0);
 }
 """
@@ -78,10 +103,10 @@ static func make_theme() -> Theme:
 	t.default_font_size = 22
 	t.set_color("font_color", "Label", INK)
 
-	var normal := _button_box(Color(0.08, 0.1, 0.17, 0.92), LINE)
-	var hover := _button_box(Color(0.12, 0.15, 0.25, 0.96), Color(1, 1, 1, 0.55))
-	var pressed := _button_box(Color(0.16, 0.2, 0.32, 1.0), INK)
-	var disabled := _button_box(Color(0.06, 0.07, 0.11, 0.7), Color(1, 1, 1, 0.06))
+	var normal := _button_box(Color(0.04, 0.04, 0.04, 0.82), Color(1, 1, 1, 0.22), 1)
+	var hover := _button_box(Color(0.12, 0.12, 0.12, 0.92), Color(1, 1, 1, 0.75), 1)
+	var pressed := _button_box(Color(0.2, 0.2, 0.2, 1.0), INK, 1)
+	var disabled := _button_box(Color(0.03, 0.03, 0.03, 0.6), Color(1, 1, 1, 0.06), 1)
 	var focus := _button_box(Color(0, 0, 0, 0), INK, 2)
 	t.set_stylebox("normal", "Button", normal)
 	t.set_stylebox("hover", "Button", hover)
@@ -95,12 +120,12 @@ static func make_theme() -> Theme:
 	t.set_color("font_focus_color", "Button", Color.WHITE)
 	t.set_color("font_disabled_color", "Button", Color(1, 1, 1, 0.3))
 
-	# Primary: a white slab with dark type.
+	# Primary: an off-white slab with dark type.
 	t.set_type_variation("PrimaryButton", "Button")
-	t.set_stylebox("normal", "PrimaryButton", _button_box(Color(0.95, 0.96, 1.0), Color(0, 0, 0, 0)))
-	t.set_stylebox("hover", "PrimaryButton", _button_box(Color.WHITE, GOLD, 3))
-	t.set_stylebox("pressed", "PrimaryButton", _button_box(Color(0.8, 0.84, 0.95), Color(0, 0, 0, 0)))
-	t.set_stylebox("focus", "PrimaryButton", _button_box(Color(0, 0, 0, 0), GOLD, 3))
+	t.set_stylebox("normal", "PrimaryButton", _button_box(INK, Color(0, 0, 0, 0)))
+	t.set_stylebox("hover", "PrimaryButton", _button_box(Color.WHITE, Color.WHITE, 2))
+	t.set_stylebox("pressed", "PrimaryButton", _button_box(Color(0.8, 0.79, 0.76), Color(0, 0, 0, 0)))
+	t.set_stylebox("focus", "PrimaryButton", _button_box(Color(0, 0, 0, 0), Color.WHITE, 2))
 	t.set_color("font_color", "PrimaryButton", BG)
 	t.set_color("font_hover_color", "PrimaryButton", BG)
 	t.set_color("font_focus_color", "PrimaryButton", BG)
@@ -113,8 +138,7 @@ static func _button_box(fill: Color, border: Color, border_width := 2) -> StyleB
 	b.bg_color = fill
 	b.border_color = border
 	b.set_border_width_all(border_width)
-	b.skew = Vector2(0.22, 0)
-	b.set_corner_radius_all(3)
+	b.set_corner_radius_all(0)   # flat, square: print-style noir
 	b.content_margin_left = 34
 	b.content_margin_right = 34
 	b.content_margin_top = 12
@@ -127,7 +151,7 @@ static func panel_box(border := LINE, fill := PANEL, skew := 0.0) -> StyleBoxFla
 	b.bg_color = fill
 	b.border_color = border
 	b.set_border_width_all(2)
-	b.set_corner_radius_all(6)
+	b.set_corner_radius_all(0)
 	b.skew = Vector2(skew, 0)
 	b.set_content_margin_all(20)
 	return b
@@ -181,13 +205,52 @@ static func button(text: String, primary := false) -> Button:
 	return b
 
 
-## "Skill Issue" with the words in the two team colors.
-static func wordmark(size := 120) -> HBoxContainer:
-	var row := HBoxContainer.new()
-	row.add_theme_constant_override("separation", int(size * 0.22))
-	row.add_child(display("Skill", size, BLUE))
-	row.add_child(display("Issue", size, RED))
-	return row
+## Old-movie title lettering: off-white face with a deep gray extrusion going down-right.
+static func title_3d(text: String, size := 120, face := INK, depth_ratio := 0.12) -> Control:
+	var f := font(DISPLAY)
+	var sz := f.get_string_size(text, HORIZONTAL_ALIGNMENT_LEFT, -1, size)
+	var depth := maxi(2, int(size * depth_ratio))
+	var box := Control.new()
+	box.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	box.custom_minimum_size = Vector2(sz.x + depth, sz.y + depth)
+	var shadow := display(text, size, Color(0, 0, 0, 0.55))
+	shadow.position = Vector2(depth * 1.6, depth * 1.9)
+	box.add_child(shadow)
+	for i in range(depth, 0, -1):
+		var k := float(i) / depth
+		var l := display(text, size, Color(0.07, 0.07, 0.07).lerp(Color(0.34, 0.34, 0.33), 1.0 - k))
+		l.position = Vector2(i * 0.75, i)
+		box.add_child(l)
+	var front := display(text, size, face)
+	front.add_theme_color_override("font_outline_color", Color(0.02, 0.02, 0.02))
+	front.add_theme_constant_override("outline_size", maxi(2, int(size * 0.02)))
+	box.add_child(front)
+	return box
+
+
+## "Skill Issue" as a film title card.
+static func wordmark(size := 120) -> Control:
+	return title_3d("SKILL ISSUE", size)
+
+
+## Script line, like "presents" on an old title card.
+static func script_line(text: String, size := 34, color := INK) -> Label:
+	return label(text, size, SCRIPT, color)
+
+
+## A dark card whose accent edge is in the team color (the other edges are faint gray).
+static func team_card_style(color: Color, edge := "left", fill := Color(0.045, 0.045, 0.045, 0.9)) -> StyleBoxFlat:
+	var b := StyleBoxFlat.new()
+	b.bg_color = fill
+	b.border_color = color
+	if edge == "top":
+		b.border_width_top = 3
+	else:
+		b.border_width_left = 4
+	b.set_content_margin_all(20)
+	b.shadow_color = Color(0, 0, 0, 0.5)
+	b.shadow_size = 10
+	return b
 
 
 ## Fade a screen in from black.

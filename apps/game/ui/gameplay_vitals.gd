@@ -14,7 +14,7 @@ var _panel_style: StyleBoxFlat
 
 func _ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_panel_style = UiKit.panel_box(UiKit.LINE, Color(0.02, 0.03, 0.065, 0.9))
+	_panel_style = UiKit.panel_box(UiKit.LINE, Color(0.055, 0.055, 0.06, 0.9))
 	var title := UiKit.label("VITALS", 13, UiKit.BODY_BOLD, UiKit.MUTED)
 	title.position = Vector2(14, 7)
 	add_child(title)
@@ -65,4 +65,4 @@ func _draw() -> void:
 	draw_rect(fill, color.lerp(Color.WHITE, _flash))
 	for i in range(1, 10):
 		var x := bar.position.x + bar.size.x * i / 10.0
-		draw_line(Vector2(x, bar.position.y), Vector2(x, bar.end.y), Color(0.02, 0.03, 0.065, 0.8), 2.0)
+		draw_line(Vector2(x, bar.position.y), Vector2(x, bar.end.y), Color(0.055, 0.055, 0.06, 0.8), 2.0)

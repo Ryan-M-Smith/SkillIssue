@@ -55,7 +55,7 @@ extends Node
 @export var build_test_arena_if_empty := true
 ## The map's CSG boxes don't have "Use Collision" ticked yet. Turn it on at runtime so you
 ## can walk on the map (spawn pads are skipped so you don't spawn on top of them).
-@export var make_map_csg_solid := true
+@export var make_map_csg_solid := false # changed line
 ## Adds a sun + sky at runtime if the world has no light / environment.
 @export var add_light_if_missing := true
 ## Start with the F3 debug view on.
@@ -91,6 +91,7 @@ var _clock: Label
 var _banner: Control
 var _details: PanelContainer
 var _detail_cells: Array = []
+var _detail_rows: Array = []   # row styles in the Tab scoreboard (lead highlight)
 
 var _time_left := 0.0
 var _running := false
@@ -479,7 +480,7 @@ func _build_scoreboard() -> Control:
 	board.add_theme_constant_override("separation", 4)
 	_score_blue = _board_cell(board, UiKit.BLUE)
 	var center := PanelContainer.new()
-	var style := UiKit.panel_box(UiKit.LINE, Color(0.02, 0.03, 0.065, 0.94))
+	var style := UiKit.panel_box(UiKit.LINE, Color(0.055, 0.055, 0.06, 0.94))
 	style.set_content_margin_all(8)
 	center.add_theme_stylebox_override("panel", style)
 	center.custom_minimum_size.x = 154
@@ -499,8 +500,10 @@ func _build_scoreboard() -> Control:
 
 func _board_cell(board: HBoxContainer, color: Color) -> Label:
 	var cell := PanelContainer.new()
-	var style := UiKit.panel_box(Color(color, 0.8), Color(color.r * 0.15, color.g * 0.15, color.b * 0.15, 0.94))
+	# charcoal cell, team color only in the number and a thick underline
+	var style := UiKit.panel_box(Color(color, 0.85), Color(0.05, 0.05, 0.05, 0.94))
 	style.set_content_margin_all(6)
+	style.set_border_width_all(0)
 	style.border_width_bottom = 4
 	cell.add_theme_stylebox_override("panel", style)
 	cell.custom_minimum_size.x = 88
@@ -512,40 +515,80 @@ func _board_cell(board: HBoxContainer, color: Color) -> Label:
 
 
 func _build_details(root: Control) -> void:
+	# Noir "case file": a charcoal card, an off-white header band, one row per team with a
+	# stripe in its color. The leading team's row gets a lamplight marker in _update_details.
 	_details = PanelContainer.new()
 	_details.set_anchors_preset(Control.PRESET_CENTER)
-	_details.offset_left = -370
-	_details.offset_right = 370
-	_details.offset_top = -160
-	_details.offset_bottom = 160
-	_details.add_theme_stylebox_override("panel", UiKit.panel_box(UiKit.LINE, Color(0.02, 0.03, 0.065, 0.97)))
+	_details.offset_left = -400
+	_details.offset_right = 400
+	_details.offset_top = -120
+	_details.offset_bottom = 120
+	var card := UiKit.panel_box(Color(1, 1, 1, 0.18), Color(0.06, 0.06, 0.065, 0.96))
+	card.set_content_margin_all(0)
+	_details.add_theme_stylebox_override("panel", card)
 	_details.visible = false
 	root.add_child(_details)
+	var outer := VBoxContainer.new()
+	outer.add_theme_constant_override("separation", 0)
+	_details.add_child(outer)
+	var band := PanelContainer.new()
+	var band_style := StyleBoxFlat.new()
+	band_style.bg_color = UiKit.INK
+	band_style.content_margin_left = 24
+	band_style.content_margin_right = 24
+	band_style.content_margin_top = 10
+	band_style.content_margin_bottom = 10
+	band.add_theme_stylebox_override("panel", band_style)
+	var band_row := HBoxContainer.new()
+	band.add_child(band_row)
+	var title := UiKit.display("CASE FILE", 30, UiKit.BG)
+	title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	band_row.add_child(title)
+	band_row.add_child(UiKit.label("LIVE MATCH  /  SCOREBOARD", 16, UiKit.BODY_BOLD, Color(UiKit.BG, 0.7)))
+	outer.add_child(band)
+	var body := MarginContainer.new()
+	for side in ["left", "right", "top", "bottom"]:
+		body.add_theme_constant_override("margin_" + side, 24)
+	outer.add_child(body)
 	var rows := VBoxContainer.new()
-	rows.add_theme_constant_override("separation", 20)
-	_details.add_child(rows)
-	rows.add_child(UiKit.eyebrow("LIVE MATCH  /  SCOREBOARD", UiKit.GOLD))
+	rows.add_theme_constant_override("separation", 12)
+	body.add_child(rows)
 	var headings := HBoxContainer.new()
 	headings.add_theme_constant_override("separation", 12)
-	for title in ["SQUAD", "KILLS", "DEATHS", "ACCURACY", "BEST STREAK"]:
-		var label := UiKit.label(title, 14, UiKit.BODY_BOLD, UiKit.MUTED)
+	for title_text in ["SQUAD", "KILLS", "DEATHS", "ACCURACY", "BEST STREAK"]:
+		var label := UiKit.label(title_text, 14, UiKit.BODY_BOLD, UiKit.MUTED)
 		label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		label.custom_minimum_size.x = 120
 		headings.add_child(label)
-	rows.add_child(headings)
+	var head_pad := MarginContainer.new()
+	head_pad.add_theme_constant_override("margin_left", 18)
+	head_pad.add_child(headings)
+	rows.add_child(head_pad)
+	_detail_rows.clear()
 	for i in 2:
+		var strip := PanelContainer.new()
+		var strip_style := StyleBoxFlat.new()
+		strip_style.bg_color = Color(1, 1, 1, 0.04)
+		strip_style.border_color = UiKit.team_color(i)
+		strip_style.border_width_left = 6
+		strip_style.content_margin_left = 12
+		strip_style.content_margin_top = 8
+		strip_style.content_margin_bottom = 8
+		strip.add_theme_stylebox_override("panel", strip_style)
+		rows.add_child(strip)
+		_detail_rows.append(strip_style)
 		var row := HBoxContainer.new()
 		row.add_theme_constant_override("separation", 12)
-		rows.add_child(row)
+		strip.add_child(row)
 		var cells: Array[Label] = []
 		for j in 5:
-			var label := UiKit.display(UiKit.team_name(i) if j == 0 else "0", 28, UiKit.team_color(i) if j == 0 else UiKit.INK)
+			var label := UiKit.display(UiKit.team_name(i) if j == 0 else "0", 30, UiKit.team_color(i) if j == 0 else UiKit.INK)
 			label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 			label.custom_minimum_size.x = 120
 			row.add_child(label)
 			cells.append(label)
 		_detail_cells.append(cells)
-	rows.add_child(UiKit.label("Hold TAB to view / Keep your squad together", 16, UiKit.BODY, UiKit.MUTED))
+	rows.add_child(UiKit.label("Hold TAB to view  /  Keep your squad together", 16, UiKit.BODY, UiKit.MUTED))
 
 
 func _update_details() -> void:
@@ -557,9 +600,13 @@ func _update_details() -> void:
 		_detail_cells[i][2].text = str(stats.get("deaths", 0))
 		_detail_cells[i][3].text = "%d%%" % roundi(MatchStats.accuracy(i) * 100.0)
 		_detail_cells[i][4].text = str(stats.get("best_streak", 0))
+	# lamplight background on the leading team's row
+	for i in mini(_detail_rows.size(), 2):
+		var lead: bool = scores[i] > scores[1 - i]
+		(_detail_rows[i] as StyleBoxFlat).bg_color = Color(UiKit.GOLD, 0.12) if lead else Color(1, 1, 1, 0.04)
 
 
-func _show_banner(winner: int) -> void:
+func _show_banner(_winner: int) -> void:
 	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 	_details.visible = false
 	var hud := get_node_or_null(hud_path)
@@ -578,8 +625,8 @@ func _show_banner(winner: int) -> void:
 	var top := UiKit.eyebrow("Match over", UiKit.INK)
 	top.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	box.add_child(top)
-	var text := "DRAW" if winner < 0 else "%s WINS" % UiKit.team_name(winner)
-	var big := UiKit.display(text, 140, UiKit.INK if winner < 0 else UiKit.team_color(winner))
+	# The winner is revealed on the results screen ("and the winner is…"), not here.
+	var big := UiKit.display("FINAL WHISTLE", 140, UiKit.INK)
 	big.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	box.add_child(big)
 	var line := UiKit.display("%d — %d" % [scores[0], scores[1]], 48)

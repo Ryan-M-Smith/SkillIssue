@@ -58,6 +58,10 @@ func add_controller(c: DuoController) -> void:
 	controllers.add_child(c)
 	c.duo = self
 	c._on_attached()
+	
+func modify_health(add: int) -> void:
+	if health.has_method("addHealth"):
+		health.heal(20)
 
 
 func _physics_process(delta: float) -> void:

@@ -33,8 +33,9 @@ func _ready() -> void:
 	left.add_theme_constant_override("separation", 14)
 	row.add_child(left)
 
-	left.add_child(UiKit.eyebrow("2 v 2  ·  two phones per team  ·  one screen"))
+	left.add_child(UiKit.script_line("HackPSU Fall 2026 presents", 36, UiKit.MUTED))
 	left.add_child(UiKit.wordmark(132))
+	left.add_child(UiKit.eyebrow("2 v 2  ·  two phones per team  ·  one screen"))
 	var tag := UiKit.label("One of you moves. One of you shoots. Nobody has the full picture.", 28, UiKit.BODY, UiKit.INK)
 	tag.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	tag.custom_minimum_size.x = 560
@@ -77,7 +78,7 @@ func _ready() -> void:
 	right.add_theme_constant_override("separation", 18)
 	row.add_child(right)
 	right.add_child(_team_card(0))
-	var vs := UiKit.display("VS", 64, UiKit.INK)
+	var vs := UiKit.script_line("vs.", 64, UiKit.INK)
 	vs.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	right.add_child(vs)
 	right.add_child(_team_card(1))
@@ -96,19 +97,14 @@ func _ready() -> void:
 
 func _team_card(team: int) -> PanelContainer:
 	var card := PanelContainer.new()
-	card.add_theme_stylebox_override("panel", UiKit.panel_box(UiKit.team_color(team), _panel_for(team), 0.12 if team == 0 else -0.12))
+	card.add_theme_stylebox_override("panel", UiKit.team_card_style(UiKit.team_color(team)))
 	var box := VBoxContainer.new()
 	box.add_theme_constant_override("separation", 4)
 	card.add_child(box)
-	box.add_child(UiKit.display("TEAM %s" % UiKit.team_name(team), 44, UiKit.team_color(team)))
+	box.add_child(UiKit.display("TEAM %s" % UiKit.team_name(team), 44, UiKit.INK))
 	box.add_child(UiKit.label("Gunner  +  Runner", 22, UiKit.BODY_SEMI, UiKit.INK))
 	box.add_child(UiKit.label("Share one body. Talk or lose.", 20, UiKit.BODY, UiKit.MUTED))
 	return card
-
-
-static func _panel_for(team: int) -> Color:
-	var c := UiKit.team_color(team)
-	return Color(c.r * 0.16, c.g * 0.16, c.b * 0.16, 0.9)
 
 
 func _on_create() -> void:
@@ -128,7 +124,7 @@ func _build_how_to_play() -> Control:
 	center.set_anchors_preset(Control.PRESET_FULL_RECT)
 	shade.add_child(center)
 	var panel := PanelContainer.new()
-	panel.add_theme_stylebox_override("panel", UiKit.panel_box(Color(1, 1, 1, 0.3), Color(0.05, 0.06, 0.1, 0.97)))
+	panel.add_theme_stylebox_override("panel", UiKit.panel_box(Color(1, 1, 1, 0.3), Color(0.09, 0.09, 0.095, 0.97)))
 	panel.custom_minimum_size = Vector2(1100, 0)
 	center.add_child(panel)
 	var box := VBoxContainer.new()

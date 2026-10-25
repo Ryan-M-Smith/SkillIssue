@@ -69,7 +69,7 @@ func _build() -> void:
 	var titles := VBoxContainer.new()
 	titles.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	titles.add_child(UiKit.eyebrow("Lobby"))
-	titles.add_child(UiKit.display("JOIN WITH YOUR PHONE", 48))
+	titles.add_child(UiKit.title_3d("JOIN WITH YOUR PHONE", 56))
 	head.add_child(titles)
 	var back := UiKit.button("BACK")
 	back.pressed.connect(_on_back)
@@ -126,11 +126,11 @@ func _team_column(team: int) -> PanelContainer:
 	var c := UiKit.team_color(team)
 	var panel := PanelContainer.new()
 	panel.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	panel.add_theme_stylebox_override("panel", UiKit.panel_box(c, Color(c.r * 0.12, c.g * 0.12, c.b * 0.12, 0.88)))
+	panel.add_theme_stylebox_override("panel", UiKit.team_card_style(c, "top"))
 	var box := VBoxContainer.new()
 	box.add_theme_constant_override("separation", 14)
 	panel.add_child(box)
-	box.add_child(UiKit.display("TEAM %s" % UiKit.team_name(team), 40, c))
+	box.add_child(UiKit.display("TEAM %s" % UiKit.team_name(team), 40, UiKit.INK))
 	for role in ["gunner", "mover"]:   # Gunner (aim phone) on top, Runner (movement) below
 		box.add_child(_slot(team, role))
 	return panel
@@ -204,8 +204,19 @@ func _render_code(code: String) -> void:
 	var text := code if not code.is_empty() else "······"
 	for i in text.length():
 		var tile := PanelContainer.new()
+		# film-card tiles: dark, a thin gray frame, a sliver of team color underneath
 		var accent := UiKit.BLUE if i < 3 else UiKit.RED
-		tile.add_theme_stylebox_override("panel", UiKit.panel_box(accent, Color(0.04, 0.05, 0.09, 0.95)))
+		var tile_style := UiKit.panel_box(Color(1, 1, 1, 0.2), Color(0.04, 0.04, 0.04, 0.95))
+		tile_style.set_border_width_all(1)
+		tile_style.border_width_bottom = 3
+		tile_style.border_color = Color(1, 1, 1, 0.2)
+		tile.add_theme_stylebox_override("panel", tile_style)
+		var under := ColorRect.new()
+		under.color = accent
+		under.custom_minimum_size.y = 3
+		under.size_flags_vertical = Control.SIZE_SHRINK_END
+		under.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		tile.add_child(under)
 		var ch := UiKit.display(text[i], 76, UiKit.INK)
 		ch.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		ch.custom_minimum_size = Vector2(64, 0)
@@ -220,18 +231,18 @@ func _render_slot(team: int, role: String, player: Dictionary) -> void:
 		s.name.text = "Open"
 		s.name.add_theme_color_override("font_color", UiKit.MUTED)
 		s.badge.text = ""
-		s.panel.add_theme_stylebox_override("panel", UiKit.panel_box(Color(1, 1, 1, 0.08), Color(0, 0, 0, 0.25)))
+		s.panel.add_theme_stylebox_override("panel", UiKit.panel_box(Color(1, 1, 1, 0.08), Color(0, 0, 0, 0.35)))
 		return
 	s.name.text = player.name
 	s.name.add_theme_color_override("font_color", UiKit.INK)
 	if player.ready:
 		s.badge.text = "READY"
 		s.badge.add_theme_color_override("font_color", UiKit.READY)
-		s.panel.add_theme_stylebox_override("panel", UiKit.panel_box(c, Color(c.r * 0.3, c.g * 0.3, c.b * 0.3, 0.9)))
+		s.panel.add_theme_stylebox_override("panel", UiKit.team_card_style(c, "left", Color(0.1, 0.1, 0.1, 0.92)))
 	else:
 		s.badge.text = "PICKING…"
 		s.badge.add_theme_color_override("font_color", UiKit.GOLD)
-		s.panel.add_theme_stylebox_override("panel", UiKit.panel_box(Color(c.r, c.g, c.b, 0.5), Color(0, 0, 0, 0.3)))
+		s.panel.add_theme_stylebox_override("panel", UiKit.team_card_style(Color(c, 0.45), "left", Color(0.05, 0.05, 0.05, 0.85)))
 
 
 func _on_server_status() -> void:
