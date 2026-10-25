@@ -101,7 +101,7 @@ func _team_card(team: int) -> PanelContainer:
 	box.add_theme_constant_override("separation", 4)
 	card.add_child(box)
 	box.add_child(UiKit.display("TEAM %s" % UiKit.team_name(team), 44, UiKit.team_color(team)))
-	box.add_child(UiKit.label("Movement phone  +  Aim phone", 22, UiKit.BODY_SEMI, UiKit.INK))
+	box.add_child(UiKit.label("Gunner  +  Runner", 22, UiKit.BODY_SEMI, UiKit.INK))
 	box.add_child(UiKit.label("Share one body. Talk or lose.", 20, UiKit.BODY, UiKit.MUTED))
 	return card
 
@@ -140,20 +140,20 @@ func _build_how_to_play() -> Control:
 	var cols := HBoxContainer.new()
 	cols.add_theme_constant_override("separation", 28)
 	box.add_child(cols)
-	cols.add_child(_how_column("MOVEMENT PHONE", UiKit.BLUE, [
+	cols.add_child(_how_column("GUNNER · AIM PHONE", UiKit.RED, [
+		["Turn the phone", "Look around (camera follows)"],
+		["Hold FIRE", "Shoot"],
+		["Tap AIM", "Aim down sights / scope"],
+		["Tap RELOAD", "Reload"],
+		["Tap SWITCH", "Next owned weapon"],
+		["Pick up guns on the map", "Unlock them"],
+	]))
+	cols.add_child(_how_column("RUNNER · MOVEMENT PHONE", UiKit.BLUE, [
 		["Tilt top away / toward you", "Walk forward / back"],
 		["Tip an end down", "Strafe left / right"],
 		["Flick forward", "Crouch (again to stand)"],
 		["Flick back", "Jump"],
 		["Twist 32 degrees, return to center", "Sprint on / off"],
-	]))
-	cols.add_child(_how_column("AIM PHONE", UiKit.RED, [
-		["Turn the phone", "Look around"],
-		["Jab forward", "Shoot"],
-		["Pull back", "Scope (sniper)"],
-		["Lift upward", "Reload"],
-		["Twist 32 degrees, then center", "Next owned weapon"],
-		["Pick up guns on the map", "Unlock them"],
 	]))
 	for l in [UiKit.label("Phones join with the 6-character code shown in the lobby, pick a team and role, then tap Ready. The match starts when all four are ready.", 20, UiKit.BODY, UiKit.MUTED)]:
 		l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART

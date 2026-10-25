@@ -131,7 +131,7 @@ func _team_column(team: int) -> PanelContainer:
 	box.add_theme_constant_override("separation", 14)
 	panel.add_child(box)
 	box.add_child(UiKit.display("TEAM %s" % UiKit.team_name(team), 40, c))
-	for role in ["mover", "gunner"]:
+	for role in ["gunner", "mover"]:   # Gunner (aim phone) on top, Runner (movement) below
 		box.add_child(_slot(team, role))
 	return panel
 
@@ -143,7 +143,7 @@ func _slot(team: int, role: String) -> PanelContainer:
 	slot.add_child(row)
 	var info := VBoxContainer.new()
 	info.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	info.add_child(UiKit.eyebrow("Movement phone" if role == "mover" else "Aim phone"))
+	info.add_child(UiKit.eyebrow("Runner · movement phone" if role == "mover" else "Gunner · aim phone"))
 	var name_label := UiKit.label("Open", 30, UiKit.DISPLAY_SEMI, UiKit.MUTED)
 	info.add_child(name_label)
 	row.add_child(info)
@@ -185,7 +185,7 @@ func _refresh() -> void:
 			if p.ready:
 				ready += 1
 	for team in 2:
-		for role in ["mover", "gunner"]:
+		for role in ["gunner", "mover"]:
 			_render_slot(team, role, GameSession.player_at(team, role))
 	_waiting.text = ("Choosing a spot: " + ", ".join(waiting)) if not waiting.is_empty() else ""
 	if _countdown < 0.0 and not _loading:

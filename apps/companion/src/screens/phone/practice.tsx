@@ -6,7 +6,7 @@ import { MotionController, emptyControls } from "@/service/motion-control-servic
 import { DebugLink, idleLinkStatus, type DebugLinkStatus } from "@/service/debug-link";
 import { MotionTally, directionOf, zeroCounts, type Counts, type MovementState } from "@/lib/motion-summary";
 import { defaultDebugRoom } from "@/lib/net/server-url";
-import type { Action, GameControls, Grip, Role } from "@/types/motion";
+import type { GameControls, Grip, Role } from "@/types/motion";
 import { Body, Eyebrow, Panel, SlantButton, SplitBackground, Title } from "./kit";
 import { fonts, ui } from "./theme";
 
@@ -18,15 +18,14 @@ const movementGuide = [
 	["↓", "FLICK FORWARD", "A short flick away toggles crouch."],
 ];
 const gunnerGuide = [
-	["◎", "TURN TO AIM", "Small, smooth turns steer the camera."],
-	["→", "JAB FORWARD", "A short push away fires. Relax briefly between shots."],
-	["↑", "LIFT TO RELOAD", "Lift the phone straight up to reload."],
-	["↻", "32° WHEEL TWIST", "Cycle weapons. Return to center before the next switch."],
-	["←", "PULL BACK", "A short pull toward you toggles the scope."],
+	["◎", "TURN TO AIM", "Turn the phone left, right, up or down: the camera follows. Nothing else is a gesture."],
+	["●", "FIRE", "Hold the FIRE button to shoot."],
+	["⊕", "AIM", "Tap AIM to aim down sights (scope with the sniper). Tap again to stop."],
+	["↻", "RELOAD · SWITCH", "Tap RELOAD for a fresh magazine, SWITCH for your next gun."],
 ];
 const movementStats: [keyof Counts, string][] = [["jumps", "JUMPS"], ["crouches", "CROUCHES"], ["sprints", "SPRINTS"], ["movements", "MOVES"]];
-const freshActions = { shoot: 0, reload: 0, weapon_next: 0, scope: 0 };
-const actionNames: Partial<Record<Exclude<Action, null>, string>> = { weapon_next: "WEAPON SWITCH", shoot: "SHOT", reload: "RELOAD", scope: "SCOPE" };
+const freshTaps = { fire: 0, aim: 0, reload: 0, switch: 0 };
+type GunnerButton = keyof typeof freshTaps;
 const subscribeHydration = () => () => {};
 const clientSnapshot = () => true;
 const serverSnapshot = () => false;
@@ -36,7 +35,7 @@ export function Practice({ serverUrl, onBack }: { serverUrl: string; onBack: () 
 	const [role, setRole] = useState<Role>("movement");
 	const [controls, setControls] = useState<GameControls>(emptyControls);
 	const [counts, setCounts] = useState<Counts>(zeroCounts);
-	const [actions, setActions] = useState(freshActions);
+	const [taps, setTaps] = useState(freshTaps);
 	const [state, setState] = useState<MovementState>("Calibrating");
 	const [grip, setGrip] = useState<Grip | null>(null);
 	const [lastAction, setLastAction] = useState("FIND YOUR NEUTRAL");
@@ -69,11 +68,6 @@ export function Practice({ serverUrl, onBack }: { serverUrl: string; onBack: () 
 					const output = controllerRef.current.process(reading, now);
 					tallyRef.current.add(output, now);
 					debugRef.current?.sendReading(reading);
-					if (output.action) {
-						const action = output.action;
-						setLastAction(actionNames[action] ?? action.toUpperCase());
-						if (action in freshActions) setActions(previous => ({ ...previous, [action]: previous[action as keyof typeof freshActions] + 1 }));
-					}
 					if (now - lastDrawRef.current >= 50 || output.action) {
 						lastDrawRef.current = now;
 						setControls(output);
@@ -93,7 +87,7 @@ export function Practice({ serverUrl, onBack }: { serverUrl: string; onBack: () 
 	function resetCounts() {
 		tallyRef.current.reset();
 		setCounts({ ...zeroCounts });
-		setActions({ ...freshActions });
+		setTaps({ ...freshTaps });
 		setLastAction("FIND YOUR NEUTRAL");
 		debugRef.current?.sendEvent("reset_counts");
 	}
@@ -127,7 +121,7 @@ export function Practice({ serverUrl, onBack }: { serverUrl: string; onBack: () 
 			onStatus: setDebug,
 			onEvent: event => {
 				if (event === "recalibrate") controllerRef.current.reset();
-				if (event === "reset_counts") { tallyRef.current.reset(); setCounts({ ...zeroCounts }); setActions({ ...freshActions }); }
+				if (event === "reset_counts") { tallyRef.current.reset(); setCounts({ ...zeroCounts }); setTaps({ ...freshTaps }); }
 			},
 		});
 		debugRef.current = link; setDebugOn(true); link.open();
@@ -136,7 +130,11 @@ export function Practice({ serverUrl, onBack }: { serverUrl: string; onBack: () 
 	const guide = role === "movement" ? movementGuide : gunnerGuide;
 	const stats: [string, number][] = role === "movement"
 		? movementStats.map(([key, label]) => [label, counts[key]])
-		: [["SHOTS", actions.shoot], ["RELOADS", actions.reload], ["SWITCHES", actions.weapon_next], ["SCOPES", actions.scope]];
+		: [["SHOTS", taps.fire], ["AIMS", taps.aim], ["RELOADS", taps.reload], ["SWITCHES", taps.switch]];
+	const tap = (button: GunnerButton, label: string) => {
+		setTaps((previous) => ({ ...previous, [button]: previous[button] + 1 }));
+		setLastAction(label);
+	};
 	return (
 		<View style={styles.screen}>
 			<SplitBackground split={0.6} />
@@ -147,7 +145,7 @@ export function Practice({ serverUrl, onBack }: { serverUrl: string; onBack: () 
 			<ScrollView contentContainerStyle={[styles.content, compact && styles.stack]} keyboardShouldPersistTaps="handled">
 				<Panel border={controls.ready ? ui.blue : ui.gold} style={[styles.live, compact && styles.stackedPanel]}>
 					<View style={styles.roleRow}>
-						<SlantButton label="MOVEMENT" small color={role === "movement" ? ui.blue : undefined} onPress={() => pickRole("movement")} style={styles.grow} />
+						<SlantButton label="RUNNER" small color={role === "movement" ? ui.blue : undefined} onPress={() => pickRole("movement")} style={styles.grow} />
 						<SlantButton label="GUNNER" small color={role === "gunner" ? ui.red : undefined} onPress={() => pickRole("gunner")} style={styles.grow} />
 						<SlantButton label="RECENTER" small onPress={recalibrate} style={styles.grow} />
 					</View>
@@ -159,6 +157,12 @@ export function Practice({ serverUrl, onBack }: { serverUrl: string; onBack: () 
 					</> : <>
 						<View style={styles.target}><View style={styles.crossH} /><View style={styles.crossV} /><View style={[styles.dot, { transform: [{ translateX: controls.lookX * 65 }, { translateY: -controls.lookY * 45 }] }]} /></View>
 						<Text style={styles.lastAction}>{controls.ready ? lastAction : "FIND YOUR NEUTRAL"}</Text>
+						<View style={styles.roleRow}>
+							<SlantButton label="FIRE" small color={ui.red} onPress={() => tap("fire", "FIRE")} style={styles.grow} />
+							<SlantButton label="AIM" small onPress={() => tap("aim", "AIM")} style={styles.grow} />
+							<SlantButton label="RELOAD" small onPress={() => tap("reload", "RELOAD")} style={styles.grow} />
+							<SlantButton label="SWITCH" small onPress={() => tap("switch", "SWITCH GUN")} style={styles.grow} />
+						</View>
 					</>}
 					{!!sensorError && <Body color={ui.red} size={13}>{sensorError}</Body>}
 					<View style={styles.stats}>{stats.map(([label, value]) => <View style={styles.stat} key={label}><Text style={styles.statValue}>{value}</Text><Eyebrow>{label}</Eyebrow></View>)}</View>
