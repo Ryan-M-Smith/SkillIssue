@@ -242,8 +242,12 @@ func _run() -> void:
 	if not _check(stats.teams[1].streak == 2 and stats.teams[1].best_streak == 2, "consecutive kill advances streak"):
 		return
 	await create_timer(0.05).timeout
+	if not _check(mode.bounty_left[0] > 0.0 and mode.bounty_left[1] == 0.0, "getting killed puts a bounty on your killer"):
+		return
 	mode.duos[1].health.kill(mode.duos[0])
 	if not _check(stats.teams[1].streak == 0 and stats.teams[1].best_streak == 2, "death resets current streak and preserves record"):
+		return
+	if not _check(mode.scores[0] == 2 and stats.teams[0].kills == 1 and mode.bounty_left[0] == 0.0, "revenge kill scores bounty points but counts one kill"):
 		return
 	mode._update_details()
 	if not _check(mode._detail_cells[1][1].text == "2" and mode._detail_cells[1][4].text == "2", "detailed scoreboard reflects kills and best streak"):
@@ -265,7 +269,7 @@ func _run() -> void:
 		return
 	if not _check(stats.teams[1].shots == final_shots + 1 and stats.teams[1].hits >= 1, "winning shot is included in final statistics"):
 		return
-	if not _check(not paused and stats.result.get("winner", -1) == 1 and stats.result.scores == [1, 3], "results preserve final score and unpause tree"):
+	if not _check(not paused and stats.result.get("winner", -1) == 1 and stats.result.scores == [2, 4], "results preserve final score (with bounty points) and unpause tree"):
 		return
 	var menu := _find_button(current_scene, "MAIN MENU")
 	if not _check(menu != null, "results offer return to menu"):
@@ -318,7 +322,7 @@ func _run() -> void:
 	phone._on_phone_message(0, "gunner", {"t": "aim", "dx": deg_to_rad(24.0), "dy": deg_to_rad(6.0)})
 	var phone_input := DuoInput.new()
 	phone.poll(phone_input, 1.0 / 60.0)
-	if not _check(phone_input.aim_delta.x > 0.0 and phone_input.aim_delta.x < deg_to_rad(24.0), "network turn starts immediately without a single-frame snap"):
+	if not _check(phone_input.aim_delta.x > deg_to_rad(24.0) * 0.85 and phone_input.aim_delta.x < deg_to_rad(24.0), "network turn starts immediately without a single-frame snap"):
 		return
 	duo.aim.tick(phone_input, 1.0 / 60.0)
 	for frame_index in range(30):

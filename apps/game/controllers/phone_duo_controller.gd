@@ -8,7 +8,7 @@ extends DuoController
 @export var team := 0
 @export var state_send_interval := 0.15
 ## Short packet-jitter filter; remaining angle is conserved, never extrapolated.
-@export_range(0.0, 0.1) var aim_smoothing_seconds := 0.025
+@export_range(0.0, 0.1) var aim_smoothing_seconds := 0.008
 
 var _move := Vector2.ZERO
 var _crouch := false

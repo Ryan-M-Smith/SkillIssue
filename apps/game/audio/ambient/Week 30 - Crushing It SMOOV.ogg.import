@@ -1,0 +1,19 @@
+[remap]
+
+importer="oggvorbisstr"
+type="AudioStreamOggVorbis"
+uid="uid://djcvhki4dccws"
+path="res://.godot/imported/Week 30 - Crushing It SMOOV.ogg-15d2c82f355560a1b71d03e762590e08.oggvorbisstr"
+
+[deps]
+
+source_file="res://audio/ambient/Week 30 - Crushing It SMOOV.ogg"
+dest_files=["res://.godot/imported/Week 30 - Crushing It SMOOV.ogg-15d2c82f355560a1b71d03e762590e08.oggvorbisstr"]
+
+[params]
+
+loop=false
+loop_offset=0
+bpm=0
+beat_count=0
+bar_beats=4

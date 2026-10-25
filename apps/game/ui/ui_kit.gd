@@ -202,7 +202,17 @@ static func button(text: String, primary := false) -> Button:
 		b.theme_type_variation = "PrimaryButton"
 	b.focus_mode = Control.FOCUS_ALL
 	b.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
+	b.pressed.connect(func(): sfx(b, "click"))
+	b.mouse_entered.connect(func(): if not b.disabled: sfx(b, "hover"))
 	return b
+
+
+## Plays a sound through the Sfx autoload. Looked up at runtime, not named: UiKit is a global
+## class that headless tests compile before autoloads exist. Silent if there's no Sfx.
+static func sfx(node: Node, sound: String) -> void:
+	var player := node.get_node_or_null("/root/Sfx") if node.is_inside_tree() else null
+	if player:
+		player.play(sound)
 
 
 ## Old-movie title lettering: off-white face with a deep gray extrusion going down-right.

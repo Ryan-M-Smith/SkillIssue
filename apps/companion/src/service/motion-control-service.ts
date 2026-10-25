@@ -1,3 +1,4 @@
+import { gyroAim } from "@/lib/math/gyro-aim";
 import type {
 	Action,
 	GameControls,
@@ -22,7 +23,7 @@ export type { GameControls, MotionDebug, Role } from "@/types/motion";
  *   tip one end down                strafe                  (held, 3.5°–12°)
  *   quick flick forward and back    crouch on / off
  *   quick flick back and forward    jump (while crouched: stand up)
- *   twist ~30° like a wheel         sprint on / off, return to center to re-arm
+ *   twist ~40° like a wheel         sprint on / off, return to center to re-arm
  *
  * WHY TWIST AND STRAFE NEED THE GYROSCOPE
  *
@@ -52,7 +53,7 @@ export type { GameControls, MotionDebug, Role } from "@/types/motion";
  * GUNNER PHONE
  *
  * Only aims: the gyroscope turns the camera. `lookDX`/`lookDY` carry the exact
- * degrees turned this sample, so the game can turn 1:1 with the phone; `lookX`
+ * camera degrees this sample after mouse-style sensitivity; `lookX`
  * and `lookY` are the same as rates (1 = 130°/s) for older games.
  */
 
@@ -96,14 +97,15 @@ const settings = {
 	afterGestureMs: 220,
 
 	// Sprint twist.
-	twistTriggerDeg: 30,
-	twistRearmDeg: 12,
-	twistCooldownMs: 350,
+	twistTriggerDeg: 40,
+	twistRearmDeg: 8,
+	twistCooldownMs: 650,
+	twistHoldMs: 120,
+	twistCenterMs: 150,
 	twistSlackDeg: 4, // twist may exceed what gravity shows by this much (noise)
 
 	// Gunner.
 	aimMaxRate: 130,
-	aimDeadzone: 1, // deg/s: reject resting noise, retain slow deliberate turns
 };
 
 // Flip a sign here if a direction comes out reversed on a real phone.
@@ -182,12 +184,6 @@ function tiltToMovement(degrees: number, wasActive: boolean, strafe = false): { 
 	return { value: Math.sign(degrees) * Math.pow(portion, strafe ? settings.strafeCurve : settings.curve), active: true };
 }
 
-function aimRate(degreesPerSecond: number) {
-	// Continuous transition avoids the old abrupt 1.5 deg/s camera stop/start.
-	const amount = clamp((Math.abs(degreesPerSecond) - settings.aimDeadzone) / 2.5, 0, 1);
-	return amount === 0 ? 0 : degreesPerSecond * amount * amount * (3 - 2 * amount);
-}
-
 export const emptyControls: GameControls = {
 	ready: false,
 	moveX: 0,
@@ -240,6 +236,9 @@ export class MotionController {
 	private lockedUntil = 0;
 	private twist = 0; // degrees twisted about the screen normal since neutral
 	private twistArmed = true;
+	private twistCandidateSince: number | null = null;
+	private twistCenterSince: number | null = null;
+	private twistDirection = 0;
 	private twistLockedUntil = 0;
 
 	private debug: MotionDebug = emptyDebug();
@@ -275,6 +274,9 @@ export class MotionController {
 		this.lockedUntil = 0;
 		this.twist = 0;
 		this.twistArmed = true;
+		this.twistCandidateSince = null;
+		this.twistCenterSince = null;
+		this.twistDirection = 0;
 		this.twistLockedUntil = 0;
 		this.debug = emptyDebug();
 	}
@@ -415,6 +417,9 @@ export class MotionController {
 		this.looseSum = { x: 0, y: 0, z: 0 };
 		this.twist = 0;
 		this.twistArmed = true;
+		this.twistCandidateSince = null;
+		this.twistCenterSince = null;
+		this.twistDirection = 0;
 		this.debug.calibration = "ready";
 		this.debug.grip = this.frame.grip;
 	}
@@ -472,7 +477,7 @@ export class MotionController {
 		const tipDeg = rotationAbout(frame.down, gravity, frame.away);
 		const rightDeg = axes.rightSign * (tipDeg - this.twist * dot(zAxis, frame.away));
 
-		let action: Action = this.updateTwist(t);
+		let action: Action = this.updateTwist(t, rates?.x ?? 0);
 		if (action) {
 			// The twist itself no longer strafes, so walking carries on through it.
 			this.flick = null;
@@ -564,11 +569,25 @@ export class MotionController {
 		return null;
 	}
 
-	/** Twist past the trigger toggles sprint; it re-arms once the twist is back near center. */
-	private updateTwist(t: number): Action {
+	/** A deliberate wheel twist held briefly; centering must also be deliberate. */
+	private updateTwist(t: number, pitchRate: number): Action {
 		const angle = Math.abs(this.twist);
-		if (angle <= settings.twistRearmDeg && t >= this.twistLockedUntil) this.twistArmed = true;
-		if (!this.twistArmed || t < this.twistLockedUntil || angle < settings.twistTriggerDeg) return null;
+		if (angle <= settings.twistRearmDeg) {
+			this.twistCenterSince ??= t;
+			if (t >= this.twistLockedUntil && t - this.twistCenterSince >= settings.twistCenterMs) this.twistArmed = true;
+		} else this.twistCenterSince = null;
+		// Pitch flicks and their recovery must not be interpreted as a sprint twist.
+		if (!this.twistArmed || t < this.twistLockedUntil || t < this.lockedUntil || this.flick ||
+			Math.abs(pitchRate) > settings.flickSettleRate || angle < settings.twistTriggerDeg) {
+			this.twistCandidateSince = null;
+			return null;
+		}
+		const direction = Math.sign(this.twist);
+		if (direction !== this.twistDirection) this.twistCandidateSince = null;
+		this.twistDirection = direction;
+		this.twistCandidateSince ??= t;
+		if (t - this.twistCandidateSince < settings.twistHoldMs) return null;
+		this.twistCandidateSince = null;
 		this.twistArmed = false;
 		this.twistLockedUntil = t + settings.twistCooldownMs;
 		this.sprinting = !this.sprinting;
@@ -603,8 +622,14 @@ export class MotionController {
 			// Turning right / tipping the back of the phone up = looking right / up.
 			const level = normalize(cross(frame.up, scale(gravity, -1)));
 			const right = magnitude(level) > 0.5 ? level : frame.right;
-			const yaw = aimRate(axes.gunnerYawSign * dot(gyro, scale(gravity, -1)));
-			const pitch = aimRate(axes.gunnerPitchSign * dot(gyro, right));
+			// Integrate each real gyro sample directly so full phone turns aren't lost
+			// to a phone-side low-pass tail. Godot smooths the accumulated deltas.
+			const aim = gyroAim(
+				axes.gunnerYawSign * dot(gyro, scale(gravity, -1)),
+				axes.gunnerPitchSign * dot(gyro, right),
+			);
+			const yaw = aim.x;
+			const pitch = aim.y;
 			output.lookX = clamp(yaw / settings.aimMaxRate);
 			output.lookY = clamp(pitch / settings.aimMaxRate);
 			output.lookDX = yaw * dt;

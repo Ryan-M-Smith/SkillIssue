@@ -10,6 +10,7 @@ var match_settings := false
 var _shade: ColorRect
 var _players: HSlider
 var _players_value: Label
+var _music: HSlider
 var _resolution: OptionButton
 var _scale: OptionButton
 var _mode: OptionButton
@@ -58,6 +59,13 @@ func _ready() -> void:
 		slider_row.add_child(_players_value)
 		_players.value_changed.connect(func(v: float): _players_value.text = str(int(v)))
 		_add_row(col, "Player Count", slider_row)
+	_music = HSlider.new()
+	_music.min_value = 0.0
+	_music.max_value = 1.0
+	_music.step = 0.05
+	_music.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	_music.value_changed.connect(func(v: float): Music.set_volume(v))   # hear it while dragging
+	_add_row(col, "Music volume", _music)
 	_resolution = OptionButton.new()
 	for size_value in GraphicsSettings.RESOLUTIONS:
 		var suffix := " / 4K" if size_value == Vector2i(3840, 2160) else (" / QHD" if size_value == Vector2i(2560, 1440) else (" / 3:2" if size_value == Vector2i(2160, 1440) else ""))
@@ -95,6 +103,7 @@ func _ready() -> void:
 		_vsync.button_pressed = true
 		if _players:
 			_players.value = 4
+		_music.value = 0.8
 		_status.text = "Default settings selected. Apply to save.")
 	buttons.add_child(reset)
 	var apply := UiKit.button("APPLY", true)
@@ -124,6 +133,7 @@ func open_menu() -> void:
 	_scale.select(GraphicsSettings.SCALES.find(GraphicsSettings.render_scale))
 	_mode.select(GraphicsSettings.window_mode)
 	_vsync.button_pressed = GraphicsSettings.vsync
+	_music.set_value_no_signal(Music.volume)
 	if _players:
 		_players.value = GameSession.players_needed
 	_status.text = ""

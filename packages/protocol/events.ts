@@ -110,7 +110,7 @@ export type TeamStats = {
 /** Game host -> server -> phones while playing: the live score and clock. */
 export type MatchStatusMessage = {
     type: "match_status";
-    /** Kills for team 1 and team 2. */
+    /** Points for team 1 and team 2 (a kill is 1; a bounty / revenge kill is worth more). */
     scores: [number, number];
     /** Seconds left on the clock. */
     timeLeft: number;
@@ -147,6 +147,23 @@ export type ControllerFeedbackMessage = {
     message: Record<string, unknown>;
 };
 
+/**
+ * Game host, while playing: swap a team's movement and aim phones (the game's swap on death).
+ * The server swaps their roles, sends each phone its new controller_assigned, re-sends
+ * lobby_state (so the game re-routes their input), then tells the host roles_swapped.
+ * Ignored unless the match is playing and the team holds both slots.
+ */
+export type SwapRolesMessage = {
+    type: "swap_roles";
+    teamId: TeamId;
+};
+
+/** Server -> game host: a swap_roles request went through. */
+export type RolesSwappedMessage = {
+    type: "roles_swapped";
+    teamId: TeamId;
+};
+
 export type StartGameMessage = {
     type: "start_game";
     protocolVersion: typeof protocolVersion;
@@ -180,6 +197,7 @@ export type ClientMessage =
     | ResetLobbyMessage
     | SetMinPlayersMessage
     | ToControllerMessage
+    | SwapRolesMessage
     | MotionInputMessage
     | EnvironmentInputMessage;
 
@@ -275,6 +293,7 @@ export type ServerMessage =
     | ControllerDisconnectedMessage
     | LobbyStateMessage
     | BroadcastMessage
+    | RolesSwappedMessage
     | AuthorizedInputMessage;
 
 // ---------------------------------------------------------------------------
