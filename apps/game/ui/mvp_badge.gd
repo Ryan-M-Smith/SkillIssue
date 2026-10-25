@@ -2,8 +2,8 @@
 ##   mvp:  the Gemini raccoon badge for the player's accolade, cropped to a medallion with a
 ##         team-colored ring; "developing" while it's on its way; a drawn raccoon medal if it
 ##         never comes (offline).
-##   none: no MVP: tumbleweeds rolling through, and a sly black-and-white raccoon lurking in the
-##         dark (Gemini's noir scene behind them when it arrives, a drawn one otherwise).
+##   none: no MVP: Gemini's noir scene (tumbleweeds, a sly black-and-white raccoon lurking).
+##         Only ever Gemini's picture; the results screen leaves it out if none arrives.
 extends Control
 
 const MASK_SHADER := """
@@ -30,7 +30,7 @@ var texture: Texture2D = null
 var failed := false
 
 var _picture: TextureRect
-var _overlay: Control   # drawn above the picture: the medal ring, the tumbleweeds
+var _overlay: Control   # drawn above the picture: the medal ring
 var _material: ShaderMaterial
 var _shown_at := -1.0
 
@@ -84,19 +84,13 @@ func _process(_delta: float) -> void:
 
 
 func _draw_overlay() -> void:
-	var t := Time.get_ticks_msec() / 1000.0
-	if mode == "none":
-		_draw_weather(t)
-	else:
+	if mode != "none":
 		_draw_ring()
 
 
 func _draw() -> void:
-	var t := Time.get_ticks_msec() / 1000.0
-	if mode == "none":
-		_draw_none(t)
-	else:
-		_draw_medal(t)
+	if mode != "none":
+		_draw_medal(Time.get_ticks_msec() / 1000.0)
 
 
 # ---------------------------------------------------------------- MVP medal
@@ -147,62 +141,3 @@ func _draw_raccoon(c: Vector2, s: float, alpha: float, t: float) -> void:
 		draw_circle(eye, s * 0.085, white)
 		draw_circle(eye + Vector2(s * 0.02 * sin(t * 0.7), 0), s * 0.045, dark)
 	draw_circle(c + Vector2(0, s * 0.3), s * 0.1, dark)   # nose
-
-
-# ---------------------------------------------------------------- no MVP
-
-func _draw_none(t: float) -> void:
-	if texture != null:
-		return   # Gemini's scene is the backdrop; the weather goes over it
-	# A dark alley under one streetlamp; the raccoon is a shape in the doorway.
-	draw_rect(Rect2(Vector2.ZERO, size), Color(0.03, 0.03, 0.03))
-	var lamp := Vector2(size.x * 0.2, size.y * 0.08)
-	for i in 6:
-		draw_circle(lamp, size.y * (0.9 - i * 0.13), Color(1, 1, 0.95, 0.025))
-	draw_rect(Rect2(lamp.x - 2, 0, 4, lamp.y), Color(0.2, 0.2, 0.2))
-	draw_circle(lamp, 5.0, Color(1, 1, 0.92, 0.9))
-	var door := Rect2(size.x * 0.6, size.y * 0.1, size.x * 0.27, size.y * 0.78)
-	draw_rect(door.grow(6), Color(0.12, 0.12, 0.12))
-	draw_rect(door, Color(0, 0, 0))
-	draw_rect(Rect2(0, size.y * 0.88, size.x, size.y * 0.12), Color(0.1, 0.1, 0.1))
-	# The lurker: ears, a pale-edged head, the bandit mask, eyes that blink.
-	var sway := sin(t * 0.5) * 5.0
-	var head := door.position + Vector2(door.size.x * 0.5 + sway, door.size.y * 0.45)
-	var shade := Color(0.13, 0.13, 0.13)
-	for side in [-1.0, 1.0]:
-		draw_colored_polygon(PackedVector2Array([head + Vector2(side * 30, -12), head + Vector2(side * 26, -42), head + Vector2(side * 8, -26)]), shade)
-	draw_circle(head, 34.0, Color(0.07, 0.07, 0.07))
-	draw_arc(head, 34.0, PI * 1.1, PI * 1.9, 24, Color(0.35, 0.35, 0.34), 2.0, true)   # lamplight on the head
-	draw_colored_polygon(PackedVector2Array([head + Vector2(-34, -4), head + Vector2(-8, -14), head + Vector2(0, -6), head + Vector2(8, -14), head + Vector2(34, -4), head + Vector2(26, 10), head + Vector2(-26, 10)]), Color(0, 0, 0))
-	var blink := 0.12 if fmod(t, 4.3) < 0.14 else 1.0
-	for side in [-1.0, 1.0]:
-		draw_set_transform(head + Vector2(side * 14, -2), 0, Vector2(1.0, blink))
-		draw_circle(Vector2.ZERO, 5.0, Color(0.96, 0.95, 0.9))
-		draw_circle(Vector2(1.5, 0), 2.2, Color(0, 0, 0))
-		draw_set_transform(Vector2.ZERO)
-	draw_arc(head + Vector2(6, 18), 9.0, 0.2, 1.4, 8, Color(0.45, 0.45, 0.44), 2.0, true)   # the smirk
-
-
-## Rain and tumbleweeds, over whatever scene is behind them.
-func _draw_weather(t: float) -> void:
-	var o := _overlay
-	for i in 40:
-		var x := fmod(i * 97.3 + t * 260.0, size.x + 60.0) - 30.0
-		var y := fmod(i * 53.1 + t * 520.0 + i * 13.0, size.y + 40.0) - 20.0
-		o.draw_line(Vector2(x, y), Vector2(x - 5, y + 14), Color(0.8, 0.8, 0.8, 0.12), 1.0)
-	for i in 3:
-		var speed := 80.0 + i * 30.0
-		var r := 20.0 + i * 8.0
-		var span := size.x + r * 4.0
-		var x := fmod(t * speed + i * span * 0.37, span) - r * 2.0
-		var hop := absf(sin(t * (2.2 + i * 0.5) + i)) * (12.0 + i * 5.0)
-		_draw_tumbleweed(o, Vector2(x, size.y - r - 6.0 - hop), r, t * speed / r)
-
-
-func _draw_tumbleweed(o: Control, c: Vector2, r: float, spin: float) -> void:
-	var col := Color(0.78, 0.76, 0.7, 0.95)
-	o.draw_circle(c + Vector2(r * 0.15, r * 1.0), r * 0.7, Color(0, 0, 0, 0.4))   # shadow
-	for k in 11:
-		var a := spin + k * 0.62
-		o.draw_line(c + Vector2.from_angle(a) * r * 0.95, c + Vector2.from_angle(a + 2.4) * r * 0.9, col, 1.8, true)
-		o.draw_arc(c, r * (0.4 + 0.05 * k), a, a + 1.7, 12, Color(col, 0.75), 1.4, true)
