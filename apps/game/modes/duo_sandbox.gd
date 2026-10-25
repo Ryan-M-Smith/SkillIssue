@@ -582,7 +582,7 @@ func _show_banner(winner: int) -> void:
 	var big := UiKit.display(text, 140, UiKit.INK if winner < 0 else UiKit.team_color(winner))
 	big.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	box.add_child(big)
-	var line := UiKit.display("%d â€” %d" % [scores[0], scores[1]], 48)
+	var line := UiKit.display("%d — %d" % [scores[0], scores[1]], 48)
 	line.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	box.add_child(line)
 	hud.add_child(_banner)
