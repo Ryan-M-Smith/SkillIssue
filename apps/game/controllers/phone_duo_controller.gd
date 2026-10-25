@@ -15,6 +15,7 @@ var _crouch := false
 var _sprint := false
 var _fire := false
 var _aim_accum := Vector2.ZERO
+var _aim_assist_rate := Vector2.ZERO
 var _jump_queued := false
 var _scope_queued := false
 var _reload_queued := false
@@ -97,6 +98,7 @@ func _on_phone_left(msg_team: int, role: String) -> void:
 	else:
 		_fire = false
 		_aim_accum = Vector2.ZERO
+		_aim_assist_rate = Vector2.ZERO
 		_scope_queued = false
 		_reload_queued = false
 		_weapon_queued = -1
@@ -112,6 +114,7 @@ func poll(input: DuoInput, delta: float) -> void:
 	if _aim_accum.length_squared() < 0.0000000001:
 		turn = _aim_accum
 	input.aim_delta += turn
+	input.aim_delta += _aim_assist_rate * delta
 	_aim_accum -= turn
 	if _jump_queued:
 		input.jump = true
@@ -125,6 +128,10 @@ func poll(input: DuoInput, delta: float) -> void:
 	if _weapon_queued >= 0:
 		input.weapon_slot = _weapon_queued
 		_weapon_queued = -1
+
+
+func set_aim_assist_rate(degrees_per_second: Vector2) -> void:
+	_aim_assist_rate = Vector2(deg_to_rad(degrees_per_second.x), deg_to_rad(degrees_per_second.y))
 
 
 func _process(delta: float) -> void:
