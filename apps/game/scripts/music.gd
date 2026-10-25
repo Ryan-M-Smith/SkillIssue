@@ -16,9 +16,9 @@ const SETTINGS_PATH := "user://game.cfg"
 
 ## Track name -> file. Add a track: drop the file in audio/music/ and add a line here.
 const TRACKS := {
-	"menu": "res://audio/music/menu.ogg",
-	"match": "res://audio/music/match.ogg",
-	"results": "res://audio/music/results.ogg",
+	"menu": "res://audio/ambient/Week 27 - Dusty Memories.ogg",
+	"match": "res://audio/ambient/Week 30 - Crushing It SMOOV.ogg",
+	"results": "res://audio/ambient/Week 37 - Schmoovin.ogg",
 }
 ## Used when a track's file isn't there yet (no results track: keep the menu music).
 const FALLBACK := {"results": "menu"}
