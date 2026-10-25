@@ -83,7 +83,7 @@ export function Practice({ serverUrl, onBack }: { serverUrl: string; onBack: () 
 					}
 				});
 			} catch (e) {
-				if (!cancelled) setSensorError(Platform.OS === "web" ? "Tap RECENTER to allow motion. Use HTTPS and a phone with motion sensors." : e instanceof Error ? e.message : String(e));
+				if (!cancelled) setSensorError(e instanceof Error ? e.message : String(e));
 			}
 		})();
 		return () => { cancelled = true; subscription?.remove(); };
@@ -104,11 +104,10 @@ export function Practice({ serverUrl, onBack }: { serverUrl: string; onBack: () 
 		setGrip(null);
 		setLastAction("HOLD STILL FOR A MOMENT");
 		debugRef.current?.sendEvent("recalibrate");
-		// Mobile browsers require requesting permission directly from this tap.
 		void DeviceMotion.requestPermissionsAsync().then(permission => {
 			if (permission.granted) { setSensorError(""); setSensorSession(session => session + 1); }
 			else setSensorError("Allow motion access in your phone’s browser settings, then tap RECENTER.");
-		}).catch(() => setSensorError("Motion sensors are unavailable. Open the native phone app or use HTTPS."));
+		}).catch(() => setSensorError("Motion sensors are unavailable on this device."));
 	}
 	function pickRole(next: Role) {
 		if (next === role) return;

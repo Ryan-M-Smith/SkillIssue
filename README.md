@@ -19,6 +19,14 @@ A 2v2 split-screen game where each team shares one character: one phone moves, t
 
 `npm run companion:start` uses an Expo tunnel when needed. That tunnel serves the app; the game connection still uses the local network and a lobby ticket. Host detection uses `EXPO_PUBLIC_GAME_SERVER` when set, otherwise the Expo LAN host or browser hostname. It never invents an IP address. Native builds also support `skillissue://join?server=<encoded-ws-url>&code=<CODE>` links.
 
+For an internet-accessible deployment, run the standalone relay behind a TLS reverse proxy and set `EXPO_PUBLIC_GAME_SERVER` to its `wss://` URL. See [Internet connection](docs/internet-connection.md). Tiger Data is used for durable data and telemetry, not live WebSocket transport.
+
+The Next.js control-plane site lives in `apps/landing`: run `pnpm landing:dev`, build it with `pnpm landing:build`, and deploy that app on Vercel. Its `/api/connection` route publishes relay configuration; it does not proxy persistent WebSocket traffic.
+
+The landing page loads a Tiger Data leaderboard once on page load; use its reset/load button for another read. Configure `TIGER_DATABASE_URL` in Vercel and create the documented `leaderboard_entries` table; see [Tiger Data leaderboard](docs/tiger-data.md).
+
+Godot can ask the landing API to provision a game with `POST /api/games`, then connect to the returned unique `/games/<gameId>` WSS route. Configure `network/control_plane_url` or pass `-- --control-plane=https://landing.example.com`. The relay still owns persistent WebSocket traffic; Vercel owns provisioning and metadata.
+
 Joining fails with a useful retry message after ten seconds. Keep the lobby open and use a fresh ticket when retrying. An HTTPS browser page needs a `wss://` host; the native app can connect directly to the local `ws://` game.
 
 If the game loses its server session during a match, it returns to a fresh lobby. Join its new code and ready up to start again.
@@ -54,7 +62,7 @@ To test with fewer phones, launch Godot with `-- --min-players=1`. To use the op
 
 ## Development and checks
 
-The companion's web root is the controller app. Start `npm run companion:web` and open `/debug` for the motion debugger. In phone Practice, enable the optional debug stream using the same server and room. Both the embedded server and Node relay support it.
+The companion is native-only; its web entry displays a native-controller message instead of loading motion controls. Use the Next.js landing app for browser connection information. In phone Practice, enable the optional debug stream using the same server and room. Both the embedded server and Node relay support it.
 
 Run from the repository root:
 

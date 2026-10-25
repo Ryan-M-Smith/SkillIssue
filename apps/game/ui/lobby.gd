@@ -171,7 +171,8 @@ func _refresh() -> void:
 	else:
 		_status.text = ""
 		_retry.visible = false
-	_address.text = "Lobby ticket: %s\nSame Wi-Fi. Paste the ticket to connect without a server address." % _join_ticket() if server_ok else ""
+	var ticket_note := "Use this ticket on each phone." if not NetworkClient.is_local() else "Same Wi-Fi. Paste this ticket to connect without a server address."
+	_address.text = "Lobby ticket: %s\n%s" % [_join_ticket(), ticket_note] if server_ok else ""
 	_copy_ticket.disabled = not server_ok or GameSession.pairing_code.is_empty()
 
 	var waiting := PackedStringArray()

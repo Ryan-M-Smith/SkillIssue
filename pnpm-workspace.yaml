@@ -1,5 +1,6 @@
 packages:
   - "apps/companion"
+  - "apps/landing"
   - "apps/server"
   - "packages/*"
 allowBuilds:

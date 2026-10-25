@@ -1,4 +1,5 @@
 import { randomInt, randomUUID } from "node:crypto";
+import { createServer } from "node:http";
 import { networkInterfaces } from "node:os";
 import { WebSocket, WebSocketServer } from "ws";
 
@@ -21,6 +22,7 @@ import {
 } from "../../packages/protocol/events.ts";
 
 const port = Number(process.env.PORT ?? 8080);
+const publicWsUrl = process.env.PUBLIC_WS_URL?.trim();
 const heartbeatIntervalMs = 30_000;
 const pairingCodeLength = 6;
 // Letters and digits that can't be mistaken for each other (no 0/O, 1/I/L).
@@ -69,7 +71,9 @@ type ClientContext =
 type HeartbeatSocket = WebSocket & { isAlive?: boolean };
 
 const sessionsByCode = new Map<string, Session>();
+const sessionsByGameId = new Map<string, Session>();
 const contexts = new Map<WebSocket, ClientContext>();
+const gameRouteBySocket = new Map<WebSocket, string>();
 
 // Debug relay: rooms of phones streaming readings to browser viewers.
 type DebugRoom = { phones: Set<WebSocket>; viewers: Set<WebSocket> };
@@ -182,7 +186,7 @@ function registerGame(socket: WebSocket) {
         return;
     }
     const session: Session = {
-        gameId: `game_${randomUUID()}`,
+        gameId: gameRouteBySocket.get(socket) ?? `game_${randomUUID()}`,
         pairingCode: createPairingCode(),
         state: "waiting",
         gameSocket: socket,
@@ -190,6 +194,7 @@ function registerGame(socket: WebSocket) {
     };
 
     sessionsByCode.set(session.pairingCode, session);
+    sessionsByGameId.set(session.gameId, session);
     contexts.set(socket, { kind: "game", session });
 
     send(socket, {
@@ -684,11 +689,13 @@ function disconnect(socket: WebSocket) {
     leaveDebug(socket);
     const context = contexts.get(socket);
     contexts.delete(socket);
+    gameRouteBySocket.delete(socket);
 
     if (!context) return;
 
     if (context.kind === "game") {
         sessionsByCode.delete(context.session.pairingCode);
+        sessionsByGameId.delete(context.session.gameId);
         for (const controller of context.session.controllers.values()) {
             contexts.delete(controller.socket);
             controller.socket.close(1001, "Game host disconnected.");
@@ -709,7 +716,24 @@ function disconnect(socket: WebSocket) {
     sendLobbyState(session);
 }
 
-const wss = new WebSocketServer({ port, maxPayload: maxMessageBytes, perMessageDeflate: false });
+const httpServer = createServer((_request, response) => {
+    response.writeHead(404);
+    response.end("WebSocket relay");
+});
+const wss = new WebSocketServer({ noServer: true, maxPayload: maxMessageBytes, perMessageDeflate: false });
+
+httpServer.on("upgrade", (request, socket, head) => {
+    const pathname = new URL(request.url ?? "/", "http://localhost").pathname;
+    const gameRoute = pathname.match(/^\/games\/([A-Za-z0-9_-]{1,128})$/)?.[1] ?? "";
+    if (pathname !== "/" && !gameRoute) {
+        socket.destroy();
+        return;
+    }
+    wss.handleUpgrade(request, socket, head, (client) => {
+        if (gameRoute) gameRouteBySocket.set(client, gameRoute);
+        wss.emit("connection", client, request);
+    });
+});
 
 wss.on("connection", (socket) => {
     if (wss.clients.size > maxConnections) {
@@ -767,6 +791,7 @@ const heartbeat = setInterval(() => {
 }, heartbeatIntervalMs);
 
 wss.on("close", () => clearInterval(heartbeat));
+httpServer.listen(port);
 
 // When the game launches this server, it passes its process id. Exit when
 // that process is gone, so a crashed or force-quit game never leaves an
@@ -783,6 +808,10 @@ if (Number.isInteger(parentPid) && parentPid > 0) {
     }, 2000).unref();
 }
 console.log(`Skill Issue WebSocket server listening on ws://localhost:${port}`);
+console.log(`  game routes: /games/<gameId>`);
+if (publicWsUrl) {
+    console.log(`  public controller endpoint: ${publicWsUrl}`);
+}
 if (minControllers < controllerSlots.length) {
     console.log(`  matches can start with ${minControllers} controller(s) (MIN_CONTROLLERS)`);
 }

@@ -34,14 +34,14 @@ export function EnterCode({ code, onCode, onJoin, onBack, busy, error }: {
 					autoCorrect={false}
 					editable={!busy}
 					maxLength={512}
-					placeholder="ABC123  or  192.168.1.20:8080/ABC123"
+					placeholder="ABC123  or  wss://game.example.com/ABC123"
 					placeholderTextColor={ui.muted}
 					accessibilityLabel="Lobby code or ticket"
 					returnKeyType="go"
 					style={styles.input}
 					onSubmitEditing={() => valid && !busy && onJoin()}
 				/>
-				<Body size={14} color={ui.muted}>Use the code when your phone and game share a host. Otherwise paste the full ticket from the game lobby. Stay on the same Wi-Fi.</Body>
+				<Body size={14} color={ui.muted}>Use the code with a configured public server, or paste the full ticket from the game lobby.</Body>
 			</View>
 			<View style={styles.foot}>
 				<Body size={14} color={error ? ui.red : ui.muted} style={{ flex: 1 }}>

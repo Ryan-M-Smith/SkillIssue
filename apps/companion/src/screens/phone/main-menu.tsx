@@ -59,7 +59,7 @@ export function MainMenu({
 							onChangeText={onServerUrl}
 							autoCapitalize="none"
 							autoCorrect={false}
-							placeholder="ws://192.168.1.20:8080"
+							placeholder="wss://game.example.com"
 							placeholderTextColor={ui.muted}
 						/>
 						<Body size={12} color={ui.muted}>Your host is found automatically. A full lobby ticket also includes its address.</Body>

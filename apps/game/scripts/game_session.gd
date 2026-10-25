@@ -91,6 +91,12 @@ func create_lobby() -> void:
 	if not override.is_empty():
 		NetworkClient.connect_to_server(override)
 		return
+	var control_plane := NetworkClient.configured_control_plane_url()
+	if not control_plane.is_empty():
+		var provisioned := await _provision_game(control_plane)
+		if not provisioned.is_empty():
+			NetworkClient.connect_to_server(provisioned)
+			return
 	await LobbyServer.ensure_running()
 	if LobbyServer.is_local():
 		NetworkClient.connect_local()
@@ -98,6 +104,27 @@ func create_lobby() -> void:
 		NetworkClient.connect_to_server(LobbyServer.server_url())
 	else:
 		server_error.emit(LobbyServer.message)
+
+
+func _provision_game(control_plane: String) -> String:
+	var request := HTTPRequest.new()
+	add_child(request)
+	var endpoint := control_plane.trim_suffix("/") + "/api/games"
+	var request_error := request.request(endpoint, ["Content-Type: application/json"], HTTPClient.METHOD_POST, "{}")
+	if request_error != OK:
+		request.queue_free()
+		server_error.emit("Could not reach the game control plane (%d)." % request_error)
+		return ""
+	var result: Array = await request.request_completed
+	request.queue_free()
+	if result.size() < 4 or int(result[1]) < 200 or int(result[1]) >= 300:
+		server_error.emit("The game control plane could not create a session.")
+		return ""
+	var payload: Variant = JSON.parse_string((result[3] as PackedByteArray).get_string_from_utf8())
+	if typeof(payload) != TYPE_DICTIONARY or typeof(payload.get("websocketUrl")) != TYPE_STRING:
+		server_error.emit("The game control plane returned an invalid session.")
+		return ""
+	return str(payload.websocketUrl)
 
 
 ## Disconnects from the server, which closes the lobby for every phone.

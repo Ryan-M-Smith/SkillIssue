@@ -50,14 +50,16 @@ test("bad tickets fail with actionable errors before opening a socket", () => {
 	assert.throws(() => parseJoinTicket("ABC123"), /full lobby ticket/);
 	for (const ticket of ["bad", "javascript://host/ABC123", "ws://user:secret@host/ABC123", "host:8080/SHORT", "companion://join?code=ABC123&server=https://host"]) assert.throws(() => parseJoinTicket(ticket));
 });
-test("join times out, exits joining, and permits a new attempt", (t) => {
+test("join retries after timeout and permits a new attempt", (t) => {
 	t.mock.timers.enable({ apis: ["setTimeout", "setInterval", "Date"], now: 1000 });
 	const client = new LobbyClient("ws://localhost:8080", "ios"); clients.push(client);
 	client.join("ABC123", "Tester");
 	assert.equal(client.snapshot.stage, "connecting");
 	t.mock.timers.tick(10001);
-	assert.equal(client.snapshot.stage, "closed");
-	assert.match(client.snapshot.error!, /in time/);
+	assert.equal(client.snapshot.stage, "connecting");
+	assert.match(client.snapshot.error!, /Retrying/);
+	t.mock.timers.tick(500);
+	assert.equal(Socket.instances.length, 2);
 	client.join("DEF456", "Tester");
 	assert.equal(client.snapshot.stage, "connecting");
 });
@@ -69,14 +71,14 @@ test("obsolete socket messages and errors cannot replace a retried connection", 
 	assert.equal(client.snapshot.code, "DEF456");
 	assert.equal(client.snapshot.stage, "connecting");
 });
-test("malformed frames are ignored and connection errors leave joining immediately", () => {
+test("malformed frames are ignored and connection errors schedule a retry", () => {
 	const { client, socket } = connect();
 	socket.receive(null);
 	socket.onmessage?.({ data: "{" });
 	assert.equal(client.snapshot.stage, "playing");
 	socket.onerror?.();
-	assert.equal(client.snapshot.stage, "closed");
-	assert.match(client.snapshot.error!, /same Wi-Fi/);
+	assert.equal(client.snapshot.stage, "connecting");
+	assert.match(client.snapshot.error!, /Retrying/);
 });
 test("gunner gestures route reload, scope and only owned weapons", () => {
 	const { client, socket } = connect();

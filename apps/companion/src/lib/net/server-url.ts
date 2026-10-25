@@ -1,5 +1,4 @@
 import Constants from "expo-constants";
-import { Platform } from "react-native";
 
 export const debugServerPort = 8080;
 export const defaultDebugRoom = "debug";
@@ -14,11 +13,6 @@ export const defaultDebugRoom = "debug";
 export function defaultDebugServerUrl(): string {
 	const configured = process.env.EXPO_PUBLIC_GAME_SERVER;
 	if (configured) return configured;
-	if (Platform.OS === "web" && typeof window !== "undefined" && window.location?.hostname) {
-		const secure = window.location.protocol === "https:";
-		return `${secure ? "wss" : "ws"}://${window.location.hostname}:${debugServerPort}`;
-	}
-
 	const hostUri = Constants.expoConfig?.hostUri ?? "";
 	let host = "";
 	try {
