@@ -8,7 +8,7 @@ signal connection_changed(connected: bool)
 signal game_event_received(event: Dictionary)
 signal network_error(message: String)
 
-const PROTOCOL_VERSION := 1
+const protocolVersion := 1
 const DEFAULT_URL := "ws://127.0.0.1:8080"
 const URL_SETTING := "network/server_url"   ## optional Project Settings override
 const URL_ARG := "--server="                ## optional command-line override: -- --server=ws://...
@@ -71,7 +71,7 @@ func is_connected_to_server() -> bool:
 func send_message(type: String, fields: Dictionary = {}) -> bool:
 	if not _connected:
 		return false
-	var msg := {"type": type, "protocolVersion": PROTOCOL_VERSION}
+	var msg := {"type": type, "protocolVersion": protocolVersion}
 	msg.merge(fields)
 	return _ws.send_text(JSON.stringify(msg)) == OK
 

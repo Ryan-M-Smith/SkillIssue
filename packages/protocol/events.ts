@@ -1,4 +1,4 @@
-export const PROTOCOL_VERSION = 1 as const;
+export const protocolVersion = 1 as const;
 
 export type ClientType = "game" | "movement" | "aim";
 export type ControllerRole = "movement" | "aim";
@@ -31,20 +31,20 @@ export type EnvironmentAction =
 
 export type HelloMessage = {
     type: "hello";
-    protocolVersion: typeof PROTOCOL_VERSION;
+    protocolVersion: typeof protocolVersion;
     clientType: ClientType;
 };
 
 export type JoinGameMessage = {
     type: "join_game";
-    protocolVersion: typeof PROTOCOL_VERSION;
+    protocolVersion: typeof protocolVersion;
     pairingCode: string;
     requestedRole: ControllerRole;
 };
 
 export type StartGameMessage = {
     type: "start_game";
-    protocolVersion: typeof PROTOCOL_VERSION;
+    protocolVersion: typeof protocolVersion;
 };
 
 export type MotionInputMessage = {
@@ -71,7 +71,7 @@ export type ClientMessage =
 
 export type GameRegisteredMessage = {
     type: "game_registered";
-    protocolVersion: typeof PROTOCOL_VERSION;
+    protocolVersion: typeof protocolVersion;
     gameId: string;
     pairingCode: string;
     state: GameState;
