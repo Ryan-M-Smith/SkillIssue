@@ -100,7 +100,8 @@ func _run() -> void:
 	await _click(graphics_button)
 	if not _check(current_scene._graphics.is_open(), "main-menu settings modal opens"):
 		return
-	if not _check(current_scene._graphics._players != null and current_scene._graphics._players.item_count == 4, "settings offer players needed (1-4)"):
+	var count: HSlider = current_scene._graphics._players
+	if not _check(count != null and count.min_value == 1 and count.max_value == 4 and count.step == 1, "settings offer a player count slider (1-4)"):
 		return
 	await _click(_find_button(current_scene._graphics, "BACK"))
 	if not _check(not current_scene._graphics.is_open(), "mouse closes graphics modal"):

@@ -34,7 +34,7 @@ Each phone joins, selects an exclusive team/role slot and readies up:
 
 ## Match lifecycle
 
-`waiting` becomes `ready` when all required slots are taken and every slotted phone is ready. Normally four phones are required; use Godot's `-- --min-players=1` or the Node relay's `MIN_CONTROLLERS=1` for testing. The lobby counts down three seconds, then the host sends `start_game`. The server checks readiness again and broadcasts `playing`. Repeated starts and team changes during a match are rejected.
+`waiting` becomes `ready` when all required slots are taken and every slotted phone is ready. The host decides how many phones are required (1-4, **Settings → Player Count**, default 4): the game sends it as `minPlayers` in `hello` and with `set_min_players` when it changes, and every `lobby_state` reports it. The Node relay's `MIN_CONTROLLERS` is only the default for a host that doesn't send one. The lobby counts down three seconds, then the host sends `start_game`. The server checks readiness again and broadcasts `playing`. Repeated starts and team changes during a match are rejected.
 
 The host sends `match_status` about once per second: two team scores, `timeLeft` and `killTarget`. At ten kills or five minutes, it sends `end_game` with `winningTeam` (or null), scores and team statistics. Phones receive `match_ended`; `lobby_state` becomes `ended`.
 
