@@ -21,7 +21,7 @@ const movementGuide = [
 	["↓", "FLICK FORWARD", "A short flick away toggles crouch."],
 ];
 const gunnerGuide = [
-	["◎", "TILT TO AIM", "Tilt left / right or up / down to steer the view. Return toward neutral to stop."],
+	["◎", "TILT TO AIM", "Tip the top of the phone toward you to look up, away to look down. Dip the left or right end to look that way. Level out to stop."],
 	["●", "FIRE", "Hold the FIRE button to shoot."],
 	["⊕", "AIM", "Tap AIM to aim down sights (scope with the sniper). Tap again to stop."],
 	["↻", "RELOAD · SWITCH", "Tap RELOAD for a fresh magazine, SWITCH for your next gun."],

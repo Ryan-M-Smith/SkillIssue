@@ -615,7 +615,9 @@ export class MotionController {
 	/** Screen tilt steers the view continuously; return the phone to neutral to stop. */
 	private processGunner(gravity: MotionVector, frame: Frame, dt: number): GameControls {
 		const output: GameControls = { ...emptyControls, ready: true };
-		const vertical = -axes.forwardSign * rotationAbout(frame.down, gravity, frame.right);
+		// Tipping the top edge back toward you looks up; tipping it away looks down (like aiming
+		// through a viewfinder). This is the opposite sign of the Runner, where away walks forward.
+		const vertical = axes.forwardSign * rotationAbout(frame.down, gravity, frame.right);
 		const horizontal = axes.rightSign * rotationAbout(frame.down, gravity, frame.away);
 		const aim = aimFromTilt(horizontal, vertical);
 		output.lookX = clamp(aim.x / settings.aimMaxRate);

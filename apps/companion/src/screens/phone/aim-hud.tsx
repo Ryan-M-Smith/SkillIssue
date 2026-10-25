@@ -44,7 +44,7 @@ export function AimHud({ view, controls, weapon, firing = false, onFire, onAim, 
 						<View style={[styles.dot, { backgroundColor: firing ? ui.gold : ui.ink, transform: [{ translateX: controls.lookX * 50 }, { translateY: -controls.lookY * 50 }] }]} />
 					</View>
 					<Text style={[styles.action, { color: firing ? ui.gold : ui.ink }]}>{firing ? "FIRING" : controls.ready ? "TILT PHONE TO AIM" : "HOLD STILL"}</Text>
-					<Body color={ui.muted} size={12} style={styles.center}>Tilt left/right or up/down to steer. Return toward neutral to stop.</Body>
+					<Body color={ui.muted} size={12} style={styles.center}>Tip the top toward you to look up, away to look down; dip an end to look that way. Level out to stop.</Body>
 				</Panel>
 				<Panel style={styles.side}>
 					<View style={styles.weaponHeader}>
