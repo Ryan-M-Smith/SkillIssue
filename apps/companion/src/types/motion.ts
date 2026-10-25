@@ -34,6 +34,17 @@ export type GameControls = {
 	action: Action;
 };
 
+export type MotionDebug = {
+	calibration: "calibrating" | "ready";
+	pitchDeg: number;
+	sidePressDeg: number;
+	pitchRate: number;
+	sidePressRate: number;
+	sprintPhase: "idle" | "ramping" | "active" | "cooldown";
+	strafeMeters: number;
+	positionTracking: "missing" | "tracking";
+};
+
 export type Counts = Record<Exclude<Action, null>, number>;
 
 export type RawMotion = {
