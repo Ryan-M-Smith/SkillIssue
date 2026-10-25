@@ -534,6 +534,12 @@ use_collision = true
 size = Vector3(8.4, 1, 0.15)
 material = SubResource("m_rail")
 
+[node name="PitRail21-2" type="CSGBox3D" parent="Rails/PitRail01" unique_id=1150168597]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.070305, -0.1457262, -1.1238832)
+use_collision = true
+size = Vector3(0.15, 1, 2.223535)
+material = SubResource("m_rail")
+
 [node name="PitRail10" type="CSGBox3D" parent="Rails" unique_id=73726590]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9.075, 3.5, 6.3)
 use_collision = true
@@ -544,6 +550,12 @@ material = SubResource("m_rail")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9.075, 3.5, -4.8)
 use_collision = true
 size = Vector3(0.15, 1, 8.4)
+material = SubResource("m_rail")
+
+[node name="PitRail21-2" type="CSGBox3D" parent="Rails/PitRail11" unique_id=514199516]
+transform = Transform3D(-0.06309552, 0, -0.9980075, 0, 1, 0, 0.9980075, 0, -0.06309552, -1.0228853, -0.033729553, 4.210407)
+use_collision = true
+size = Vector3(0.15, 1, 2.1112428)
 material = SubResource("m_rail")
 
 [node name="PitRail20" type="CSGBox3D" parent="Rails" unique_id=1859166455]
@@ -558,6 +570,12 @@ use_collision = true
 size = Vector3(8.4, 1, 0.15)
 material = SubResource("m_rail")
 
+[node name="PitRail21-2" type="CSGBox3D" parent="Rails/PitRail21" unique_id=328601444]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.2173033, -0.018576622, 1.0035791)
+use_collision = true
+size = Vector3(0.15, 1, 2.223535)
+material = SubResource("m_rail")
+
 [node name="PitRail30" type="CSGBox3D" parent="Rails" unique_id=1400753602]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9.075, 3.5, -6.3)
 use_collision = true
@@ -568,6 +586,12 @@ material = SubResource("m_rail")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9.075, 3.5, 4.8)
 use_collision = true
 size = Vector3(0.15, 1, 8.4)
+material = SubResource("m_rail")
+
+[node name="PitRail21-2" type="CSGBox3D" parent="Rails/PitRail31" unique_id=632788973]
+transform = Transform3D(-0.009560245, 0, 0.9999543, 0, 1, 0, -0.9999543, 0, -0.009560245, 1.0839982, -0.018576622, -4.162507)
+use_collision = true
+size = Vector3(0.15, 1, 2.223535)
 material = SubResource("m_rail")
 
 [node name="Stairs" type="Node3D" parent="." unique_id=2051246809]
