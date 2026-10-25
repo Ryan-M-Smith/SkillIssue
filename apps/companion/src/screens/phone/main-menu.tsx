@@ -52,17 +52,17 @@ export function MainMenu({
 				<SlantButton label={settings ? "HIDE SETTINGS" : "SETTINGS"} small onPress={() => setSettings(!settings)} />
 				{settings && (
 					<View style={{ gap: 6 }}>
-						<Eyebrow>Host override (optional)</Eyebrow>
+						<Eyebrow>Practice debug stream</Eyebrow>
 						<TextInput
 							style={styles.input}
 							value={serverUrl}
 							onChangeText={onServerUrl}
 							autoCapitalize="none"
 							autoCorrect={false}
-							placeholder="wss://game.example.com"
+							placeholder="ws://192.168.1.20:8080"
 							placeholderTextColor={ui.muted}
 						/>
-						<Body size={12} color={ui.muted}>Your host is found automatically. A full lobby ticket also includes its address.</Body>
+						<Body size={12} color={ui.muted}>Only for streaming Practice motion to the web debugger. Lobbies are found automatically.</Body>
 					</View>
 				)}
 			</View>

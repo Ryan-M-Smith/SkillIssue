@@ -13,11 +13,11 @@ A 2v2 split-screen game where each team shares one character: one phone moves, t
    npm run companion:lan
    ```
 
-4. Open the app on each phone using the Expo instructions printed in the terminal. Keep phones and the game computer on the same Wi-Fi. Choose **Join a Lobby**, enter the six-character code, pick a team and role, and tap **Ready**.
-5. The code alone is enough: the app looks for the lobby on the public relay the game uses (from `skillissue.vodka/api/connection`), then on the game computer over Wi-Fi. If neither has it, paste the complete **lobby ticket** shown in Godot, such as `192.168.1.20:8080/T6YYH9`, which carries both the address and the code.
+4. Open the app on each phone using the Expo instructions printed in the terminal. Phones just need to be online. Choose **Join a Lobby**, enter the six-character code, pick a team and role, and tap **Ready**.
+5. Every lobby lives on the Skill Issue relay, so the code is all a phone needs: the app finds the relay through `skillissue.vodka/api/connection`, the same service the game uses to open its lobby. **Copy Code** in the lobby copies just the code.
 6. All four ready phones start a three-second countdown. After the match, choose **Play Again** on the game computer to keep the lobby, or return to the main menu.
 
-`npm run companion:start` uses an Expo tunnel when needed. That tunnel serves the app; the game connection still uses the local network and a lobby ticket. Host detection uses `EXPO_PUBLIC_GAME_SERVER` when set, otherwise the Expo LAN host or browser hostname. It never invents an IP address. Native builds also support `skillissue://join?server=<encoded-ws-url>&code=<CODE>` links.
+`npm run companion:start` uses an Expo tunnel when needed; the game connection goes through the relay either way. Set `EXPO_PUBLIC_GAME_SERVER` to point the app at a different relay. Native builds also support `skillissue://join?code=<CODE>` links.
 
 For an internet-accessible deployment, run the standalone relay behind a TLS reverse proxy and set `EXPO_PUBLIC_GAME_SERVER` to its `wss://` URL. See [Internet connection](docs/internet-connection.md). Tiger Data is used for durable data and telemetry, not live WebSocket transport.
 
@@ -29,7 +29,7 @@ Godot now asks `https://skillissue.vodka/api/games` to provision a game, then co
 
 When deploying `apps/server` on Render, use `npm install` as the build command and `npm run server:start` as the start command. No pnpm or Corepack setup is required.
 
-Joining fails with a useful retry message after ten seconds. Keep the lobby open and use a fresh ticket when retrying. An HTTPS browser page needs a `wss://` host; the native app can connect directly to the local `ws://` game.
+Joining fails with a useful retry message after ten seconds. A wrong code says so right away. An HTTPS browser page needs a `wss://` host; the native app can connect directly to the local `ws://` game.
 
 If the game loses its server session during a match, it returns to a fresh lobby. Join its new code and ready up to start again.
 
@@ -74,7 +74,7 @@ npm run typecheck
 npm run lint
 ```
 
-Node.js 24 is recommended because network tests use its built-in TypeScript stripping. `npm test` covers motion, lobby tickets, connection lifecycle, protocol authority and relay limits. Set `GODOT_BIN` to include real WebSocket tests against the embedded Godot server. Import the project first on a fresh checkout. PowerShell example:
+Node.js 24 is recommended because network tests use its built-in TypeScript stripping. `npm test` covers motion, lobby codes and relay lookup, connection lifecycle, protocol authority and relay limits. Set `GODOT_BIN` to include real WebSocket tests against the embedded Godot server. Import the project first on a fresh checkout. PowerShell example:
 
 ```powershell
 $env:GODOT_BIN = "C:\tools\Godot_v4.7.2-stable_win64_console.exe"

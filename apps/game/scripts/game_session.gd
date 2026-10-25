@@ -82,10 +82,13 @@ func request_start() -> bool:
 	return NetworkClient.send_message("start_game")
 
 
-## Opens a lobby on the server inside this game (LobbyServer) and hosts it. The server
-## replies with the join code (`registered`). Await it; check `pairing_code`.
-## With `-- --server=ws://...`, or when another server already holds the port, the game
-## connects to that server over WebSocket instead.
+## Opens a lobby on the Skill Issue relay: asks the control plane (network/control_plane_url)
+## for a game, then connects to it. Phones find the same relay and join with the code.
+## The server replies with the join code (`registered`). Await it; check `pairing_code`.
+## No local fallback: phones only look on the relay, so a lobby hosted here couldn't be
+## joined. On failure, `server_error` says why and the lobby screen offers Retry.
+## For development: `-- --server=ws://...` connects to a given server; clearing the control
+## plane setting hosts the lobby inside this game (LobbyServer).
 func create_lobby() -> void:
 	var override := NetworkClient.configured_override()
 	if not override.is_empty():
@@ -96,7 +99,7 @@ func create_lobby() -> void:
 		var provisioned := await _provision_game(control_plane)
 		if not provisioned.is_empty():
 			NetworkClient.connect_to_server(provisioned)
-			return
+		return
 	await LobbyServer.ensure_running()
 	if LobbyServer.is_local():
 		NetworkClient.connect_local()
@@ -113,16 +116,16 @@ func _provision_game(control_plane: String) -> String:
 	var request_error := request.request(endpoint, ["Content-Type: application/json"], HTTPClient.METHOD_POST, "{}")
 	if request_error != OK:
 		request.queue_free()
-		server_error.emit("Could not reach the game control plane (%d)." % request_error)
+		server_error.emit("Can't reach the Skill Issue servers (error %d). Check the internet connection, then Retry." % request_error)
 		return ""
 	var result: Array = await request.request_completed
 	request.queue_free()
 	if result.size() < 4 or int(result[1]) < 200 or int(result[1]) >= 300:
-		server_error.emit("The game control plane could not create a session.")
+		server_error.emit("The Skill Issue servers couldn't open a lobby right now. Try again in a moment.")
 		return ""
 	var payload: Variant = JSON.parse_string((result[3] as PackedByteArray).get_string_from_utf8())
 	if typeof(payload) != TYPE_DICTIONARY or typeof(payload.get("websocketUrl")) != TYPE_STRING:
-		server_error.emit("The game control plane returned an invalid session.")
+		server_error.emit("The Skill Issue servers sent an unexpected reply. Try again in a moment.")
 		return ""
 	return str(payload.websocketUrl)
 

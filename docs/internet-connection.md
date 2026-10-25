@@ -52,13 +52,13 @@ EXPO_PUBLIC_GAME_SERVER=wss://game.example.com npm run companion:start
 
 The Vercel app exposes the current public connection metadata at `/api/connection`. Godot or an admin surface can use that HTTP endpoint to discover the configured relay, but the actual motion stream must connect directly to the returned `wss://` URL.
 
-Godot can provision a session by sending `POST /api/games`. The response contains a UUID `gameId` and a route such as `wss://game.example.com/games/<gameId>`. Godot connects to that route, receives the normal six-character pairing code, and displays a full WSS ticket for phones. Set the Godot `network/control_plane_url` project setting or launch with `-- --control-plane=https://landing.example.com`.
+Godot can provision a session by sending `POST /api/games`. The response contains a UUID `gameId` and a route such as `wss://game.example.com/games/<gameId>`. Godot connects to that route, receives the normal six-character pairing code, and shows just that code. Phones look up the same relay from `/api/connection` and join with the code. Set the Godot `network/control_plane_url` project setting or launch with `-- --control-plane=https://landing.example.com`.
 
-Users can also paste a complete ticket such as `wss://game.example.com?code=ABC123`. The companion now retries transient socket failures with exponential backoff and replays its selected team, role, and ready state after reconnecting.
+The companion retries transient socket failures with exponential backoff and replays its selected team, role, and ready state after reconnecting.
 
 ## Local fallback
 
-LAN development remains supported with `ws://<local-ip>:8080`. The companion still accepts a full LAN ticket from the Godot lobby. No TLS certificate is needed for native local development; HTTPS web builds require `wss://`.
+For local development, run the relay with `npm run server:start`, start Godot with `-- --server=ws://<your-ip>:8080`, and the companion with `EXPO_PUBLIC_GAME_SERVER=ws://<your-ip>:8080`. Players never get a LAN fallback.
 
 ## Operational notes
 

@@ -1,7 +1,8 @@
 import assert from "node:assert/strict";
 import { afterEach, beforeEach, test } from "node:test";
 import { LobbyClient } from "../src/service/lobby-client.ts";
-import { parseJoinTicket } from "../src/lib/net/join-ticket.ts";
+import { normalizeLobbyCode } from "../src/lib/net/lobby-code.ts";
+import { publicGameServer, resetPublicGameServer } from "../src/lib/net/relay.ts";
 
 class Socket {
 	static OPEN = 1;
@@ -36,20 +37,33 @@ function connect(role: "aim" | "movement" = "aim") {
 const controls = { ready: true, moveX: 0.5, moveY: 1, lookX: 0, lookY: 0, sprint: false, crouch: false, action: null } as const;
 const reading = { rotation: { alpha: 0, beta: 0, gamma: 0 }, rotationRate: null, acceleration: null, accelerationIncludingGravity: { x: 0, y: 0, z: -9.81 } };
 
-test("join tickets resolve codes, LAN addresses, IPv6, secure and app links", () => {
-	assert.deepEqual(parseJoinTicket(" abc123 ", "ws://localhost:8080"), { code: "ABC123", serverUrl: "ws://localhost:8080/" });
-	assert.deepEqual(parseJoinTicket("192.168.1.25:8080/abc123"), { code: "ABC123", serverUrl: "ws://192.168.1.25:8080/" });
-	assert.equal(parseJoinTicket("[::1]:8080/ABC123").serverUrl, "ws://[::1]:8080/");
-	assert.equal(parseJoinTicket("https://host.example/ABC123").serverUrl, "wss://host.example/");
-	assert.equal(parseJoinTicket("wss://host.example/game/ABC123").serverUrl, "wss://host.example/game");
-	assert.equal(parseJoinTicket("wss://host.example/game?code=ABC123&region=us").serverUrl, "wss://host.example/game?region=us");
-	assert.deepEqual(parseJoinTicket("skillissue://join?server=wss%3A%2F%2Fhost.example&code=abc123"), { code: "ABC123", serverUrl: "wss://host.example/" });
-	assert.deepEqual(parseJoinTicket("https://controller.example/join?server=wss%3A%2F%2Fhost.example&code=abc123"), { code: "ABC123", serverUrl: "wss://host.example/" });
+test("lobby codes are six letters or digits, any case, spaces ignored", () => {
+	assert.equal(normalizeLobbyCode(" abc123 "), "ABC123");
+	assert.equal(normalizeLobbyCode("abc-123"), "ABC123");
+	for (const bad of ["", "ABC12", "ABC1234", "wss://host.example/ABC123", "ABC!23"]) assert.throws(() => normalizeLobbyCode(bad), /6-character code/);
 });
-test("bad tickets fail with actionable errors before opening a socket", () => {
-	assert.throws(() => parseJoinTicket("ABC123"), /full lobby ticket/);
-	for (const ticket of ["bad", "javascript://host/ABC123", "ws://user:secret@host/ABC123", "host:8080/SHORT", "companion://join?code=ABC123&server=https://host"]) assert.throws(() => parseJoinTicket(ticket));
+
+test("the relay comes from EXPO_PUBLIC_GAME_SERVER, else the control plane", async () => {
+	try {
+		process.env.EXPO_PUBLIC_GAME_SERVER = "wss://configured.example.com";
+		assert.equal(await publicGameServer(async () => { throw new Error("not called"); }), "wss://configured.example.com");
+		delete process.env.EXPO_PUBLIC_GAME_SERVER;
+		const asked: string[] = [];
+		const fake = (async (url: string) => {
+			asked.push(url);
+			return new Response(JSON.stringify({ websocketUrl: "wss://relay.example.com", configured: true }));
+		}) as unknown as typeof fetch;
+		assert.equal(await publicGameServer(fake), "wss://relay.example.com");
+		assert.deepEqual(asked, ["https://skillissue.vodka/api/connection"]);
+		resetPublicGameServer();
+		const down = (async () => { throw new Error("offline"); }) as unknown as typeof fetch;
+		assert.equal(await publicGameServer(down), "");
+	} finally {
+		delete process.env.EXPO_PUBLIC_GAME_SERVER;
+		resetPublicGameServer();
+	}
 });
+
 test("join retries after timeout and permits a new attempt", (t) => {
 	t.mock.timers.enable({ apis: ["setTimeout", "setInterval", "Date"], now: 1000 });
 	const client = new LobbyClient("ws://localhost:8080", "ios"); clients.push(client);
