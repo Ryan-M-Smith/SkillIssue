@@ -107,6 +107,8 @@ export class LobbyClient {
 		private readonly url: string,
 		private readonly platform: string,
 		private readonly onChange: (view: LobbyView) => void = () => {},
+		/** The game buzzed this phone (its team took damage). */
+		private readonly onBuzz: () => void = () => {},
 	) {}
 
 	get snapshot(): LobbyView { return this.view; }
@@ -327,6 +329,10 @@ export class LobbyClient {
 				return;
 			case "controller_feedback": {
 				const f = message.message;
+				if (f?.t === "buzz") {
+					if (this.view.stage === "playing" && this.view.state !== "paused") this.onBuzz();
+					return;
+				}
 				if (!f || f.t !== "state") return;
 				const maxHp = bounded(f.max_hp, 100, 1, 10000);
 				const magazineSize = Math.floor(bounded(f.magazine_size, 0, 0, 1000));

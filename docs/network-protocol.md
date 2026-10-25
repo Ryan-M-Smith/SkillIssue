@@ -94,7 +94,7 @@ Feedback is implemented in both servers. The host sends:
 {"type":"to_controller","controllerId":"controller_...","message":{"t":"state","hp":75,"max_hp":100,"alive":true,"weapon":0,"owned":[true,false,false],"ammo":8,"magazine_size":12,"reloading":false,"reload_progress":0}}
 ```
 
-The server permits only host-originated `state` or `buzz` messages, limited to 4096 characters, addressed to a controller in that host's lobby. The phone receives `{"type":"controller_feedback","message":{...}}`. State includes health, ownership, scope, ammo and reload progress; phone HUDs consume it and weapon cycling skips unowned weapons. `buzz` is available on the transport; device vibration is not currently implemented.
+The server permits only host-originated `state` or `buzz` messages, limited to 4096 characters, addressed to a controller in that host's lobby. The phone receives `{"type":"controller_feedback","message":{...}}`. State includes health, ownership, scope, ammo and reload progress; phone HUDs consume it and weapon cycling skips unowned weapons. `buzz` makes the phone play a damage haptic (the app ignores it while paused).
 
 ## Practice and debugging
 

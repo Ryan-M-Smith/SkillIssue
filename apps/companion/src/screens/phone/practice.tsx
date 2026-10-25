@@ -7,6 +7,7 @@ import { DebugLink, idleLinkStatus, type DebugLinkStatus } from "@/service/debug
 import { MotionTally, directionOf, zeroCounts, type Counts, type MovementState } from "@/lib/motion-summary";
 import { defaultDebugRoom } from "@/lib/net/server-url";
 import { useMotionAccess } from "@/lib/motion-permission";
+import { gestureCue, haptic, type Cue } from "@/lib/haptics";
 import { MotionAccessPrompt } from "./motion-access";
 import type { GameControls, Grip, Role } from "@/types/motion";
 import { Body, Eyebrow, Panel, Script, SlantButton, SplitBackground, Title } from "./kit";
@@ -28,6 +29,7 @@ const gunnerGuide = [
 const movementStats: [keyof Counts, string][] = [["jumps", "JUMPS"], ["crouches", "CROUCHES"], ["sprints", "SPRINTS"], ["movements", "MOVES"]];
 const freshTaps = { fire: 0, aim: 0, reload: 0, switch: 0 };
 type GunnerButton = keyof typeof freshTaps;
+const buttonCues: Record<GunnerButton, Cue> = { fire: "fire", aim: "select", reload: "tap", switch: "select" };
 const subscribeHydration = () => () => {};
 const clientSnapshot = () => true;
 const serverSnapshot = () => false;
@@ -54,6 +56,7 @@ export function Practice({ serverUrl, onBack }: { serverUrl: string; onBack: () 
 	const tallyRef = useRef(new MotionTally());
 	const debugRef = useRef<DebugLink | null>(null);
 	const lastDrawRef = useRef(0);
+	const calibratedRef = useRef(false);
 
 	const { access, request } = useMotionAccess(true);
 	const allowed = access === "granted";
@@ -71,6 +74,11 @@ export function Practice({ serverUrl, onBack }: { serverUrl: string; onBack: () 
 					const now = Date.now();
 					const output = controllerRef.current.process(reading, now);
 					tallyRef.current.add(output, now);
+					// Same haptics as a live match, so practice teaches the feel too.
+					const cue = gestureCue(output.action);
+					if (cue) haptic(cue);
+					if (output.ready && !calibratedRef.current) haptic("calibrated");
+					calibratedRef.current = output.ready;
 					debugRef.current?.sendReading(reading);
 					if (now - lastDrawRef.current >= 50 || output.action) {
 						lastDrawRef.current = now;
@@ -96,7 +104,9 @@ export function Practice({ serverUrl, onBack }: { serverUrl: string; onBack: () 
 		debugRef.current?.sendEvent("reset_counts");
 	}
 	function recalibrate() {
+		haptic("tap");
 		controllerRef.current.reset();
+		calibratedRef.current = false;
 		setControls({ ...emptyControls });
 		setState("Calibrating");
 		setGrip(null);
@@ -108,6 +118,8 @@ export function Practice({ serverUrl, onBack }: { serverUrl: string; onBack: () 
 	}
 	function pickRole(next: Role) {
 		if (next === role) return;
+		haptic("select");
+		calibratedRef.current = false;
 		setRole(next);
 		controllerRef.current = new MotionController(next, Platform.OS);
 		resetCounts();
@@ -135,6 +147,7 @@ export function Practice({ serverUrl, onBack }: { serverUrl: string; onBack: () 
 		? movementStats.map(([key, label]) => [label, counts[key]])
 		: [["SHOTS", taps.fire], ["AIMS", taps.aim], ["RELOADS", taps.reload], ["SWITCHES", taps.switch]];
 	const tap = (button: GunnerButton, label: string) => {
+		haptic(buttonCues[button]);
 		setTaps((previous) => ({ ...previous, [button]: previous[button] + 1 }));
 		setLastAction(label);
 	};

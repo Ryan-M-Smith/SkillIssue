@@ -29,6 +29,8 @@ Joining times out after ten seconds and offers a retry instead of waiting indefi
 
 Hold the phone at a comfortable angle; it calibrates in a moment, follows slow grip changes while resting, and re-calibrates by itself after a new grip, so **Recenter** is rarely needed. Practice and the live match use the same model. Both ask for motion access explicitly (**Allow Motion**) and, when it was denied, explain how to turn it on in Settings.
 
+The phone confirms what it did with haptics (`expo-haptics`, works in Expo Go): a tap for buttons and picks, distinct pulses for jump, crouch and the sprint twist, a heavy thump on FIRE and whenever your team takes damage (the game's existing buzz), plus cues for calibration, an empty magazine, reload done, elimination, respawn, joining, Ready, kickoff and the final result. Practice uses the same haptics.
+
 | Role | Motion | Result |
 | --- | --- | --- |
 | Runner | Gentle forward/back tilt | Walk; 5-degree deadzone, full speed at 20 degrees |
