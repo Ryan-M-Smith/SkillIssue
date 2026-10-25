@@ -2,10 +2,10 @@ import { Pressable, StyleSheet, Text, View } from "react-native";
 
 import type { GameControls } from "@/types/motion";
 import type { LobbyView } from "@/service/lobby-client";
-import { Body, Eyebrow, Panel, SlantButton } from "./kit";
+import { Body, Eyebrow, Panel, SlantButton, SplitBackground } from "./kit";
 import { MatchBar } from "./match-bar";
 import { LiveVitals } from "./live-vitals";
-import { fonts, teamColor, teamTint, ui } from "./theme";
+import { fonts, teamColor, ui } from "./theme";
 
 const weapons = ["PISTOL", "SHOTGUN", "SNIPER"];
 /**
@@ -30,25 +30,26 @@ export function AimHud({ view, controls, weapon, firing = false, onFire, onAim, 
 	const scoped = !!feedback?.scoped;
 	return (
 		<View style={styles.screen}>
+			<SplitBackground />
 			<MatchBar view={view} role="Gunner · turn to aim" calibrated={controls.ready} />
 			<View style={styles.row}>
-				<Panel border={color} fill={teamTint(team, 0.08)} style={styles.scope}>
+				<Panel style={[styles.scope, { borderLeftWidth: 4, borderLeftColor: color }]}>
 					<View style={styles.scopeTop}>
-						<Eyebrow color={color}>GYRO LINK</Eyebrow>
+						<Eyebrow color={ui.soft}>GYRO LINK</Eyebrow>
 						<Eyebrow color={controls.ready ? ui.ready : ui.gold}>{controls.ready ? "LIVE" : "HOLD STILL"}</Eyebrow>
 					</View>
 					<View style={styles.reticle}>
-						<View style={[styles.ring, { borderColor: firing ? ui.gold : color }]} />
+						<View style={[styles.ring, { borderColor: firing ? ui.gold : ui.soft }]} />
 						<View style={styles.crossH} />
 						<View style={styles.crossV} />
-						<View style={[styles.dot, { backgroundColor: color, transform: [{ translateX: controls.lookX * 50 }, { translateY: -controls.lookY * 50 }] }]} />
+						<View style={[styles.dot, { backgroundColor: firing ? ui.gold : ui.ink, transform: [{ translateX: controls.lookX * 50 }, { translateY: -controls.lookY * 50 }] }]} />
 					</View>
 					<Text style={[styles.action, { color: firing ? ui.gold : ui.ink }]}>{firing ? "FIRING" : controls.ready ? "TURN THE PHONE TO AIM" : "HOLD STILL"}</Text>
 					<Body color={ui.muted} size={12} style={styles.center}>The camera turns exactly as far as your phone does.</Body>
 				</Panel>
 				<Panel style={styles.side}>
 					<View style={styles.weaponHeader}>
-						<View style={[styles.weaponIcon, { borderColor: color }]}><View style={[styles.barrel, { backgroundColor: color, width: weapon === 2 ? 38 : 26 }]} /><View style={[styles.grip, { backgroundColor: color }]} /></View>
+						<View style={styles.weaponIcon}><View style={[styles.barrel, { width: weapon === 2 ? 38 : 26 }]} /><View style={styles.grip} /></View>
 						<View><Eyebrow>ACTIVE KIT</Eyebrow><Text style={styles.weapon}>{weapons[weapon] ?? weapons[0]}</Text></View>
 						<View style={styles.ammoBlock}><Text style={[styles.ammo, feedback && feedback.ammo <= 2 && { color: ui.red }]}>{feedback?.ammo ?? "–"}<Text style={styles.magSize}> / {feedback?.magazine_size ?? "–"}</Text></Text><Eyebrow>{feedback?.scoped ? "SCOPED" : "MAGAZINE"}</Eyebrow></View>
 					</View>
@@ -59,7 +60,7 @@ export function AimHud({ view, controls, weapon, firing = false, onFire, onAim, 
 					<View style={styles.buttons}>
 						<View style={styles.smallButtons}>
 							{/* Only the sniper has a scope to aim down. */}
-							<SlantButton label={scoped ? "AIMING" : weapon === 2 ? "AIM" : "AIM · SNIPER"} small color={scoped ? color : undefined} disabled={weapon !== 2 && !scoped} onPress={onAim} style={styles.small} />
+							<SlantButton label={scoped ? "AIMING" : weapon === 2 ? "AIM" : "AIM · SNIPER"} small color={scoped ? ui.ink : undefined} disabled={weapon !== 2 && !scoped} onPress={onAim} style={styles.small} />
 							<SlantButton label="RELOAD" small onPress={onReload} disabled={!!feedback?.reloading} style={styles.small} />
 							<SlantButton label="SWITCH" small onPress={onSwitch} style={styles.small} />
 						</View>
@@ -68,7 +69,7 @@ export function AimHud({ view, controls, weapon, firing = false, onFire, onAim, 
 							onPressOut={() => onFire(false)}
 							accessibilityRole="button"
 							accessibilityLabel="Fire"
-							style={[styles.fire, { borderColor: color, backgroundColor: firing ? color : teamTint(team, 0.25) }]}
+							style={[styles.fire, { borderBottomColor: color, backgroundColor: firing ? ui.ink : ui.panel2 }]}
 						>
 							<Text style={[styles.fireText, { color: firing ? ui.bg : ui.ink }]}>FIRE</Text>
 						</Pressable>
@@ -103,13 +104,13 @@ const styles = StyleSheet.create({
 	reloadRing: { height: 32, width: 32, alignItems: "center", justifyContent: "center" },
 	reloadSegment: { position: "absolute", height: 4, width: 3, borderRadius: 1 },
 	reloadPercent: { fontFamily: fonts.bodyBold, color: ui.gold, fontSize: 9 },
-	weaponIcon: { width: 48, height: 38, borderWidth: 1, borderRadius: 6, alignItems: "center", justifyContent: "center" },
-	barrel: { height: 7, marginTop: -5 },
-	grip: { width: 8, height: 12, marginRight: 14, transform: [{ skewX: "-16deg" }] },
+	weaponIcon: { width: 48, height: 38, borderWidth: 1, borderColor: ui.line, borderRadius: 0, alignItems: "center", justifyContent: "center" },
+	barrel: { height: 7, marginTop: -5, backgroundColor: ui.ink },
+	grip: { width: 8, height: 12, marginRight: 14, backgroundColor: ui.ink, transform: [{ skewX: "-16deg" }] },
 	buttons: { flex: 1, flexDirection: "row", gap: 10, minHeight: 90 },
 	smallButtons: { flex: 1, justifyContent: "space-between", gap: 6 },
 	small: { flex: 1 },
-	fire: { flex: 1.15, borderWidth: 2, borderRadius: 14, alignItems: "center", justifyContent: "center" },
+	fire: { flex: 1.15, borderWidth: 1, borderColor: ui.ink, borderBottomWidth: 4, borderRadius: 0, alignItems: "center", justifyContent: "center" },
 	fireText: { fontFamily: fonts.display, fontSize: 26, letterSpacing: 2 },
 	recenter: { alignSelf: "flex-end" },
 });

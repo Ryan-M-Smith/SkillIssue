@@ -3,19 +3,20 @@ import { StyleSheet, Text, View } from "react-native";
 import type { Counts, Direction, MovementState } from "@/lib/motion-summary";
 import type { GameControls } from "@/types/motion";
 import type { LobbyView } from "@/service/lobby-client";
-import { Eyebrow, Panel, SlantButton } from "./kit";
+import { Eyebrow, Panel, Script, SlantButton, SplitBackground } from "./kit";
 import { MatchBar } from "./match-bar";
 import { LiveVitals } from "./live-vitals";
-import { fonts, teamColor, teamTint, ui } from "./theme";
+import { fonts, teamColor, ui } from "./theme";
 
 const stateColor: Record<MovementState, string> = {
-	Calibrating: ui.gold,
+	// Noir: off-white type; only calibrating is dimmed.
+	Calibrating: ui.muted,
 	Standing: ui.ink,
-	Walking: ui.blue,
-	Sprinting: ui.ready,
-	Crouching: ui.gold,
-	"Crouch-walking": ui.gold,
-	Jumping: ui.ready,
+	Walking: ui.ink,
+	Sprinting: ui.gold,
+	Crouching: ui.soft,
+	"Crouch-walking": ui.soft,
+	Jumping: ui.gold,
 };
 
 const countLabels: [keyof Counts, string][] = [
@@ -43,13 +44,14 @@ export function MovementHud({
 	const team = view.me?.teamId ?? 1;
 	return (
 		<View style={styles.screen}>
+			<SplitBackground />
 			<MatchBar view={view} role="Runner · movement phone" calibrated={controls.ready} />
 			<View style={styles.row}>
-				<Panel style={styles.main} border={teamColor(team)} fill={teamTint(team, 0.1)}>
-					<Eyebrow>Now</Eyebrow>
+				<Panel style={[styles.main, { borderLeftWidth: 4, borderLeftColor: teamColor(team) }]}>
+					<Script size={18}>right now…</Script>
 					<Text style={[styles.state, { color: stateColor[state] }]} numberOfLines={1} adjustsFontSizeToFit>{state}</Text>
 					<View style={styles.dirRow}>
-						<Text style={[styles.arrow, { color: teamColor(team) }]}>{direction.arrow}</Text>
+						<Text style={styles.arrow}>{direction.arrow}</Text>
 						<Text style={styles.dir}>{direction.label}</Text>
 					</View>
 					<LiveVitals feedback={view.feedback} color={teamColor(team)} />
@@ -79,9 +81,9 @@ const styles = StyleSheet.create({
 	screen: { flex: 1, padding: 12, gap: 10 },
 	row: { flex: 1, flexDirection: "row", gap: 10 },
 	main: { flex: 1.3, justifyContent: "space-between" },
-	state: { fontFamily: fonts.display, fontSize: 46, color: ui.ink },
+	state: { fontFamily: fonts.display, fontSize: 46, color: ui.ink, textShadowColor: "#2A2A2A", textShadowOffset: { width: 3, height: 4 }, textShadowRadius: 0 },
 	dirRow: { flexDirection: "row", alignItems: "center", gap: 12 },
-	arrow: { fontFamily: fonts.display, fontSize: 44, width: 48, textAlign: "center" },
+	arrow: { fontFamily: fonts.display, fontSize: 44, width: 48, textAlign: "center", color: ui.ink },
 	dir: { fontFamily: fonts.displaySemi, fontSize: 22, color: ui.ink },
 	flags: { flexDirection: "row", gap: 8 },
 	flag: { flex: 1, textAlign: "center", fontFamily: fonts.bodyBold, fontSize: 12, letterSpacing: 1, color: ui.muted, borderWidth: 1.5, borderColor: ui.line, borderRadius: 12, paddingVertical: 5, overflow: "hidden" },
