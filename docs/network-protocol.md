@@ -41,11 +41,23 @@ The server reports `waiting` until all four slots are assigned, then `ready`. Go
 
 The server accepts that request only from the registered game host and only when all four slots are occupied. It then broadcasts the authoritative state.
 
+Godot sends `start_game` on its own as soon as the lobby reports `ready` (`GameSession.auto_start`, on by default). Until the match starts, the `LobbyOverlay` autoload shows the join code, the server address phones should use (when the server runs on the same computer), and how many phones have joined.
+
+To test with fewer than four phones, start the server with `MIN_CONTROLLERS` set, for example `MIN_CONTROLLERS=1 npm run server:start`. The lobby is then `ready`, and the match starts, as soon as that many controllers have joined. The default is 4.
+
 ## Input authority
 
 Controllers send `motion` or `environment` messages without a trusted sender field. The server derives `sender` from the authenticated WebSocket connection and forwards authorized input only to Godot. Input sent before `playing` is rejected with a structured error.
 
 When a controller disconnects, the server sends `controller_disconnected` to the game, removes the slot, and returns the lobby to `waiting`. If the game host disconnects, the session is invalidated and controller connections are closed.
+
+## Companion movement phone
+
+The companion app runs in landscape, held like a controller. Its **Game** panel takes the server address and the 6-digit join code from the game, and joins with `requestedRole: "movement"`. Once the match is `playing` it sends:
+
+- `motion` at 30 Hz with `payload.controls` (`moveX`, `moveY` from the phone's own motion model, `lookX`/`lookY` 0) plus the raw `accelerometer` (with gravity, m/s²) and `gyroscope` (phone axes, rad/s). Godot uses `controls` when present.
+- `environment` `jump` with `pressed: true` for each jump.
+- `environment` `crouch` and `sprint` with `pressed` set to the new state each time it changes, and once more when the match starts, so the game's held states match the phone.
 
 ## Debug relay (phone to web debugger)
 
@@ -109,4 +121,4 @@ expo-sensors orders `DeviceMotion.rotationRate` differently per platform (iOS: a
 
 - **Phone feedback.** `PhoneDuoController` wants to send health/weapon state and a hit vibration to each team's phones. The server currently rejects unknown types, so Godot keeps this off (`InputRouter.feedback_enabled = false`). Proposal: Godot sends `{"type":"to_controller","controllerId":"...","message":{...}}`, the server forwards `message` to that controller.
 - **`scope` and `weapon` actions** for the aim phone (`weapon` with a `slot` number: 0 pistol, 1 shotgun, 2 sniper). Godot already accepts them.
-- **`controls`** in the motion payload (`moveX`, `moveY`, `lookX`, `lookY`, each −1..1) if the companion prefers to send its own computed values. Godot uses them over raw readings when present.
+- (Implemented) **`controls`** in the motion payload (`moveX`, `moveY`, `lookX`, `lookY`, each −1..1). The companion's movement phone sends them; Godot uses them over raw readings when present.

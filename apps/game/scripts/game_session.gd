@@ -24,6 +24,9 @@ const ROLE_ALIASES := {
 
 ## The protocol numbers teams 1 and 2; the game's TeamData ids are 0 (blue) and 1 (red).
 @export var server_team_offset := 1
+## Ask the server to start the match as soon as the lobby is ready (all four
+## slots, or fewer when the server runs with MIN_CONTROLLERS).
+@export var auto_start := true
 
 var game_id := ""
 var pairing_code := ""
@@ -179,6 +182,8 @@ func _set_state(new_state: String) -> void:
 	if new_state != state:
 		state = new_state
 		state_changed.emit(state)
+		if state == "ready" and auto_start:
+			request_start.call_deferred()
 
 
 ## Losing the server invalidates the session: the server drops it when the host leaves,
