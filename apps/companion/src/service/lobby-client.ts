@@ -31,7 +31,6 @@ export const idleLobby: LobbyView = {
 };
 
 const motionHz = 30;
-const tapMs = 120;
 const reconnectDelaysMs = [500, 1000, 2000, 4000, 8000];
 /** Tries before a first join gives up (a lobby we were in keeps retrying). */
 const firstJoinAttempts = 3;
@@ -75,7 +74,8 @@ export class LobbyClient {
 	private view: LobbyView = { ...idleLobby };
 	private timer: ReturnType<typeof setInterval> | null = null;
 	private joinTimer: ReturnType<typeof setTimeout> | null = null;
-	private shotTimer: ReturnType<typeof setTimeout> | null = null;
+	/** Gunner is holding FIRE (sent as shoot pressed; released on lift-off). */
+	private firing = false;
 	private reconnectTimer: ReturnType<typeof setTimeout> | null = null;
 	private reconnectAttempt = 0;
 	/** Got lobby_joined at least once since join() was called (reconnects keep it). */
@@ -198,24 +198,39 @@ export class LobbyClient {
 		if (this.view.me?.role === "movement") {
 			if (controls.action === "jump") this.sendAction("jump", true);
 			this.syncHeld(controls);
-		} else if (this.view.me?.role === "aim") {
-			switch (controls.action) {
-				case "shoot":
-					if (this.shotTimer) clearTimeout(this.shotTimer);
-					this.sendAction("shoot", true);
-					this.shotTimer = setTimeout(() => { this.shotTimer = null; this.sendAction("shoot", false); }, tapMs);
-					break;
-				case "reload": this.sendAction("reload", true); break;
-				case "scope": this.sendAction("scope", true); break;
-				case "weapon_next": {
-					const owned = this.view.feedback?.owned ?? [true, false, false];
-					for (let step = 1; step <= owned.length; step++) {
-						const slot = (this.weapon + step) % owned.length;
-						if (owned[slot]) { this.selectWeapon(slot); break; }
-					}
-					break;
-				}
-			}
+		}
+		// The gunner's phone only aims (sendMotion); its actions are buttons, below.
+	}
+
+	/** Gunner can act: in a running match, holding the aim role. */
+	private gunnerLive() {
+		return this.view.stage === "playing" && this.view.state !== "paused" && this.view.me?.role === "aim";
+	}
+
+	/** Gunner: FIRE held down (true) or released (false). */
+	setFiring(down: boolean) {
+		if (down === this.firing || (down && !this.gunnerLive())) return;
+		this.firing = down;
+		this.sendAction("shoot", down);
+	}
+
+	/** Gunner: AIM button (toggles aiming down sights / the sniper scope). */
+	toggleAim() {
+		if (this.gunnerLive()) this.sendAction("scope", true);
+	}
+
+	/** Gunner: RELOAD button. */
+	reload() {
+		if (this.gunnerLive()) this.sendAction("reload", true);
+	}
+
+	/** Gunner: SWITCH button: the next gun this duo owns. */
+	nextWeapon() {
+		if (!this.gunnerLive()) return;
+		const owned = this.view.feedback?.owned ?? [true, false, false];
+		for (let step = 1; step <= owned.length; step++) {
+			const slot = (this.weapon + step) % owned.length;
+			if (owned[slot]) { this.selectWeapon(slot); break; }
 		}
 	}
 
@@ -323,8 +338,7 @@ export class LobbyClient {
 			// Lobby gestures and pre-pause readings must never move a fresh match.
 			this.latest = null;
 			this.latestReading = null;
-			if (this.shotTimer) clearTimeout(this.shotTimer);
-			this.shotTimer = null;
+			this.firing = false;
 		}
 	}
 
@@ -350,9 +364,8 @@ export class LobbyClient {
 	private stop() {
 		this.clearJoinTimer();
 		if (this.timer) clearInterval(this.timer);
-		if (this.shotTimer) clearTimeout(this.shotTimer);
 		this.timer = null;
-		this.shotTimer = null;
+		this.firing = false;
 		this.sentCrouch = false;
 		this.sentSprint = false;
 		this.latest = null;

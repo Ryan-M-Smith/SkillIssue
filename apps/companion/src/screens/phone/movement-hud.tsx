@@ -43,7 +43,7 @@ export function MovementHud({
 	const team = view.me?.teamId ?? 1;
 	return (
 		<View style={styles.screen}>
-			<MatchBar view={view} role="Movement phone" calibrated={controls.ready} />
+			<MatchBar view={view} role="Runner · movement phone" calibrated={controls.ready} />
 			<View style={styles.row}>
 				<Panel style={styles.main} border={teamColor(team)} fill={teamTint(team, 0.1)}>
 					<Eyebrow>Now</Eyebrow>

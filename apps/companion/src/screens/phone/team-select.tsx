@@ -5,8 +5,8 @@ import { Body, Eyebrow, SlantButton, SplitBackground, Title } from "./kit";
 import { fonts, teamColor, teamName, teamSolid, ui } from "./theme";
 
 const roles: { role: ControllerRole; label: string; hint: string }[] = [
-	{ role: "movement", label: "MOVEMENT", hint: "Walk, jump, crouch, sprint" },
-	{ role: "aim", label: "AIM", hint: "Look, shoot, scope, guns" },
+	{ role: "aim", label: "GUNNER", hint: "Turn to aim · fire, aim, reload buttons" },
+	{ role: "movement", label: "RUNNER", hint: "Walk, jump, crouch, sprint" },
 ];
 
 export function TeamSelect({

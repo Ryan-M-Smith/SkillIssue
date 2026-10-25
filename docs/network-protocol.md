@@ -62,7 +62,7 @@ The actual companion also includes raw `accelerometer`, `gyroscope`, AR placehol
 | Aim | `shoot`, `scope`, `reload`, `weapon` |
 | Either | `ready`, `interact`, `none` |
 
-`pressed` is a boolean. Shoot, crouch and sprint follow press/release state; a jab fires a 120 ms shoot pulse. Jump, reload and scope act on press. Weapon slots are **0 pistol, 1 shotgun, 2 sniper**. `interact` and `none` have no gameplay effect. Sprint accelerates forward movement and is disabled while crouched.
+`pressed` is a boolean. Shoot, crouch and sprint follow press/release state (the gunner's FIRE button sends `shoot` pressed, then released). Jump, reload and scope act on press. Weapon slots are **0 pistol, 1 shotgun, 2 sniper**. `interact` and `none` have no gameplay effect. Sprint accelerates forward movement and is disabled while crouched.
 
 The game clears movement and held actions after **250 ms** without valid input, on controller removal, or when gameplay closes. The phone stops replaying stale sensor intent after **300 ms**, sends zero movement/aim and releases crouch/sprint. Duplicate one-shot actions are suppressed. Both servers cap messages at **64 KiB**, connections at **32**, and each peer at **240 messages/second**. New sockets must identify within ten seconds. Invalid JSON, nonfinite sensor values, malformed payloads and unauthorized actions are rejected. Debug connections cannot drive a match.
 
@@ -70,7 +70,7 @@ The game clears movement and held actions after **250 ms** without valid input, 
 
 Phones calibrate from a short still hold, using gravity to detect the grip. Movement has a **5-degree deadzone** and reaches full speed at **20 degrees**. Slow tilts walk/strafe; a forward flick toggles crouch and a backward flick jumps or stands up. A **32-degree wheel twist** toggles sprint without a speed threshold, rearms below **12 degrees**, and has a **350 ms** debounce. Crouch and sprint are exclusive.
 
-The gunner turns to aim, jabs forward to shoot, lifts upward to reload, pulls back to toggle scope, and uses the same wheel gesture to cycle owned weapons. A short still interval rearms linear gestures and prevents the return swing from firing twice. The companion maps iOS and Android rotation-rate axes before interpreting them.
+The gunner (aim phone) only turns to aim: its gyro becomes `controls.lookX` / `lookY` (+X = turn right, +Y = look up, matching the game's `aim_delta`). Shooting, aiming down sights (`scope`), reloading and switching guns (`weapon` with the next owned slot) are on-screen buttons. The companion maps iOS and Android rotation-rate axes before interpreting them.
 
 | Weapon | Magazine | Reload |
 | --- | --- | --- |

@@ -46,6 +46,7 @@ export default function PhoneApp() {
 	const [state, setState] = useState<MovementState>("Calibrating");
 	const [notice, setNotice] = useState<string | null>(null);
 	const [joinError, setJoinError] = useState<string | null>(null);
+	const [firing, setFiring] = useState(false);
 	const [sensorSession, setSensorSession] = useState(0);
 	const activeControls = screen === "match" && (view.stage === "lobby" || view.stage === "playing");
 
@@ -129,6 +130,7 @@ export default function PhoneApp() {
 	// Synchronize the sensor model before the next reading reaches the game.
 	function onLobbyChange(next: LobbyView) {
 		if (next.stage === "idle" && stageRef.current === "ended") setScreen("menu");
+		if (next.stage !== "playing" || next.state === "paused") setFiring(false);
 		const role = modelRole(next.me?.role);
 		if (role !== roleRef.current) {
 			roleRef.current = role;
@@ -224,7 +226,17 @@ export default function PhoneApp() {
 	} else if (view.stage === "playing") {
 		body =
 			view.me?.role === "aim" ? (
-				<AimHud view={view} controls={controls} weapon={view.feedback?.weapon ?? 0} firing={controls.action === "shoot"} onRecalibrate={recenter} />
+				<AimHud
+					view={view}
+					controls={controls}
+					weapon={view.feedback?.weapon ?? 0}
+					firing={firing}
+					onFire={(down) => { setFiring(down); clientRef.current?.setFiring(down); }}
+					onAim={() => clientRef.current?.toggleAim()}
+					onReload={() => clientRef.current?.reload()}
+					onSwitch={() => clientRef.current?.nextWeapon()}
+					onRecalibrate={recenter}
+				/>
 			) : (
 				<MovementHud view={view} controls={controls} state={state} direction={directionOf(controls)} counts={counts} onRecalibrate={recenter} />
 			);

@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View } from "react-native";
+import { Pressable, StyleSheet, Text, View } from "react-native";
 
 import type { GameControls } from "@/types/motion";
 import type { LobbyView } from "@/service/lobby-client";
@@ -8,28 +8,29 @@ import { LiveVitals } from "./live-vitals";
 import { fonts, teamColor, teamTint, ui } from "./theme";
 
 const weapons = ["PISTOL", "SHOTGUN", "SNIPER"];
-const gestures = [
-	["→", "JAB FORWARD", "Fire a shot"],
-	["↑", "LIFT UP", "Reload the magazine"],
-	["↻", "TWIST 32°", "Next weapon · return to center"],
-	["←", "PULL BACK", "Toggle scope"],
-];
-
-export function AimHud({ view, controls, weapon, firing = false, onRecalibrate }: {
+/**
+ * The gunner's phone. Turning the phone moves the camera (gyro only); everything
+ * else is a button: hold FIRE, toggle AIM (scope), RELOAD, SWITCH gun.
+ */
+export function AimHud({ view, controls, weapon, firing = false, onFire, onAim, onReload, onSwitch, onRecalibrate }: {
 	view: LobbyView;
 	controls: GameControls;
 	weapon: number;
 	firing?: boolean;
+	onFire: (down: boolean) => void;
+	onAim: () => void;
+	onReload: () => void;
+	onSwitch: () => void;
 	onRecalibrate?: () => void;
 }) {
 	const team = view.me?.teamId ?? 1;
 	const color = teamColor(team);
 	const feedback = view.feedback;
 	const reloadProgress = Math.max(0, Math.min(1, feedback?.reload_progress ?? 0));
-	const action = controls.action === "weapon_next" ? "WEAPON SWITCH" : controls.action?.toUpperCase();
+	const scoped = !!feedback?.scoped;
 	return (
 		<View style={styles.screen}>
-			<MatchBar view={view} role="Aim phone · motion control" calibrated={controls.ready} />
+			<MatchBar view={view} role="Gunner · turn to aim" calibrated={controls.ready} />
 			<View style={styles.row}>
 				<Panel border={color} fill={teamTint(team, 0.08)} style={styles.scope}>
 					<View style={styles.scopeTop}>
@@ -37,13 +38,13 @@ export function AimHud({ view, controls, weapon, firing = false, onRecalibrate }
 						<Eyebrow color={controls.ready ? ui.ready : ui.gold}>{controls.ready ? "LIVE" : "HOLD STILL"}</Eyebrow>
 					</View>
 					<View style={styles.reticle}>
-						<View style={[styles.ring, { borderColor: firing || controls.action === "shoot" ? ui.gold : color }]} />
+						<View style={[styles.ring, { borderColor: firing ? ui.gold : color }]} />
 						<View style={styles.crossH} />
 						<View style={styles.crossV} />
 						<View style={[styles.dot, { backgroundColor: color, transform: [{ translateX: controls.lookX * 50 }, { translateY: -controls.lookY * 50 }] }]} />
 					</View>
-					<Text style={[styles.action, { color: action ? ui.gold : ui.ink }]}>{action ?? (controls.ready ? "AIM WITH YOUR PHONE" : "FIND YOUR NEUTRAL")}</Text>
-					<Body color={ui.muted} size={12} style={styles.center}>Turn to aim. Small, deliberate gestures control your kit.</Body>
+					<Text style={[styles.action, { color: firing ? ui.gold : ui.ink }]}>{firing ? "FIRING" : controls.ready ? "TURN THE PHONE TO AIM" : "HOLD STILL"}</Text>
+					<Body color={ui.muted} size={12} style={styles.center}>The camera follows your phone. Recenter if it drifts.</Body>
 				</Panel>
 				<Panel style={styles.side}>
 					<View style={styles.weaponHeader}>
@@ -55,10 +56,23 @@ export function AimHud({ view, controls, weapon, firing = false, onRecalibrate }
 						<View style={styles.reloadRing}>{Array.from({ length: 12 }, (_, index) => <View key={index} style={[styles.reloadSegment, { backgroundColor: index < Math.ceil(reloadProgress * 12) ? ui.gold : ui.line, transform: [{ rotate: `${index * 30}deg` }, { translateY: -12 }] }]} />)}<Text style={styles.reloadPercent}>{Math.round(reloadProgress * 100)}</Text></View>
 						<Eyebrow color={ui.gold}>RELOADING</Eyebrow>
 					</View>}
-					{gestures.map(([icon, label, hint]) => <View style={styles.gesture} key={label}>
-						<Text style={[styles.gestureIcon, { color }]}>{icon}</Text>
-						<View style={styles.gestureText}><Eyebrow color={ui.ink}>{label}</Eyebrow><Body size={12} color={ui.muted}>{hint}</Body></View>
-					</View>)}
+					<View style={styles.buttons}>
+						<View style={styles.smallButtons}>
+							{/* Only the sniper has a scope to aim down. */}
+							<SlantButton label={scoped ? "AIMING" : weapon === 2 ? "AIM" : "AIM · SNIPER"} small color={scoped ? color : undefined} disabled={weapon !== 2 && !scoped} onPress={onAim} style={styles.small} />
+							<SlantButton label="RELOAD" small onPress={onReload} disabled={!!feedback?.reloading} style={styles.small} />
+							<SlantButton label="SWITCH" small onPress={onSwitch} style={styles.small} />
+						</View>
+						<Pressable
+							onPressIn={() => onFire(true)}
+							onPressOut={() => onFire(false)}
+							accessibilityRole="button"
+							accessibilityLabel="Fire"
+							style={[styles.fire, { borderColor: color, backgroundColor: firing ? color : teamTint(team, 0.25) }]}
+						>
+							<Text style={[styles.fireText, { color: firing ? ui.bg : ui.ink }]}>FIRE</Text>
+						</Pressable>
+					</View>
 					<LiveVitals feedback={feedback} color={color} />
 					{onRecalibrate && <SlantButton label="RECENTER" small onPress={onRecalibrate} style={styles.recenter} />}
 				</Panel>
@@ -92,8 +106,10 @@ const styles = StyleSheet.create({
 	weaponIcon: { width: 48, height: 38, borderWidth: 1, borderRadius: 6, alignItems: "center", justifyContent: "center" },
 	barrel: { height: 7, marginTop: -5 },
 	grip: { width: 8, height: 12, marginRight: 14, transform: [{ skewX: "-16deg" }] },
-	gesture: { flexDirection: "row", alignItems: "center", gap: 10 },
-	gestureIcon: { width: 28, textAlign: "center", fontSize: 25, fontFamily: fonts.display },
-	gestureText: { flex: 1, gap: 1 },
+	buttons: { flex: 1, flexDirection: "row", gap: 10, minHeight: 90 },
+	smallButtons: { flex: 1, justifyContent: "space-between", gap: 6 },
+	small: { flex: 1 },
+	fire: { flex: 1.15, borderWidth: 2, borderRadius: 14, alignItems: "center", justifyContent: "center" },
+	fireText: { fontFamily: fonts.display, fontSize: 26, letterSpacing: 2 },
 	recenter: { alignSelf: "flex-end" },
 });

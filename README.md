@@ -39,14 +39,14 @@ Hold the phone sideways, screen toward you, at a comfortable tilted angle. Hold 
 
 | Phone | Motion | Action |
 | --- | --- | --- |
-| Movement | Gentle forward/back tilt; tip either end down | Walk and strafe |
-| Movement | Twist about 32 degrees like a wheel, then return to center | Toggle sprint |
-| Movement | Quick flick away / toward you | Toggle crouch / jump or stand |
-| Gunner | Smooth turns | Aim |
-| Gunner | Short forward jab | Fire |
-| Gunner | Lift upward | Reload |
-| Gunner | Short pull backward | Toggle sniper scope |
-| Gunner | Twist about 32 degrees, then center | Cycle owned weapons |
+| Runner | Gentle forward/back tilt; tip either end down | Walk and strafe |
+| Runner | Twist about 32 degrees like a wheel, then return to center | Toggle sprint |
+| Runner | Quick flick away / toward you | Toggle crouch / jump or stand |
+| Gunner | Turn the phone left / right / up / down | Camera follows (not inverted) |
+| Gunner | Hold **FIRE** | Shoot |
+| Gunner | Tap **AIM** | Aim down sights / sniper scope |
+| Gunner | Tap **RELOAD** | Reload |
+| Gunner | Tap **SWITCH** | Next owned weapon |
 
 Wheel gestures rearm below 12 degrees with a 350 ms debounce. **Practice Controls** in the companion teaches both roles without a lobby. **Practice / Keyboard** in the Godot menu enters a local match without phones. Keyboard controls are in [the Duo README](apps/game/entities/duo/README.md); `R` reloads blue's weapon and `O` reloads red's. Hold **Tab** for the live scoreboard. **F3** shows hitboxes and weapon spread in keyboard practice.
 

@@ -31,15 +31,15 @@ Hold still briefly at a comfortable angle to calibrate. Practice and the live ma
 
 | Role | Motion | Result |
 | --- | --- | --- |
-| Movement | Gentle forward/back tilt | Walk; 5-degree deadzone, full speed at 20 degrees |
-| Movement | Tip an end down | Strafe |
-| Movement | Twist 32 degrees, then center | Toggle sprint |
-| Movement | Quick flick away / toward you | Toggle crouch / jump or stand |
-| Gunner | Smooth turns | Aim |
-| Gunner | Short forward jab | Fire |
-| Gunner | Lift upward | Reload |
-| Gunner | Pull back | Toggle sniper scope |
-| Gunner | Twist 32 degrees, then center | Cycle owned weapons |
+| Runner | Gentle forward/back tilt | Walk; 5-degree deadzone, full speed at 20 degrees |
+| Runner | Tip an end down | Strafe |
+| Runner | Twist 32 degrees, then center | Toggle sprint |
+| Runner | Quick flick away / toward you | Toggle crouch / jump or stand |
+| Gunner | Turn the phone left / right / up / down | Camera follows (not inverted) |
+| Gunner | Hold **FIRE** | Shoot |
+| Gunner | Tap **AIM** | Aim down sights / sniper scope |
+| Gunner | Tap **RELOAD** | Reload |
+| Gunner | Tap **SWITCH** | Next owned weapon |
 
 Wheel gestures rearm below 12 degrees with a 350 ms debounce. Linear gunner gestures need a short pause before the next action. Gameplay actions use motion; calibration and menu controls remain touch controls.
 

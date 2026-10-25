@@ -136,15 +136,19 @@ test("malformed frames are ignored and connection errors schedule a retry", () =
 	assert.equal(client.snapshot.stage, "connecting");
 	assert.match(client.snapshot.error!, /Retrying/);
 });
-test("gunner gestures route reload, scope and only owned weapons", () => {
+test("gunner buttons send fire, aim, reload and only owned weapons; gestures send nothing", () => {
 	const { client, socket } = connect();
 	socket.receive({ type: "controller_feedback", message: { t: "state", hp: 80, max_hp: 100, alive: true, weapon: 0, owned: [true, false, true], ammo: 5, magazine_size: 12 } });
-	client.update({ ...controls, action: "reload" }, reading);
-	client.update({ ...controls, action: "scope" }, reading);
-	client.update({ ...controls, action: "weapon_next" }, reading);
+	for (const action of ["shoot", "reload", "scope", "weapon_next"] as const) client.update({ ...controls, action }, reading);
+	client.setFiring(true);
+	client.setFiring(true); // still held: nothing new
+	client.setFiring(false);
+	client.toggleAim();
+	client.reload();
+	client.nextWeapon();
 	const actions = socket.sent.filter((m) => m.type === "environment").map((m) => m.payload);
-	assert.deepEqual(actions.map((a) => a.action), ["reload", "scope", "weapon"]);
-	assert.equal(actions[2].slot, 2);
+	assert.deepEqual(actions.map((a) => [a.action, a.pressed]), [["shoot", true], ["shoot", false], ["scope", true], ["reload", true], ["weapon", true]]);
+	assert.equal(actions[4].slot, 2);
 	assert.equal(client.snapshot.feedback?.ammo, 5);
 });
 test("host-ended results return cleanly to the menu state when the host closes", () => {
@@ -158,13 +162,12 @@ test("host-ended results return cleanly to the menu state when the host closes",
 		assert.equal(client.snapshot.error, null);
 	}
 });
-test("a queued shot release cannot fire into the next connection", (t) => {
-	t.mock.timers.enable({ apis: ["setTimeout", "setInterval", "Date"], now: 1000 });
+test("a held FIRE ends with the connection and never carries into the next one", () => {
 	const { client } = connect();
-	client.update({ ...controls, action: "shoot" }, reading);
+	client.setFiring(true);
 	client.join("DEF456", "Tester");
 	const next = Socket.instances.at(-1)!;
-	t.mock.timers.tick(200);
+	client.setFiring(false);
 	assert.equal(next.sent.length, 0);
 });
 test("frozen sensors release held movement and send neutral intent", (t) => {

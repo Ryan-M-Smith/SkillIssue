@@ -85,15 +85,7 @@ const settings = {
   twistRearmDeg: 12,
   twistCooldownMs: 350,
 
-  // Gunner controls
-  jabThreshold: 3.4,
-  liftThreshold: 4.2,
-  gestureMaxRotation: 110,
-  gunnerCooldownMs: 230,
-  rearmStillMs: 90,
-  rearmAcceleration: 1.8,
-  rearmRotation: 40,
-  aimFreezeAfterShotMs: 70,
+  // Gunner aiming
   aimMaxRate: 130,
   aimDeadzone: 1.5,
 };
@@ -101,9 +93,10 @@ const settings = {
 const axes = {
   forwardSign: 1,
   rightSign: 1,
-  gunnerYawSign: 1,
-  gunnerPitchSign: -1,
-  forwardJabZSign: -1,
+  // + rates.y turns the phone left and + rates.x tips its back up (right-hand
+  // rule); the game wants + lookX = turn right and + lookY = look up.
+  gunnerYawSign: -1,
+  gunnerPitchSign: 1,
 };
 
 export type Frame = {
@@ -288,12 +281,6 @@ export class MotionController {
   private twistInProgress = false;
   private twistMoveAtStart: Move = { ...zero };
 
-  // Gunner state
-  private armed = false;
-  private gunnerLockedUntil = 0;
-  private stillSince: number | null = null;
-  private aimFrozenUntil = 0;
-
   private debug: MotionDebug = emptyDebug();
 
   constructor(
@@ -336,10 +323,6 @@ export class MotionController {
     this.twistInProgress = false;
     this.twistMoveAtStart = { ...zero };
 
-    this.armed = false;
-    this.gunnerLockedUntil = 0;
-    this.stillSince = null;
-    this.aimFrozenUntil = 0;
 
     this.debug = emptyDebug();
   }
@@ -496,7 +479,6 @@ export class MotionController {
 
           this.debug.calibration = "ready";
           this.debug.grip = this.frame.grip;
-          this.armed = true;
         }
       } else {
         this.calibrationSince = null;
@@ -528,15 +510,7 @@ export class MotionController {
           t,
           dt
         )
-      : this.processGunner(
-          reading,
-          gravity,
-          this.frame,
-          rates,
-          angularSpeed,
-          t,
-          dt
-        );
+      : this.processGunner(rates);
   }
 
   private updateGravity(
@@ -1060,151 +1034,20 @@ export class MotionController {
   // GUNNER PHONE
   // ===================================
 
-  private processGunner(
-    reading: MotionReading,
-    gravity: MotionVector,
-    frame: Frame,
-    rates: PlayerRates | null,
-    angularSpeed: number,
-    t: number,
-    dt: number
-  ): GameControls {
-    const total =
-      reading.accelerationIncludingGravity;
-
-    const linear =
-      reading.acceleration ?? {
-        x:
-          total.x -
-          gravity.x * 9.80665,
-
-        y:
-          total.y -
-          gravity.y * 9.80665,
-
-        z:
-          total.z -
-          gravity.z * 9.80665,
-      };
-
-    const linearMagnitude =
-      magnitude(linear);
-
-    // Twist changes weapon for gunner
-    let action: Action =
-      rates &&
-      this.updateTwist(rates, t, dt)
-        ? "weapon_next"
-        : null;
-
-    if (this.role !== "movement") {
-      this.sprinting = false;
-    }
-
-    // Re-arm after firing
-    if (!this.armed) {
-      const settled =
-        t >= this.gunnerLockedUntil &&
-
-        linearMagnitude <
-          settings.rearmAcceleration &&
-
-        angularSpeed <
-          settings.rearmRotation;
-
-      if (settled) {
-        if (this.stillSince === null) {
-          this.stillSince = t;
-        }
-
-        if (
-          t - this.stillSince >=
-          settings.rearmStillMs
-        ) {
-          this.armed = true;
-        }
-      } else {
-        this.stillSince = null;
-      }
-    }
-
-    // Detect shot / scope / reload
-    if (
-      this.armed &&
-      !action &&
-      angularSpeed <
-        settings.gestureMaxRotation
-    ) {
-      const forwardImpulse =
-        axes.forwardJabZSign *
-        linear.z;
-
-      const liftImpulse = dot(
-        linear,
-        scale(frame.down, -1)
-      );
-
-      if (
-        Math.abs(forwardImpulse) >=
-          settings.jabThreshold &&
-
-        Math.abs(forwardImpulse) >
-          0.75 * linearMagnitude
-      ) {
-        action =
-          forwardImpulse > 0
-            ? "shoot"
-            : "scope";
-      } else if (
-        liftImpulse >=
-          settings.liftThreshold &&
-
-        liftImpulse >
-          0.75 * linearMagnitude
-      ) {
-        action = "reload";
-      }
-    }
-
-    if (action) {
-      this.aimFrozenUntil =
-        t +
-        settings.aimFreezeAfterShotMs;
-
-      this.armed = false;
-
-      this.gunnerLockedUntil =
-        t +
-        settings.gunnerCooldownMs;
-
-      this.stillSince = null;
-    }
-
-    this.debug.gesture =
-      this.armed
-        ? "armed"
-        : "locked";
-
+  /**
+   * The gunner's phone only aims: gyro turns become camera movement. Shooting,
+   * aiming down sights, reloading and switching guns are buttons on the screen.
+   */
+  private processGunner(rates: PlayerRates | null): GameControls {
     const output: GameControls = {
       ...emptyControls,
       ready: true,
-      action,
     };
 
-    // Camera aiming
-    if (
-      rates &&
-      t >= this.aimFrozenUntil
-    ) {
-      output.lookX = gyroToMovement(
-        axes.gunnerYawSign *
-        rates.y
-      );
-
-      output.lookY = gyroToMovement(
-        axes.gunnerPitchSign *
-        rates.x
-      );
+    if (rates) {
+      // Turning right / tipping the back of the phone up = looking right / up.
+      output.lookX = gyroToMovement(axes.gunnerYawSign * rates.y);
+      output.lookY = gyroToMovement(axes.gunnerPitchSign * rates.x);
     }
 
     return output;

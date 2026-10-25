@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
+import { PhoneRig } from "./phone-rig.ts";
 import { MotionController } from "../src/service/motion-control-service";
 import type { MotionReading, MotionVector, Role } from "../src/types/motion";
 
@@ -59,38 +60,37 @@ test("normal small tilts move promptly and stay below the sprint threshold", () 
 	assert.equal(controls.action, null);
 });
 
-test("gunner forward jab fires once and ignores the pullback", () => {
-	const model = calibrated("gunner");
-	assert.equal(model.process(sample(600, gravity, { x: 0, y: 0, z: -4 }), 600).action, "shoot");
-	assert.equal(model.process(sample(620, gravity, { x: 0, y: 0, z: -4 }), 620).action, null);
-	assert.equal(model.process(sample(660, gravity, { x: 0, y: 0, z: 4 }), 660).action, null);
-	model.process(sample(840), 840);
-	model.process(sample(940), 940);
-	assert.equal(model.process(sample(960, gravity, { x: 0, y: 0, z: -4 }), 960).action, "shoot");
-});
-
-test("gunner upward lift reloads and backward jab scopes", () => {
+test("gunner gestures no longer trigger anything: jab, lift, pull and twist only aim", () => {
 	const lift = { x: -gravity.x * 5, y: 0, z: -gravity.z * 5 };
-	assert.equal(calibrated("gunner").process(sample(600, gravity, lift), 600).action, "reload");
-	assert.equal(calibrated("gunner").process(sample(600, gravity, { x: 0, y: 0, z: 4 }), 600).action, "scope");
+	for (const [linear, down] of [[{ x: 0, y: 0, z: -4 }, gravity], [{ x: 0, y: 0, z: 4 }, gravity], [lift, gravity], [zero, wheel(33)]] as const) {
+		assert.equal(calibrated("gunner").process(sample(600, down, linear), 600).action, null);
+	}
 });
 
-test("gunner twist cycles once until the phone returns to center", () => {
-	const model = calibrated("gunner");
-	assert.equal(model.process(sample(600, wheel(33)), 600).action, "weapon_next");
-	assert.equal(model.process(sample(1100, wheel(40)), 1100).action, null);
-	model.process(sample(1120), 1120);
-	assert.equal(model.process(sample(1140, wheel(33)), 1140).action, "weapon_next");
-});
-
-test("small gyro turns aim, tremor does not, and shot motion briefly freezes aim", () => {
+test("small gyro turns aim and tremor does not", () => {
 	const model = calibrated("gunner");
 	assert.equal(model.process(sample(600, gravity, zero, { x: 1, y: 0, z: 0 }), 600).lookX, 0);
-	assert.ok(model.process(sample(620, gravity, zero, { x: 10, y: 0, z: 0 }), 620).lookX > 0);
-	const shot = model.process(sample(640, gravity, { x: 0, y: 0, z: -4 }, { x: 10, y: 0, z: 0 }), 640);
-	assert.equal(shot.action, "shoot");
-	assert.equal(shot.lookX, 0);
-	assert.ok(model.process(sample(740, gravity, zero, { x: 10, y: 0, z: 0 }), 740).lookX > 0);
+	assert.notEqual(model.process(sample(620, gravity, zero, { x: 10, y: 0, z: 0 }), 620).lookX, 0);
+});
+
+test("turning the phone right looks right and tipping its back up looks up (not inverted)", () => {
+	for (const platform of ["ios", "android"]) {
+		for (const grip of ["landscape-left", "landscape-right"] as const) {
+			const rig = new PhoneRig(grip, platform);
+			rig.tremor = false;
+			const model = new MotionController("gunner", platform);
+			let now = 1000;
+			const pose = { fwd: 0, right: 0, twist: 0, yaw: 0 };
+			const step = () => { now += 20; return model.process(rig.step(pose, 20).reading as never, now); };
+			for (let i = 0; i < 60; i++) step(); // calibrate
+			let right = 0, up = 0;
+			for (let i = 0; i < 20; i++) { pose.yaw -= 1.2; right += step().lookX; }  // yaw < 0: turning right
+			for (let i = 0; i < 20; i++) step();
+			for (let i = 0; i < 20; i++) { pose.fwd -= 1.2; up += step().lookY; }    // fwd < 0: back of the phone tips up
+			assert.ok(right > 1, `${platform} ${grip}: turning right gave lookX ${right}`);
+			assert.ok(up > 1, `${platform} ${grip}: tipping up gave lookY ${up}`);
+		}
+	}
 });
 
 test("jump and crouch remain one-shot actions and crouch ends sprint", () => {
