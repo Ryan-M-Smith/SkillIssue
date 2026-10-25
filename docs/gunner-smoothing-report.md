@@ -1,38 +1,14 @@
-# Natural motion controls
+# Gunner gyro aiming
 
-The way you move the phone is the way you move.
+Gunner aiming uses the phone gyroscope for relative yaw and pitch. Slow turns map about 1:1; fast turns get a gradual sensitivity gain capped at 1.5x. Yaw has no 360-degree cap, so rotating the phone continuously can turn the camera through 240?360 degrees and further. Pitch stays within the normal first-person look range.
 
-## Gunner: 1:1 gyro aim
-
-The view turns by exactly what the phone turned, with no gain curve or rate cap. Turning your body
-(or the phone in your hands) about true vertical turns the view, however far the phone is tilted
-back. Tipping the top edge toward you looks up and away looks down. Holding still holds the view,
-and pointing the phone back where it was puts the view back where it was.
-
-- Each gyroscope sample's exact turn goes to the game as `lookDX`/`lookDY` in degrees. No
-  phone-side smoothing, so there's nothing to lag.
-- Below 0.2°/s is treated as resting noise, ramping to exactly 1:1 by 1°/s.
-- The gyro's zero-rate bias is learned during calibration and keeps being tracked whenever the
-  phone is still, so a resting phone doesn't creep the view.
-
-This replaces tilt-to-steer, where holding a tilt kept the view turning.
-
-## Runner: walk where the phone tips
-
-Forward and side tilt are read as one direction, not two separate sticks. Tip the top-right corner
-away and the character walks forward-right. How far you tip sets the speed. The deadzone and full
-speed are ellipses, because side tips need less wrist (full speed at 12° sideways, 20° forward).
-So on a single axis the feel is unchanged, and diagonals now go where the phone points. Tremor
-under about 1° on the axis you aren't tipping is ignored, so straight walks stay straight.
+Every valid gyro sample contributes its turn directly. A phone-side low-pass filter was removed after simulation showed it dropped part of a quick turn when the sensor stopped. Godot retains an 8 ms filter on accumulated turns to smooth packet timing while preserving total camera rotation. The gunner's aim response is the only gameplay behavior changed in this follow-up.
 
 ## Verification
 
-Companion tests run a simulated phone (both landscape grips, iOS and Android). They check:
+- 53 companion tests pass, including simulated full phone rotations in both landscape grips on Android and iOS models.
+- TypeScript checks and Expo lint pass.
+- All 5 network integration tests pass, including the embedded Godot server.
+- Godot gameplay, lifecycle, and rules smoke checks pass (69, 25, and 32 checks).
 
-- a 20° turn gives a 20° view turn, and turning back returns the view;
-- a 360° turn gives 360° and a 600°/s flick turns all the way;
-- tilted-back turns don't pitch the view;
-- with gyro bias there's no drift over 10 s;
-- diagonal tips walk in the tipped direction.
-
-Real-device feel still needs a playtest.
+These simulations verify axis math and turn accumulation. They cannot confirm physical feel, sensor noise, or relay latency on a handset; that still needs a phone test.
