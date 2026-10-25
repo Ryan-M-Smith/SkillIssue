@@ -106,6 +106,10 @@ func _run() -> void:
 	await _click(_find_button(current_scene._graphics, "BACK"))
 	if not _check(not current_scene._graphics.is_open(), "mouse closes graphics modal"):
 		return
+	current_scene._graphics.open_menu()
+	await _click(_find_button(current_scene._graphics, "APPLY"))
+	if not _check(not current_scene._graphics.is_open(), "applying settings closes the modal"):
+		return
 	var practice := _find_button(current_scene, "PRACTICE / KEYBOARD")
 	if not _check(practice != null, "main menu exposes practice"):
 		return

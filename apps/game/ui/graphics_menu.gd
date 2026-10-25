@@ -146,8 +146,12 @@ func _apply() -> void:
 		var saved := GameSession.set_players_needed(int(_players.value))
 		if error == OK:
 			error = saved
-	_status.text = "Settings applied and saved." if error == OK else "Applied, but settings could not be saved (%s)." % error_string(error)
-	_status.add_theme_color_override("font_color", UiKit.READY if error == OK else UiKit.GOLD)
+	if error == OK:
+		close_menu()   # applied and saved: nothing left to do here
+		return
+	# Keep the dialog open so the problem stays visible.
+	_status.text = "Applied, but settings could not be saved (%s)." % error_string(error)
+	_status.add_theme_color_override("font_color", UiKit.GOLD)
 
 
 func _input(event: InputEvent) -> void:
