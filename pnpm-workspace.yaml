@@ -3,7 +3,8 @@ packages:
   - "apps/server"
   - "packages/*"
 allowBuilds:
-  esbuild: set this to true or false
+  esbuild: true
+  unrs-resolver: true
 minimumReleaseAgeExclude:
   - "@expo/cli@58.1.15"
   - "@expo/config@58.0.8"
