@@ -44,8 +44,9 @@
 .heroMeta { display: flex; flex-wrap: wrap; gap: 20px; margin-top: 36px; color: var(--muted); font-size: .68rem; font-weight: 800; letter-spacing: .12em; }
 .heroMeta span { display: inline-flex; align-items: center; gap: 7px; }
 .readyDot, .statusDot { display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: var(--ready); box-shadow: 0 0 12px var(--ready); }
-.arena { position: relative; min-height: 520px; overflow: hidden; border: 1.5px solid rgba(242,245,255,.42); background: linear-gradient(125deg, rgba(59,140,255,.24), rgba(15,20,36,.76) 48%, rgba(255,74,74,.24)); box-shadow: 16px 16px 0 rgba(255,74,74,.16), -12px -12px 0 rgba(59,140,255,.12); transform: skewY(-2deg); }
-.arena > * { transform: skewY(2deg); }
+.arena { position: relative; min-height: 520px; overflow: visible; border: 1.5px solid rgba(242,245,255,.42); background: #10172a; box-shadow: 18px 22px 0 rgba(255,74,74,.18), -12px -14px 0 rgba(59,140,255,.14), 0 28px 60px rgba(0,0,0,.35); transform: rotate(-1.2deg); }
+.arena > * { transform: none; }
+.heroSceneArt { position: absolute; inset: 0 !important; width: 100% !important; height: 100% !important; object-fit: cover; object-position: center; }
 .arenaGrid { position: absolute; inset: 35% 0 0; opacity: .5; background-image: linear-gradient(rgba(255,255,255,.15) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.15) 1px, transparent 1px); background-size: 42px 42px; transform: perspective(500px) rotateX(56deg) scale(1.6); transform-origin: top; }
 .arenaHorizon { position: absolute; top: 48%; left: 0; right: 0; height: 1px; background: rgba(242,245,255,.5); box-shadow: 0 0 24px rgba(242,245,255,.3); }
 .arenaSplit { position: absolute; top: -10%; bottom: -10%; left: 50%; width: 1px; background: rgba(242,245,255,.5); transform: rotate(14deg); box-shadow: 0 0 22px rgba(242,245,255,.5); }

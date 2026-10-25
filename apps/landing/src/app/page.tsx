@@ -29,15 +29,7 @@ export default function Home() {
                     <div className={styles.heroMeta}><span><i className={styles.readyDot} /> 2v2 CO-OP FPS</span><span>FIRST TO 10</span><span>ONE HEALTH BAR</span></div>
                 </div>
                 <div className={styles.arena} aria-label="Blue and red team arena preview">
-                    <div className={styles.arenaGrid} />
-                    <div className={styles.arenaHorizon} />
-                    <div className={styles.arenaSplit} />
-                    <div className={styles.arenaCrosshair}><span /><span /></div>
-                    <Image className={`${styles.characterArt} ${styles.blueCharacterArt}`} src="/hero-blue.png" alt="Blue trench-coat raccoon character" fill priority sizes="(max-width: 900px) 72vw, 38vw" />
-                    <Image className={`${styles.characterArt} ${styles.redCharacterArt}`} src="/hero-red.png" alt="Red trench-coat raccoon character" fill priority sizes="(max-width: 900px) 72vw, 38vw" />
-                    <div className={`${styles.teamBadge} ${styles.badgeBlue}`}><b>BLUE</b><span>MOVE</span></div>
-                    <div className={`${styles.teamBadge} ${styles.badgeRed}`}><b>RED</b><span>AIM</span></div>
-                    <div className={styles.arenaCode}>MATCH / 02<br /><strong>READY</strong></div>
+                    <Image className={styles.heroSceneArt} src="/hero-match.png" alt="Blue and red raccoon teammates facing off with shotguns" fill priority sizes="(max-width: 900px) 100vw, 58vw" />
                 </div>
             </section>
 
