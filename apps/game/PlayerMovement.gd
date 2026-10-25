@@ -9,6 +9,7 @@ const MOUSE_SENSITIVITY = 0.003
 @onready var head = $head
 @onready var camera = $head/Camera3D
 @onready var health_system = $HealthSystem
+@onready var inventory_system = $WeaponSystem
 
 func _ready():
 	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
@@ -50,3 +51,9 @@ func modify_health(add: int) -> void:
 func modify_armor(add: int) -> void:
 	if health_system.has_method("addArmor"):
 		health_system.addArmor(add)
+
+func modify_ammo(weapon, amt) -> void:
+	if inventory_system.has_method("addAmmo"):
+		inventory_system.addAmmo(weapon, amt)
+		
+	

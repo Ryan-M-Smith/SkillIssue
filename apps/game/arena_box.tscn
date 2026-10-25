@@ -67,7 +67,7 @@ script = ExtResource("1_w5s1w")
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Terrain/Spawns/HealthPickups/HealthPickupObject" unique_id=1345897729]
 shape = SubResource("SphereShape3D_yf5fn")
 
-[node name="HealthPickup" type="CSGSphere3D" parent="Terrain/Spawns/HealthPickups/HealthPickupObject/CollisionShape3D" unique_id=1920780753]
+[node name="Pickup" type="CSGSphere3D" parent="Terrain/Spawns/HealthPickups/HealthPickupObject/CollisionShape3D" unique_id=1920780753]
 rings = 16
 material = ExtResource("2_sija8")
 
@@ -78,7 +78,7 @@ script = ExtResource("1_w5s1w")
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Terrain/Spawns/HealthPickups/HealthPickupObject5" unique_id=1225891968]
 shape = SubResource("SphereShape3D_yf5fn")
 
-[node name="HealthPickup" type="CSGSphere3D" parent="Terrain/Spawns/HealthPickups/HealthPickupObject5/CollisionShape3D" unique_id=232429644]
+[node name="Pickup" type="CSGSphere3D" parent="Terrain/Spawns/HealthPickups/HealthPickupObject5/CollisionShape3D" unique_id=232429644]
 rings = 16
 material = ExtResource("2_sija8")
 
@@ -89,7 +89,7 @@ script = ExtResource("1_w5s1w")
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Terrain/Spawns/HealthPickups/HealthPickupObject2" unique_id=123827784]
 shape = SubResource("SphereShape3D_yf5fn")
 
-[node name="HealthPickup" type="CSGSphere3D" parent="Terrain/Spawns/HealthPickups/HealthPickupObject2/CollisionShape3D" unique_id=628898204]
+[node name="Pickup" type="CSGSphere3D" parent="Terrain/Spawns/HealthPickups/HealthPickupObject2/CollisionShape3D" unique_id=628898204]
 rings = 16
 material = ExtResource("2_sija8")
 
@@ -100,7 +100,7 @@ script = ExtResource("1_w5s1w")
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Terrain/Spawns/HealthPickups/HealthPickupObject6" unique_id=1395010996]
 shape = SubResource("SphereShape3D_yf5fn")
 
-[node name="HealthPickup" type="CSGSphere3D" parent="Terrain/Spawns/HealthPickups/HealthPickupObject6/CollisionShape3D" unique_id=276194215]
+[node name="Pickup" type="CSGSphere3D" parent="Terrain/Spawns/HealthPickups/HealthPickupObject6/CollisionShape3D" unique_id=276194215]
 rings = 16
 material = ExtResource("2_sija8")
 
@@ -113,40 +113,46 @@ script = ExtResource("1_w5s1w")
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Terrain/Spawns/ArmorPickups/ArmorPickupObject" unique_id=631888370]
 shape = SubResource("SphereShape3D_57qmd")
 
-[node name="ArmorPickup1" type="CSGSphere3D" parent="Terrain/Spawns/ArmorPickups/ArmorPickupObject/CollisionShape3D" unique_id=1261700422]
+[node name="Pickup" type="CSGSphere3D" parent="Terrain/Spawns/ArmorPickups/ArmorPickupObject/CollisionShape3D" unique_id=1261700422]
 rings = 16
 material = SubResource("StandardMaterial3D_vrfma")
 
-[node name="ArmorPickupObject2" type="Area3D" parent="Terrain/Spawns/ArmorPickups" unique_id=1211125230]
+[node name="ArmorPickupObject2" type="Area3D" parent="Terrain/Spawns/ArmorPickups" unique_id=1211125230 node_paths=PackedStringArray("armor_collision_shape", "armor_visual_mesh")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 21.5, 1.5, -7)
 script = ExtResource("1_w5s1w")
+armor_collision_shape = NodePath("CollisionShape3D")
+armor_visual_mesh = NodePath("CollisionShape3D/Pickup")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Terrain/Spawns/ArmorPickups/ArmorPickupObject2" unique_id=163064926]
 shape = SubResource("SphereShape3D_57qmd")
 
-[node name="ArmorPickup1" type="CSGSphere3D" parent="Terrain/Spawns/ArmorPickups/ArmorPickupObject2/CollisionShape3D" unique_id=337237008]
+[node name="Pickup" type="CSGSphere3D" parent="Terrain/Spawns/ArmorPickups/ArmorPickupObject2/CollisionShape3D" unique_id=337237008]
 rings = 16
 material = SubResource("StandardMaterial3D_vrfma")
 
-[node name="ArmorPickupObject3" type="Area3D" parent="Terrain/Spawns/ArmorPickups" unique_id=1872749112]
+[node name="ArmorPickupObject3" type="Area3D" parent="Terrain/Spawns/ArmorPickups" unique_id=1872749112 node_paths=PackedStringArray("armor_collision_shape", "armor_visual_mesh")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -21.5, 1.5, 7)
 script = ExtResource("1_w5s1w")
+armor_collision_shape = NodePath("CollisionShape3D")
+armor_visual_mesh = NodePath("CollisionShape3D/Pickup")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Terrain/Spawns/ArmorPickups/ArmorPickupObject3" unique_id=1906460687]
 shape = SubResource("SphereShape3D_57qmd")
 
-[node name="ArmorPickup1" type="CSGSphere3D" parent="Terrain/Spawns/ArmorPickups/ArmorPickupObject3/CollisionShape3D" unique_id=1042625666]
+[node name="Pickup" type="CSGSphere3D" parent="Terrain/Spawns/ArmorPickups/ArmorPickupObject3/CollisionShape3D" unique_id=1042625666]
 rings = 16
 material = SubResource("StandardMaterial3D_vrfma")
 
-[node name="ArmorPickupObject4" type="Area3D" parent="Terrain/Spawns/ArmorPickups" unique_id=1650140208]
+[node name="ArmorPickupObject4" type="Area3D" parent="Terrain/Spawns/ArmorPickups" unique_id=1650140208 node_paths=PackedStringArray("armor_collision_shape", "armor_visual_mesh")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -21.5, 1.5, -7)
 script = ExtResource("1_w5s1w")
+armor_collision_shape = NodePath("CollisionShape3D")
+armor_visual_mesh = NodePath("CollisionShape3D/Pickup")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Terrain/Spawns/ArmorPickups/ArmorPickupObject4" unique_id=292186369]
 shape = SubResource("SphereShape3D_57qmd")
 
-[node name="ArmorPickup1" type="CSGSphere3D" parent="Terrain/Spawns/ArmorPickups/ArmorPickupObject4/CollisionShape3D" unique_id=900830626]
+[node name="Pickup" type="CSGSphere3D" parent="Terrain/Spawns/ArmorPickups/ArmorPickupObject4/CollisionShape3D" unique_id=900830626]
 rings = 16
 material = SubResource("StandardMaterial3D_vrfma")
 
@@ -175,7 +181,7 @@ script = ExtResource("1_w5s1w")
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Terrain/Spawns/SniperSpawnObject" unique_id=93231739]
 shape = SubResource("SphereShape3D_3gngh")
 
-[node name="SniperSpawn" type="CSGSphere3D" parent="Terrain/Spawns/SniperSpawnObject/CollisionShape3D" unique_id=1151756044]
+[node name="Pickup" type="CSGSphere3D" parent="Terrain/Spawns/SniperSpawnObject/CollisionShape3D" unique_id=1151756044]
 rings = 16
 material = ExtResource("4_reqvt")
 
@@ -186,7 +192,7 @@ script = ExtResource("1_w5s1w")
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Terrain/Spawns/ShotgunSpawnObject" unique_id=794123757]
 shape = SubResource("SphereShape3D_d0u6y")
 
-[node name="ShotgunSpawn" type="CSGSphere3D" parent="Terrain/Spawns/ShotgunSpawnObject/CollisionShape3D" unique_id=2100700433]
+[node name="Pickup" type="CSGSphere3D" parent="Terrain/Spawns/ShotgunSpawnObject/CollisionShape3D" unique_id=2100700433]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
 rings = 16
 material = ExtResource("3_tj2tj")
@@ -198,7 +204,7 @@ script = ExtResource("1_w5s1w")
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Terrain/Spawns/ShotgunSpawnObject2" unique_id=103542605]
 shape = SubResource("SphereShape3D_d0u6y")
 
-[node name="ShotgunSpawn2" type="CSGSphere3D" parent="Terrain/Spawns/ShotgunSpawnObject2/CollisionShape3D" unique_id=965338892]
+[node name="Pickup" type="CSGSphere3D" parent="Terrain/Spawns/ShotgunSpawnObject2/CollisionShape3D" unique_id=965338892]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
 rings = 16
 material = ExtResource("3_tj2tj")
@@ -303,7 +309,10 @@ script = ExtResource("5_tj2tj")
 [connection signal="body_entered" from="Terrain/Spawns/HealthPickups/HealthPickupObject5" to="Terrain/Spawns/HealthPickups/HealthPickupObject5" method="_on_body_entered"]
 [connection signal="body_entered" from="Terrain/Spawns/HealthPickups/HealthPickupObject2" to="Terrain/Spawns/HealthPickups/HealthPickupObject2" method="_on_body_entered"]
 [connection signal="body_entered" from="Terrain/Spawns/HealthPickups/HealthPickupObject6" to="Terrain/Spawns/HealthPickups/HealthPickupObject6" method="_on_body_entered"]
-[connection signal="body_entered" from="Terrain/Spawns/ArmorPickups/ArmorPickupObject" to="Terrain/Spawns/HealthPickups/HealthPickupObject" method="_on_armor_pickup_object_body_entered"]
-[connection signal="body_entered" from="Terrain/Spawns/ArmorPickups/ArmorPickupObject2" to="Terrain/Spawns/HealthPickups/HealthPickupObject" method="_on_armor_pickup_object_body_entered"]
-[connection signal="body_entered" from="Terrain/Spawns/ArmorPickups/ArmorPickupObject3" to="Terrain/Spawns/HealthPickups/HealthPickupObject" method="_on_armor_pickup_object_body_entered"]
-[connection signal="body_entered" from="Terrain/Spawns/ArmorPickups/ArmorPickupObject4" to="Terrain/Spawns/HealthPickups/HealthPickupObject" method="_on_armor_pickup_object_body_entered"]
+[connection signal="body_entered" from="Terrain/Spawns/ArmorPickups/ArmorPickupObject" to="Terrain/Spawns/ArmorPickups/ArmorPickupObject" method="_on_body_entered"]
+[connection signal="body_entered" from="Terrain/Spawns/ArmorPickups/ArmorPickupObject2" to="Terrain/Spawns/ArmorPickups/ArmorPickupObject2" method="_on_body_entered"]
+[connection signal="body_entered" from="Terrain/Spawns/ArmorPickups/ArmorPickupObject3" to="Terrain/Spawns/ArmorPickups/ArmorPickupObject3" method="_on_body_entered"]
+[connection signal="body_entered" from="Terrain/Spawns/ArmorPickups/ArmorPickupObject4" to="Terrain/Spawns/ArmorPickups/ArmorPickupObject4" method="_on_body_entered"]
+[connection signal="body_entered" from="Terrain/Spawns/SniperSpawnObject" to="Terrain/Spawns/SniperSpawnObject" method="_on_body_entered"]
+[connection signal="body_entered" from="Terrain/Spawns/ShotgunSpawnObject" to="Terrain/Spawns/ShotgunSpawnObject" method="_on_body_entered"]
+[connection signal="body_entered" from="Terrain/Spawns/ShotgunSpawnObject2" to="Terrain/Spawns/ShotgunSpawnObject2" method="_on_body_entered"]
