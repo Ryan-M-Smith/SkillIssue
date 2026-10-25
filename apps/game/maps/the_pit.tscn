@@ -629,9 +629,9 @@ size = Vector3(1.32, 2.7, 2)
 material = SubResource("m_stairs")
 
 [node name="Step9" type="CSGBox3D" parent="Stairs/PitStairs0" unique_id=1796812020]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.33, 1.4955, 8)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.5736134, 1.4955, 8)
 use_collision = true
-size = Vector3(0.66, 3, 2)
+size = Vector3(2.1727734, 3, 2)
 material = SubResource("m_stairs")
 
 [node name="Walk" type="StaticBody3D" parent="Stairs/PitStairs0" unique_id=1486467820]
@@ -697,9 +697,9 @@ size = Vector3(2, 2.7, 1.32)
 material = SubResource("m_stairs")
 
 [node name="Step9" type="CSGBox3D" parent="Stairs/PitStairs1" unique_id=479256898]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8, 1.4955, 1.33)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8, 1.4955, 0.5174415)
 use_collision = true
-size = Vector3(2, 3, 0.66)
+size = Vector3(2, 3, 2.2851171)
 material = SubResource("m_stairs")
 
 [node name="Walk" type="StaticBody3D" parent="Stairs/PitStairs1" unique_id=1192359171]
@@ -764,10 +764,10 @@ use_collision = true
 size = Vector3(1.32, 2.7, 2)
 material = SubResource("m_stairs")
 
-[node name="Step9" type="CSGBox3D" parent="Stairs/PitStairs2" unique_id=1801138485]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.33, 1.4955, -8)
+[node name="Step10" type="CSGBox3D" parent="Stairs/PitStairs2" unique_id=1326991605]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 3.5570872, 0.35176706, 1.5382164, -8.137947)
 use_collision = true
-size = Vector3(0.66, 3, 2)
+size = Vector3(1.8579102, 3, 0.64445317)
 material = SubResource("m_stairs")
 
 [node name="Walk" type="StaticBody3D" parent="Stairs/PitStairs2" unique_id=22368811]
@@ -833,15 +833,15 @@ size = Vector3(2, 2.7, 1.32)
 material = SubResource("m_stairs")
 
 [node name="Step9" type="CSGBox3D" parent="Stairs/PitStairs3" unique_id=1929318200]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 1.4955, -1.33)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 3.5570872, -8, 1.4955, -0.5541523)
 use_collision = true
-size = Vector3(2, 3, 0.66)
+size = Vector3(2, 3, 0.64445317)
 material = SubResource("m_stairs")
 
 [node name="Walk" type="StaticBody3D" parent="Stairs/PitStairs3" unique_id=691190245]
 
 [node name="Shape" type="CollisionShape3D" parent="Stairs/PitStairs3/Walk" unique_id=1244490431]
-transform = Transform3D(0, 0, 1, 0.4138, 0.9104, 0, 0.9104, -0.4138, 0, -8, 1.3634, -4.8979)
+transform = Transform3D(0, 0, 1, 0.41380003, 0.9104, 0, 0.9104, -0.41380003, 0, -8, 1.3634, -4.8979)
 shape = SubResource("ramp_4")
 
 [node name="PorchStairsNorth" type="Node3D" parent="Stairs" unique_id=21838822]

@@ -1,0 +1,24 @@
+[remap]
+
+importer="wav"
+type="AudioStreamWAV"
+uid="uid://dx01bnygvlcos"
+path="res://.godot/imported/heavy_blast_010.wav-fd99588468319d228b31d0c0d9a04ae7.sample"
+
+[deps]
+
+source_file="res://audio/Laser Weapons - Free Library/heavy_blast_010.wav"
+dest_files=["res://.godot/imported/heavy_blast_010.wav-fd99588468319d228b31d0c0d9a04ae7.sample"]
+
+[params]
+
+force/8_bit=false
+force/mono=false
+force/max_rate=false
+force/max_rate_hz=44100
+edit/trim=false
+edit/normalize=false
+edit/loop_mode=0
+edit/loop_begin=0
+edit/loop_end=-1
+compress/mode=2

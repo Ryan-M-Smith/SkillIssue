@@ -1,0 +1,24 @@
+[remap]
+
+importer="wav"
+type="AudioStreamWAV"
+uid="uid://bfpuy38y2s5ka"
+path="res://.godot/imported/light_blast_6.wav-2a16f5f47a6e4f750830b13124eea1c0.sample"
+
+[deps]
+
+source_file="res://audio/Laser Weapons - Free Library/light_blast_6.wav"
+dest_files=["res://.godot/imported/light_blast_6.wav-2a16f5f47a6e4f750830b13124eea1c0.sample"]
+
+[params]
+
+force/8_bit=false
+force/mono=false
+force/max_rate=false
+force/max_rate_hz=44100
+edit/trim=false
+edit/normalize=false
+edit/loop_mode=0
+edit/loop_begin=0
+edit/loop_end=-1
+compress/mode=2

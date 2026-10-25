@@ -1,0 +1,24 @@
+[remap]
+
+importer="wav"
+type="AudioStreamWAV"
+uid="uid://dcwejxop4vo60"
+path="res://.godot/imported/weapon_handling_44.wav-56f2e79ce77268305238482366eb166a.sample"
+
+[deps]
+
+source_file="res://audio/Laser Weapons - Free Library/weapon_handling_44.wav"
+dest_files=["res://.godot/imported/weapon_handling_44.wav-56f2e79ce77268305238482366eb166a.sample"]
+
+[params]
+
+force/8_bit=false
+force/mono=false
+force/max_rate=false
+force/max_rate_hz=44100
+edit/trim=false
+edit/normalize=false
+edit/loop_mode=0
+edit/loop_begin=0
+edit/loop_end=-1
+compress/mode=2

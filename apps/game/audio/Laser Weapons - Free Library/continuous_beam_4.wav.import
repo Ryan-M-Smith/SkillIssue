@@ -1,0 +1,24 @@
+[remap]
+
+importer="wav"
+type="AudioStreamWAV"
+uid="uid://cenlkut5dwnme"
+path="res://.godot/imported/continuous_beam_4.wav-ab1ccafa87fd3523ba7cd322dab56f65.sample"
+
+[deps]
+
+source_file="res://audio/Laser Weapons - Free Library/continuous_beam_4.wav"
+dest_files=["res://.godot/imported/continuous_beam_4.wav-ab1ccafa87fd3523ba7cd322dab56f65.sample"]
+
+[params]
+
+force/8_bit=false
+force/mono=false
+force/max_rate=false
+force/max_rate_hz=44100
+edit/trim=false
+edit/normalize=false
+edit/loop_mode=0
+edit/loop_begin=0
+edit/loop_end=-1
+compress/mode=2
