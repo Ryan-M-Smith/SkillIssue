@@ -5,8 +5,5 @@
 
 [node name="Main" unique_id=1203397750 instance=ExtResource("1_main")]
 
-[node name="ArenaBox" parent="World" parent_id_path=PackedInt32Array(891396000) index="0" unique_id=2005310880]
-transform = Transform3D(-0.9216425, -0.0019608317, 0.38803545, 0.007484769, 0.9997114, 0.022829184, -0.38796824, 0.023944704, -0.9213618, 0, 0, 0)
-
 [node name="DuoSandbox" type="Node" parent="." index="4" unique_id=146206534]
 script = ExtResource("2_sandbox")

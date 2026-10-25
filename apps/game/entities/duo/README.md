@@ -6,10 +6,11 @@ One character, two players. The **mover** drives `Legs`, the **gunner** drives `
 Duo (CharacterBody3D)            duo.gd: wires components, nothing else
 ├── Legs/Model                   leg boxes + DuoLegsAnimator (walk swing, air tuck, crouch squash)
 │   ├── LeftHip, RightHip        pivots the animator rotates; keep these if you swap in a real model
-│   └── Pelvis
+│   ├── Pelvis
+│   (Legs/LegsHurtbox            legs zone, squashes with crouch)
 ├── Torso                        yaw (gunner turns)
 │   ├── Model                    chest, arms, backpack (backpack marks the back)
-│   ├── BodyHurtbox              normal damage
+│   ├── BodyHurtbox              body zone (sized by Components/Hitboxes from the HitboxProfile)
 │   └── Head                     pitch (gunner looks up/down); camera follows this via CameraMount
 │       ├── Model/Cockpit        headshot zone (HeadHurtbox matches it)
 │       ├── Model/ThirdPersonGun the gun the ENEMY sees, follows the current weapon
@@ -23,6 +24,12 @@ Team A (left screen): WASD, Space jump, Ctrl crouch, hold Q sprint, mouse aim (c
 Team B (right screen): IJKL, Shift jump, N crouch, hold U sprint, arrow keys aim, Enter fire, M scope, 8/9/0 guns.
 
 **Tune it:** numbers live in `data/` (`.tres` files, edit in the Inspector, re-run).
+- `data/hitboxes/default_hitboxes.tres`: head / body / legs box sizes, positions, damage multipliers
+  (head uses each gun's `headshot_multiplier`; body ×1.0, legs ×0.75 by default).
+- `data/weapons/*.tres` → **Spread** (base, moving / airborne add, crouch multiplier, bloom, RANDOM or RING
+  pattern) and **Trail** (tracer color / width / lifetime, impact size / lifetime).
+- Press **F3** in the sandbox to see the enemy's hitbox zones (red head, yellow body, blue legs) and each
+  team's live spread circle.
 
 **Team globals:** the Duo uses the team's `GameEvents` autoload (owned by the structure teammate).
 It emits `health_changed(team, hp, max_hp)` and `duo_killed(victim_team, killer_team)`, and the

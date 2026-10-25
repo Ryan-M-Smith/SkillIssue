@@ -15,6 +15,8 @@
 [ext_resource type="Resource" path="res://data/weapons/sniper.tres" id="13_sniper"]
 [ext_resource type="Resource" path="res://data/teams/team_blue.tres" id="14_team"]
 [ext_resource type="Script" path="res://entities/duo/duo_legs_animator.gd" id="15_legs"]
+[ext_resource type="Script" path="res://components/hitbox_component.gd" id="16_hitbox"]
+[ext_resource type="Resource" path="res://data/hitboxes/default_hitboxes.tres" id="17_hbprofile"]
 
 [sub_resource type="CapsuleShape3D" id="body_shape"]
 resource_local_to_scene = true
@@ -109,6 +111,17 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.85, -0.09)
 mesh = SubResource("foot_mesh")
 surface_material_override/0 = SubResource("dark_mat")
 
+[node name="LegsHurtbox" type="Area3D" parent="Legs" node_paths=PackedStringArray("health")]
+collision_layer = 4
+collision_mask = 0
+monitoring = false
+script = ExtResource("7_hurt")
+health = NodePath("../../Components/Health")
+zone = 2
+multiplier = 0.75
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Legs/LegsHurtbox"]
+
 [node name="Torso" type="Node3D" parent="."]
 
 [node name="Model" type="Node3D" parent="Torso"]
@@ -199,7 +212,7 @@ torso = NodePath("../../Torso")
 head = NodePath("../../Torso/Head")
 weapons = NodePath("../Weapons")
 
-[node name="Weapons" type="Node" parent="Components" node_paths=PackedStringArray("body", "aim_origin", "muzzle", "view_model", "third_person_gun")]
+[node name="Weapons" type="Node" parent="Components" node_paths=PackedStringArray("body", "aim_origin", "muzzle", "view_model", "third_person_gun", "movement")]
 script = ExtResource("4_weap")
 loadout = Array[ExtResource("10_wdata")]([ExtResource("11_pistol"), ExtResource("12_shotgun"), ExtResource("13_sniper")])
 body = NodePath("../..")
@@ -207,6 +220,7 @@ aim_origin = NodePath("../../Torso/Head")
 muzzle = NodePath("../../Torso/Head/ViewModel/Muzzle")
 view_model = NodePath("../../Torso/Head/ViewModel/GunMesh")
 third_person_gun = NodePath("../../Torso/Head/Model/ThirdPersonGun")
+movement = NodePath("../Movement")
 
 [node name="Health" type="Node" parent="Components"]
 script = ExtResource("5_hp")
@@ -217,5 +231,14 @@ team = ExtResource("14_team")
 legs = NodePath("../../Legs")
 torso = NodePath("../../Torso")
 view_model_root = NodePath("../../Torso/Head/ViewModel")
+
+[node name="Hitboxes" type="Node" parent="Components" node_paths=PackedStringArray("head", "body", "legs", "movement", "team")]
+script = ExtResource("16_hitbox")
+profile = ExtResource("17_hbprofile")
+head = NodePath("../../Torso/Head/HeadHurtbox")
+body = NodePath("../../Torso/BodyHurtbox")
+legs = NodePath("../../Legs/LegsHurtbox")
+movement = NodePath("../Movement")
+team = NodePath("../Team")
 
 [node name="Controllers" type="Node" parent="."]

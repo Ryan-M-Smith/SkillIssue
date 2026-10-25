@@ -16,6 +16,7 @@ signal killed(killer: Node, weapon_name: String)
 @onready var weapons: WeaponComponent = $Components/Weapons
 @onready var health: HealthComponent = $Components/Health
 @onready var team: TeamComponent = $Components/Team
+@onready var hitboxes: HitboxComponent = $Components/Hitboxes
 @onready var controllers: Node = $Controllers
 
 var input := DuoInput.new()
