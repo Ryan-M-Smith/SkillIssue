@@ -60,6 +60,8 @@ The results screen opens with "and the winner is…" and the winning team (**Red
 
 The game sends the finished match to the control plane (`POST /api/mvp`), which asks Gemini to judge it. Set `GEMINI_API_KEY` (and optionally `GEMINI_MODEL`, default `gemini-flash-latest`) in the Vercel environment for `apps/landing`; the key never ships in the game. If the endpoint is unconfigured, slow (12 s) or offline, the game picks with its own rule and labels the card "Judged offline".
 
+The MVP also gets a **raccoon badge** made for their accolade: Gemini draws it (`POST /api/mvp/badge`, image model `GEMINI_IMAGE_MODEL`, default `gemini-3.1-flash-image` with `gemini-2.5-flash-image` as fallback) and the card develops it into a team-colored medallion. With no MVP, the card shows tumbleweeds rolling through a rainy noir alley while a sly black-and-white raccoon lurks in a doorway. Judging and drawing start at the final whistle (`MvpService`), during the end banner, so they're usually ready when the results open; offline, the game draws its own medal and alley.
+
 ## Graphics
 
 The default window is **1920 × 1080**. Open **Graphics** from the main menu or **Menu / Esc** during a match to set output resolution, 3D render scale, window mode and V-sync. Presets include 720p, 900p, 1080p, 2160 × 1440, 1440p (2560 × 1440), and 4K (3840 × 2160).
