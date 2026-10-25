@@ -2624,7 +2624,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 7.2, 20.3)
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 7.2, -20.3)
 
 [node name="HealthPickupObject" type="Area3D" parent="." unique_id=136840695]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4.0525064, 11.519271)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 4, 12)
 collision_layer = 7
 collision_mask = 7
 script = ExtResource("2_kjx7f")
@@ -2636,4 +2636,46 @@ shape = SubResource("SphereShape3D_anpqv")
 rings = 16
 material = ExtResource("3_h7cbt")
 
+[node name="HealthPickupObject3" type="Area3D" parent="." unique_id=1203832592]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12, 4, 0)
+collision_layer = 7
+collision_mask = 7
+script = ExtResource("2_kjx7f")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="HealthPickupObject3" unique_id=31569541]
+shape = SubResource("SphereShape3D_anpqv")
+
+[node name="Pickup" type="CSGSphere3D" parent="HealthPickupObject3/CollisionShape3D" unique_id=613149719]
+rings = 16
+material = ExtResource("3_h7cbt")
+
+[node name="HealthPickupObject4" type="Area3D" parent="." unique_id=1599241148]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12, 4, 0)
+collision_layer = 7
+collision_mask = 7
+script = ExtResource("2_kjx7f")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="HealthPickupObject4" unique_id=1581609730]
+shape = SubResource("SphereShape3D_anpqv")
+
+[node name="Pickup" type="CSGSphere3D" parent="HealthPickupObject4/CollisionShape3D" unique_id=238512575]
+rings = 16
+material = ExtResource("3_h7cbt")
+
+[node name="HealthPickupObject2" type="Area3D" parent="." unique_id=1167086384]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 4, -12)
+collision_layer = 7
+collision_mask = 7
+script = ExtResource("2_kjx7f")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="HealthPickupObject2" unique_id=535514939]
+shape = SubResource("SphereShape3D_anpqv")
+
+[node name="Pickup" type="CSGSphere3D" parent="HealthPickupObject2/CollisionShape3D" unique_id=1078362093]
+rings = 16
+material = ExtResource("3_h7cbt")
+
 [connection signal="body_entered" from="HealthPickupObject" to="HealthPickupObject" method="_on_body_entered"]
+[connection signal="body_entered" from="HealthPickupObject3" to="HealthPickupObject3" method="_on_body_entered"]
+[connection signal="body_entered" from="HealthPickupObject4" to="HealthPickupObject4" method="_on_body_entered"]
+[connection signal="body_entered" from="HealthPickupObject2" to="HealthPickupObject2" method="_on_body_entered"]
