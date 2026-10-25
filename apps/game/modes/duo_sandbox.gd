@@ -18,8 +18,8 @@
 ## the phones, and the results screen (ui/results.tscn) loads.
 ##
 ## Controls work from phones (via the relay) and from the keyboard at the same time:
-##   Team A: WASD, Space jump, Ctrl crouch, hold Q sprint, mouse aim (click to capture), LMB fire, RMB scope, 1/2/3 guns, E / wheel next gun
-##   Team B: IJKL, Shift jump, N crouch, hold U sprint, arrow keys aim, Enter fire, M scope, 8/9/0 guns, O next gun
+##   Team A (Blue, left): WASD move, Space jump, C crouch, hold Shift sprint, mouse aim (click to capture), left click fire, right click scope, Q / wheel swap gun
+##   Team B (Red, right): IJKL move, U jump, O crouch, hold P sprint, arrow keys aim, Enter fire, / scope, . swap gun
 ##
 ## Weapon pickups: the map's "Sniper..." / "Shotgun..." spots become floating, spinning guns
 ## (entities/weapons/weapon_pickup.tscn) at runtime. Walk through one to own that gun; it

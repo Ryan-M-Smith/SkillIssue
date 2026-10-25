@@ -7,6 +7,8 @@ signal weapon_changed(index: int, data: WeaponData)
 signal fired(data: WeaponData)
 signal scope_changed(scoped: bool)
 signal hit_confirmed(target: Node, damage: float, headshot: bool)
+## A pickup gun ran out of ammo and is gone (see WeaponData.drop_when_empty).
+signal weapon_dropped(index: int, data: WeaponData)
 
 @export var loadout: Array[WeaponData] = []    ## slot order = phone buttons (pistol, shotgun, sniper)
 @export var body: CharacterBody3D
@@ -80,21 +82,41 @@ func reload_progress() -> float:
 
 func reload() -> void:
 	var data := current_data()
-	if reloading or data == null or ammo_in_mag() >= data.magazine_size:
+	if reloading or data == null or data.drop_when_empty or ammo_in_mag() >= data.magazine_size:
 		return
 	reloading = true
 	_reload_left = maxf(data.reload_seconds, 0.1)
 	_set_scoped(false)
 
 
-## Pickups call this. Returns true if it was a new gun (pickup gets consumed).
+## Pickups call this. Returns true if the pickup should be used up: a new gun (you switch to
+## it, full ammo), or a gun you already hold that isn't full (topped back up).
 func give(data: WeaponData) -> bool:
 	var i := loadout.find(data)
-	if i == -1 or owned[i]:
+	if i == -1:
 		return false
+	var full := maxi(data.magazine_size, 1)
+	if owned[i]:
+		if _magazines[i] >= full:
+			return false
+		_magazines[i] = full
+		return true
 	owned[i] = true
+	_magazines[i] = full
 	select(i)
 	return true
+
+
+## A pickup gun ran dry: it's gone. Switch to another gun you own (the pistol at worst).
+func drop(i: int) -> void:
+	if i <= 0 or i >= loadout.size() or not owned[i]:
+		return       # slot 0 (the pistol) is never dropped
+	owned[i] = false
+	_magazines[i] = maxi(loadout[i].magazine_size, 1)
+	weapon_dropped.emit(i, loadout[i])
+	if i == current:
+		_set_scoped(false)
+		cycle(-1)
 
 
 func select(i: int, force := false) -> void:
@@ -148,7 +170,10 @@ func tick(input: DuoInput, delta: float) -> void:
 			_magazines[current] -= 1
 			_shoot(data)
 		if ammo_in_mag() <= 0:
-			reload()
+			if data.drop_when_empty:
+				drop(current)
+			else:
+				reload()
 	_fire_was = input.fire
 	_bloom = move_toward(_bloom, 0.0, data.bloom_recovery * delta)
 	# view-model recoil
