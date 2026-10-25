@@ -278,7 +278,7 @@ function neutral(): Pose {
 	return { fwd: 0, right: 0, twist: 0, yaw: 0 };
 }
 
-test("gunner look deltas turn the camera 1:1 with the phone", () => {
+test("gunner wrist turns sweep the view with mouse-style sensitivity", () => {
 	for (const [grip, platform] of grips) {
 		const rig = new PhoneRig(grip, platform);
 		rig.tremor = false;
@@ -292,7 +292,7 @@ test("gunner look deltas turn the camera 1:1 with the phone", () => {
 			const out = model.process(rig.step(pose, 16).reading as never, (now += 16));
 			dx += out.lookDX ?? 0; dy += out.lookDY ?? 0;
 		}
-		assert.ok(Math.abs(dx - 30) < 3, `${grip} ${platform}: turned ${dx.toFixed(1)}° for 30°`);
+		assert.ok(dx > 70 && dx < 80, `${grip} ${platform}: turned ${dx.toFixed(1)}° for 30°`);
 		assert.ok(Math.abs(dy) < 2);
 		// A flick faster than the old 130°/s cap still turns all the way.
 		dx = 0;
@@ -300,6 +300,6 @@ test("gunner look deltas turn the camera 1:1 with the phone", () => {
 			pose.yaw = -30 - i * 10; // 600°/s
 			dx += model.process(rig.step(pose, 16).reading as never, (now += 16)).lookDX ?? 0;
 		}
-		assert.ok(Math.abs(dx - 60) < 6, `${grip} ${platform}: a fast flick turned ${dx.toFixed(1)}° for 60°`);
+		assert.ok(Math.abs(dx - 180) < 8, `${grip} ${platform}: a fast flick turned ${dx.toFixed(1)}° for 60°`);
 	}
 });

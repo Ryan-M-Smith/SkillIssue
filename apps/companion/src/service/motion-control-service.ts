@@ -1,3 +1,4 @@
+import { gyroAim } from "@/lib/math/gyro-aim";
 import type {
 	Action,
 	GameControls,
@@ -52,7 +53,7 @@ export type { GameControls, MotionDebug, Role } from "@/types/motion";
  * GUNNER PHONE
  *
  * Only aims: the gyroscope turns the camera. `lookDX`/`lookDY` carry the exact
- * degrees turned this sample, so the game can turn 1:1 with the phone; `lookX`
+ * camera degrees this sample after mouse-style sensitivity; `lookX`
  * and `lookY` are the same as rates (1 = 130°/s) for older games.
  */
 
@@ -103,7 +104,6 @@ const settings = {
 
 	// Gunner.
 	aimMaxRate: 130,
-	aimDeadzone: 1, // deg/s: reject resting noise, retain slow deliberate turns
 };
 
 // Flip a sign here if a direction comes out reversed on a real phone.
@@ -180,12 +180,6 @@ function tiltToMovement(degrees: number, wasActive: boolean, strafe = false): { 
 	if (abs < (wasActive ? exit : enter)) return { value: 0, active: false };
 	const portion = clamp((abs - exit) / (full - exit), 0, 1);
 	return { value: Math.sign(degrees) * Math.pow(portion, strafe ? settings.strafeCurve : settings.curve), active: true };
-}
-
-function aimRate(degreesPerSecond: number) {
-	// Continuous transition avoids the old abrupt 1.5 deg/s camera stop/start.
-	const amount = clamp((Math.abs(degreesPerSecond) - settings.aimDeadzone) / 2.5, 0, 1);
-	return amount === 0 ? 0 : degreesPerSecond * amount * amount * (3 - 2 * amount);
 }
 
 export const emptyControls: GameControls = {
@@ -603,8 +597,12 @@ export class MotionController {
 			// Turning right / tipping the back of the phone up = looking right / up.
 			const level = normalize(cross(frame.up, scale(gravity, -1)));
 			const right = magnitude(level) > 0.5 ? level : frame.right;
-			const yaw = aimRate(axes.gunnerYawSign * dot(gyro, scale(gravity, -1)));
-			const pitch = aimRate(axes.gunnerPitchSign * dot(gyro, right));
+			const aim = gyroAim(
+				axes.gunnerYawSign * dot(gyro, scale(gravity, -1)),
+				axes.gunnerPitchSign * dot(gyro, right),
+			);
+			const yaw = aim.x;
+			const pitch = aim.y;
 			output.lookX = clamp(yaw / settings.aimMaxRate);
 			output.lookY = clamp(pitch / settings.aimMaxRate);
 			output.lookDX = yaw * dt;

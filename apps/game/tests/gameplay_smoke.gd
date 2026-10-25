@@ -318,7 +318,7 @@ func _run() -> void:
 	phone._on_phone_message(0, "gunner", {"t": "aim", "dx": deg_to_rad(24.0), "dy": deg_to_rad(6.0)})
 	var phone_input := DuoInput.new()
 	phone.poll(phone_input, 1.0 / 60.0)
-	if not _check(phone_input.aim_delta.x > 0.0 and phone_input.aim_delta.x < deg_to_rad(24.0), "network turn starts immediately without a single-frame snap"):
+	if not _check(phone_input.aim_delta.x > deg_to_rad(24.0) * 0.85 and phone_input.aim_delta.x < deg_to_rad(24.0), "network turn starts immediately without a single-frame snap"):
 		return
 	duo.aim.tick(phone_input, 1.0 / 60.0)
 	for frame_index in range(30):

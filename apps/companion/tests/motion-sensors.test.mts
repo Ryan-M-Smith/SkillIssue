@@ -51,7 +51,7 @@ test("browser top-level seconds calibrate even when JS callbacks arrive in a bat
 	for (let ms = 0; ms <= 500; ms += 20) model.process(sample(ms), 2000);
 	assert.equal(model.getDebug().calibration, "ready");
 	const turn = model.process(sample(520, { x: 40, y: 0, z: 40 }), 2000);
-	assert.ok(Math.abs(turn.lookDX!) > 0.5 && Math.abs(turn.lookDX!) < 2);
+	assert.ok(Math.abs(turn.lookDX!) > 0.5 && Math.abs(turn.lookDX!) < 5);
 });
 test("sensor timestamp restart recovers instead of rejecting samples forever", () => {
 	const model = new MotionController("movement", "android");
@@ -108,7 +108,7 @@ test("raw Android sensors move and aim correctly in both landscape grips", () =>
 				assert.ok(right < -0.93, `${grip}: raw Android left strafe matches right (${right})`);
 			} else {
 				for (let i = 0; i < 25; i++) { pose.yaw -= 1.2; right += step().lookDX!; }
-				assert.ok(Math.abs(right - 30) < 1, `${grip}: raw radians must turn camera 30 degrees, got ${right}`);
+				assert.ok(right > 70 && right < 77, `${grip}: raw radians must use the same mouse-style sensitivity, got ${right}`);
 			}
 		}
 	}

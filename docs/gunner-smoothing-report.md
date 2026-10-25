@@ -25,3 +25,11 @@ References: [Expo developer menu](https://docs.expo.dev/versions/v58.0.0/sdk/dev
 - Network integration: all 4 tests pass, including real WebSocket clients against the embedded Godot server.
 
 Physical Android/iOS feel and real relay latency still need a device check. Automated tests verify the camera path, but do not establish why a particular handset previously had no aiming or guarantee flawless play. Pull main, restart the game, clear Metro's cache, then test both landscape grips after holding still briefly for calibration.
+
+## Mouse-style aiming follow-up
+
+The phone now uses a shared radial sensitivity curve for yaw and pitch: 1.5x for deliberate slow turns, smoothly rising to 3x for fast sweeps (20 to 90 degrees/second). A fast 30-degree wrist turn can rotate the view 90 degrees. The radial curve preserves diagonal direction and equal horizontal/vertical sensitivity. Resting noise is suppressed with a continuous transition. This replaces the old physical 1:1 mapping; Godot still consumes each transmitted camera-angle delta exactly once.
+
+The game-side packet filter is now 8 ms instead of 25 ms. At 60 physics frames/second, over 85% of a received turn applies on the first frame; the remainder settles quickly. No phone-side temporal filter adds another delay. Scope sensitivity continues to apply in Godot.
+
+Validation: 50 companion tests, TypeScript, lint, 67 Godot gameplay checks and 25 lifecycle checks. The camera smoke test now enforces the faster first-frame response. Runner gestures are unchanged. Physical handset testing is still needed to assess personal sensitivity and network conditions.
