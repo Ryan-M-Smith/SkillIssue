@@ -24,6 +24,7 @@ import {
 const port = Number(process.env.PORT ?? 8080);
 const publicWsUrl = process.env.PUBLIC_WS_URL?.trim();
 const heartbeatIntervalMs = 30_000;
+const emptyLobbyTimeoutMs = 10 * 60_000;
 const pairingCodeLength = 6;
 // Letters and digits that can't be mistaken for each other (no 0/O, 1/I/L).
 const pairingAlphabet = "ABCDEFGHJKMNPQRSTUVWXYZ23456789";
@@ -51,6 +52,7 @@ type Session = {
     pairingCode: string;
     state: GameState;
     gameSocket: WebSocket;
+    emptySince: number;
     /** Every phone in the lobby, in join order. */
     controllers: Map<string, ControllerConnection>;
 };
@@ -190,6 +192,7 @@ function registerGame(socket: WebSocket) {
         pairingCode: createPairingCode(),
         state: "waiting",
         gameSocket: socket,
+        emptySince: Date.now(),
         controllers: new Map(),
     };
 
@@ -249,6 +252,7 @@ function joinGame(socket: WebSocket, pairingCode: string, requestedRole: Control
     };
 
     session.controllers.set(controller.controllerId, controller);
+    session.emptySince = 0;
     contexts.set(socket, { kind: "controller", session, controller });
 
     send(socket, { type: "lobby_joined", controllerId: controller.controllerId, pairingCode: session.pairingCode });
@@ -705,6 +709,7 @@ function disconnect(socket: WebSocket) {
 
     const { session, controller } = context;
     session.controllers.delete(controller.controllerId);
+    if (session.controllers.size === 0) session.emptySince = Date.now();
     if (controller.teamId !== null && controller.role !== null) {
         broadcast(session, {
             type: "controller_disconnected",
@@ -789,6 +794,21 @@ const heartbeat = setInterval(() => {
         socket.ping();
     }
 }, heartbeatIntervalMs);
+
+const emptyLobbyCleanup = setInterval(() => {
+    const now = Date.now();
+    for (const session of sessionsByGameId.values()) {
+        if (
+            session.controllers.size === 0 &&
+            session.emptySince > 0 &&
+            now - session.emptySince >= emptyLobbyTimeoutMs
+        ) {
+            console.log(`[relay] closing empty lobby ${session.gameId} after 10 minutes`);
+            session.gameSocket.close(1000, "Lobby expired after 10 minutes without controllers.");
+        }
+    }
+}, heartbeatIntervalMs);
+emptyLobbyCleanup.unref();
 
 wss.on("close", () => clearInterval(heartbeat));
 httpServer.listen(port);
