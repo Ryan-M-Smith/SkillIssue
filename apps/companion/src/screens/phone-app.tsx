@@ -10,12 +10,14 @@ import { MotionTally, directionOf, zeroCounts, type Counts, type MovementState }
 import { defaultDebugServerUrl } from "@/lib/net/server-url";
 import { normalizeLobbyCode } from "@/lib/net/lobby-code";
 import { publicGameServer } from "@/lib/net/relay";
+import { useMotionAccess } from "@/lib/motion-permission";
 import type { GameControls, Role } from "@/types/motion";
 
 import { AimHud } from "./phone/aim-hud";
 import { EnterCode } from "./phone/enter-code";
 import { GameOver } from "./phone/game-over";
 import { MainMenu } from "./phone/main-menu";
+import { MotionAccessPrompt } from "./phone/motion-access";
 import { MovementHud } from "./phone/movement-hud";
 import { Practice } from "./phone/practice";
 import { TeamSelect } from "./phone/team-select";
@@ -36,7 +38,8 @@ const modelRole = (role: ControllerRole | null | undefined): Role => (role === "
 export default function PhoneApp() {
 	const [screen, setScreen] = useState<Screen>("menu");
 	const [name, setName] = useState("");
-	const [serverUrl, setServerUrl] = useState(defaultDebugServerUrl);
+	// Practice's optional web-debugger stream; not a player setting (lobbies are found by code).
+	const [serverUrl] = useState(defaultDebugServerUrl);
 	const [code, setCode] = useState("");
 	const [view, setView] = useState<LobbyView>(idleLobby);
 	const [waitingAgain, setWaitingAgain] = useState(false);
@@ -49,6 +52,8 @@ export default function PhoneApp() {
 	const [firing, setFiring] = useState(false);
 	const [sensorSession, setSensorSession] = useState(0);
 	const activeControls = screen === "match" && (view.stage === "lobby" || view.stage === "playing");
+	const { access: motionAccess, request: requestMotion } = useMotionAccess(activeControls);
+	const sensorsAllowed = motionAccess === "granted";
 
 	const clientRef = useRef<LobbyClient | null>(null);
 	const joinAttemptRef = useRef(0);
@@ -84,16 +89,15 @@ export default function PhoneApp() {
 
 	// Practice owns its own sensors; the match model runs only while in a lobby/game.
 	useEffect(() => {
-		if (!activeControls) return;
+		// Access is asked for explicitly (MotionAccessPrompt); sensors start once it's granted.
+		if (!activeControls || !sensorsAllowed) return;
 		let subscription: ReturnType<typeof DeviceMotion.addListener> | null = null;
 		let cancelled = false;
 		(async () => {
 			try {
-				const permission = await DeviceMotion.requestPermissionsAsync();
-				if (!permission.granted) throw new Error("Motion permission denied. Allow it in the phone's settings.");
-				if (!(await DeviceMotion.isAvailableAsync())) throw new Error("This device has no motion sensors.");
 				if (cancelled) return;
-				DeviceMotion.setUpdateInterval(20);
+				// ~60 Hz: the controller sends each processed sample right away.
+				DeviceMotion.setUpdateInterval(16);
 				subscription = DeviceMotion.addListener((reading) => {
 					const now = Date.now();
 					const output = controllerRef.current.process(reading, now);
@@ -114,17 +118,16 @@ export default function PhoneApp() {
 			cancelled = true;
 			subscription?.remove();
 		};
-	}, [activeControls, sensorSession]);
+	}, [activeControls, sensorsAllowed, sensorSession]);
 
 	useEffect(() => () => { clientRef.current?.leave(); }, []);
 
 	function recenter() {
 		controllerRef.current.reset();
 		// Browser motion permission must be requested directly from a user gesture.
-		void DeviceMotion.requestPermissionsAsync().then((permission) => {
-			if (permission.granted) { setNotice(null); setSensorSession((session) => session + 1); }
-			else setNotice("Motion permission denied. Allow motion access in your phone settings.");
-		}).catch(() => setNotice("Motion sensors are unavailable. Open the native phone app or use HTTPS."));
+		void requestMotion().then((next) => {
+			if (next === "granted") { setNotice(null); setSensorSession((session) => session + 1); }
+		});
 	}
 
 	// Synchronize the sensor model before the next reading reaches the game.
@@ -194,8 +197,6 @@ export default function PhoneApp() {
 			<MainMenu
 				name={name}
 				onName={setName}
-				serverUrl={serverUrl}
-				onServerUrl={setServerUrl}
 				onJoin={() => { setJoinError(null); setScreen("code"); }}
 				onPractice={() => setScreen("practice")}
 				notice={notice}
@@ -249,6 +250,9 @@ export default function PhoneApp() {
 			<StatusBar hidden />
 			{body}
 			{notice && screen === "match" && view.stage === "playing" && <Body size={12} color={ui.gold} style={styles.notice}>{notice} Tap RECENTER to retry.</Body>}
+			{activeControls && motionAccess !== "granted" && motionAccess !== "checking" && (
+				<MotionAccessPrompt access={motionAccess} onAllow={() => void requestMotion()} onBack={leave} backLabel="LEAVE" />
+			)}
 		</SafeAreaView>
 	);
 }

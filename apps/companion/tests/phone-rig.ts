@@ -28,7 +28,17 @@ export const GRIP_BASES: Record<Grip, M> = {
 
 export const neutralPose = (): Pose => ({ fwd: 0, right: 0, twist: 0, yaw: 0 });
 
-const noise = (a: number) => (Math.random() - 0.5) * 2 * a;
+/** Small deterministic PRNG, so tests with tremor always see the same noise. */
+export function seeded(seed = 1) {
+  let s = seed >>> 0;
+  return () => {
+    s = (s + 0x6d2b79f5) >>> 0;
+    let t = s;
+    t = Math.imul(t ^ (t >>> 15), t | 1);
+    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
 
 export class PhoneRig {
   base: M;
@@ -36,7 +46,12 @@ export class PhoneRig {
   pose: Pose = neutralPose();
   t = 1000; // sensor clock, seconds
   tremor = true;
+  /** Tremor size: gyro deg/s and gravity m/s². */
+  shake = { gyro: 5, gravity: 0.04 };
+  /** Constant gyroscope error, deg/s, as real phones have. */
+  bias: V3 = [0, 0, 0];
   linear = true;
+  random: () => number = Math.random;
 
   constructor(public grip: Grip = "landscape-left", public platform = "ios") {
     this.base = GRIP_BASES[grip];
@@ -65,8 +80,9 @@ export class PhoneRig {
     const dt = dtMs / 1000;
     let gyro = [(d[2][1] - d[1][2]) / 2, (d[0][2] - d[2][0]) / 2, (d[1][0] - d[0][1]) / 2]
       .map((v) => Math.asin(Math.max(-1, Math.min(1, v))) / D2R / dt) as V3;
-    if (this.tremor) gyro = gyro.map((v) => v + noise(5)) as V3;
-    const gravity = mv(T(R), [0, 0, -9.81]).map((v) => v + (this.tremor ? noise(0.04) : 0)) as V3;
+    const noise = (a: number) => (this.random() - 0.5) * 2 * a;
+    gyro = gyro.map((v, i) => v + this.bias[i] + (this.tremor ? noise(this.shake.gyro) : 0)) as V3;
+    const gravity = mv(T(R), [0, 0, -9.81]).map((v) => v + (this.tremor ? noise(this.shake.gravity) : 0)) as V3;
     this.t += dt;
     const [x, y, z] = gyro;
     const packed =

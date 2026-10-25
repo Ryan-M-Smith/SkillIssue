@@ -131,6 +131,27 @@ func reset_stats() -> void:
 	_stats.max_poll_usec = 0
 
 
+## Also read the socket right before physics, so a phone's newest input reaches InputRouter
+## (which runs its physics after this autoload) in the same frame, not one frame later.
+func _physics_process(_delta: float) -> void:
+	if _local:
+		var batch := _local_inbox
+		_local_inbox = []
+		for value in batch:
+			_stats.packets += 1
+			_handle_value(value)
+		return
+	if not _connected:
+		return
+	_ws.poll()
+	if _ws.get_ready_state() != WebSocketPeer.STATE_OPEN:
+		return
+	var count := 0
+	while _ws.get_available_packet_count() > 0 and count < MAX_PACKETS_PER_FRAME:
+		count += 1
+		_handle_packet(_ws.get_packet())
+
+
 func _process(delta: float) -> void:
 	var start := Time.get_ticks_usec()
 	if _local:

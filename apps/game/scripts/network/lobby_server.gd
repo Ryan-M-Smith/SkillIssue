@@ -626,6 +626,10 @@ func _valid_input(msg: Dictionary, role: String) -> bool:
 		for key in ["moveX", "moveY", "lookX", "lookY"]:
 			if not _finite(controls.get(key)) or absf(float(controls[key])) > 1.0:
 				return false
+		# Optional gunner turn since the last message, in degrees.
+		for key in ["lookDX", "lookDY"]:
+			if controls.has(key) and (not _finite(controls.get(key)) or absf(float(controls[key])) > 180.0):
+				return false
 		return true
 	return _vector(payload.get("accelerometer")) and _vector(payload.get("gyroscope"))
 

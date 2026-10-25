@@ -17,6 +17,12 @@ export type MotionControls = {
     moveY: number;
     lookX: number;
     lookY: number;
+    /**
+     * Gunner: degrees the phone turned since its previous motion message (+ = right / up).
+     * When present the game turns the camera by exactly this, instead of by the lookX/lookY rate.
+     */
+    lookDX?: number;
+    lookDY?: number;
 };
 
 export type MotionReading = {

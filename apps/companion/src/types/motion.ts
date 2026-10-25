@@ -45,6 +45,9 @@ export type GameControls = {
 	crouch: boolean;
 	lookX: number;
 	lookY: number;
+	/** Gunner: degrees the phone turned this sample (+ = right / up), for 1:1 aiming. */
+	lookDX?: number;
+	lookDY?: number;
 	action: Action;
 };
 
