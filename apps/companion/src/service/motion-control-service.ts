@@ -1,18 +1,21 @@
 import type {
 	Action,
 	GameControls,
-	MotionAngles,
+	Grip,
 	MotionDebug,
 	MotionReading,
 	MotionVector,
 	Role,
 } from "@/types/motion";
 import {
-	angleDiff,
 	clamp,
+	cross,
 	deviceRotationRate,
+	dot,
 	magnitude,
+	normalize,
 	radToDeg,
+	scale,
 } from "@/lib/math/motion";
 
 export type { GameControls, MotionDebug, Role } from "@/types/motion";
@@ -20,26 +23,36 @@ export type { GameControls, MotionDebug, Role } from "@/types/motion";
 /*
  * MOVEMENT PHONE
  *
- * Hold the phone at about 45°, screen toward you. The pose it is held still
- * in at start is neutral. Each control lives on one of the phone's own axes:
+ * Hold the phone in landscape with both hands, like a controller, tilted
+ * about 45° with the screen toward you. (Portrait works too.) The pose it
+ * is held still in at start is neutral.
  *
- *   Pitch / X   slow tilt and hold    walk forward (top away) / back
- *               quick flick forward   crouch, flick again to stand up
- *               quick flick back      jump (while crouched: stand up)
- *   Yaw / Y     slow tilt and hold    strafe right (right side down) / left
- *   Roll / Z    quick twist           sprint on, twist again for off
+ *   Pitch   slow tilt and hold    walk forward (top edge away) / back
+ *           quick flick forward   crouch, flick again to stand up
+ *           quick flick back      jump (while crouched: stand up)
+ *   Yaw     slow tilt and hold    strafe right (right end down) / left
+ *   Roll/Z  quick twist           sprint on, twist again for off
  *
- * HOW IT DETECTS THEM
+ * WORKS IN ANY GRIP
  *
- * Held tilts come from the phone's fused orientation, relative to neutral.
+ * The phone's own X/Y axes swap places between portrait and landscape, so
+ * nothing here assumes a grip. During calibration, gravity shows which way
+ * is up on the screen. From that we build the player's axes in the phone's
+ * frame:
  *
- * Gestures come from the gyroscope. Any fast motion starts a "burst". During
- * the burst the gyroscope's rotation is added up per axis (using the
- * sensor's own timestamps, not the JS clock). As soon as one axis clearly
- * dominates and has turned far and fast enough, that axis's gesture fires.
- * A burst can fire at most once, so the swing back to neutral never counts
- * as a second gesture. After a gesture there is a short lock, and the
- * gesture's own motion never turns into walking.
+ *   up     the screen's up direction        (portrait: +Y, landscape: ±X)
+ *   right  the player's left-right axis     up × Z, always level
+ *   away   level, pointing away from you    up-world × right
+ *
+ * Held tilts are measured from gravity: how far it has turned, since
+ * neutral, about `right` (forward/back) and about `away` (left/right).
+ *
+ * Gestures come from the gyroscope, projected onto `right`, `up` and the
+ * screen normal Z. A fast motion starts a "burst"; its rotation is added up
+ * per axis using the sensor's own timestamps. As soon as one axis clearly
+ * dominates and has turned far and fast enough, that gesture fires. A burst
+ * fires at most once, then gestures are locked briefly, and the gesture's
+ * own motion never turns into walking.
  *
  * Crouch and sprint are exclusive stances; starting one ends the other.
  */
@@ -54,6 +67,9 @@ const settings = {
 	deadzoneDeg: 8,
 	fullSpeedDeg: 25,
 
+	// Gravity smoothing when the phone doesn't report linear acceleration
+	gravitySmoothing: 0.15,
+
 	// Bursts: a fast motion in progress
 	burstStartRate: 80, // deg/s
 	burstEndRate: 50, // deg/s
@@ -61,7 +77,7 @@ const settings = {
 	burstMaxMs: 800,
 	dominance: 1.5, // winning axis must turn this many times more than the others
 
-	// Pitch flick (X): jump / crouch
+	// Pitch flick: jump / crouch
 	flickRate: 150, // deg/s peak
 	flickMinDeg: 12,
 
@@ -87,15 +103,54 @@ const settings = {
 
 // Flip a sign here if a direction comes out reversed on a real phone.
 const axes = {
-	// rotation.beta is 0° flat and 90° upright on iOS and Android, so tilting
-	// the top away (forward) lowers it; gyro X is negative for the same motion.
-	forwardSign: -1,
-	// rotation.gamma grows as the right side goes down.
-	rightSign: 1,
-	gunnerYawSign: 1, // lookX from gyro Y
-	gunnerPitchSign: -1, // lookY from gyro X
+	forwardSign: 1, // + = top edge away walks forward
+	rightSign: 1, // + = right end down strafes right
+	gunnerYawSign: 1, // lookX from rotation about the screen's up axis
+	gunnerPitchSign: -1, // lookY from rotation about the left-right axis
 	forwardJabZSign: -1,
 };
+
+/** The player's axes, in the phone's own frame, worked out at calibration. */
+type Frame = {
+	grip: Grip;
+	down: MotionVector; // gravity direction at neutral
+	up: MotionVector; // screen's up direction, in the screen plane
+	right: MotionVector; // player's left-right axis
+	away: MotionVector; // level, pointing away from the player
+};
+
+const zAxis: MotionVector = { x: 0, y: 0, z: 1 };
+
+function buildFrame(down: MotionVector): Frame {
+	// Screen's up = world up, projected onto the screen plane.
+	const inPlane = { x: -down.x, y: -down.y, z: 0 };
+	const flat = magnitude(inPlane) < 0.25;
+	const up = flat ? { x: 0, y: 1, z: 0 } : normalize(inPlane);
+	const right = cross(up, zAxis);
+	const away = normalize(cross(scale(down, -1), right));
+
+	let grip: Grip;
+
+	if (flat) {
+		grip = "flat";
+	} else if (Math.abs(up.x) > Math.abs(up.y)) {
+		grip = "landscape";
+	} else {
+		grip = up.y > 0 ? "portrait" : "upside down";
+	}
+
+	return { grip, down, up, right, away };
+}
+
+// Device rotation (degrees) about `axis` that turned gravity from `from` to `to`.
+function rotationAbout(
+	from: MotionVector,
+	to: MotionVector,
+	axis: MotionVector
+) {
+	// Gravity turns the opposite way to the phone, hence the minus.
+	return -radToDeg(Math.asin(clamp(dot(cross(from, to), axis))));
+}
 
 // Convert held tilt into WASD-style movement
 function tiltToMovement(degrees: number) {
@@ -131,6 +186,7 @@ export const emptyControls: GameControls = {
 function emptyDebug(): MotionDebug {
 	return {
 		calibration: "calibrating",
+		grip: "portrait",
 		pitchDeg: 0,
 		sidePressDeg: 0,
 		pitchRate: 0,
@@ -142,12 +198,15 @@ function emptyDebug(): MotionDebug {
 	};
 }
 
+/** Gyroscope rates about the player's axes: x = pitch, y = side, z = twist. */
+type PlayerRates = MotionVector;
+
 type Burst = {
 	startedAt: number;
 	lastFastAt: number;
-	turned: MotionVector; // degrees turned about each axis during the burst
-	peak: MotionVector; // fastest rate about each axis, deg/s
-	moveBefore: { x: number; y: number };
+	turned: PlayerRates; // degrees turned about each axis during the burst
+	peak: PlayerRates; // fastest rate about each axis, deg/s
+	moveBefore: Move;
 	fired: boolean;
 };
 
@@ -157,7 +216,9 @@ const still: Move = { x: 0, y: 0 };
 
 export class MotionController {
 	private calibrationSince: number | null = null;
-	private neutral: MotionAngles | null = null;
+	private gravitySum: MotionVector = { x: 0, y: 0, z: 0 };
+	private frame: Frame | null = null;
+	private gravity: MotionVector | null = null;
 	private lastSampleAt: number | null = null;
 
 	// Movement role
@@ -189,7 +250,9 @@ export class MotionController {
 	// Recalibrate when necessary
 	reset() {
 		this.calibrationSince = null;
-		this.neutral = null;
+		this.gravitySum = { x: 0, y: 0, z: 0 };
+		this.frame = null;
+		this.gravity = null;
 		this.lastSampleAt = null;
 
 		this.crouching = false;
@@ -222,27 +285,33 @@ export class MotionController {
 				: clamp((t - this.lastSampleAt) / 1000, 0, 0.1);
 		this.lastSampleAt = t;
 
+		const gravity = this.updateGravity(reading);
+
 		const gyro: MotionVector | null = reading.rotationRate
 			? deviceRotationRate(reading.rotationRate, this.platform)
 			: null;
 		const angularSpeed = gyro ? magnitude(gyro) : Infinity;
 
-		this.debug.pitchRate = gyro?.x ?? 0;
-		this.debug.sidePressRate = gyro?.y ?? 0;
-		this.debug.twistRate = gyro?.z ?? 0;
-
 		// STEP 1: AUTOMATIC CALIBRATION
-		// Phone must be held still before controls activate.
-		if (!this.neutral) {
+		// Hold still: gravity then gives neutral and the grip.
+		if (!this.frame) {
 			if (angularSpeed < settings.calibrationMaxRate) {
 				if (this.calibrationSince === null) {
 					this.calibrationSince = t;
+					this.gravitySum = { x: 0, y: 0, z: 0 };
 				}
 
+				this.gravitySum = {
+					x: this.gravitySum.x + gravity.x,
+					y: this.gravitySum.y + gravity.y,
+					z: this.gravitySum.z + gravity.z,
+				};
+
 				if (t - this.calibrationSince >= settings.calibrationMs) {
-					this.neutral = { ...reading.rotation };
+					this.frame = buildFrame(normalize(this.gravitySum));
 					this.armed = true;
 					this.debug.calibration = "ready";
+					this.debug.grip = this.frame.grip;
 				}
 			} else {
 				this.calibrationSince = null;
@@ -250,31 +319,72 @@ export class MotionController {
 
 			return {
 				...emptyControls,
-				ready: this.neutral !== null,
+				ready: this.frame !== null,
 			};
 		}
 
+		const rates: PlayerRates | null = gyro
+			? {
+					x: dot(gyro, this.frame.right),
+					y: dot(gyro, this.frame.up),
+					z: gyro.z,
+				}
+			: null;
+
+		this.debug.pitchRate = rates?.x ?? 0;
+		this.debug.sidePressRate = rates?.y ?? 0;
+		this.debug.twistRate = rates?.z ?? 0;
+
 		return this.role === "movement"
-			? this.processMovement(reading, this.neutral, gyro, t, dt)
-			: this.processGunner(reading, gyro, angularSpeed, t);
+			? this.processMovement(gravity, this.frame, rates, t, dt)
+			: this.processGunner(reading, rates, angularSpeed, t);
+	}
+
+	// Unit gravity direction in the phone's frame (points at the ground).
+	private updateGravity(reading: MotionReading): MotionVector {
+		const total = reading.accelerationIncludingGravity;
+		const linear = reading.acceleration;
+
+		if (linear) {
+			// Both platforms already separate gravity from hand motion.
+			this.gravity = normalize({
+				x: total.x - linear.x,
+				y: total.y - linear.y,
+				z: total.z - linear.z,
+			});
+		} else {
+			// No linear acceleration: smooth out hand motion instead.
+			const sample = normalize(total);
+			const k = settings.gravitySmoothing;
+
+			this.gravity = this.gravity
+				? normalize({
+						x: this.gravity.x + k * (sample.x - this.gravity.x),
+						y: this.gravity.y + k * (sample.y - this.gravity.y),
+						z: this.gravity.z + k * (sample.z - this.gravity.z),
+					})
+				: sample;
+		}
+
+		return this.gravity;
 	}
 
 	// -------------------- MOVEMENT PHONE --------------------
 
 	private processMovement(
-		reading: MotionReading,
-		neutral: MotionAngles,
-		gyro: MotionVector | null,
+		gravity: MotionVector,
+		frame: Frame,
+		rates: PlayerRates | null,
 		t: number,
 		dt: number
 	): GameControls {
+		// Rotation about `right` is + when the top edge comes toward you.
 		const forwardDeg =
-			axes.forwardSign *
-			radToDeg(angleDiff(reading.rotation.beta, neutral.beta));
+			-axes.forwardSign * rotationAbout(frame.down, gravity, frame.right);
 
+		// Rotation about `away` is + when the right end goes down.
 		const rightDeg =
-			axes.rightSign *
-			radToDeg(angleDiff(reading.rotation.gamma, neutral.gamma));
+			axes.rightSign * rotationAbout(frame.down, gravity, frame.away);
 
 		const atNeutral =
 			Math.abs(forwardDeg) < settings.deadzoneDeg &&
@@ -283,8 +393,8 @@ export class MotionController {
 		// STEP 2: GESTURES FROM GYROSCOPE BURSTS
 		let action: Action = null;
 
-		if (gyro) {
-			action = this.updateBurst(gyro, t, dt);
+		if (rates) {
+			action = this.updateBurst(rates, t, dt);
 		}
 
 		// STEP 3: WALK / STRAFE FROM HELD TILT
@@ -308,7 +418,9 @@ export class MotionController {
 
 		this.debug.pitchDeg = forwardDeg;
 		this.debug.sidePressDeg = rightDeg;
-		this.debug.burst = this.burst ? dominantAxisName(this.burst.turned) : "none";
+		this.debug.burst = this.burst
+			? dominantAxisName(this.burst.turned)
+			: "none";
 		this.debug.gesture = t >= this.lockedUntil ? "armed" : "locked";
 		this.debug.sprintPhase = this.sprinting ? "on" : "off";
 
@@ -323,8 +435,8 @@ export class MotionController {
 		};
 	}
 
-	private updateBurst(gyro: MotionVector, t: number, dt: number): Action {
-		const speed = magnitude(gyro);
+	private updateBurst(rates: PlayerRates, t: number, dt: number): Action {
+		const speed = magnitude(rates);
 
 		if (!this.burst) {
 			if (speed < settings.burstStartRate) {
@@ -344,14 +456,14 @@ export class MotionController {
 		const burst = this.burst;
 
 		burst.turned = {
-			x: burst.turned.x + gyro.x * dt,
-			y: burst.turned.y + gyro.y * dt,
-			z: burst.turned.z + gyro.z * dt,
+			x: burst.turned.x + rates.x * dt,
+			y: burst.turned.y + rates.y * dt,
+			z: burst.turned.z + rates.z * dt,
 		};
 		burst.peak = {
-			x: Math.max(burst.peak.x, Math.abs(gyro.x)),
-			y: Math.max(burst.peak.y, Math.abs(gyro.y)),
-			z: Math.max(burst.peak.z, Math.abs(gyro.z)),
+			x: Math.max(burst.peak.x, Math.abs(rates.x)),
+			y: Math.max(burst.peak.y, Math.abs(rates.y)),
+			z: Math.max(burst.peak.z, Math.abs(rates.z)),
 		};
 
 		if (speed >= settings.burstEndRate) {
@@ -386,31 +498,31 @@ export class MotionController {
 
 	// Which gesture, if any, this burst is so far.
 	private classify(burst: Burst): Action {
-		const x = Math.abs(burst.turned.x);
-		const y = Math.abs(burst.turned.y);
-		const z = Math.abs(burst.turned.z);
+		const pitch = Math.abs(burst.turned.x);
+		const side = Math.abs(burst.turned.y);
+		const twist = Math.abs(burst.turned.z);
 
-		// Pitch flick (X)
+		// Pitch flick
 		if (
-			x >= settings.flickMinDeg &&
+			pitch >= settings.flickMinDeg &&
 			burst.peak.x >= settings.flickRate &&
-			x >= settings.dominance * Math.max(y, z)
+			pitch >= settings.dominance * Math.max(side, twist)
 		) {
-			// Gyro X is positive when the top comes toward you.
-			const forward = axes.forwardSign * burst.turned.x > 0;
+			// Rotation about `right` is + when the top edge comes toward you.
+			const forward = -axes.forwardSign * burst.turned.x > 0;
 			return forward ? this.toggleCrouch() : this.jump();
 		}
 
-		// Twist (Z)
+		// Twist about the screen normal (Z)
 		if (
-			z >= settings.twistMinDeg &&
+			twist >= settings.twistMinDeg &&
 			burst.peak.z >= settings.twistRate &&
-			z >= settings.dominance * Math.max(x, y)
+			twist >= settings.dominance * Math.max(pitch, side)
 		) {
 			return this.toggleSprint();
 		}
 
-		// A fast tilt about Y is just a quick strafe: no gesture.
+		// Anything else (e.g. a quick left/right tilt) is not a gesture.
 		return null;
 	}
 
@@ -447,7 +559,7 @@ export class MotionController {
 
 	private processGunner(
 		reading: MotionReading,
-		gyro: MotionVector | null,
+		rates: PlayerRates | null,
 		angularSpeed: number,
 		t: number
 	): GameControls {
@@ -507,16 +619,16 @@ export class MotionController {
 			action,
 		};
 
-		if (gyro && t >= this.aimFrozenUntil) {
-			output.lookX = gyroToMovement(axes.gunnerYawSign * gyro.y);
-			output.lookY = gyroToMovement(axes.gunnerPitchSign * gyro.x);
+		if (rates && t >= this.aimFrozenUntil) {
+			output.lookX = gyroToMovement(axes.gunnerYawSign * rates.y);
+			output.lookY = gyroToMovement(axes.gunnerPitchSign * rates.x);
 		}
 
 		return output;
 	}
 }
 
-function dominantAxisName(v: MotionVector): MotionDebug["burst"] {
+function dominantAxisName(v: PlayerRates): MotionDebug["burst"] {
 	const x = Math.abs(v.x);
 	const y = Math.abs(v.y);
 	const z = Math.abs(v.z);

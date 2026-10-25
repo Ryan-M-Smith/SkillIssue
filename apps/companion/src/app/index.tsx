@@ -43,6 +43,7 @@ const zeroCounts: Counts = {
 
 const zeroDebug: MotionDebug = {
   calibration: "calibrating",
+  grip: "portrait",
   pitchDeg: 0,
   sidePressDeg: 0,
   pitchRate: 0,
@@ -582,31 +583,41 @@ export default function Index() {
         {/* MOTION DIAGNOSTICS */}
 
         <Panel title="GESTURE DIAGNOSTICS">
+          <View style={styles.line}>
+            <Text style={styles.label}>
+              Grip (from calibration)
+            </Text>
+
+            <Text style={styles.highlight}>
+              {ready ? debug.grip.toUpperCase() : "—"}
+            </Text>
+          </View>
+
           <View style={styles.stats}>
             <Value
-              name="PITCH TILT (X)"
+              name="FORWARD TILT"
               value={`${fmt(debug.pitchDeg)}°`}
             />
 
             <Value
-              name="SIDE TILT (Y)"
+              name="RIGHT TILT"
               value={`${fmt(debug.sidePressDeg)}°`}
             />
           </View>
 
           <View style={styles.stats}>
             <Value
-              name="X RATE"
+              name="PITCH RATE"
               value={`${fmt(debug.pitchRate, 0)} °/s`}
             />
 
             <Value
-              name="Y RATE"
+              name="SIDE RATE"
               value={`${fmt(debug.sidePressRate, 0)} °/s`}
             />
 
             <Value
-              name="Z RATE"
+              name="TWIST (Z) RATE"
               value={`${fmt(debug.twistRate, 0)} °/s`}
             />
           </View>
@@ -689,31 +700,34 @@ export default function Index() {
           TESTING INSTRUCTIONS
 
           {"\n\n"}
-          1. Start sensors and hold the phone still at
-          about 45°, screen toward you, for about a
-          second. That pose is neutral.
+          1. Hold the phone in landscape with both
+          hands, like a controller, tilted about 45°
+          with the screen toward you. Start sensors and
+          hold still for about a second. That pose is
+          neutral. (Portrait works too: the grip is
+          detected when you calibrate.)
 
           {"\n"}
-          2. Pitch (X): slowly tilt the top away and
+          2. Pitch: slowly tilt the top edge away and
           hold to walk forward. Tilt it toward you to
           walk back. Return to neutral to stop.
 
           {"\n"}
-          3. Pitch (X): quickly flick forward to crouch,
+          3. Pitch: quickly flick forward to crouch,
           again to stand up. Quickly flick back to jump.
 
           {"\n"}
-          4. Yaw (Y): slowly press the right or left
-          side down and hold to strafe.
+          4. Yaw: slowly tip the right or left end down
+          and hold to strafe that way.
 
           {"\n"}
-          5. Roll (Z): quickly twist the phone like a
-          steering wheel to sprint, again to stop.
+          5. Roll (Z): quickly twist the phone in the
+          plane of the screen to sprint, again to stop.
 
           {"\n\n"}
-          The X / Y / Z rates above show which axis a
-          motion uses. If a direction is reversed, flip
-          its sign in motion-control-service.ts.
+          Recalibrate after changing your grip. If a
+          direction is reversed, flip its sign in
+          motion-control-service.ts.
         </Text>
 
       </ScrollView>
