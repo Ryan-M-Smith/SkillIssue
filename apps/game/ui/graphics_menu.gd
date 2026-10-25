@@ -10,6 +10,8 @@ var match_settings := false
 var _shade: ColorRect
 var _players: HSlider
 var _players_value: Label
+var _minutes: HSlider
+var _minutes_value: Label
 var _music: HSlider
 var _resolution: OptionButton
 var _scale: OptionButton
@@ -59,6 +61,25 @@ func _ready() -> void:
 		slider_row.add_child(_players_value)
 		_players.value_changed.connect(func(v: float): _players_value.text = str(int(v)))
 		_add_row(col, "Player Count", slider_row)
+		# Match length: 2 to 5 minutes (5 by default).
+		var minutes_row := HBoxContainer.new()
+		minutes_row.add_theme_constant_override("separation", 18)
+		_minutes = HSlider.new()
+		_minutes.min_value = GameSession.MATCH_MINUTES_MIN
+		_minutes.max_value = GameSession.MATCH_MINUTES_MAX
+		_minutes.step = 1
+		_minutes.tick_count = GameSession.MATCH_MINUTES_MAX - GameSession.MATCH_MINUTES_MIN + 1
+		_minutes.ticks_on_borders = true
+		_minutes.value = GameSession.MATCH_MINUTES_MAX
+		_minutes.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		_minutes.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+		minutes_row.add_child(_minutes)
+		_minutes_value = UiKit.display("5:00", 32)
+		_minutes_value.custom_minimum_size.x = 72
+		_minutes_value.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+		minutes_row.add_child(_minutes_value)
+		_minutes.value_changed.connect(func(v: float): _minutes_value.text = "%d:00" % int(v))
+		_add_row(col, "Match Length", minutes_row)
 	_music = HSlider.new()
 	_music.min_value = 0.0
 	_music.max_value = 1.0
@@ -103,6 +124,8 @@ func _ready() -> void:
 		_vsync.button_pressed = true
 		if _players:
 			_players.value = 4
+		if _minutes:
+			_minutes.value = GameSession.MATCH_MINUTES_MAX
 		_music.value = 0.8
 		_status.text = "Default settings selected. Apply to save.")
 	buttons.add_child(reset)
@@ -136,6 +159,8 @@ func open_menu() -> void:
 	_music.set_value_no_signal(Music.volume)
 	if _players:
 		_players.value = GameSession.players_needed
+	if _minutes:
+		_minutes.value = GameSession.match_minutes
 	_status.text = ""
 	_shade.visible = true
 	(_players if _players else _resolution).grab_focus()
@@ -156,6 +181,10 @@ func _apply() -> void:
 		var saved := GameSession.set_players_needed(int(_players.value))
 		if error == OK:
 			error = saved
+	if _minutes:
+		var saved_minutes := GameSession.set_match_minutes(int(_minutes.value))
+		if error == OK:
+			error = saved_minutes
 	if error == OK:
 		close_menu()   # applied and saved: nothing left to do here
 		return
