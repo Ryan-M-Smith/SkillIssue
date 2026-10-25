@@ -77,7 +77,7 @@ func connect_local() -> void:
 	_local = true
 	LobbyServer.attach_host(_receive_local)
 	_set_connected(true)
-	send_message("hello", {"clientType": "game"})
+	send_message("hello", {"clientType": "game", "minPlayers": GameSession.players_needed})
 
 
 func is_local() -> bool:
@@ -150,7 +150,7 @@ func _process(delta: float) -> void:
 				_ws.set_no_delay(true)
 				_set_connected(true)
 				_retry_delay = reconnect_delay
-				send_message("hello", {"clientType": "game"})
+				send_message("hello", {"clientType": "game", "minPlayers": GameSession.players_needed})
 			var count := 0
 			while _ws.get_available_packet_count() > 0 and count < MAX_PACKETS_PER_FRAME:
 				count += 1

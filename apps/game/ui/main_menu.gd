@@ -51,7 +51,7 @@ func _ready() -> void:
 	var how := UiKit.button("HOW TO PLAY")
 	how.custom_minimum_size = Vector2(420, 60)
 	how.pressed.connect(_show_how)
-	var graphics := UiKit.button("GRAPHICS")
+	var graphics := UiKit.button("SETTINGS")
 	graphics.custom_minimum_size = Vector2(420, 60)
 	graphics.pressed.connect(func(): _graphics.open_menu())
 	var practice := UiKit.button("PRACTICE / KEYBOARD")
@@ -86,6 +86,7 @@ func _ready() -> void:
 	_how.visible = false
 	add_child(_how)
 	_graphics = preload("res://ui/graphics_menu.gd").new()
+	_graphics.match_settings = true
 	add_child(_graphics)
 	_graphics.closed.connect(func(): graphics.grab_focus())
 

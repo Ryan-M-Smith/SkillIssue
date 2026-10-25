@@ -189,9 +189,9 @@ func _refresh() -> void:
 			_render_slot(team, role, GameSession.player_at(team, role))
 	_waiting.text = ("Choosing a spot: " + ", ".join(waiting)) if not waiting.is_empty() else ""
 	if _countdown < 0.0 and not _loading:
+		# The host's Settings → Players needed decides `need` (the server reports it back).
 		var need := GameSession.min_players
-		var note := "" if need >= 4 else "   (test mode: %d phone%s can start)" % [need, "" if need == 1 else "s"]
-		_footer.text = "%d / %d READY%s" % [ready, maxi(need, slotted), note] if server_ok else ""
+		_footer.text = "%d / %d READY" % [ready, maxi(need, slotted)] if server_ok else ""
 		_footer.add_theme_color_override("font_color", UiKit.INK)
 
 

@@ -53,6 +53,8 @@ type Session = {
     state: GameState;
     gameSocket: WebSocket;
     emptySince: number;
+    /** Ready phones it takes to start (1-4), set by the host. */
+    minPlayers: number;
     /** Every phone in the lobby, in join order. */
     controllers: Map<string, ControllerConnection>;
 };
@@ -154,14 +156,19 @@ function playersFor(session: Session): LobbyPlayer[] {
     }));
 }
 
-/** Enough slotted phones (all four, or MIN_CONTROLLERS) and every slotted phone ready. */
+/** A host's player count, or null if it isn't a whole number from 1 to 4. */
+function playerCount(value: unknown): number | null {
+    return typeof value === "number" && Number.isInteger(value) && value >= 1 && value <= controllerSlots.length ? value : null;
+}
+
+/** Enough slotted phones (all four, or the lobby's minPlayers) and every slotted phone ready. */
 function isReady(session: Session) {
     const inSlots = slotted(session);
     if (inSlots.length === 0 || !inSlots.every((c) => c.ready)) {
         return false;
     }
-    if (minControllers < controllerSlots.length) {
-        return inSlots.length >= minControllers;
+    if (session.minPlayers < controllerSlots.length) {
+        return inSlots.length >= session.minPlayers;
     }
     return controllerSlots.every(({ teamId, role }) => slotHolder(session, teamId, role));
 }
@@ -176,13 +183,13 @@ function sendLobbyState(session: Session) {
         state: session.state,
         assignments: assignmentsFor(session),
         players: playersFor(session),
-        minPlayers: minControllers,
+        minPlayers: session.minPlayers,
     };
 
     broadcast(session, message);
 }
 
-function registerGame(socket: WebSocket) {
+function registerGame(socket: WebSocket, minPlayers: number | null) {
     if (contexts.has(socket)) {
         sendError(socket, "invalid_message", "This connection is already in a lobby.");
         return;
@@ -193,6 +200,7 @@ function registerGame(socket: WebSocket) {
         state: "waiting",
         gameSocket: socket,
         emptySince: Date.now(),
+        minPlayers: minPlayers ?? minControllers,
         controllers: new Map(),
     };
 
@@ -349,8 +357,8 @@ function startGame(socket: WebSocket) {
         sendError(
             socket,
             "game_unavailable",
-            minControllers < controllerSlots.length
-                ? `At least ${minControllers} controller(s) must pick a spot and ready up first.`
+            context.session.minPlayers < controllerSlots.length
+                ? `At least ${context.session.minPlayers} controller(s) must pick a spot and ready up first.`
                 : "All four spots must be taken and ready first."
         );
         return;
@@ -638,8 +646,20 @@ function handleMessage(socket: WebSocket, message: ClientMessage | DebugClientMe
                 sendError(socket, "invalid_message", "Only protocol version 1 game hello messages are supported.");
                 return;
             }
-            registerGame(socket);
+            registerGame(socket, playerCount(message.minPlayers));
             return;
+        case "set_min_players": {
+            const host = hostContext(socket);
+            const count = playerCount(message.minPlayers);
+            if (!host || count === null) {
+                sendError(socket, "invalid_message", "Only the game host can set the player count (1-4).");
+                return;
+            }
+            if (host.session.state !== "waiting" && host.session.state !== "ready") return;
+            host.session.minPlayers = count;
+            sendLobbyState(host.session);
+            return;
+        }
         case "join_game":
             if (debugMembers.has(socket)) {
                 sendError(socket, "invalid_message", "Debug connections can't join a game.");

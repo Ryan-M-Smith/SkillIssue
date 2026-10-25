@@ -40,12 +40,23 @@ var state := "waiting"
 var players: Array[Dictionary] = []
 ## Slotted, ready phones it takes to start (from the server).
 var min_players := 4
+## The host's setting: phones a match needs (1-4). Saved; sent to the server with each
+## lobby (hello) and when it changes. `-- --min-players=N` overrides it for one run.
+var players_needed := 4
+
+const SETTINGS_PATH := "user://game.cfg"
 
 ## controller_id -> {"team": int, "role": String, "ready": bool}
 var _controllers := {}
 
 
 func _ready() -> void:
+	var config := ConfigFile.new()
+	if config.load(SETTINGS_PATH) == OK:
+		players_needed = clampi(int(config.get_value("match", "players_needed", 4)), 1, 4)
+	for arg in OS.get_cmdline_user_args():
+		if arg.begins_with("--min-players="):
+			players_needed = clampi(arg.get_slice("=", 1).to_int(), 1, 4)
 	NetworkClient.game_event_received.connect(_on_game_event)
 	NetworkClient.connection_changed.connect(_on_connection_changed)
 	NetworkClient.network_error.connect(func(message: String): server_error.emit(message))
@@ -81,6 +92,17 @@ func is_playing() -> bool:
 ## filled, then broadcasts state "playing"; otherwise it replies with join_rejected.
 func request_start() -> bool:
 	return NetworkClient.send_message("start_game")
+
+
+## Sets how many phones a match needs (1-4), saves it, and tells an open lobby.
+func set_players_needed(count: int) -> Error:
+	players_needed = clampi(count, 1, 4)
+	if NetworkClient.is_connected_to_server() and not pairing_code.is_empty():
+		NetworkClient.send_message("set_min_players", {"minPlayers": players_needed})
+	var config := ConfigFile.new()
+	config.load(SETTINGS_PATH)
+	config.set_value("match", "players_needed", players_needed)
+	return config.save(SETTINGS_PATH)
 
 
 ## Opens a lobby on the Skill Issue relay: asks the control plane (network/control_plane_url)

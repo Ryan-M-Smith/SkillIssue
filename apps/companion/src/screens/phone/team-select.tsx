@@ -2,7 +2,7 @@ import { Pressable, StyleSheet, Text, View } from "react-native";
 
 import type { ControllerRole, LobbyPlayer, LobbyView, TeamId } from "@/service/lobby-client";
 import { Body, Eyebrow, SlantButton, SplitBackground, Title } from "./kit";
-import { fonts, teamColor, teamName, teamTint, ui } from "./theme";
+import { fonts, teamColor, teamName, teamSolid, ui } from "./theme";
 
 const roles: { role: ControllerRole; label: string; hint: string }[] = [
 	{ role: "movement", label: "MOVEMENT", hint: "Walk, jump, crouch, sprint" },
@@ -40,7 +40,7 @@ export function TeamSelect({
 
 			<View style={styles.teams}>
 				{([1, 2] as TeamId[]).map((team) => (
-					<View key={team} style={[styles.team, { borderColor: teamColor(team), backgroundColor: teamTint(team, 0.12) }]}>
+					<View key={team} style={[styles.team, { borderColor: teamColor(team), backgroundColor: teamSolid(team, 0.1) }]}>
 						<Title size={20} color={teamColor(team)}>TEAM {teamName(team)}</Title>
 						{roles.map(({ role, label, hint }) => (
 							<Slot
@@ -82,17 +82,16 @@ function Slot({ team, label, hint, holder, mine, onPress }: { team: TeamId; labe
 			disabled={taken}
 			style={({ pressed }) => [
 				styles.slot,
-				mine && { borderColor: teamColor(team), backgroundColor: teamTint(team, 0.35) },
-				taken && { opacity: 0.75 },
-				pressed && { opacity: 0.7 },
+				{ backgroundColor: teamSolid(team, pressed ? 0.12 : 0.03) },
+				mine && { borderColor: teamColor(team), backgroundColor: teamSolid(team, 0.32) },
 			]}
 		>
 			<View style={{ flex: 1 }}>
-				<Eyebrow color={mine ? ui.ink : ui.muted}>{label}</Eyebrow>
-				<Text style={[styles.slotName, !holder && { color: ui.muted }]} numberOfLines={1}>
+				<Eyebrow color={mine ? ui.ink : ui.soft}>{label}</Eyebrow>
+				<Text style={[styles.slotName, !holder && { color: ui.soft }, taken && { color: ui.soft }]} numberOfLines={1}>
 					{holder ? (mine ? `${holder.name} (you)` : holder.name) : "Tap to take this spot"}
 				</Text>
-				{!holder && <Body size={12} color={ui.muted}>{hint}</Body>}
+				{!holder && <Body size={12} color={ui.soft}>{hint}</Body>}
 			</View>
 			{holder && <Text style={[styles.badge, { color: holder.ready ? ui.ready : ui.gold }]}>{holder.ready ? "READY" : "PICKING"}</Text>}
 		</Pressable>
@@ -104,7 +103,7 @@ const styles = StyleSheet.create({
 	head: { flexDirection: "row", justifyContent: "space-between", alignItems: "flex-start" },
 	teams: { flex: 1, flexDirection: "row", gap: 14 },
 	team: { flex: 1, borderWidth: 1.5, borderRadius: 10, padding: 10, gap: 8 },
-	slot: { flex: 1, flexDirection: "row", alignItems: "center", gap: 8, borderWidth: 1.5, borderColor: ui.line, borderRadius: 8, padding: 10, backgroundColor: "rgba(7, 10, 18, 0.6)" },
+	slot: { flex: 1, flexDirection: "row", alignItems: "center", gap: 8, borderWidth: 1.5, borderColor: ui.line, borderRadius: 8, padding: 10 },
 	slotName: { fontFamily: fonts.displaySemi, fontSize: 18, color: ui.ink },
 	badge: { fontFamily: fonts.bodyBold, fontSize: 12, letterSpacing: 1 },
 	foot: { flexDirection: "row", alignItems: "center", gap: 16 },
