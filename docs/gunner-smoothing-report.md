@@ -44,3 +44,8 @@ Validation: all 52 companion tests, TypeScript and lint pass. New regression cas
 ## PUBG style gyro follow-up
 
 The previous mouse style curve topped out at 3x gyro speed, making faster wrist movement overshoot. Gunner aiming now has a conservative curve: 0.75x for controlled turns, rising gradually to 1.3x only during a fast sweep. An 18 ms sensor filter calms hand jitter, while a 15 ms in game filter softens packet timing. Both settle quickly when the phone stops. This adjustment only changes gunner camera response.
+
+
+## Full turn and latency follow-up
+
+Gunner yaw remains cumulative with no 180 or 360 degree camera cap. Motion samples carry relative turn deltas (bounded per packet), so continued phone rotation can sweep the view through 240 to 360 degrees and beyond. Pitch remains limited to the normal FPS look range so it cannot flip over the character. Reduced sensor filtering to 10 ms and game packet smoothing to 8 ms to make a full turn feel immediate while taking the edge off sensor/network jitter. Existing modest speed gain remains capped at 1.3x to limit overshoot.

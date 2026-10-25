@@ -5,7 +5,7 @@ export function gyroAim(yaw: number, pitch: number): { x: number; y: number } {
 	const speed = Math.hypot(yaw, pitch);
 	if (!Number.isFinite(speed) || speed <= 1.2) return { x: 0, y: 0 };
 	// One radial curve preserves diagonal direction. Tiny wrist corrections stay
-	// precise; a brisk 30-degree sweep can turn the view by up to 90 degrees.
+	// precise; fast turns get only modest extra gain to allow a full camera sweep without overshoot.
 	const precision = clamp((speed - 1.2) / 3.3, 0, 1);
 	const acceleration = clamp((speed - 50) / 180, 0, 1);
 	const smooth = (x: number) => x * x * (3 - 2 * x);

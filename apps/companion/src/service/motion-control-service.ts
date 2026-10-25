@@ -104,8 +104,9 @@ const settings = {
 	twistCenterMs: 150,
 	twistSlackDeg: 4, // twist may exceed what gravity shows by this much (noise)
 
-	// Gunner.
+	// Gunner: 10 ms filters sensor chatter without noticeably trailing a phone turn.
 	aimMaxRate: 130,
+	aimFilterTau: 0.010,
 };
 
 // Flip a sign here if a direction comes out reversed on a real phone.
@@ -624,7 +625,7 @@ export class MotionController {
 			// Turning right / tipping the back of the phone up = looking right / up.
 			const level = normalize(cross(frame.up, scale(gravity, -1)));
 			const right = magnitude(level) > 0.5 ? level : frame.right;
-			const response = 1 - Math.exp(-dt / 0.018);
+			const response = 1 - Math.exp(-dt / settings.aimFilterTau);
 			const targetYaw = axes.gunnerYawSign * dot(gyro, scale(gravity, -1));
 			const targetPitch = axes.gunnerPitchSign * dot(gyro, right);
 			this.aimRateFiltered.x += response * (targetYaw - this.aimRateFiltered.x);
