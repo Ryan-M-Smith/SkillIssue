@@ -2,7 +2,7 @@ import { randomUUID } from "node:crypto";
 import { WebSocket, WebSocketServer } from "ws";
 
 import {
-    PROTOCOL_VERSION,
+    protocolVersion,
     type AuthorizedInputMessage,
     type ClientMessage,
     type ControllerAssignment,
@@ -12,10 +12,10 @@ import {
     type TeamId,
 } from "../../packages/protocol/events.ts";
 
-const PORT = Number(process.env.PORT ?? 8080);
-const HEARTBEAT_INTERVAL_MS = 30_000;
-const PAIRING_CODE_LENGTH = 6;
-const CONTROLLER_SLOTS: ReadonlyArray<{ teamId: TeamId; role: ControllerRole }> = [
+const port = Number(process.env.PORT ?? 8080);
+const heartbeatIntervalMs = 30_000;
+const pairingCodeLength = 6;
+const controllerSlots: ReadonlyArray<{ teamId: TeamId; role: ControllerRole }> = [
     { teamId: 1, role: "movement" },
     { teamId: 1, role: "aim" },
     { teamId: 2, role: "movement" },
@@ -63,9 +63,9 @@ function sendError(
 function createPairingCode() {
     let code = "";
     do {
-        code = Math.floor(Math.random() * 10 ** PAIRING_CODE_LENGTH)
+        code = Math.floor(Math.random() * 10 ** pairingCodeLength)
             .toString()
-            .padStart(PAIRING_CODE_LENGTH, "0");
+            .padStart(pairingCodeLength, "0");
     } while (sessionsByCode.has(code));
     return code;
 }
@@ -80,7 +80,7 @@ function assignmentsFor(session: Session): ControllerAssignment[] {
 }
 
 function isReady(session: Session) {
-    return CONTROLLER_SLOTS.every(({ teamId, role }) =>
+    return controllerSlots.every(({ teamId, role }) =>
         [...session.controllers.values()].some(
             (controller) => controller.teamId === teamId && controller.role === role
         )
@@ -124,7 +124,7 @@ function registerGame(socket: WebSocket) {
 
     send(socket, {
         type: "game_registered",
-        protocolVersion: PROTOCOL_VERSION,
+        protocolVersion: protocolVersion,
         gameId: session.gameId,
         pairingCode: session.pairingCode,
         state: session.state,
@@ -144,7 +144,7 @@ function joinGame(socket: WebSocket, pairingCode: string, requestedRole: Control
         return;
     }
 
-    const slot = CONTROLLER_SLOTS.find(({ teamId, role }) =>
+    const slot = controllerSlots.find(({ teamId, role }) =>
         role === requestedRole && ![...session.controllers.values()].some(
             (controller) => controller.teamId === teamId && controller.role === role
         )
@@ -234,14 +234,14 @@ function parseMessage(data: WebSocket.RawData): ClientMessage | null {
 function handleMessage(socket: WebSocket, message: ClientMessage) {
     switch (message.type) {
         case "hello":
-            if (message.protocolVersion !== PROTOCOL_VERSION || message.clientType !== "game") {
+            if (message.protocolVersion !== protocolVersion || message.clientType !== "game") {
                 sendError(socket, "invalid_message", "Only protocol version 1 game hello messages are supported.");
                 return;
             }
             registerGame(socket);
             return;
         case "join_game":
-            if (message.protocolVersion !== PROTOCOL_VERSION || !["movement", "aim"].includes(message.requestedRole)) {
+            if (message.protocolVersion !== protocolVersion || !["movement", "aim"].includes(message.requestedRole)) {
                 sendError(socket, "invalid_message", "Invalid join request.");
                 return;
             }
@@ -285,7 +285,7 @@ function disconnect(socket: WebSocket) {
     sendLobbyState(session);
 }
 
-const wss = new WebSocketServer({ port: PORT });
+const wss = new WebSocketServer({ port });
 
 wss.on("connection", (socket) => {
     const heartbeatSocket = socket as HeartbeatSocket;
@@ -315,7 +315,7 @@ const heartbeat = setInterval(() => {
         heartbeatSocket.isAlive = false;
         socket.ping();
     }
-}, HEARTBEAT_INTERVAL_MS);
+}, heartbeatIntervalMs);
 
 wss.on("close", () => clearInterval(heartbeat));
-console.log(`SkillIssue WebSocket server listening on ws://localhost:${PORT}`);
+console.log(`SkillIssue WebSocket server listening on ws://localhost:${port}`);

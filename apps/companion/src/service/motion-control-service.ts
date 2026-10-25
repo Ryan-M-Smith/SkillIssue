@@ -84,7 +84,6 @@ export const emptyControls: GameControls = {
 	action: null,
 };
 
-export const EMPTY_CONTROLS = emptyControls;
 
 export class MotionController {
 	private calibrationSince: number | null = null;

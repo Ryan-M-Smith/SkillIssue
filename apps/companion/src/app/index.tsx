@@ -6,15 +6,17 @@ import {
 } from "react-native";
 import { DeviceMotion } from "expo-sensors";
 
+import { Axis, Panel, Value } from "@/components/motion-ui";
+
 import {
   MotionController,
-  EMPTY_CONTROLS,
+  emptyControls,
   type Role,
   type GameControls,
   type MotionDebug,
 } from "../service/motion-control-service";
 
-const COLORS = {
+const colors = {
   bg: "#0A1020",
   card: "#161F32",
   border: "#2A3954",
@@ -29,14 +31,14 @@ const COLORS = {
 type EventType = "jump" | "crouch" | "shoot" | "sprint";
 type Counts = Record<EventType, number>;
 
-const ZERO_COUNTS: Counts = {
+const zeroCounts: Counts = {
   jump: 0,
   crouch: 0,
   shoot: 0,
   sprint: 0,
 };
 
-const ZERO_DEBUG: MotionDebug = {
+const zeroDebug: MotionDebug = {
   calibration: "calibrating",
   pitchDeg: 0,
   sidePressDeg: 0,
@@ -50,90 +52,6 @@ const ZERO_DEBUG: MotionDebug = {
 const fmt = (n: number, places = 1) =>
   Number.isFinite(n) ? n.toFixed(places) : "0";
 
-// -------------------- UI COMPONENTS --------------------
-
-function Panel({
-  title,
-  children,
-}: {
-  title: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <View style={styles.panel}>
-      <Text style={styles.panelTitle}>{title}</Text>
-      {children}
-    </View>
-  );
-}
-
-function Axis({
-  name,
-  value,
-  negative,
-  positive,
-}: {
-  name: string;
-  value: number;
-  negative: string;
-  positive: string;
-}) {
-  const v = Math.max(-1, Math.min(1, value));
-
-  const percent =
-    `${Math.round(Math.abs(v) * 100)}%` as `${number}%`;
-
-  return (
-    <View style={styles.axis}>
-      <View style={styles.line}>
-        <Text style={styles.label}>{name}</Text>
-        <Text style={styles.value}>
-          {v >= 0 ? "+" : ""}
-          {fmt(v, 2)}
-        </Text>
-      </View>
-
-      <View style={styles.track}>
-        <View
-          style={[
-            styles.fill,
-            { width: percent },
-          ]}
-        />
-      </View>
-
-      <View style={styles.line}>
-        <Text style={styles.hint}>− {negative}</Text>
-        <Text style={styles.hint}>+ {positive}</Text>
-      </View>
-    </View>
-  );
-}
-
-function Value({
-  name,
-  value,
-  active = false,
-}: {
-  name: string;
-  value: string | number;
-  active?: boolean;
-}) {
-  return (
-    <View style={styles.metric}>
-      <Text style={styles.hint}>{name}</Text>
-      <Text
-        style={[
-          styles.metricValue,
-          active && { color: COLORS.green },
-        ]}
-      >
-        {value}
-      </Text>
-    </View>
-  );
-}
-
 // -------------------- MAIN SCREEN --------------------
 
 export default function Index() {
@@ -143,13 +61,13 @@ export default function Index() {
   const [error, setError] = useState("");
 
   const [controls, setControls] =
-    useState<GameControls>(EMPTY_CONTROLS);
+    useState<GameControls>(emptyControls);
 
   const [debug, setDebug] =
-    useState<MotionDebug>(ZERO_DEBUG);
+    useState<MotionDebug>(zeroDebug);
 
   const [counts, setCounts] =
-    useState<Counts>(ZERO_COUNTS);
+    useState<Counts>(zeroCounts);
 
   const [history, setHistory] =
     useState<string[]>([]);
@@ -206,9 +124,9 @@ export default function Index() {
   // -------------------- RESET --------------------
 
   function clearReadings() {
-    setControls({ ...EMPTY_CONTROLS });
-    setDebug({ ...ZERO_DEBUG });
-    setCounts({ ...ZERO_COUNTS });
+    setControls({ ...emptyControls });
+    setDebug({ ...zeroDebug });
+    setCounts({ ...zeroCounts });
 
     setHistory([]);
     setRateHz(0);
@@ -735,7 +653,7 @@ export default function Index() {
 const styles = StyleSheet.create({
   screen: {
     flex: 1,
-    backgroundColor: COLORS.bg,
+    backgroundColor: colors.bg,
   },
 
   content: {
@@ -752,22 +670,22 @@ const styles = StyleSheet.create({
   },
 
   overline: {
-    color: COLORS.blue,
+    color: colors.blue,
     fontSize: 10,
     letterSpacing: 2,
     fontWeight: "800",
   },
 
   title: {
-    color: COLORS.text,
+    color: colors.text,
     fontSize: 28,
     fontWeight: "900",
     marginTop: 3,
   },
 
   badge: {
-    color: COLORS.yellow,
-    borderColor: COLORS.yellow,
+    color: colors.yellow,
+    borderColor: colors.yellow,
     borderWidth: 1,
     padding: 8,
     borderRadius: 20,
@@ -776,13 +694,13 @@ const styles = StyleSheet.create({
   },
 
   badgeReady: {
-    color: COLORS.green,
-    borderColor: COLORS.green,
+    color: colors.green,
+    borderColor: colors.green,
   },
 
   roles: {
     flexDirection: "row",
-    backgroundColor: COLORS.card,
+    backgroundColor: colors.card,
     borderRadius: 12,
     padding: 4,
     gap: 4,
@@ -800,7 +718,7 @@ const styles = StyleSheet.create({
   },
 
   roleText: {
-    color: COLORS.text,
+    color: colors.text,
     fontSize: 12,
     fontWeight: "800",
   },
@@ -834,7 +752,7 @@ const styles = StyleSheet.create({
   },
 
   error: {
-    color: COLORS.red,
+    color: colors.red,
     backgroundColor: "#442431",
     borderRadius: 8,
     padding: 10,
@@ -846,37 +764,6 @@ const styles = StyleSheet.create({
     gap: 8,
   },
 
-  metric: {
-    flexGrow: 1,
-    flexBasis: 90,
-    backgroundColor: "#1D2A40",
-    borderRadius: 9,
-    padding: 12,
-    gap: 5,
-  },
-
-  metricValue: {
-    color: COLORS.text,
-    fontSize: 17,
-    fontWeight: "900",
-  },
-
-  panel: {
-    backgroundColor: COLORS.card,
-    borderColor: COLORS.border,
-    borderWidth: 1,
-    borderRadius: 13,
-    padding: 15,
-    gap: 14,
-  },
-
-  panelTitle: {
-    color: COLORS.text,
-    fontWeight: "900",
-    fontSize: 14,
-    letterSpacing: 0.6,
-  },
-
   label: {
     color: "#CBD8ED",
     fontSize: 12,
@@ -884,52 +771,35 @@ const styles = StyleSheet.create({
   },
 
   value: {
-    color: COLORS.text,
+    color: colors.text,
     fontSize: 13,
     fontWeight: "900",
   },
 
   hint: {
-    color: COLORS.muted,
+    color: colors.muted,
     fontSize: 11,
   },
 
-  axis: {
-    gap: 7,
-  },
-
-  track: {
-    height: 10,
-    borderRadius: 5,
-    backgroundColor: "#34435D",
-    overflow: "hidden",
-  },
-
-  fill: {
-    height: 10,
-    backgroundColor: COLORS.blue,
-    borderRadius: 5,
-  },
-
   event: {
-    color: COLORS.green,
+    color: colors.green,
     fontSize: 12,
     fontWeight: "700",
   },
 
   highlight: {
-    color: COLORS.yellow,
+    color: colors.yellow,
     fontSize: 12,
     fontWeight: "900",
   },
 
   raw: {
-    color: COLORS.blue,
+    color: colors.blue,
     fontSize: 11,
   },
 
   note: {
-    color: COLORS.muted,
+    color: colors.muted,
     fontSize: 12,
     lineHeight: 20,
     paddingHorizontal: 4,
