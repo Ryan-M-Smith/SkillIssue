@@ -39,3 +39,8 @@ Validation: 50 companion tests, TypeScript, lint, 67 Godot gameplay checks and 2
 Sprint now needs a wheel twist past 40 degrees held for 120 ms. A second toggle requires returning within 8 degrees of center for 150 ms, with a 650 ms cooldown. Pitch flicks and their recovery suppress sprint detection. This keeps jump/crouch gesture controls while rejecting brief incidental twists and swings through center. Practice and runner instructions show the new gesture.
 
 Validation: all 52 companion tests, TypeScript and lint pass. New regression cases cover mixed forward/sideways motion with incidental twist, short threshold crossings, required center dwell, and intentional toggles in both landscape grips on Android/iOS models.
+
+
+## PUBG style gyro follow-up
+
+The previous mouse style curve topped out at 3x gyro speed, making faster wrist movement overshoot. Gunner aiming now has a conservative curve: 0.75x for controlled turns, rising gradually to 1.3x only during a fast sweep. An 18 ms sensor filter calms hand jitter, while a 15 ms in game filter softens packet timing. Both settle quickly when the phone stops. This adjustment only changes gunner camera response.
