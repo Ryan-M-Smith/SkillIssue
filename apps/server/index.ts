@@ -1,4 +1,5 @@
 import { randomUUID } from "node:crypto";
+import { networkInterfaces } from "node:os";
 import { WebSocket, WebSocketServer } from "ws";
 
 import {
@@ -7,6 +8,9 @@ import {
     type ClientMessage,
     type ControllerAssignment,
     type ControllerRole,
+    type DebugClientMessage,
+    type DebugRole,
+    type DebugServerMessage,
     type GameState,
     type ServerMessage,
     type TeamId,
@@ -45,6 +49,20 @@ type HeartbeatSocket = WebSocket & { isAlive?: boolean };
 
 const sessionsByCode = new Map<string, Session>();
 const contexts = new Map<WebSocket, ClientContext>();
+
+// Debug relay: rooms of phones streaming readings to browser viewers.
+type DebugRoom = { phones: Set<WebSocket>; viewers: Set<WebSocket> };
+const debugRooms = new Map<string, DebugRoom>();
+const debugMembers = new Map<WebSocket, { room: string; role: DebugRole }>();
+const debugRoomPattern = /^[A-Za-z0-9_-]{1,32}$/;
+const maxReadingsPerMessage = 50;
+
+function lanAddresses() {
+    return Object.values(networkInterfaces())
+        .flat()
+        .filter((net) => net && net.family === "IPv4" && !net.internal)
+        .map((net) => `ws://${net!.address}:${port}`);
+}
 
 function send(socket: WebSocket, message: ServerMessage) {
     if (socket.readyState === WebSocket.OPEN) {
@@ -222,18 +240,130 @@ function forwardInput(socket: WebSocket, message: AuthorizedInputMessage) {
     });
 }
 
-function parseMessage(data: WebSocket.RawData): ClientMessage | null {
+function sendDebug(socket: WebSocket, message: DebugServerMessage) {
+    if (socket.readyState === WebSocket.OPEN) {
+        socket.send(JSON.stringify(message));
+    }
+}
+
+function sendDebugStatus(room: string) {
+    const members = debugRooms.get(room);
+    if (!members) return;
+    const status: DebugServerMessage = {
+        type: "debug_status",
+        room,
+        phones: members.phones.size,
+        viewers: members.viewers.size,
+    };
+    for (const socket of [...members.phones, ...members.viewers]) {
+        sendDebug(socket, status);
+    }
+}
+
+function leaveDebug(socket: WebSocket) {
+    const member = debugMembers.get(socket);
+    if (!member) return;
+    debugMembers.delete(socket);
+    const members = debugRooms.get(member.room);
+    if (!members) return;
+    members.phones.delete(socket);
+    members.viewers.delete(socket);
+    if (members.phones.size === 0 && members.viewers.size === 0) {
+        debugRooms.delete(member.room);
+    } else {
+        sendDebugStatus(member.room);
+    }
+}
+
+function joinDebug(socket: WebSocket, room: string, role: DebugRole) {
+    if (contexts.has(socket)) {
+        sendError(socket, "invalid_message", "A game or controller connection can't join a debug room.");
+        return;
+    }
+    leaveDebug(socket);
+    const members = debugRooms.get(room) ?? { phones: new Set(), viewers: new Set() };
+    debugRooms.set(room, members);
+    (role === "phone" ? members.phones : members.viewers).add(socket);
+    debugMembers.set(socket, { room, role });
+    sendDebug(socket, { type: "debug_joined", room, role, addresses: lanAddresses() });
+    sendDebugStatus(room);
+}
+
+function handleDebugMessage(socket: WebSocket, message: DebugClientMessage) {
+    if (message.type === "debug_join") {
+        if (
+            message.protocolVersion !== protocolVersion ||
+            typeof message.room !== "string" ||
+            !debugRoomPattern.test(message.room) ||
+            (message.role !== "phone" && message.role !== "viewer")
+        ) {
+            sendError(socket, "invalid_message", "Invalid debug_join: room must be 1-32 letters, digits, _ or -, role phone or viewer.");
+            return;
+        }
+        joinDebug(socket, message.room, message.role);
+        return;
+    }
+
+    const member = debugMembers.get(socket);
+    const members = member && debugRooms.get(member.room);
+    if (!member || !members) {
+        sendError(socket, "invalid_message", "Join a debug room before sending debug messages.");
+        return;
+    }
+
+    if (message.type === "debug_motion") {
+        if (
+            member.role !== "phone" ||
+            typeof message.platform !== "string" ||
+            !Array.isArray(message.readings) ||
+            message.readings.length > maxReadingsPerMessage
+        ) {
+            sendError(socket, "invalid_message", "Invalid debug_motion: only phones send it, with up to 50 readings.");
+            return;
+        }
+        const relay: DebugServerMessage = {
+            type: "debug_motion",
+            platform: message.platform,
+            readings: message.readings,
+        };
+        for (const viewer of members.viewers) {
+            sendDebug(viewer, relay);
+        }
+        return;
+    }
+
+    if (message.event !== "recalibrate" && message.event !== "reset_counts") {
+        sendError(socket, "invalid_message", "Unknown debug event.");
+        return;
+    }
+    for (const other of [...members.phones, ...members.viewers]) {
+        if (other !== socket) {
+            sendDebug(other, { type: "debug_event", event: message.event });
+        }
+    }
+}
+
+function parseMessage(data: WebSocket.RawData): ClientMessage | DebugClientMessage | null {
     try {
-        const message = JSON.parse(data.toString()) as ClientMessage;
+        const message = JSON.parse(data.toString()) as ClientMessage | DebugClientMessage;
         return message && typeof message.type === "string" ? message : null;
     } catch {
         return null;
     }
 }
 
-function handleMessage(socket: WebSocket, message: ClientMessage) {
+function handleMessage(socket: WebSocket, message: ClientMessage | DebugClientMessage) {
     switch (message.type) {
+        case "debug_join":
+        case "debug_motion":
+        case "debug_event":
+            handleDebugMessage(socket, message);
+            return;
         case "hello":
+            if (debugMembers.has(socket)) {
+                sendError(socket, "invalid_message", "Debug connections can't register a game.");
+                return;
+            }
             if (message.protocolVersion !== protocolVersion || message.clientType !== "game") {
                 sendError(socket, "invalid_message", "Only protocol version 1 game hello messages are supported.");
                 return;
@@ -241,6 +371,10 @@ function handleMessage(socket: WebSocket, message: ClientMessage) {
             registerGame(socket);
             return;
         case "join_game":
+            if (debugMembers.has(socket)) {
+                sendError(socket, "invalid_message", "Debug connections can't join a game.");
+                return;
+            }
             if (message.protocolVersion !== protocolVersion || !["movement", "aim"].includes(message.requestedRole)) {
                 sendError(socket, "invalid_message", "Invalid join request.");
                 return;
@@ -252,6 +386,10 @@ function handleMessage(socket: WebSocket, message: ClientMessage) {
             return;
         case "motion":
         case "environment":
+            if (debugMembers.has(socket)) {
+                sendError(socket, "invalid_message", "Debug connections can't send game input.");
+                return;
+            }
             forwardInput(socket, message as AuthorizedInputMessage);
             return;
         default:
@@ -260,6 +398,7 @@ function handleMessage(socket: WebSocket, message: ClientMessage) {
 }
 
 function disconnect(socket: WebSocket) {
+    leaveDebug(socket);
     const context = contexts.get(socket);
     contexts.delete(socket);
 
@@ -319,3 +458,6 @@ const heartbeat = setInterval(() => {
 
 wss.on("close", () => clearInterval(heartbeat));
 console.log(`SkillIssue WebSocket server listening on ws://localhost:${port}`);
+for (const address of lanAddresses()) {
+    console.log(`  on your network: ${address}`);
+}

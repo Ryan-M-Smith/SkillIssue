@@ -111,7 +111,7 @@ const axes = {
 };
 
 /** The player's axes, in the phone's own frame, worked out at calibration. */
-type Frame = {
+export type Frame = {
 	grip: Grip;
 	down: MotionVector; // gravity direction at neutral
 	up: MotionVector; // screen's up direction, in the screen plane
@@ -272,6 +272,18 @@ export class MotionController {
 
 	getDebug(): MotionDebug {
 		return { ...this.debug };
+	}
+
+	/**
+	 * The calibrated player frame and the current gravity direction, both in
+	 * the phone's own frame. Null until calibrated. For debug views.
+	 */
+	getOrientation(): { frame: Frame; gravity: MotionVector } | null {
+		if (!this.frame || !this.gravity) {
+			return null;
+		}
+
+		return { frame: { ...this.frame }, gravity: { ...this.gravity } };
 	}
 
 	process(reading: MotionReading, now = Date.now()): GameControls {

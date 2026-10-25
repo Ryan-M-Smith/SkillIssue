@@ -47,6 +47,26 @@ Controllers send `motion` or `environment` messages without a trusted sender fie
 
 When a controller disconnects, the server sends `controller_disconnected` to the game, removes the slot, and returns the lobby to `waiting`. If the game host disconnects, the session is invalidated and controller connections are closed.
 
+## Debug relay (phone to web debugger)
+
+A separate, game-free channel for debugging the movement phone. It needs no Godot host, pairing code or slots, and debug connections can't send game input or join a game.
+
+1. Start the server: `npm run server:start`. It prints the `ws://` addresses it can be reached on from your network.
+2. Open the companion's web version on the computer: `npm run companion:web` (or press `w` in a running Expo dev server). The web version is the **Motion Debugger**; it connects to `ws://<this page's host>:8080`, room `debug`.
+3. On the phone, open the companion (it shows the simplified **Controller** screen), enter one of the printed addresses and the same room, and tap **Connect**. The phone and computer must be on the same network.
+
+The phone runs the motion model itself and streams its raw DeviceMotion readings. The web version runs the same model on that stream, so it shows exactly what the phone computes, plus a 3D view of the phone in the player's frame (pitch, side and twist axes, and gravity).
+
+| Message | From | To | Payload |
+| --- | --- | --- | --- |
+| `debug_join` | phone or viewer | server | `protocolVersion`, `room` (1-32 letters, digits, `_`, `-`), `role`: `phone` or `viewer` |
+| `debug_joined` | server | that client | `room`, `role`, `addresses` (`ws://` LAN addresses) |
+| `debug_status` | server | everyone in the room | `phones`, `viewers` (sent on every join and leave) |
+| `debug_motion` | phone | viewers | `platform` (the phone's `Platform.OS`), `readings` (up to 50 DeviceMotion readings with sensor timestamps) |
+| `debug_event` | anyone | everyone else in the room | `event`: `recalibrate` or `reset_counts` |
+
+Types are in `packages/protocol/events.ts` (`Debug*`).
+
 ## Godot client
 
 Implemented in `apps/game` against this server (`apps/server/index.ts`) and `packages/protocol/events.ts`.

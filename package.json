@@ -10,7 +10,9 @@
 	],
 	"scripts": {
 		"test": "echo \"Error: no test specified\" && exit 1",
-		"companion:start": "npm --prefix apps/companion run start -- --tunnel"
+		"companion:start": "npm --prefix apps/companion run start -- --tunnel",
+		"companion:web": "npm --prefix apps/companion run web",
+		"server:start": "npm --prefix apps/server run start"
 	},
 	"keywords": [],
 	"author": "",
