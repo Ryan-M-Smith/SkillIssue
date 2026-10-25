@@ -23,7 +23,7 @@ export type { GameControls, MotionDebug, Role } from "@/types/motion";
  *   tip one end down                strafe                  (held, 3.5°–12°)
  *   quick flick forward and back    crouch on / off
  *   quick flick back and forward    jump (while crouched: stand up)
- *   twist ~30° like a wheel         sprint on / off, return to center to re-arm
+ *   twist ~40° like a wheel         sprint on / off, return to center to re-arm
  *
  * WHY TWIST AND STRAFE NEED THE GYROSCOPE
  *
@@ -97,9 +97,11 @@ const settings = {
 	afterGestureMs: 220,
 
 	// Sprint twist.
-	twistTriggerDeg: 30,
-	twistRearmDeg: 12,
-	twistCooldownMs: 350,
+	twistTriggerDeg: 40,
+	twistRearmDeg: 8,
+	twistCooldownMs: 650,
+	twistHoldMs: 120,
+	twistCenterMs: 150,
 	twistSlackDeg: 4, // twist may exceed what gravity shows by this much (noise)
 
 	// Gunner.
@@ -234,6 +236,9 @@ export class MotionController {
 	private lockedUntil = 0;
 	private twist = 0; // degrees twisted about the screen normal since neutral
 	private twistArmed = true;
+	private twistCandidateSince: number | null = null;
+	private twistCenterSince: number | null = null;
+	private twistDirection = 0;
 	private twistLockedUntil = 0;
 
 	private debug: MotionDebug = emptyDebug();
@@ -269,6 +274,9 @@ export class MotionController {
 		this.lockedUntil = 0;
 		this.twist = 0;
 		this.twistArmed = true;
+		this.twistCandidateSince = null;
+		this.twistCenterSince = null;
+		this.twistDirection = 0;
 		this.twistLockedUntil = 0;
 		this.debug = emptyDebug();
 	}
@@ -409,6 +417,9 @@ export class MotionController {
 		this.looseSum = { x: 0, y: 0, z: 0 };
 		this.twist = 0;
 		this.twistArmed = true;
+		this.twistCandidateSince = null;
+		this.twistCenterSince = null;
+		this.twistDirection = 0;
 		this.debug.calibration = "ready";
 		this.debug.grip = this.frame.grip;
 	}
@@ -466,7 +477,7 @@ export class MotionController {
 		const tipDeg = rotationAbout(frame.down, gravity, frame.away);
 		const rightDeg = axes.rightSign * (tipDeg - this.twist * dot(zAxis, frame.away));
 
-		let action: Action = this.updateTwist(t);
+		let action: Action = this.updateTwist(t, rates?.x ?? 0);
 		if (action) {
 			// The twist itself no longer strafes, so walking carries on through it.
 			this.flick = null;
@@ -558,11 +569,25 @@ export class MotionController {
 		return null;
 	}
 
-	/** Twist past the trigger toggles sprint; it re-arms once the twist is back near center. */
-	private updateTwist(t: number): Action {
+	/** A deliberate wheel twist held briefly; centering must also be deliberate. */
+	private updateTwist(t: number, pitchRate: number): Action {
 		const angle = Math.abs(this.twist);
-		if (angle <= settings.twistRearmDeg && t >= this.twistLockedUntil) this.twistArmed = true;
-		if (!this.twistArmed || t < this.twistLockedUntil || angle < settings.twistTriggerDeg) return null;
+		if (angle <= settings.twistRearmDeg) {
+			this.twistCenterSince ??= t;
+			if (t >= this.twistLockedUntil && t - this.twistCenterSince >= settings.twistCenterMs) this.twistArmed = true;
+		} else this.twistCenterSince = null;
+		// Pitch flicks and their recovery must not be interpreted as a sprint twist.
+		if (!this.twistArmed || t < this.twistLockedUntil || t < this.lockedUntil || this.flick ||
+			Math.abs(pitchRate) > settings.flickSettleRate || angle < settings.twistTriggerDeg) {
+			this.twistCandidateSince = null;
+			return null;
+		}
+		const direction = Math.sign(this.twist);
+		if (direction !== this.twistDirection) this.twistCandidateSince = null;
+		this.twistDirection = direction;
+		this.twistCandidateSince ??= t;
+		if (t - this.twistCandidateSince < settings.twistHoldMs) return null;
+		this.twistCandidateSince = null;
 		this.twistArmed = false;
 		this.twistLockedUntil = t + settings.twistCooldownMs;
 		this.sprinting = !this.sprinting;

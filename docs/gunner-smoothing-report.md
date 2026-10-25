@@ -33,3 +33,9 @@ The phone now uses a shared radial sensitivity curve for yaw and pitch: 1.5x for
 The game-side packet filter is now 8 ms instead of 25 ms. At 60 physics frames/second, over 85% of a received turn applies on the first frame; the remainder settles quickly. No phone-side temporal filter adds another delay. Scope sensitivity continues to apply in Godot.
 
 Validation: 50 companion tests, TypeScript, lint, 67 Godot gameplay checks and 25 lifecycle checks. The camera smoke test now enforces the faster first-frame response. Runner gestures are unchanged. Physical handset testing is still needed to assess personal sensitivity and network conditions.
+
+## Accidental sprint follow-up
+
+Sprint now needs a wheel twist past 40 degrees held for 120 ms. A second toggle requires returning within 8 degrees of center for 150 ms, with a 650 ms cooldown. Pitch flicks and their recovery suppress sprint detection. This keeps jump/crouch gesture controls while rejecting brief incidental twists and swings through center. Practice and runner instructions show the new gesture.
+
+Validation: all 52 companion tests, TypeScript and lint pass. New regression cases cover mixed forward/sideways motion with incidental twist, short threshold crossings, required center dwell, and intentional toggles in both landscape grips on Android/iOS models.
