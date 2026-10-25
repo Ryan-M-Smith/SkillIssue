@@ -21,7 +21,7 @@ GameEvents="*res://game_events.gd"
 NetworkClient="*res://scripts/network/network_client.gd"
 GameSession="*res://scripts/game_session.gd"
 InputRouter="*res://scripts/input_router.gd"
-ServerProcess="*res://scripts/server_process.gd"
+LobbyServer="*res://scripts/network/lobby_server.gd"
 MatchStats="*res://scripts/match_stats.gd"
 
 [display]

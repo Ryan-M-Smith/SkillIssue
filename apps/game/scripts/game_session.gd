@@ -82,14 +82,22 @@ func request_start() -> bool:
 	return NetworkClient.send_message("start_game")
 
 
-## Starts the server if needed and connects to it as the game host. The server
+## Opens a lobby on the server inside this game (LobbyServer) and hosts it. The server
 ## replies with the join code (`registered`). Await it; check `pairing_code`.
+## With `-- --server=ws://...`, or when another server already holds the port, the game
+## connects to that server over WebSocket instead.
 func create_lobby() -> void:
-	await ServerProcess.ensure_running()
-	if not ServerProcess.is_up():
-		server_error.emit(ServerProcess.message)
+	var override := NetworkClient.configured_override()
+	if not override.is_empty():
+		NetworkClient.connect_to_server(override)
 		return
-	NetworkClient.connect_to_server(ServerProcess.server_url())
+	await LobbyServer.ensure_running()
+	if LobbyServer.is_local():
+		NetworkClient.connect_local()
+	elif LobbyServer.is_up():
+		NetworkClient.connect_to_server(LobbyServer.server_url())
+	else:
+		server_error.emit(LobbyServer.message)
 
 
 ## Disconnects from the server, which closes the lobby for every phone.

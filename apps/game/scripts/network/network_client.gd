@@ -1,5 +1,7 @@
-## Autoload `NetworkClient`: the WebSocket link to the Node.js server. Transport only:
-## connect / reconnect, JSON decode, envelope validation, stats. It does not know about
+## Autoload `NetworkClient`: the game's link to the lobby server. Transport only:
+## connect / reconnect, JSON decode, envelope validation, stats. Two transports:
+## - local: the server runs inside this game (LobbyServer); messages are passed in-process.
+## - WebSocket: a server elsewhere (e.g. apps/server run by hand), by URL. It does not know about
 ## teams, roles or Duos. GameSession and InputRouter listen to `game_event_received`.
 ## Protocol contract: docs/network-protocol.md and packages/protocol/events.ts (repo root).
 extends Node
@@ -27,6 +29,8 @@ const KNOWN_TYPES: PackedStringArray = [
 
 var url := ""
 var _ws := WebSocketPeer.new()
+var _local := false                        ## talking to LobbyServer in-process
+var _local_inbox: Array = []               ## server → game messages, handled next frame
 var _connected := false
 var _want_connection := false
 var _retry_in := 0.0
@@ -55,8 +59,26 @@ func connect_to_server(new_url: String) -> void:
 	_open()
 
 
+## Host the lobby on the server running inside this game (LobbyServer).
+func connect_local() -> void:
+	disconnect_from_server()
+	url = LobbyServer.server_url()
+	_local = true
+	LobbyServer.attach_host(_receive_local)
+	_set_connected(true)
+	send_message("hello", {"clientType": "game"})
+
+
+func is_local() -> bool:
+	return _local
+
+
 ## Intentional disconnect: no automatic reconnect afterwards.
 func disconnect_from_server() -> void:
+	if _local:
+		_local = false
+		_local_inbox.clear()
+		LobbyServer.host_left()
 	_want_connection = false
 	if _ws.get_ready_state() != WebSocketPeer.STATE_CLOSED:
 		_ws.close(1000, "client closing")
@@ -74,6 +96,9 @@ func send_message(type: String, fields: Dictionary = {}) -> bool:
 		return false
 	var msg := {"type": type, "protocolVersion": protocolVersion}
 	msg.merge(fields)
+	if _local:
+		LobbyServer.host_message(msg)
+		return true
 	return _ws.send_text(JSON.stringify(msg)) == OK
 
 
@@ -97,6 +122,15 @@ func reset_stats() -> void:
 
 func _process(delta: float) -> void:
 	var start := Time.get_ticks_usec()
+	if _local:
+		var batch := _local_inbox
+		_local_inbox = []
+		for value in batch:
+			_stats.packets += 1
+			_handle_value(value)
+		_stats.last_poll_usec = Time.get_ticks_usec() - start
+		_stats.max_poll_usec = maxi(_stats.max_poll_usec, _stats.last_poll_usec)
+		return
 	_ws.poll()
 	var state := _ws.get_ready_state()
 	match state:
@@ -133,6 +167,10 @@ func _open() -> void:
 	_retry_delay = minf(_retry_delay * 2.0, max_reconnect_delay)
 	if err != OK:
 		network_error.emit("could not start connection to %s (error %d)" % [url, err])
+
+
+func _receive_local(value: Variant) -> void:
+	_local_inbox.append(value)
 
 
 func _set_connected(on: bool) -> void:
@@ -202,6 +240,16 @@ func _validate(value: Variant) -> Dictionary:
 func _reject(reason: String) -> void:
 	_stats.rejected += 1
 	network_error.emit("rejected message: " + reason)
+
+
+## The server given with `-- --server=ws://...` or the Project Setting, or "" if none.
+func configured_override() -> String:
+	for arg in OS.get_cmdline_user_args():
+		if arg.begins_with(URL_ARG):
+			return arg.substr(URL_ARG.length())
+	if ProjectSettings.has_setting(URL_SETTING):
+		return str(ProjectSettings.get_setting(URL_SETTING))
+	return ""
 
 
 func _configured_url() -> String:

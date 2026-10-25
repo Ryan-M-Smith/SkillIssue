@@ -4,9 +4,9 @@ A 2v2 game where each team is one character driven by two phones held sideways l
 
 ## Run it
 
-1. Once: install Node.js 20+ and run `npm install` in this folder.
-2. Open `apps/game` in Godot 4.7 and press Play. The main menu opens.
-3. **Create a Lobby**. The game starts the server itself and shows a 6-character join code and the server address.
+1. Open `apps/game` in Godot 4.7 and press **Run Project** (F5). The main menu opens. (F6, "Run Current Scene", skips the menu.)
+2. **Create a Lobby**. The game hosts the server itself (nothing else to install) and shows a 6-character join code and the address phones connect to. Allow Godot through the firewall if your computer asks.
+3. For the phone app, once: install Node.js 20+ and run `npm install` in this folder.
 4. On each phone, open the companion app (`npm run companion:start`, then Expo Go): **Join a Lobby**, enter the code, pick a team and role, tap **Ready**. Set the server address under Settings if it isn't filled in.
 5. When all four phones are ready the match counts down and starts. At the end: scores and stats, then **Play Again** or **Main Menu**.
 
@@ -18,6 +18,6 @@ Testing with fewer phones: run the game with `-- --min-players=1`. Keyboard cont
 | --- | --- |
 | `apps/game` | Godot game: menus, lobby, split-screen match, results |
 | `apps/companion` | Expo app: the phone controller (movement or aim). Its web version is a motion debugger |
-| `apps/server` | WebSocket server the game starts: lobbies, input relay, debug relay |
+| `apps/server` | The same server in Node.js, for the web motion debugger or to run a server on its own. The game uses it if it's already running on port 8080 |
 | `packages/protocol` | Message types shared by all three |
 | `docs/network-protocol.md` | The protocol and the flow |

@@ -1,4 +1,4 @@
-## Lobby: starts the server, shows the join code, waits for four phones to pick a team
+## Lobby: opens the in-game server, shows the join code, waits for four phones to pick a team
 ## and role and ready up, counts down, starts the match, loads split-screen gameplay.
 ## Coming back from the results screen (Play Again) reuses the open lobby and code.
 extends Control
@@ -24,7 +24,7 @@ func _ready() -> void:
 	add_child(UiKit.background(0.5, 0.8))
 	_build()
 
-	ServerProcess.status_changed.connect(_on_server_status.unbind(2))
+	LobbyServer.status_changed.connect(_on_server_status.unbind(2))
 	GameSession.registered.connect(_refresh.unbind(2))
 	GameSession.lobby_changed.connect(_refresh)
 	GameSession.state_changed.connect(_on_state)
@@ -151,11 +151,11 @@ func _refresh() -> void:
 		return
 	_render_code(GameSession.pairing_code)
 	var server_ok := NetworkClient.is_connected_to_server()
-	if ServerProcess.state == "failed":
-		_status.text = ServerProcess.message
+	if LobbyServer.state == "failed":
+		_status.text = LobbyServer.message
 		_retry.visible = true
 	elif not server_ok:
-		_status.text = ServerProcess.message if not ServerProcess.message.is_empty() else "Connecting…"
+		_status.text = "Connecting to %s…" % NetworkClient.url if not NetworkClient.url.is_empty() else "Opening the lobby…"
 	elif GameSession.pairing_code.is_empty():
 		_status.text = "Opening the lobby…"
 	else:
@@ -221,12 +221,8 @@ func _render_slot(team: int, role: String, player: Dictionary) -> void:
 
 
 func _phone_address() -> String:
-	var url := ServerProcess.server_url()
-	var port := url.get_slice(":", 2)
-	for address in IP.get_local_addresses():
-		if address.count(".") == 3 and not address.begins_with("127.") and not address.begins_with("169.254."):
-			return "ws://%s:%s" % [address, port]
-	return url
+	var urls := LobbyServer.lan_urls()
+	return urls[0] if not urls.is_empty() else LobbyServer.server_url()
 
 
 func _on_server_status() -> void:
