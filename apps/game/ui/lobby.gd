@@ -18,6 +18,7 @@ var _copy_ticket: Button
 var _rendered_code := ""
 var _countdown := -1.0
 var _loading := false
+var _ready_count := 0     # for the "someone readied up" sound
 
 
 func _ready() -> void:
@@ -185,6 +186,9 @@ func _refresh() -> void:
 			slotted += 1
 			if p.ready:
 				ready += 1
+	if ready > _ready_count:
+		UiKit.sfx(self, "positive")
+	_ready_count = ready
 	for team in 2:
 		for role in ["gunner", "mover"]:
 			_render_slot(team, role, GameSession.player_at(team, role))
@@ -251,6 +255,7 @@ func _on_server_status() -> void:
 
 
 func _on_server_error(error: String) -> void:
+	UiKit.sfx(self, "negative")
 	if not NetworkClient.is_connected_to_server():
 		_error = error
 	_status.text = error

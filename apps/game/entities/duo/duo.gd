@@ -4,6 +4,8 @@ class_name Duo
 extends CharacterBody3D
 
 signal respawned()
+## A health pack was picked up (the HUD flashes a green vignette).
+signal health_picked_up(amount: float)
 ## Emitted on death with the killer Duo (or null) and the weapon name, for kill feeds.
 signal killed(killer: Node, weapon_name: String)
 
@@ -70,6 +72,7 @@ func modify_health(add: int) -> void:
 	if health.has_method("heal"):
 		print('give health')
 		health.heal(20)
+		health_picked_up.emit(20.0)
 
 func test_damage() -> void:
 	print('ok')

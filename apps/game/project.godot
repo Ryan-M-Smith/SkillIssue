@@ -26,7 +26,7 @@ MatchStats="*res://scripts/match_stats.gd"
 GraphicsSettings="*res://scripts/graphics_settings.gd"
 MvpService="*res://scripts/mvp_service.gd"
 Music="*res://scripts/music.gd"
-Sfx="*uid://bud54ht4mnbpv"
+Sfx="*res://scripts/sfx.gd"
 
 [display]
 

@@ -18,7 +18,8 @@ func _ready() -> void:
 
 func play(sound: String) -> void:
 	var stream: AudioStream = SOUNDS.get(sound)
-	if stream == null:
+	# Headless runs (tests, servers) have no speakers; a playback left at quit is an error.
+	if stream == null or DisplayServer.get_name() == "headless":
 		return
 	var p := AudioStreamPlayer.new()
 	p.stream = stream

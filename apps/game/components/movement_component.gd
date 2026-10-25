@@ -15,8 +15,7 @@ enum ForwardMode {
 @export var collision: CollisionShape3D
 @export var jump_buffer_time := 0.15     ## a JUMP tap just before landing still counts
 
-@onready var health: HealthComponent = $Components/Health
-
+@onready var health: HealthComponent = get_node_or_null("../Health")   ## sibling under Components
 var crouching := false
 ## Power-ups scale walking / sprinting / crouching speed (1 = normal). Set by the Duo.
 var speed_scale := 1.0

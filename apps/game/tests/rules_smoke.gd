@@ -104,6 +104,24 @@ func _run() -> void:
 	if not _check(rolled.size() == Effect.size(), "every effect can come out of a box"):
 		return
 
+	# --- a health pack (item_pickup.gd on The Pit) heals and flashes the green vignette
+	var pack: Node3D = current_scene.find_child("HealthPickupObject", true, false)
+	var blue_hud = current_scene.get_node("HUD/TeamHuds/TeamAHud")
+	var red_hud = current_scene.get_node("HUD/TeamHuds/TeamBHud")
+	if not _check(pack != null and blue_hud._heal == 0.0, "The Pit has health packs and no green flash yet"):
+		return
+	blue.health.apply_damage(50.0, null)
+	await _move(blue, pack.global_position)
+	if not _check(blue.health.hp == 70.0, "walking into a health pack heals 20"):
+		return
+	if not _check(blue_hud._heal > 0.5 and red_hud._heal == 0.0, "health pack flashes green on the picker's screen only"):
+		return
+	await create_timer(1.2).timeout
+	if not _check(blue_hud._heal == 0.0, "green vignette fades out"):
+		return
+	await _move(blue, away)
+	blue.health.reset()
+
 	# --- shooting effects (red shoots blue from 2 m, like gameplay_smoke). A big health pool
 	# keeps Blue standing through the test shots, and makes the one-shot check stricter.
 	blue.health.max_health = 1000.0

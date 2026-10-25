@@ -31,6 +31,10 @@ var current := ""
 ## The TRACKS table in use (a copy, so tests or a mod can point a track at another file).
 var tracks: Dictionary = TRACKS.duplicate()
 
+## Headless runs (tests, servers) have no speakers: track logic runs, nothing plays. Playing
+## there would leave audio playbacks behind at quit, which Godot reports as an error.
+var silent := DisplayServer.get_name() == "headless"
+
 var _players: Array[AudioStreamPlayer] = []
 var _active := 0
 var _tween: Tween
@@ -64,7 +68,8 @@ func play(track: String, fade := -1.0) -> bool:
 		return false
 	_loop(stream)
 	current = track
-	_crossfade(stream, fade_seconds if fade < 0.0 else fade)
+	if not silent:
+		_crossfade(stream, fade_seconds if fade < 0.0 else fade)
 	return true
 
 
