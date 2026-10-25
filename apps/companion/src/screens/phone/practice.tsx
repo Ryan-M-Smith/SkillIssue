@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { Platform, ScrollView, StyleSheet, Text, TextInput, View, useWindowDimensions } from "react-native";
-import { DeviceMotion } from "expo-sensors";
+import { MotionSensor as DeviceMotion } from "@/service/motion-sensor";
 
 import { MotionController, emptyControls } from "@/service/motion-control-service";
 import { DebugLink, idleLinkStatus, type DebugLinkStatus } from "@/service/debug-link";

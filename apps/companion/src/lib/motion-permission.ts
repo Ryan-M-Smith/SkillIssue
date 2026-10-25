@@ -1,6 +1,8 @@
 import { useCallback, useEffect, useState } from "react";
-import { AppState } from "react-native";
-import { DeviceMotion } from "expo-sensors";
+import { AppState, Platform } from "react-native";
+import { Accelerometer, DeviceMotion, Gyroscope } from "expo-sensors";
+import { resolveMotionAccess, type MotionAccess } from "./motion-access-policy";
+export type { MotionAccess } from "./motion-access-policy";
 
 /**
  * Where motion access stands:
@@ -10,17 +12,18 @@ import { DeviceMotion } from "expo-sensors";
  * - unavailable: no motion sensors (or a browser without them / without HTTPS)
  * - granted
  */
-export type MotionAccess = "checking" | "ask" | "blocked" | "unavailable" | "granted";
+const sensors = {
+	accelerometerAvailable: () => Accelerometer.isAvailableAsync(),
+	gyroscopeAvailable: () => Gyroscope.isAvailableAsync(),
+	motionAvailable: () => DeviceMotion.isAvailableAsync(),
+	getPermission: () => DeviceMotion.getPermissionsAsync(),
+	requestPermission: () => DeviceMotion.requestPermissionsAsync(),
+};
+
+export const requestMotionAccess = () => resolveMotionAccess(Platform.OS, true, sensors);
 
 async function check(): Promise<MotionAccess> {
-	try {
-		if (!(await DeviceMotion.isAvailableAsync())) return "unavailable";
-		const permission = await DeviceMotion.getPermissionsAsync();
-		if (permission.granted) return "granted";
-		return permission.canAskAgain === false ? "blocked" : "ask";
-	} catch {
-		return "unavailable";
-	}
+	return resolveMotionAccess(Platform.OS, false, sensors);
 }
 
 /**
@@ -46,8 +49,7 @@ export function useMotionAccess(active: boolean) {
 
 	const request = useCallback(async () => {
 		try {
-			const permission = await DeviceMotion.requestPermissionsAsync();
-			const next: MotionAccess = permission.granted ? "granted" : permission.canAskAgain === false ? "blocked" : "ask";
+			const next = await requestMotionAccess();
 			setAccess(next);
 			return next;
 		} catch {

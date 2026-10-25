@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { Platform, StatusBar, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { DeviceMotion } from "expo-sensors";
+import { MotionSensor as DeviceMotion } from "@/service/motion-sensor";
 import * as Linking from "expo-linking";
 
 import { MotionController, emptyControls } from "@/service/motion-control-service";

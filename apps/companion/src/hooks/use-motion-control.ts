@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Alert, Platform } from "react-native";
-import { DeviceMotion } from "expo-sensors";
+import { MotionSensor as DeviceMotion } from "@/service/motion-sensor";
+import { requestMotionAccess } from "@/lib/motion-permission";
 
 import { average } from "@/lib/math/sensors";
 import { deviceRotationRate } from "@/lib/math/motion";
@@ -93,13 +94,8 @@ export function useMotionControl(initialRole: Role = "movement") {
 
         try {
             // Safari requires the permission request directly after the user's tap.
-            const permission = await DeviceMotion.requestPermissionsAsync();
-            if (!permission.granted) {
-                throw new Error("Motion sensor permission is required.");
-            }
-            if (!(await DeviceMotion.isAvailableAsync())) {
-                throw new Error("DeviceMotion is unavailable on this device.");
-            }
+            const access = await requestMotionAccess();
+            if (access !== "granted") throw new Error(access === "unavailable" ? "Motion sensors are unavailable on this device." : "Allow motion access, then try again.");
             if (generation !== startGenerationRef.current) return;
 
             controllerRef.current = new MotionController(role, Platform.OS);

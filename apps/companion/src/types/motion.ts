@@ -18,6 +18,8 @@ export type MotionVector = {
 type Stamped = { timestamp?: number };
 
 export type MotionReading = {
+	/** Browser/native monotonic measurement time, in seconds (never wall-clock ms). */
+	timestamp?: number;
 	rotation: MotionAngles & Stamped;
 	rotationRate: (MotionAngles & Stamped) | null;
 	acceleration: (MotionVector & Stamped) | null;

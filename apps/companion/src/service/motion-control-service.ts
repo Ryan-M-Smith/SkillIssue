@@ -215,6 +215,8 @@ export class MotionController {
 	private frame: Frame | null = null;
 	private gravity: MotionVector | null = null;
 	private lastSampleAt: number | null = null;
+	private lastClockSource: "sensor" | "receipt" | null = null;
+	private gyroBias: MotionVector = { x: 0, y: 0, z: 0 };
 	private awaySince: number | null = null;
 
 	// Runner
@@ -250,6 +252,8 @@ export class MotionController {
 		this.frame = null;
 		this.gravity = null;
 		this.lastSampleAt = null;
+		this.lastClockSource = null;
+		this.gyroBias = { x: 0, y: 0, z: 0 };
 		this.awaySince = null;
 		this.crouching = false;
 		this.sprinting = false;
@@ -279,7 +283,7 @@ export class MotionController {
 		};
 	}
 
-	process(reading: MotionReading, now = Date.now()): GameControls {
+	process(reading: MotionReading, now = globalThis.performance?.now() ?? Date.now()): GameControls {
 		const total = reading.accelerationIncludingGravity;
 		const rate = reading.rotationRate;
 		if (!total || !finite(total) || magnitude(total) < 0.1 || !finite(reading.acceleration) ||
@@ -287,20 +291,32 @@ export class MotionController {
 			return this.hold();
 		}
 		// Prefer the sensor's own clock: JS callbacks can arrive in bunches.
-		const stamp = rate?.timestamp ?? reading.rotation?.timestamp;
-		const t = typeof stamp === "number" && Number.isFinite(stamp) ? stamp * 1000 : now;
-		if (this.lastSampleAt !== null && t <= this.lastSampleAt) return this.hold();
-		const gap = this.lastSampleAt === null ? 0 : (t - this.lastSampleAt) / 1000;
-		const dt = clamp(gap || 0.016, 0.002, 0.1);
+		const stamp = reading.timestamp ?? rate?.timestamp ?? total.timestamp ?? reading.rotation?.timestamp;
+		const source = typeof stamp === "number" && Number.isFinite(stamp) && stamp >= 0 ? "sensor" : "receipt";
+		const t = source === "sensor" ? stamp! * 1000 : now;
+		let gap = this.lastSampleAt === null ? 0 : (t - this.lastSampleAt) / 1000;
+		if ((this.lastClockSource !== null && source !== this.lastClockSource) || gap < 0 || gap > 0.35) {
+			// Restarts, backgrounding and clock-source changes must not integrate a jump,
+			// or leave every future sample rejected against the old clock.
+			this.reset();
+			gap = 0;
+		} else if (this.lastSampleAt !== null && t === this.lastSampleAt) return this.hold();
+		const dt = clamp(gap || 0.016, 0, 0.1);
+		this.lastClockSource = source;
 		this.lastSampleAt = t;
-		if (gap > 0.35) {
-			// The app was paused or the sensor stalled: drop anything in progress.
-			this.flick = null;
-			this.move = still;
-		}
 
-		const gravity = this.updateGravity(reading, dt);
-		const gyro = rate ? deviceRotationRate(rate, this.platform) : null;
+		const rawGyro = rate ? deviceRotationRate(rate, this.platform) : null;
+		if (rawGyro && magnitude(rawGyro) < 3 && (!this.frame || magnitude(rawGyro) < 0.8)) {
+			// Learn small zero-rate offsets at rest, without absorbing deliberate turns.
+			const k = 1 - Math.exp(-dt / (this.frame ? 5 : 0.15));
+			this.gyroBias = {
+				x: this.gyroBias.x + k * (rawGyro.x - this.gyroBias.x),
+				y: this.gyroBias.y + k * (rawGyro.y - this.gyroBias.y),
+				z: this.gyroBias.z + k * (rawGyro.z - this.gyroBias.z),
+			};
+		}
+		const gyro = rawGyro ? { x: rawGyro.x - this.gyroBias.x, y: rawGyro.y - this.gyroBias.y, z: rawGyro.z - this.gyroBias.z } : null;
+		const gravity = this.updateGravity(reading, dt, gyro);
 		const speed = gyro ? magnitude(gyro) : 0;
 
 		if (!this.frame) {
@@ -330,7 +346,7 @@ export class MotionController {
 	}
 
 	/** Unit gravity in the phone's frame (points at the ground). */
-	private updateGravity(reading: MotionReading, dt: number): MotionVector {
+	private updateGravity(reading: MotionReading, dt: number, gyro: MotionVector | null): MotionVector {
 		const total = reading.accelerationIncludingGravity;
 		const linear = reading.acceleration;
 		if (linear) {
@@ -343,7 +359,15 @@ export class MotionController {
 		}
 		// No linear acceleration (some browsers): smooth out hand motion instead.
 		const sample = normalize(total);
-		const k = 1 - Math.exp(-dt / settings.rawGravityTau);
+		// Predict gravity with gyro for immediate tilt response; accelerometer corrects
+		// long-term drift. Reduce correction during linear jolts, rather than steering
+		// the character in response to shaking the phone.
+		if (this.gravity && gyro) {
+			const turn = cross(scale(gyro, Math.PI / 180), this.gravity);
+			this.gravity = normalize({ x: this.gravity.x - turn.x * dt, y: this.gravity.y - turn.y * dt, z: this.gravity.z - turn.z * dt });
+		}
+		const confidence = Math.abs(magnitude(total) - 9.80665) < 1.5 ? 1 : 0.05;
+		const k = (1 - Math.exp(-dt / settings.rawGravityTau)) * confidence;
 		this.gravity = this.gravity
 			? normalize({
 				x: this.gravity.x + k * (sample.x - this.gravity.x),
@@ -374,6 +398,7 @@ export class MotionController {
 	}
 
 	private setNeutral(down: MotionVector) {
+		if (magnitude(down) < 0.5) down = this.gravity ?? { x: 0, y: 0, z: -1 };
 		this.frame = buildFrame(down);
 		this.calibrationSince = null;
 		this.calibrationStarted = null;
