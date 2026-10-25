@@ -15,6 +15,8 @@
 ## Controls work from phones (via the relay) and from the keyboard at the same time:
 ##   Team A: WASD, Space jump, Ctrl crouch, hold Q sprint, mouse aim (click to capture), LMB fire, RMB scope, 1/2/3 guns
 ##   Team B: IJKL, Shift jump, N crouch, hold U sprint, arrow keys aim, Enter fire, M scope, 8/9/0 guns
+##   F3: debug view: hitbox zones on both duos (red head / yellow body / blue legs)
+##       plus each team's live spread circle and spread value
 class_name DuoSandbox
 extends Node
 
@@ -37,6 +39,8 @@ extends Node
 @export var make_map_csg_solid := true
 ## Adds a sun + sky at runtime if the world has no light / environment.
 @export var add_light_if_missing := true
+## Start with the F3 debug view on.
+@export var debug_view := false
 
 @export_group("Scene paths (relative to this node; it sits directly under Main)")
 @export var world_path: NodePath = ^"../World"
@@ -54,6 +58,7 @@ var scores: Array[int] = [0, 0]
 var _cameras: Array[Camera3D] = []
 var _hud_halves: Array[Dictionary] = []
 var _score_label: Label
+var _hint_label: Label
 
 
 func _ready() -> void:
@@ -88,6 +93,23 @@ func _setup() -> void:
 
 	GameEvents.duo_killed.connect(_on_duo_killed)
 	_update_score()
+	set_debug_view(debug_view)
+
+
+func _unhandled_input(event: InputEvent) -> void:
+	if event is InputEventKey and event.pressed and not event.echo and event.physical_keycode == KEY_F3:
+		set_debug_view(not debug_view)
+
+
+## F3: show hitbox zones + spread circles. Purely visual; nothing changes in the game rules.
+func set_debug_view(on: bool) -> void:
+	debug_view = on
+	for d in duos:
+		if d.hitboxes:
+			d.hitboxes.set_debug_visible(on)
+	if _hint_label:
+		_hint_label.text = "F3: debug ON (hitboxes + spread)" if on else "F3: debug view"
+
 
 
 # ---------------------------------------------------------------- cameras
@@ -214,7 +236,7 @@ func _build_hud() -> void:
 
 		var info := _label("", 18)
 		info.set_anchors_preset(Control.PRESET_BOTTOM_LEFT)
-		info.position = Vector2(16, -64)
+		info.position = Vector2(16, -118)   # sits above the team HUD's health bar / kill counter
 		half.add_child(info)
 
 		var dead := _label("RESPAWNING…", 40)
@@ -225,7 +247,29 @@ func _build_hud() -> void:
 		dead.visible = false
 		half.add_child(dead)
 
-		_hud_halves.append({"crosshair": crosshair, "info": info, "dead": dead})
+		# Spread circle: a ring whose radius = the current spread cone on screen.
+		var ring := Panel.new()
+		ring.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		ring.set_anchors_preset(Control.PRESET_CENTER)
+		var sb := StyleBoxFlat.new()
+		sb.bg_color = Color(0, 0, 0, 0)
+		sb.border_color = Color(1, 1, 1, 0.8)
+		sb.set_border_width_all(2)
+		sb.set_corner_radius_all(4096)
+		sb.anti_aliasing = true
+		ring.add_theme_stylebox_override("panel", sb)
+		ring.visible = false
+		half.add_child(ring)
+
+		var spread_label := _label("", 16)
+		spread_label.set_anchors_preset(Control.PRESET_CENTER)
+		spread_label.position = Vector2(-60, 40)
+		spread_label.custom_minimum_size = Vector2(120, 24)
+		spread_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		spread_label.visible = false
+		half.add_child(spread_label)
+
+		_hud_halves.append({"crosshair": crosshair, "info": info, "dead": dead, "half": half, "ring": ring, "spread": spread_label})
 
 	_score_label = _label("", 26)
 	_score_label.set_anchors_preset(Control.PRESET_CENTER_TOP)
@@ -233,6 +277,13 @@ func _build_hud() -> void:
 	_score_label.custom_minimum_size = Vector2(320, 40)
 	_score_label.position = Vector2(-160, 8)
 	root.add_child(_score_label)
+
+	_hint_label = _label("F3: debug view", 14)
+	_hint_label.set_anchors_preset(Control.PRESET_CENTER_TOP)
+	_hint_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_hint_label.custom_minimum_size = Vector2(360, 24)
+	_hint_label.position = Vector2(-180, 120)
+	root.add_child(_hint_label)
 
 
 func _label(text: String, size: int) -> Label:
@@ -254,10 +305,27 @@ func _update_half_hud(i: int, duo: Duo) -> void:
 	for g in w.loadout.size():
 		var n := w.loadout[g].display_name.to_upper()
 		guns.append("[%s]" % n if g == w.current else (n if w.owned[g] else "·"))
-	h.info.text = "HP %d\n%s" % [ceili(duo.health.hp), "   ".join(guns)]
+	# HP is shown by the team HUD (health bar); this line only lists the guns.
+	h.info.text = "   ".join(guns)
 	h.crosshair.visible = duo.alive
 	h.crosshair.text = "( + )" if w.scoped else "+"
 	h.dead.visible = not duo.alive
+	# Spread circle (debug view)
+	var show: bool = debug_view and duo.alive
+	h.ring.visible = show
+	h.spread.visible = show
+	if show:
+		var deg := w.current_spread_degrees()
+		var cam := _cameras[i]
+		var half_h: float = (h.half as Control).size.y * 0.5
+		var r := tan(deg_to_rad(deg)) / tan(deg_to_rad(cam.fov * 0.5)) * half_h
+		r = maxf(r, 3.0)
+		# anchored at the center of this half, so offsets are relative to the center
+		h.ring.offset_left = -r
+		h.ring.offset_top = -r
+		h.ring.offset_right = r
+		h.ring.offset_bottom = r
+		h.spread.text = "spread %.1f°" % deg
 
 
 func _update_score() -> void:
