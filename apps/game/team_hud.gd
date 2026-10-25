@@ -6,6 +6,8 @@ const VITALS = preload("res://ui/gameplay_vitals.gd")
 const GLYPH = preload("res://ui/gameplay_glyph.gd")
 const RETICLE = preload("res://crosshair.gd")
 const DAMAGE_SHADER := "shader_type canvas_item; uniform float strength = 0.0; uniform float downed = 0.0; void fragment(){ vec2 edge = abs(UV - vec2(0.5)) * 2.0; float rim = pow(max(edge.x, edge.y), 5.0); vec3 tint = mix(vec3(1.0, 0.08, 0.12), vec3(0.08, 0.01, 0.025), downed); COLOR = vec4(tint, clamp(rim * strength + downed * 0.52, 0.0, 0.85)); }"
+## Green edge glow when a health pack is picked up: only the outer border of the screen.
+const HEAL_SHADER := "shader_type canvas_item; uniform float strength = 0.0; void fragment(){ vec2 edge = abs(UV - vec2(0.5)) * 2.0; float rim = smoothstep(0.6, 1.0, max(edge.x, edge.y)); COLOR = vec4(0.25, 1.0, 0.45, rim * strength * 0.6); }"
 
 @export var team_data: TeamData
 
@@ -30,6 +32,8 @@ var _kill_streak: Label
 var _streak: Label
 var _effect: ShaderMaterial
 var _damage := 0.0
+var _heal_effect: ShaderMaterial
+var _heal := 0.0          ## 1 = full green flash, fades to 0
 var _death_remaining := 0.0
 var _respawn_duration := 3.0
 var _celebration_tween: Tween
@@ -48,6 +52,7 @@ func bind_duo(duo: Duo, respawn_seconds: float) -> void:
 	_respawn_duration = respawn_seconds
 	duo.killed.connect(_on_killed)
 	duo.respawned.connect(_on_respawned)
+	duo.health_picked_up.connect(func(_amount: float): _heal = 1.0)
 	duo.weapons.hit_confirmed.connect(func(_target: Node, _amount: float, headshot: bool):
 		_reticle.confirm_hit(headshot))
 	duo.weapons.fired.connect(func(_data: WeaponData): _reticle.recoil())
@@ -64,6 +69,16 @@ func _build() -> void:
 	_effect.shader = shader
 	damage.material = _effect
 	add_child(damage)
+	var heal := ColorRect.new()
+	heal.name = "HealVignette"
+	heal.set_anchors_preset(Control.PRESET_FULL_RECT)
+	heal.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var heal_shader := Shader.new()
+	heal_shader.code = HEAL_SHADER
+	_heal_effect = ShaderMaterial.new()
+	_heal_effect.shader = heal_shader
+	heal.material = _heal_effect
+	add_child(heal)
 
 	_reticle = RETICLE.new()
 	_reticle.set_anchors_preset(Control.PRESET_CENTER)
@@ -185,6 +200,8 @@ func _build_celebration() -> void:
 
 func _process(delta: float) -> void:
 	_damage = move_toward(_damage, 0.0, delta * 1.8)
+	_heal = move_toward(_heal, 0.0, delta * 1.1)
+	_heal_effect.set_shader_parameter("strength", _heal)
 	var critical := is_instance_valid(_duo) and _duo.alive and _duo.health.hp <= _duo.health.max_health * 0.25
 	var pulse := (0.12 + 0.08 * sin(Time.get_ticks_msec() * 0.008)) if critical else 0.0
 	_effect.set_shader_parameter("strength", maxf(_damage, pulse))
@@ -236,6 +253,7 @@ func _on_killed(killer: Node, weapon_name: String) -> void:
 func _on_respawned() -> void:
 	_death.visible = false
 	_damage = 0.0
+	_heal = 0.0
 	_vitals.set_health(_duo.health.hp, _duo.health.max_health, true)
 
 

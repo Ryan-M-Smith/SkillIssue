@@ -31,12 +31,13 @@ func _ready() -> void:
 			break
 
 
-## Returns the damage actually dealt.
-func take_hit(amount: float, headshot_multiplier: float, source: Node) -> float:
+## Returns the damage actually dealt. lethal: a One-Shot Round, takes all remaining HP in
+## any zone (spawn protection still blocks it).
+func take_hit(amount: float, headshot_multiplier: float, source: Node, lethal := false) -> float:
 	if health == null or health.dead or health.is_protected():
 		return 0.0
 	var mult := headshot_multiplier if zone == Zone.HEAD else multiplier
-	var dmg := amount * mult
+	var dmg := health.hp if lethal else amount * mult
 	hit_taken.emit(dmg, zone, source)     # before the damage, so a killing headshot still pops the hat
 	health.apply_damage(dmg, source)
 	return dmg

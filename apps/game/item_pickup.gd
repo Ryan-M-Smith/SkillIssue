@@ -12,7 +12,10 @@ extends Area3D
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
-	pass # Replace with function body.
+	# Detect players (the mask) without being something bullets can hit: guns ray-cast the
+	# world and hurtbox layers, so a pickup on those layers would stop shots. Layer 0 = nothing
+	# hits it; the mask is untouched, so walking into it still works.
+	collision_layer = 0
 
 
 

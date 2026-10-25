@@ -10,6 +10,7 @@ for (const args of [
 	["--headless", "--path", "apps/game", "--editor", "--import", "--quit"],
 	["--headless", "--path", "apps/game", "--script", "res://tests/gameplay_smoke.gd"],
 	["--headless", "--path", "apps/game", "--script", "res://tests/lifecycle_smoke.gd"],
+	["--headless", "--path", "apps/game", "--script", "res://tests/rules_smoke.gd"],
 ]) {
 	const result = spawnSync(executable, args, { encoding: "utf8", windowsHide: true, timeout: 60000, maxBuffer: 8 * 1024 * 1024 });
 	if (result.stdout) process.stdout.write(result.stdout);

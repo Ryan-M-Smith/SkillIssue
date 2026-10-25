@@ -475,6 +475,26 @@ function forwardFeedback(socket: WebSocket, message: ToControllerMessage) {
     if (controller) send(controller.socket, { type: "controller_feedback", message: message.message });
 }
 
+/** Swap on death: a team's movement and aim phones trade roles mid-match (host only). */
+function swapRoles(socket: WebSocket, teamId: unknown) {
+    const context = hostContext(socket);
+    if (!context) {
+        sendError(socket, "invalid_message", "Only the game host can swap roles.");
+        return;
+    }
+    const { session } = context;
+    if (session.state !== "playing" || (teamId !== 1 && teamId !== 2)) return;
+    const runner = slotHolder(session, teamId, "movement");
+    const gunner = slotHolder(session, teamId, "aim");
+    if (!runner || !gunner) return;
+    runner.role = "aim";
+    gunner.role = "movement";
+    sendAssigned(runner);
+    sendAssigned(gunner);
+    sendLobbyState(session);
+    send(session.gameSocket, { type: "roles_swapped", teamId });
+}
+
 function record(value: unknown): value is Record<string, unknown> {
     return value !== null && typeof value === "object" && !Array.isArray(value);
 }
@@ -697,6 +717,9 @@ function handleMessage(socket: WebSocket, message: ClientMessage | DebugClientMe
             return;
         case "to_controller":
             forwardFeedback(socket, message);
+            return;
+        case "swap_roles":
+            swapRoles(socket, message.teamId);
             return;
         case "motion":
         case "environment":
