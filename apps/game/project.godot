@@ -25,6 +25,7 @@ LobbyServer="*res://scripts/network/lobby_server.gd"
 MatchStats="*res://scripts/match_stats.gd"
 GraphicsSettings="*res://scripts/graphics_settings.gd"
 Music="*res://scripts/music.gd"
+Sfx="*uid://bud54ht4mnbpv"
 
 [display]
 
