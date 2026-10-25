@@ -528,7 +528,9 @@ function validInput(message: AuthorizedInputMessage, role: ControllerRole | null
     }
     if ("controls" in payload) {
         const controls = payload.controls;
-        return record(controls) && ["moveX", "moveY", "lookX", "lookY"].every((key) => finite(controls[key]) && Math.abs(controls[key]) <= 1);
+        // lookDX/lookDY (gunner degrees since the last message) are optional, within half a turn.
+        return record(controls) && ["moveX", "moveY", "lookX", "lookY"].every((key) => finite(controls[key]) && Math.abs(controls[key]) <= 1)
+            && ["lookDX", "lookDY"].every((key) => controls[key] === undefined || (finite(controls[key]) && Math.abs(controls[key]) <= 180));
     }
     return vector(payload.accelerometer) && vector(payload.gyroscope);
 }

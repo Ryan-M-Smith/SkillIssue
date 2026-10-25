@@ -1,109 +1,28 @@
-[gd_scene format=3]
+[gd_scene format=3 uid="uid://mn3ill8ohpq7"]
 
-[ext_resource type="Script" path="res://entities/duo/duo.gd" id="1_duo"]
-[ext_resource type="Script" path="res://components/movement_component.gd" id="2_move"]
-[ext_resource type="Script" path="res://components/aim_component.gd" id="3_aim"]
-[ext_resource type="Script" path="res://components/weapon_component.gd" id="4_weap"]
-[ext_resource type="Script" path="res://components/health_component.gd" id="5_hp"]
-[ext_resource type="Script" path="res://components/team_component.gd" id="6_team"]
-[ext_resource type="Script" path="res://components/hurtbox.gd" id="7_hurt"]
+[ext_resource type="Script" uid="uid://d3jydvj8m65ca" path="res://entities/duo/duo.gd" id="1_duo"]
+[ext_resource type="Script" uid="uid://cgsi264jqnhgd" path="res://components/movement_component.gd" id="2_move"]
+[ext_resource type="Script" uid="uid://x8w6kp1aksp8" path="res://components/aim_component.gd" id="3_aim"]
+[ext_resource type="Script" uid="uid://xm6iulrc22re" path="res://components/weapon_component.gd" id="4_weap"]
+[ext_resource type="Script" uid="uid://d4emc7g8nxmwc" path="res://components/health_component.gd" id="5_hp"]
+[ext_resource type="Script" uid="uid://bpj6iytddutvc" path="res://components/team_component.gd" id="6_team"]
+[ext_resource type="Script" uid="uid://b5uhwo2glrpcj" path="res://components/hurtbox.gd" id="7_hurt"]
 [ext_resource type="Resource" path="res://data/movement/default_movement.tres" id="8_mstats"]
 [ext_resource type="Resource" path="res://data/aim/default_aim.tres" id="9_astats"]
-[ext_resource type="Script" path="res://data/weapons/weapon_data.gd" id="10_wdata"]
+[ext_resource type="Script" uid="uid://ccwjuo0qhv51q" path="res://data/weapons/weapon_data.gd" id="10_wdata"]
 [ext_resource type="Resource" path="res://data/weapons/pistol.tres" id="11_pistol"]
 [ext_resource type="Resource" path="res://data/weapons/shotgun.tres" id="12_shotgun"]
 [ext_resource type="Resource" path="res://data/weapons/sniper.tres" id="13_sniper"]
 [ext_resource type="Resource" path="res://data/teams/team_blue.tres" id="14_team"]
-[ext_resource type="Script" path="res://entities/duo/duo_legs_animator.gd" id="15_legs"]
-[ext_resource type="Script" path="res://components/hitbox_component.gd" id="16_hitbox"]
+[ext_resource type="Script" uid="uid://c7xyxb3ndyepq" path="res://entities/duo/duo_legs_animator.gd" id="15_legs"]
+[ext_resource type="Script" uid="uid://bp8j56l12sbxd" path="res://components/hitbox_component.gd" id="16_hitbox"]
 [ext_resource type="Resource" path="res://data/hitboxes/default_hitboxes.tres" id="17_hbprofile"]
-[ext_resource type="Script" path="res://entities/duo/duo_fx.gd" id="18_fx"]
+[ext_resource type="Script" uid="uid://bx6b48b66fx74" path="res://entities/duo/duo_fx.gd" id="18_fx"]
 
 [sub_resource type="CapsuleShape3D" id="body_shape"]
 resource_local_to_scene = true
 radius = 0.4
 height = 1.8
-
-[sub_resource type="CapsuleShape3D" id="body_hurt_shape"]
-radius = 0.44
-height = 1.4
-
-[sub_resource type="BoxShape3D" id="head_hurt_shape"]
-size = Vector3(0.54, 0.36, 0.5)
-
-[sub_resource type="StandardMaterial3D" id="rc_fur"]
-albedo_color = Color(0.5, 0.51, 0.55, 1)
-roughness = 0.85
-
-[sub_resource type="StandardMaterial3D" id="rc_fur_dark"]
-albedo_color = Color(0.17, 0.17, 0.19, 1)
-roughness = 0.85
-
-[sub_resource type="StandardMaterial3D" id="rc_mask"]
-albedo_color = Color(0.06, 0.06, 0.07, 1)
-roughness = 0.85
-
-[sub_resource type="StandardMaterial3D" id="rc_white"]
-albedo_color = Color(0.93, 0.91, 0.86, 1)
-roughness = 0.85
-
-[sub_resource type="StandardMaterial3D" id="rc_paw"]
-albedo_color = Color(0.26, 0.26, 0.29, 1)
-roughness = 0.85
-
-[sub_resource type="StandardMaterial3D" id="rc_nose"]
-albedo_color = Color(0.03, 0.03, 0.03, 1)
-roughness = 0.85
-
-[sub_resource type="StandardMaterial3D" id="rc_eye"]
-albedo_color = Color(0.98, 0.97, 0.92, 1)
-roughness = 0.85
-emission_enabled = true
-emission = Color(0.98, 0.97, 0.92, 1)
-emission_energy_multiplier = 0.3
-
-[sub_resource type="StandardMaterial3D" id="rc_lining"]
-albedo_color = Color(0.07, 0.04, 0.05, 1)
-roughness = 0.85
-
-[sub_resource type="StandardMaterial3D" id="rc_belt"]
-albedo_color = Color(0.14, 0.09, 0.08, 1)
-roughness = 0.85
-
-[sub_resource type="StandardMaterial3D" id="rc_buckle"]
-albedo_color = Color(0.78, 0.64, 0.3, 1)
-roughness = 0.85
-
-[sub_resource type="StandardMaterial3D" id="rc_shirt"]
-albedo_color = Color(0.9, 0.86, 0.74, 1)
-roughness = 0.85
-
-[sub_resource type="StandardMaterial3D" id="rc_tie"]
-albedo_color = Color(0.85, 0.8, 0.62, 1)
-roughness = 0.85
-
-[sub_resource type="StandardMaterial3D" id="rc_band"]
-albedo_color = Color(0.07, 0.07, 0.08, 1)
-roughness = 0.85
-
-[sub_resource type="StandardMaterial3D" id="rc_pick"]
-albedo_color = Color(0.86, 0.7, 0.45, 1)
-roughness = 0.85
-
-[sub_resource type="StandardMaterial3D" id="rc_sweat"]
-albedo_color = Color(0.55, 0.8, 1.0, 1)
-roughness = 0.85
-emission_enabled = true
-emission = Color(0.55, 0.8, 1.0, 1)
-emission_energy_multiplier = 0.3
-
-[sub_resource type="StandardMaterial3D" id="rc_fur_light"]
-albedo_color = Color(0.72, 0.73, 0.76, 1)
-roughness = 0.85
-
-[sub_resource type="StandardMaterial3D" id="rc_feather"]
-albedo_color = Color(0.95, 0.92, 0.85, 1)
-roughness = 0.85
 
 [sub_resource type="CylinderMesh" id="rc_mesh_1"]
 top_radius = 0.05
@@ -112,12 +31,20 @@ height = 0.28
 radial_segments = 6
 rings = 0
 
+[sub_resource type="StandardMaterial3D" id="rc_fur_dark"]
+albedo_color = Color(0.17, 0.17, 0.19, 1)
+roughness = 0.85
+
 [sub_resource type="CylinderMesh" id="rc_mesh_2"]
 top_radius = 0.05
 bottom_radius = 0.066
 height = 0.06
 radial_segments = 6
 rings = 0
+
+[sub_resource type="StandardMaterial3D" id="rc_paw"]
+albedo_color = Color(0.26, 0.26, 0.29, 1)
+roughness = 0.85
 
 [sub_resource type="BoxMesh" id="rc_mesh_3"]
 size = Vector3(0.025, 0.03, 0.04)
@@ -166,10 +93,14 @@ radial_segments = 6
 rings = 0
 
 [sub_resource type="BoxMesh" id="rc_mesh_13"]
-size = Vector3(0.016, 0.08999999999999986, 0.02)
+size = Vector3(0.016, 0.09, 0.02)
+
+[sub_resource type="StandardMaterial3D" id="rc_lining"]
+albedo_color = Color(0.07, 0.04, 0.05, 1)
+roughness = 0.85
 
 [sub_resource type="BoxMesh" id="rc_mesh_14"]
-size = Vector3(0.05, 0.08999999999999986, 0.012)
+size = Vector3(0.05, 0.09, 0.012)
 
 [sub_resource type="BoxMesh" id="rc_mesh_15"]
 size = Vector3(0.025, 0.09, 0.02)
@@ -190,28 +121,28 @@ size = Vector3(0.14, 0.045, 0.03)
 size = Vector3(1, 1, 0.012)
 
 [sub_resource type="BoxMesh" id="rc_mesh_21"]
-size = Vector3(0.335286750449475, 0.055, 0.035)
+size = Vector3(0.33528674, 0.055, 0.035)
 
 [sub_resource type="BoxMesh" id="rc_mesh_22"]
-size = Vector3(0.30528675044947495, 0.014, 0.02)
+size = Vector3(0.30528677, 0.014, 0.02)
 
 [sub_resource type="BoxMesh" id="rc_mesh_23"]
-size = Vector3(0.335286750449475, 0.055, 0.035)
+size = Vector3(0.33528674, 0.055, 0.035)
 
 [sub_resource type="BoxMesh" id="rc_mesh_24"]
-size = Vector3(0.30528675044947495, 0.014, 0.02)
+size = Vector3(0.30528677, 0.014, 0.02)
 
 [sub_resource type="BoxMesh" id="rc_mesh_25"]
-size = Vector3(0.335286750449475, 0.055, 0.035)
+size = Vector3(0.33528674, 0.055, 0.035)
 
 [sub_resource type="BoxMesh" id="rc_mesh_26"]
-size = Vector3(0.30528675044947495, 0.014, 0.02)
+size = Vector3(0.30528677, 0.014, 0.02)
 
 [sub_resource type="BoxMesh" id="rc_mesh_27"]
-size = Vector3(0.335286750449475, 0.055, 0.035)
+size = Vector3(0.33528674, 0.055, 0.035)
 
 [sub_resource type="BoxMesh" id="rc_mesh_28"]
-size = Vector3(0.30528675044947495, 0.014, 0.02)
+size = Vector3(0.30528677, 0.014, 0.02)
 
 [sub_resource type="SphereMesh" id="rc_mesh_29"]
 radius = 0.16
@@ -219,25 +150,50 @@ height = 0.32
 radial_segments = 7
 rings = 4
 
+[sub_resource type="StandardMaterial3D" id="rc_fur"]
+albedo_color = Color(0.5, 0.51, 0.55, 1)
+roughness = 0.85
+
 [sub_resource type="PrismMesh" id="rc_mesh_30"]
-left_to_right = 0.5
 size = Vector3(0.07, 0.07, 0.08)
 
+[sub_resource type="StandardMaterial3D" id="rc_fur_light"]
+albedo_color = Color(0.72, 0.73, 0.76, 1)
+roughness = 0.85
+
 [sub_resource type="PrismMesh" id="rc_mesh_31"]
-left_to_right = 0.5
 size = Vector3(0.07, 0.07, 0.08)
 
 [sub_resource type="BoxMesh" id="rc_mesh_32"]
 size = Vector3(0.1275, 0.06375, 0.034)
 
+[sub_resource type="StandardMaterial3D" id="rc_mask"]
+albedo_color = Color(0.06, 0.06, 0.07, 1)
+roughness = 0.85
+
 [sub_resource type="BoxMesh" id="rc_mesh_33"]
 size = Vector3(0.102, 0.0204, 0.0255)
+
+[sub_resource type="StandardMaterial3D" id="rc_white"]
+albedo_color = Color(0.93, 0.91, 0.86, 1)
+roughness = 0.85
 
 [sub_resource type="BoxMesh" id="rc_mesh_34"]
 size = Vector3(0.051, 0.034, 0.02)
 
+[sub_resource type="StandardMaterial3D" id="rc_eye"]
+albedo_color = Color(0.98, 0.97, 0.92, 1)
+roughness = 0.85
+emission_enabled = true
+emission = Color(0.98, 0.97, 0.92, 1)
+emission_energy_multiplier = 0.3
+
 [sub_resource type="BoxMesh" id="rc_mesh_35"]
-size = Vector3(0.017, 0.028900000000000002, 0.01)
+size = Vector3(0.017, 0.0289, 0.01)
+
+[sub_resource type="StandardMaterial3D" id="rc_nose"]
+albedo_color = Color(0.03, 0.03, 0.03, 1)
+roughness = 0.85
 
 [sub_resource type="BoxMesh" id="rc_mesh_36"]
 size = Vector3(0.1275, 0.06375, 0.034)
@@ -249,18 +205,17 @@ size = Vector3(0.102, 0.0204, 0.0255)
 size = Vector3(0.051, 0.034, 0.02)
 
 [sub_resource type="BoxMesh" id="rc_mesh_39"]
-size = Vector3(0.017, 0.028900000000000002, 0.01)
+size = Vector3(0.017, 0.0289, 0.01)
 
 [sub_resource type="BoxMesh" id="rc_mesh_40"]
-size = Vector3(0.0425, 0.034, 0.029750000000000002)
+size = Vector3(0.0425, 0.034, 0.02975)
 
 [sub_resource type="PrismMesh" id="rc_mesh_41"]
-left_to_right = 0.5
 size = Vector3(0.051, 0.068, 0.02)
 
 [sub_resource type="CylinderMesh" id="rc_mesh_42"]
 top_radius = 0.0102
-bottom_radius = 0.07225000000000001
+bottom_radius = 0.07225
 height = 0.136
 radial_segments = 4
 rings = 0
@@ -326,6 +281,13 @@ height = 0.04
 radial_segments = 6
 rings = 3
 
+[sub_resource type="StandardMaterial3D" id="rc_sweat"]
+albedo_color = Color(0.55, 0.8, 1, 1)
+roughness = 0.85
+emission_enabled = true
+emission = Color(0.55, 0.8, 1, 1)
+emission_energy_multiplier = 0.3
+
 [sub_resource type="SphereMesh" id="rc_mesh_56"]
 radius = 0.014
 height = 0.028
@@ -339,13 +301,13 @@ radial_segments = 6
 rings = 3
 
 [sub_resource type="BoxMesh" id="rc_mesh_58"]
-size = Vector3(0.017099999999999997, 0.019, 0.028499999999999998)
+size = Vector3(0.0171, 0.019, 0.0285)
 
 [sub_resource type="BoxMesh" id="rc_mesh_59"]
-size = Vector3(0.017099999999999997, 0.019, 0.028499999999999998)
+size = Vector3(0.0171, 0.019, 0.0285)
 
 [sub_resource type="BoxMesh" id="rc_mesh_60"]
-size = Vector3(0.017099999999999997, 0.019, 0.028499999999999998)
+size = Vector3(0.0171, 0.019, 0.0285)
 
 [sub_resource type="SphereMesh" id="rc_mesh_61"]
 radius = 0.0456
@@ -354,13 +316,13 @@ radial_segments = 6
 rings = 3
 
 [sub_resource type="BoxMesh" id="rc_mesh_62"]
-size = Vector3(0.017099999999999997, 0.019, 0.028499999999999998)
+size = Vector3(0.0171, 0.019, 0.0285)
 
 [sub_resource type="BoxMesh" id="rc_mesh_63"]
-size = Vector3(0.017099999999999997, 0.019, 0.028499999999999998)
+size = Vector3(0.0171, 0.019, 0.0285)
 
 [sub_resource type="BoxMesh" id="rc_mesh_64"]
-size = Vector3(0.017099999999999997, 0.019, 0.028499999999999998)
+size = Vector3(0.0171, 0.019, 0.0285)
 
 [sub_resource type="CylinderMesh" id="rc_mesh_65"]
 top_radius = 0.314
@@ -369,8 +331,16 @@ height = 0.065
 radial_segments = 6
 rings = 0
 
+[sub_resource type="StandardMaterial3D" id="rc_belt"]
+albedo_color = Color(0.14, 0.09, 0.08, 1)
+roughness = 0.85
+
 [sub_resource type="BoxMesh" id="rc_mesh_66"]
 size = Vector3(0.085, 0.07, 0.02)
+
+[sub_resource type="StandardMaterial3D" id="rc_buckle"]
+albedo_color = Color(0.78, 0.64, 0.3, 1)
+roughness = 0.85
 
 [sub_resource type="BoxMesh" id="rc_mesh_67"]
 size = Vector3(0.05, 0.035, 0.022)
@@ -382,64 +352,64 @@ size = Vector3(0.09, 0.05, 0.02)
 size = Vector3(0.09, 0.05, 0.02)
 
 [sub_resource type="CylinderMesh" id="rc_mesh_70"]
-top_radius = 0.07508408188399972
-bottom_radius = 0.05669960642282255
+top_radius = 0.07508408
+bottom_radius = 0.056699608
 height = 0.116
 radial_segments = 6
 rings = 0
 
 [sub_resource type="CylinderMesh" id="rc_mesh_71"]
-top_radius = 0.08915495022742982
-bottom_radius = 0.07508408188399972
+top_radius = 0.08915495
+bottom_radius = 0.07508408
 height = 0.116
 radial_segments = 6
 rings = 0
 
 [sub_resource type="CylinderMesh" id="rc_mesh_72"]
-top_radius = 0.09677004930056475
-bottom_radius = 0.08915495022742982
+top_radius = 0.09677005
+bottom_radius = 0.08915495
 height = 0.116
 radial_segments = 6
 rings = 0
 
 [sub_resource type="CylinderMesh" id="rc_mesh_73"]
-top_radius = 0.09677004930056475
-bottom_radius = 0.09677004930056475
+top_radius = 0.09677005
+bottom_radius = 0.09677005
 height = 0.116
 radial_segments = 6
 rings = 0
 
 [sub_resource type="CylinderMesh" id="rc_mesh_74"]
-top_radius = 0.08915495022742984
-bottom_radius = 0.09677004930056475
+top_radius = 0.08915495
+bottom_radius = 0.09677005
 height = 0.116
 radial_segments = 6
 rings = 0
 
 [sub_resource type="CylinderMesh" id="rc_mesh_75"]
-top_radius = 0.07508408188399972
-bottom_radius = 0.08915495022742984
+top_radius = 0.07508408
+bottom_radius = 0.08915495
 height = 0.116
 radial_segments = 6
 rings = 0
 
 [sub_resource type="CylinderMesh" id="rc_mesh_76"]
-top_radius = 0.05669960642282256
-bottom_radius = 0.07508408188399972
+top_radius = 0.056699608
+bottom_radius = 0.07508408
 height = 0.116
 radial_segments = 6
 rings = 0
 
 [sub_resource type="CylinderMesh" id="rc_mesh_77"]
 top_radius = 0.006
-bottom_radius = 0.05669960642282256
+bottom_radius = 0.056699608
 height = 0.13
 radial_segments = 6
 rings = 0
 
 [sub_resource type="SphereMesh" id="rc_mesh_78"]
-radius = 0.06520454738624593
-height = 0.13040909477249185
+radius = 0.065204546
+height = 0.13040909
 radial_segments = 6
 rings = 3
 
@@ -458,30 +428,34 @@ radial_segments = 6
 rings = 0
 
 [sub_resource type="PrismMesh" id="rc_mesh_81"]
-left_to_right = 0.5
 size = Vector3(0.2, 0.27, 0.01)
 
+[sub_resource type="StandardMaterial3D" id="rc_shirt"]
+albedo_color = Color(0.9, 0.86, 0.74, 1)
+roughness = 0.85
+
 [sub_resource type="PrismMesh" id="rc_mesh_82"]
-left_to_right = 0.5
 size = Vector3(0.055, 0.23, 0.012)
+
+[sub_resource type="StandardMaterial3D" id="rc_tie"]
+albedo_color = Color(0.85, 0.8, 0.62, 1)
+roughness = 0.85
 
 [sub_resource type="BoxMesh" id="rc_mesh_83"]
 size = Vector3(0.05, 0.04, 0.02)
 
 [sub_resource type="PrismMesh" id="rc_mesh_84"]
-left_to_right = 1
+left_to_right = 1.0
 size = Vector3(0.1, 0.32, 0.03)
 
 [sub_resource type="PrismMesh" id="rc_mesh_85"]
-left_to_right = 0.5
 size = Vector3(0.07, 0.07, 0.03)
 
 [sub_resource type="PrismMesh" id="rc_mesh_86"]
-left_to_right = 0
+left_to_right = 0.0
 size = Vector3(0.1, 0.32, 0.03)
 
 [sub_resource type="PrismMesh" id="rc_mesh_87"]
-left_to_right = 0.5
 size = Vector3(0.07, 0.07, 0.03)
 
 [sub_resource type="CylinderMesh" id="rc_mesh_88"]
@@ -543,7 +517,6 @@ radial_segments = 6
 rings = 0
 
 [sub_resource type="PrismMesh" id="rc_mesh_98"]
-left_to_right = 0.5
 size = Vector3(0.15, 0.24, 0.03)
 
 [sub_resource type="BoxMesh" id="rc_mesh_99"]
@@ -557,7 +530,6 @@ radial_segments = 6
 rings = 0
 
 [sub_resource type="PrismMesh" id="rc_mesh_101"]
-left_to_right = 0.5
 size = Vector3(0.15, 0.24, 0.03)
 
 [sub_resource type="SphereMesh" id="rc_mesh_102"]
@@ -587,21 +559,21 @@ rings = 4
 [sub_resource type="CylinderMesh" id="rc_mesh_107"]
 top_radius = 0.07
 bottom_radius = 0.078
-height = 0.24515301344262522
+height = 0.24515301
 radial_segments = 6
 rings = 0
 
 [sub_resource type="CylinderMesh" id="rc_mesh_108"]
 top_radius = 0.064
 bottom_radius = 0.07
-height = 0.20808652046684814
+height = 0.20808652
 radial_segments = 6
 rings = 0
 
 [sub_resource type="CylinderMesh" id="rc_mesh_109"]
 top_radius = 0.072
 bottom_radius = 0.072
-height = 0.060000000000000005
+height = 0.06
 radial_segments = 6
 rings = 0
 
@@ -632,21 +604,21 @@ rings = 4
 [sub_resource type="CylinderMesh" id="rc_mesh_116"]
 top_radius = 0.07
 bottom_radius = 0.078
-height = 0.38013155617496425
+height = 0.38013154
 radial_segments = 6
 rings = 0
 
 [sub_resource type="CylinderMesh" id="rc_mesh_117"]
 top_radius = 0.064
 bottom_radius = 0.07
-height = 0.4993996395673509
+height = 0.49939963
 radial_segments = 6
 rings = 0
 
 [sub_resource type="CylinderMesh" id="rc_mesh_118"]
 top_radius = 0.072
 bottom_radius = 0.072
-height = 0.059999999999999984
+height = 0.06
 radial_segments = 6
 rings = 0
 
@@ -669,66 +641,70 @@ size = Vector3(0.018, 0.02, 0.03)
 size = Vector3(0.018, 0.02, 0.03)
 
 [sub_resource type="CylinderMesh" id="rc_mesh_124"]
-top_radius = 0.07508408188399972
-bottom_radius = 0.05669960642282255
+top_radius = 0.07508408
+bottom_radius = 0.056699608
 height = 0.116
 radial_segments = 6
 rings = 0
 
 [sub_resource type="CylinderMesh" id="rc_mesh_125"]
-top_radius = 0.08915495022742982
-bottom_radius = 0.07508408188399972
+top_radius = 0.08915495
+bottom_radius = 0.07508408
 height = 0.116
 radial_segments = 6
 rings = 0
 
 [sub_resource type="CylinderMesh" id="rc_mesh_126"]
-top_radius = 0.09677004930056475
-bottom_radius = 0.08915495022742982
+top_radius = 0.09677005
+bottom_radius = 0.08915495
 height = 0.116
 radial_segments = 6
 rings = 0
 
 [sub_resource type="CylinderMesh" id="rc_mesh_127"]
-top_radius = 0.09677004930056475
-bottom_radius = 0.09677004930056475
+top_radius = 0.09677005
+bottom_radius = 0.09677005
 height = 0.116
 radial_segments = 6
 rings = 0
 
 [sub_resource type="CylinderMesh" id="rc_mesh_128"]
-top_radius = 0.08915495022742984
-bottom_radius = 0.09677004930056475
+top_radius = 0.08915495
+bottom_radius = 0.09677005
 height = 0.116
 radial_segments = 6
 rings = 0
 
 [sub_resource type="CylinderMesh" id="rc_mesh_129"]
-top_radius = 0.07508408188399972
-bottom_radius = 0.08915495022742984
+top_radius = 0.07508408
+bottom_radius = 0.08915495
 height = 0.116
 radial_segments = 6
 rings = 0
 
 [sub_resource type="CylinderMesh" id="rc_mesh_130"]
-top_radius = 0.05669960642282256
-bottom_radius = 0.07508408188399972
+top_radius = 0.056699608
+bottom_radius = 0.07508408
 height = 0.116
 radial_segments = 6
 rings = 0
 
 [sub_resource type="CylinderMesh" id="rc_mesh_131"]
 top_radius = 0.006
-bottom_radius = 0.05669960642282256
+bottom_radius = 0.056699608
 height = 0.13
 radial_segments = 6
 rings = 0
 
 [sub_resource type="SphereMesh" id="rc_mesh_132"]
-radius = 0.06520454738624593
-height = 0.13040909477249185
+radius = 0.065204546
+height = 0.13040909
 radial_segments = 6
 rings = 3
+
+[sub_resource type="CapsuleShape3D" id="body_hurt_shape"]
+radius = 0.44
+height = 1.4
 
 [sub_resource type="SphereMesh" id="rc_mesh_133"]
 radius = 0.2
@@ -737,11 +713,9 @@ radial_segments = 8
 rings = 4
 
 [sub_resource type="PrismMesh" id="rc_mesh_134"]
-left_to_right = 0.5
 size = Vector3(0.11, 0.13, 0.17)
 
 [sub_resource type="PrismMesh" id="rc_mesh_135"]
-left_to_right = 0.5
 size = Vector3(0.08, 0.1, 0.14)
 
 [sub_resource type="CylinderMesh" id="rc_mesh_136"]
@@ -766,11 +740,9 @@ radial_segments = 4
 rings = 0
 
 [sub_resource type="PrismMesh" id="rc_mesh_139"]
-left_to_right = 0.5
 size = Vector3(0.11, 0.13, 0.17)
 
 [sub_resource type="PrismMesh" id="rc_mesh_140"]
-left_to_right = 0.5
 size = Vector3(0.08, 0.1, 0.14)
 
 [sub_resource type="CylinderMesh" id="rc_mesh_141"]
@@ -810,7 +782,7 @@ size = Vector3(0.12, 0.024, 0.03)
 size = Vector3(0.06, 0.018, 0.02)
 
 [sub_resource type="BoxMesh" id="rc_mesh_148"]
-size = Vector3(0.02, 0.015299999999999998, 0.01)
+size = Vector3(0.02, 0.0153, 0.01)
 
 [sub_resource type="BoxMesh" id="rc_mesh_149"]
 size = Vector3(0.15, 0.075, 0.04)
@@ -822,13 +794,12 @@ size = Vector3(0.12, 0.024, 0.03)
 size = Vector3(0.06, 0.018, 0.02)
 
 [sub_resource type="BoxMesh" id="rc_mesh_152"]
-size = Vector3(0.02, 0.015299999999999998, 0.01)
+size = Vector3(0.02, 0.0153, 0.01)
 
 [sub_resource type="BoxMesh" id="rc_mesh_153"]
 size = Vector3(0.05, 0.04, 0.035)
 
 [sub_resource type="PrismMesh" id="rc_mesh_154"]
-left_to_right = 0.5
 size = Vector3(0.06, 0.08, 0.02)
 
 [sub_resource type="CylinderMesh" id="rc_mesh_155"]
@@ -872,6 +843,10 @@ height = 0.16
 radial_segments = 4
 rings = 0
 
+[sub_resource type="StandardMaterial3D" id="rc_pick"]
+albedo_color = Color(0.86, 0.7, 0.45, 1)
+roughness = 0.85
+
 [sub_resource type="CylinderMesh" id="rc_mesh_165"]
 top_radius = 0.27
 bottom_radius = 0.26
@@ -900,7 +875,6 @@ radial_segments = 6
 rings = 0
 
 [sub_resource type="PrismMesh" id="rc_mesh_170"]
-left_to_right = 0.5
 size = Vector3(0.24, 0.045, 0.25)
 
 [sub_resource type="CylinderMesh" id="rc_mesh_171"]
@@ -910,26 +884,36 @@ height = 0.05
 radial_segments = 6
 rings = 0
 
+[sub_resource type="StandardMaterial3D" id="rc_band"]
+albedo_color = Color(0.07, 0.07, 0.08, 1)
+roughness = 0.85
+
 [sub_resource type="PrismMesh" id="rc_mesh_172"]
-left_to_right = 0.5
 size = Vector3(0.028, 0.11, 0.012)
+
+[sub_resource type="StandardMaterial3D" id="rc_feather"]
+albedo_color = Color(0.95, 0.92, 0.85, 1)
+roughness = 0.85
 
 [sub_resource type="BoxMesh" id="rc_mesh_173"]
 size = Vector3(0.005, 0.1, 0.014)
 
-[node name="Duo" type="CharacterBody3D"]
+[sub_resource type="BoxShape3D" id="head_hurt_shape"]
+size = Vector3(0.54, 0.36, 0.5)
+
+[node name="Duo" type="CharacterBody3D" unique_id=219760218]
 collision_layer = 2
 collision_mask = 3
 floor_snap_length = 0.3
 script = ExtResource("1_duo")
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=582044276]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, 0)
 shape = SubResource("body_shape")
 
-[node name="Legs" type="Node3D" parent="."]
+[node name="Legs" type="Node3D" parent="." unique_id=272035095]
 
-[node name="Model" type="Node3D" parent="Legs" node_paths=PackedStringArray("body", "movement", "left_hip", "right_hip", "pelvis")]
+[node name="Model" type="Node3D" parent="Legs" unique_id=1983681632 node_paths=PackedStringArray("body", "movement", "left_hip", "right_hip", "pelvis")]
 script = ExtResource("15_legs")
 body = NodePath("../..")
 movement = NodePath("../../Components/Movement")
@@ -937,428 +921,427 @@ left_hip = NodePath("LeftHip")
 right_hip = NodePath("RightHip")
 pelvis = NodePath("Pelvis")
 
-[node name="LeftHip" type="Node3D" parent="Legs/Model"]
+[node name="LeftHip" type="Node3D" parent="Legs/Model" unique_id=787477855]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.12, 0.36, 0)
 
-[node name="Leg" type="MeshInstance3D" parent="Legs/Model/LeftHip" groups=["no_tint"]]
+[node name="Leg" type="MeshInstance3D" parent="Legs/Model/LeftHip" unique_id=778324327 groups=["no_tint"]]
 transform = Transform3D(1, 0, 0, 0, -1, 0, 0, 0, -1, 0, -0.14, 0)
 mesh = SubResource("rc_mesh_1")
 surface_material_override/0 = SubResource("rc_fur_dark")
 
-[node name="Foot" type="MeshInstance3D" parent="Legs/Model/LeftHip" groups=["no_tint"]]
+[node name="Foot" type="MeshInstance3D" parent="Legs/Model/LeftHip" unique_id=153134898 groups=["no_tint"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1.7, 0, -0.33, -0.05)
 mesh = SubResource("rc_mesh_2")
 surface_material_override/0 = SubResource("rc_paw")
 
-[node name="Toe0" type="MeshInstance3D" parent="Legs/Model/LeftHip" groups=["no_tint"]]
+[node name="Toe0" type="MeshInstance3D" parent="Legs/Model/LeftHip" unique_id=551914175 groups=["no_tint"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.035, -0.345, -0.16)
 mesh = SubResource("rc_mesh_3")
 surface_material_override/0 = SubResource("rc_paw")
 
-[node name="Toe1" type="MeshInstance3D" parent="Legs/Model/LeftHip" groups=["no_tint"]]
+[node name="Toe1" type="MeshInstance3D" parent="Legs/Model/LeftHip" unique_id=433481971 groups=["no_tint"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.345, -0.16)
 mesh = SubResource("rc_mesh_4")
 surface_material_override/0 = SubResource("rc_paw")
 
-[node name="Toe2" type="MeshInstance3D" parent="Legs/Model/LeftHip" groups=["no_tint"]]
+[node name="Toe2" type="MeshInstance3D" parent="Legs/Model/LeftHip" unique_id=1337291194 groups=["no_tint"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.035, -0.345, -0.16)
 mesh = SubResource("rc_mesh_5")
 surface_material_override/0 = SubResource("rc_paw")
 
-[node name="RightHip" type="Node3D" parent="Legs/Model"]
+[node name="RightHip" type="Node3D" parent="Legs/Model" unique_id=779771998]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.12, 0.36, 0)
 
-[node name="Leg" type="MeshInstance3D" parent="Legs/Model/RightHip" groups=["no_tint"]]
+[node name="Leg" type="MeshInstance3D" parent="Legs/Model/RightHip" unique_id=1990292831 groups=["no_tint"]]
 transform = Transform3D(1, 0, 0, 0, -1, 0, 0, 0, -1, 0, -0.14, 0)
 mesh = SubResource("rc_mesh_6")
 surface_material_override/0 = SubResource("rc_fur_dark")
 
-[node name="Foot" type="MeshInstance3D" parent="Legs/Model/RightHip" groups=["no_tint"]]
+[node name="Foot" type="MeshInstance3D" parent="Legs/Model/RightHip" unique_id=2070713184 groups=["no_tint"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1.7, 0, -0.33, -0.05)
 mesh = SubResource("rc_mesh_7")
 surface_material_override/0 = SubResource("rc_paw")
 
-[node name="Toe0" type="MeshInstance3D" parent="Legs/Model/RightHip" groups=["no_tint"]]
+[node name="Toe0" type="MeshInstance3D" parent="Legs/Model/RightHip" unique_id=200871833 groups=["no_tint"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.035, -0.345, -0.16)
 mesh = SubResource("rc_mesh_8")
 surface_material_override/0 = SubResource("rc_paw")
 
-[node name="Toe1" type="MeshInstance3D" parent="Legs/Model/RightHip" groups=["no_tint"]]
+[node name="Toe1" type="MeshInstance3D" parent="Legs/Model/RightHip" unique_id=163770861 groups=["no_tint"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.345, -0.16)
 mesh = SubResource("rc_mesh_9")
 surface_material_override/0 = SubResource("rc_paw")
 
-[node name="Toe2" type="MeshInstance3D" parent="Legs/Model/RightHip" groups=["no_tint"]]
+[node name="Toe2" type="MeshInstance3D" parent="Legs/Model/RightHip" unique_id=1103724121 groups=["no_tint"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.035, -0.345, -0.16)
 mesh = SubResource("rc_mesh_10")
 surface_material_override/0 = SubResource("rc_paw")
 
-[node name="Pelvis" type="Node3D" parent="Legs/Model"]
+[node name="Pelvis" type="Node3D" parent="Legs/Model" unique_id=1281335142]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.95, 0)
 
-[node name="Skirt" type="MeshInstance3D" parent="Legs/Model/Pelvis"]
+[node name="Skirt" type="MeshInstance3D" parent="Legs/Model/Pelvis" unique_id=172936837]
 transform = Transform3D(0.866, 0, 0.5, 0, 1, 0, -0.36, 0, 0.6235, 0, -0.325, 0)
 mesh = SubResource("rc_mesh_11")
 
-[node name="Hem" type="MeshInstance3D" parent="Legs/Model/Pelvis" groups=["team_dark"]]
+[node name="Hem" type="MeshInstance3D" parent="Legs/Model/Pelvis" unique_id=1570036401 groups=["team_dark"]]
 transform = Transform3D(0.866, 0, 0.5, 0, 1, 0, -0.36, 0, 0.6235, 0, -0.69, 0)
 mesh = SubResource("rc_mesh_12")
 
-[node name="FrontSeam" type="MeshInstance3D" parent="Legs/Model/Pelvis" groups=["no_tint"]]
+[node name="FrontSeam" type="MeshInstance3D" parent="Legs/Model/Pelvis" unique_id=398392665 groups=["no_tint"]]
 transform = Transform3D(1, 0, 0, 0, 0.9955, 0.0943, 0, -0.0943, 0.9955, 0.012, -0.605, -0.255)
 mesh = SubResource("rc_mesh_13")
 surface_material_override/0 = SubResource("rc_lining")
 
-[node name="FrontPanel" type="MeshInstance3D" parent="Legs/Model/Pelvis"]
+[node name="FrontPanel" type="MeshInstance3D" parent="Legs/Model/Pelvis" unique_id=1788697016]
 transform = Transform3D(1, 0, 0, 0, 0.9955, 0.0943, 0, -0.0943, 0.9955, -0.02, -0.605, -0.259)
 mesh = SubResource("rc_mesh_14")
 
-[node name="BeltLoop0" type="MeshInstance3D" parent="Legs/Model/Pelvis" groups=["team_dark"]]
+[node name="BeltLoop0" type="MeshInstance3D" parent="Legs/Model/Pelvis" unique_id=246447495 groups=["team_dark"]]
 transform = Transform3D(0.766, 0, 0.6428, 0, 1, 0, -0.6428, 0, 0.766, -0.21, 0.035, -0.128)
 mesh = SubResource("rc_mesh_15")
 
-[node name="BeltLoop1" type="MeshInstance3D" parent="Legs/Model/Pelvis" groups=["team_dark"]]
+[node name="BeltLoop1" type="MeshInstance3D" parent="Legs/Model/Pelvis" unique_id=2128398848 groups=["team_dark"]]
 transform = Transform3D(0.766, 0, -0.6428, 0, 1, 0, 0.6428, 0, 0.766, 0.21, 0.035, -0.128)
 mesh = SubResource("rc_mesh_16")
 
-[node name="BackVent" type="MeshInstance3D" parent="Legs/Model/Pelvis" groups=["no_tint"]]
+[node name="BackVent" type="MeshInstance3D" parent="Legs/Model/Pelvis" unique_id=1090234157 groups=["no_tint"]]
 transform = Transform3D(1, 0, 0, 0, 0.9955, -0.0943, 0, 0.0943, 0.9955, 0, -0.55, 0.2508)
 mesh = SubResource("rc_mesh_17")
 surface_material_override/0 = SubResource("rc_lining")
 
-[node name="PocketL" type="MeshInstance3D" parent="Legs/Model/Pelvis" groups=["team_dark"]]
+[node name="PocketL" type="MeshInstance3D" parent="Legs/Model/Pelvis" unique_id=508295990 groups=["team_dark"]]
 transform = Transform3D(0.6157, 0, 0.788, 0, 1, 0, -0.788, 0, 0.6157, -0.2, -0.2, -0.1526)
 mesh = SubResource("rc_mesh_18")
 
-[node name="PocketR" type="MeshInstance3D" parent="Legs/Model/Pelvis" groups=["team_dark"]]
+[node name="PocketR" type="MeshInstance3D" parent="Legs/Model/Pelvis" unique_id=1148799946 groups=["team_dark"]]
 transform = Transform3D(0.6157, 0, -0.788, 0, 1, 0, 0.788, 0, 0.6157, 0.2, -0.2, -0.1526)
 mesh = SubResource("rc_mesh_19")
 
-[node name="Opening" type="Node3D" parent="Legs/Model/Pelvis"]
+[node name="Opening" type="Node3D" parent="Legs/Model/Pelvis" unique_id=39561207]
 transform = Transform3D(1, 0, 0, 0, 0.9955, 0.0943, 0, -0.0943, 0.9955, 0, -0.27, -0.2193)
 
-[node name="Lining" type="MeshInstance3D" parent="Legs/Model/Pelvis/Opening" groups=["no_tint"]]
+[node name="Lining" type="MeshInstance3D" parent="Legs/Model/Pelvis/Opening" unique_id=87730382 groups=["no_tint"]]
 transform = Transform3D(0.185, -0.185, 0, 0.285, 0.285, 0, 0, 0, 1, 0, 0, -0.004)
 mesh = SubResource("rc_mesh_20")
 surface_material_override/0 = SubResource("rc_lining")
 
-[node name="FlapUL" type="MeshInstance3D" parent="Legs/Model/Pelvis/Opening" groups=["team_dark"]]
+[node name="FlapUL" type="MeshInstance3D" parent="Legs/Model/Pelvis/Opening" unique_id=1929945222 groups=["team_dark"]]
 transform = Transform3D(0.5241, -0.8517, 0, 0.8517, 0.5241, 0, 0, 0, 1, -0.0954, 0.141, -0.02)
 mesh = SubResource("rc_mesh_21")
 
-[node name="FlapULEdge" type="MeshInstance3D" parent="Legs/Model/Pelvis/Opening" groups=["no_tint"]]
+[node name="FlapULEdge" type="MeshInstance3D" parent="Legs/Model/Pelvis/Opening" unique_id=127312743 groups=["no_tint"]]
 transform = Transform3D(0.5241, -0.8517, 0, 0.8517, 0.5241, 0, 0, 0, 1, -0.0736, 0.1196, -0.03)
 mesh = SubResource("rc_mesh_22")
 surface_material_override/0 = SubResource("rc_lining")
 
-[node name="FlapUR" type="MeshInstance3D" parent="Legs/Model/Pelvis/Opening" groups=["team_dark"]]
+[node name="FlapUR" type="MeshInstance3D" parent="Legs/Model/Pelvis/Opening" unique_id=1945587777 groups=["team_dark"]]
 transform = Transform3D(0.5241, 0.8517, 0, -0.8517, 0.5241, 0, 0, 0, 1, 0.0954, 0.141, -0.02)
 mesh = SubResource("rc_mesh_23")
 
-[node name="FlapUREdge" type="MeshInstance3D" parent="Legs/Model/Pelvis/Opening" groups=["no_tint"]]
+[node name="FlapUREdge" type="MeshInstance3D" parent="Legs/Model/Pelvis/Opening" unique_id=1936587370 groups=["no_tint"]]
 transform = Transform3D(0.5241, 0.8517, 0, -0.8517, 0.5241, 0, 0, 0, 1, 0.0736, 0.1196, -0.03)
 mesh = SubResource("rc_mesh_24")
 surface_material_override/0 = SubResource("rc_lining")
 
-[node name="FlapLL" type="MeshInstance3D" parent="Legs/Model/Pelvis/Opening" groups=["team_dark"]]
+[node name="FlapLL" type="MeshInstance3D" parent="Legs/Model/Pelvis/Opening" unique_id=591831368 groups=["team_dark"]]
 transform = Transform3D(0.5241, 0.8517, 0, -0.8517, 0.5241, 0, 0, 0, 1, -0.0954, -0.141, -0.02)
 mesh = SubResource("rc_mesh_25")
 
-[node name="FlapLLEdge" type="MeshInstance3D" parent="Legs/Model/Pelvis/Opening" groups=["no_tint"]]
+[node name="FlapLLEdge" type="MeshInstance3D" parent="Legs/Model/Pelvis/Opening" unique_id=613691244 groups=["no_tint"]]
 transform = Transform3D(0.5241, 0.8517, 0, -0.8517, 0.5241, 0, 0, 0, 1, -0.0736, -0.1196, -0.03)
 mesh = SubResource("rc_mesh_26")
 surface_material_override/0 = SubResource("rc_lining")
 
-[node name="FlapLR" type="MeshInstance3D" parent="Legs/Model/Pelvis/Opening" groups=["team_dark"]]
+[node name="FlapLR" type="MeshInstance3D" parent="Legs/Model/Pelvis/Opening" unique_id=1813111132 groups=["team_dark"]]
 transform = Transform3D(0.5241, -0.8517, 0, 0.8517, 0.5241, 0, 0, 0, 1, 0.0954, -0.141, -0.02)
 mesh = SubResource("rc_mesh_27")
 
-[node name="FlapLREdge" type="MeshInstance3D" parent="Legs/Model/Pelvis/Opening" groups=["no_tint"]]
+[node name="FlapLREdge" type="MeshInstance3D" parent="Legs/Model/Pelvis/Opening" unique_id=1422869893 groups=["no_tint"]]
 transform = Transform3D(0.5241, -0.8517, 0, 0.8517, 0.5241, 0, 0, 0, 1, 0.0736, -0.1196, -0.03)
 mesh = SubResource("rc_mesh_28")
 surface_material_override/0 = SubResource("rc_lining")
 
-[node name="Bottom" type="Node3D" parent="Legs/Model/Pelvis/Opening"]
+[node name="Bottom" type="Node3D" parent="Legs/Model/Pelvis/Opening" unique_id=994038732]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.02, -0.02)
 
-[node name="Head" type="MeshInstance3D" parent="Legs/Model/Pelvis/Opening/Bottom" groups=["no_tint"]]
+[node name="Head" type="MeshInstance3D" parent="Legs/Model/Pelvis/Opening/Bottom" unique_id=2145080174 groups=["no_tint"]]
 transform = Transform3D(1.05, 0, 0, 0, 0.9, 0, 0, 0, 0.8, 0, 0, 0.06)
 mesh = SubResource("rc_mesh_29")
 surface_material_override/0 = SubResource("rc_fur")
 
-[node name="CheekL" type="MeshInstance3D" parent="Legs/Model/Pelvis/Opening/Bottom" groups=["no_tint"]]
+[node name="CheekL" type="MeshInstance3D" parent="Legs/Model/Pelvis/Opening/Bottom" unique_id=435514013 groups=["no_tint"]]
 transform = Transform3D(0, 1, 0, -1, 0, 0, 0, 0, 1, -0.12, -0.05, 0)
 mesh = SubResource("rc_mesh_30")
 surface_material_override/0 = SubResource("rc_fur_light")
 
-[node name="CheekR" type="MeshInstance3D" parent="Legs/Model/Pelvis/Opening/Bottom" groups=["no_tint"]]
+[node name="CheekR" type="MeshInstance3D" parent="Legs/Model/Pelvis/Opening/Bottom" unique_id=2012060360 groups=["no_tint"]]
 transform = Transform3D(0, -1, 0, 1, 0, 0, 0, 0, 1, 0.12, -0.05, 0)
 mesh = SubResource("rc_mesh_31")
 surface_material_override/0 = SubResource("rc_fur_light")
 
-[node name="Face" type="Node3D" parent="Legs/Model/Pelvis/Opening/Bottom"]
+[node name="Face" type="Node3D" parent="Legs/Model/Pelvis/Opening/Bottom" unique_id=680590409]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.04)
 
-[node name="PatchL" type="MeshInstance3D" parent="Legs/Model/Pelvis/Opening/Bottom/Face" groups=["no_tint"]]
+[node name="PatchL" type="MeshInstance3D" parent="Legs/Model/Pelvis/Opening/Bottom/Face" unique_id=1930153565 groups=["no_tint"]]
 transform = Transform3D(0.9781, -0.2079, 0, 0.2079, 0.9781, 0, 0, 0, 1, -0.0638, 0.0255, -0.004)
 mesh = SubResource("rc_mesh_32")
 surface_material_override/0 = SubResource("rc_mask")
 
-[node name="BrowL" type="MeshInstance3D" parent="Legs/Model/Pelvis/Opening/Bottom/Face" groups=["no_tint"]]
+[node name="BrowL" type="MeshInstance3D" parent="Legs/Model/Pelvis/Opening/Bottom/Face" unique_id=2074697387 groups=["no_tint"]]
 transform = Transform3D(0.9903, -0.1392, 0, 0.1392, 0.9903, 0, 0, 0, 1, -0.068, 0.0706, -0.01)
 mesh = SubResource("rc_mesh_33")
 surface_material_override/0 = SubResource("rc_white")
 
-[node name="EyeL" type="MeshInstance3D" parent="Legs/Model/Pelvis/Opening/Bottom/Face" groups=["no_tint"]]
+[node name="EyeL" type="MeshInstance3D" parent="Legs/Model/Pelvis/Opening/Bottom/Face" unique_id=1760272968 groups=["no_tint"]]
 transform = Transform3D(0.9848, -0.1736, 0, 0.1736, 0.9848, 0, 0, 0, 1, -0.0638, 0.0272, -0.0255)
 mesh = SubResource("rc_mesh_34")
 surface_material_override/0 = SubResource("rc_eye")
 
-[node name="PupilL" type="MeshInstance3D" parent="Legs/Model/Pelvis/Opening/Bottom/Face" groups=["no_tint"]]
+[node name="PupilL" type="MeshInstance3D" parent="Legs/Model/Pelvis/Opening/Bottom/Face" unique_id=141870780 groups=["no_tint"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.051, 0.0272, -0.0357)
 mesh = SubResource("rc_mesh_35")
 surface_material_override/0 = SubResource("rc_nose")
 
-[node name="PatchR" type="MeshInstance3D" parent="Legs/Model/Pelvis/Opening/Bottom/Face" groups=["no_tint"]]
+[node name="PatchR" type="MeshInstance3D" parent="Legs/Model/Pelvis/Opening/Bottom/Face" unique_id=397636283 groups=["no_tint"]]
 transform = Transform3D(0.9781, 0.2079, 0, -0.2079, 0.9781, 0, 0, 0, 1, 0.0638, 0.0255, -0.004)
 mesh = SubResource("rc_mesh_36")
 surface_material_override/0 = SubResource("rc_mask")
 
-[node name="BrowR" type="MeshInstance3D" parent="Legs/Model/Pelvis/Opening/Bottom/Face" groups=["no_tint"]]
+[node name="BrowR" type="MeshInstance3D" parent="Legs/Model/Pelvis/Opening/Bottom/Face" unique_id=13657936 groups=["no_tint"]]
 transform = Transform3D(0.9903, 0.1392, 0, -0.1392, 0.9903, 0, 0, 0, 1, 0.068, 0.0706, -0.01)
 mesh = SubResource("rc_mesh_37")
 surface_material_override/0 = SubResource("rc_white")
 
-[node name="EyeR" type="MeshInstance3D" parent="Legs/Model/Pelvis/Opening/Bottom/Face" groups=["no_tint"]]
+[node name="EyeR" type="MeshInstance3D" parent="Legs/Model/Pelvis/Opening/Bottom/Face" unique_id=1787069133 groups=["no_tint"]]
 transform = Transform3D(0.9848, 0.1736, 0, -0.1736, 0.9848, 0, 0, 0, 1, 0.0638, 0.0272, -0.0255)
 mesh = SubResource("rc_mesh_38")
 surface_material_override/0 = SubResource("rc_eye")
 
-[node name="PupilR" type="MeshInstance3D" parent="Legs/Model/Pelvis/Opening/Bottom/Face" groups=["no_tint"]]
+[node name="PupilR" type="MeshInstance3D" parent="Legs/Model/Pelvis/Opening/Bottom/Face" unique_id=43417341 groups=["no_tint"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.051, 0.0272, -0.0357)
 mesh = SubResource("rc_mesh_39")
 surface_material_override/0 = SubResource("rc_nose")
 
-[node name="Bridge" type="MeshInstance3D" parent="Legs/Model/Pelvis/Opening/Bottom/Face" groups=["no_tint"]]
+[node name="Bridge" type="MeshInstance3D" parent="Legs/Model/Pelvis/Opening/Bottom/Face" unique_id=1383432474 groups=["no_tint"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.017, -0.012)
 mesh = SubResource("rc_mesh_40")
 surface_material_override/0 = SubResource("rc_mask")
 
-[node name="Blaze" type="MeshInstance3D" parent="Legs/Model/Pelvis/Opening/Bottom/Face" groups=["no_tint"]]
+[node name="Blaze" type="MeshInstance3D" parent="Legs/Model/Pelvis/Opening/Bottom/Face" unique_id=1607537090 groups=["no_tint"]]
 transform = Transform3D(-1, 0, 0, 0, -1, 0, 0, 0, 1, 0, 0.0935, -0.006)
 mesh = SubResource("rc_mesh_41")
 surface_material_override/0 = SubResource("rc_white")
 
-[node name="Snout" type="MeshInstance3D" parent="Legs/Model/Pelvis/Opening/Bottom/Face" groups=["no_tint"]]
+[node name="Snout" type="MeshInstance3D" parent="Legs/Model/Pelvis/Opening/Bottom/Face" unique_id=643477652 groups=["no_tint"]]
 transform = Transform3D(0.7071, -0.7071, 0, 0, 0, 1, -0.7071, -0.7071, 0, 0, -0.0382, -0.0595)
 mesh = SubResource("rc_mesh_42")
 surface_material_override/0 = SubResource("rc_white")
 
-[node name="Nose" type="MeshInstance3D" parent="Legs/Model/Pelvis/Opening/Bottom/Face" groups=["no_tint"]]
+[node name="Nose" type="MeshInstance3D" parent="Legs/Model/Pelvis/Opening/Bottom/Face" unique_id=659964987 groups=["no_tint"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.034, -0.1292)
 mesh = SubResource("rc_mesh_43")
 surface_material_override/0 = SubResource("rc_nose")
 
-[node name="Mouth" type="MeshInstance3D" parent="Legs/Model/Pelvis/Opening/Bottom/Face" groups=["no_tint"]]
+[node name="Mouth" type="MeshInstance3D" parent="Legs/Model/Pelvis/Opening/Bottom/Face" unique_id=1982800310 groups=["no_tint"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.0723, -0.085)
 mesh = SubResource("rc_mesh_44")
 surface_material_override/0 = SubResource("rc_nose")
 
-[node name="GlintL" type="MeshInstance3D" parent="Legs/Model/Pelvis/Opening/Bottom/Face" groups=["no_tint"]]
+[node name="GlintL" type="MeshInstance3D" parent="Legs/Model/Pelvis/Opening/Bottom/Face" unique_id=115388629 groups=["no_tint"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.0527, 0.034, -0.0408)
 mesh = SubResource("rc_mesh_45")
 surface_material_override/0 = SubResource("rc_eye")
 
-[node name="WhiskerL0" type="MeshInstance3D" parent="Legs/Model/Pelvis/Opening/Bottom/Face" groups=["no_tint"]]
+[node name="WhiskerL0" type="MeshInstance3D" parent="Legs/Model/Pelvis/Opening/Bottom/Face" unique_id=205276435 groups=["no_tint"]]
 transform = Transform3D(0.9305, 0.1308, 0.342, -0.1392, 0.9903, 0, -0.3387, -0.0476, 0.9397, -0.085, -0.0298, -0.0723)
 mesh = SubResource("rc_mesh_46")
 surface_material_override/0 = SubResource("rc_white")
 
-[node name="WhiskerL1" type="MeshInstance3D" parent="Legs/Model/Pelvis/Opening/Bottom/Face" groups=["no_tint"]]
+[node name="WhiskerL1" type="MeshInstance3D" parent="Legs/Model/Pelvis/Opening/Bottom/Face" unique_id=1872626482 groups=["no_tint"]]
 transform = Transform3D(0.9345, -0.0982, 0.342, 0.1045, 0.9945, 0, -0.3401, 0.0358, 0.9397, -0.085, -0.0425, -0.0723)
 mesh = SubResource("rc_mesh_47")
 surface_material_override/0 = SubResource("rc_white")
 
-[node name="GlintR" type="MeshInstance3D" parent="Legs/Model/Pelvis/Opening/Bottom/Face" groups=["no_tint"]]
+[node name="GlintR" type="MeshInstance3D" parent="Legs/Model/Pelvis/Opening/Bottom/Face" unique_id=1497448703 groups=["no_tint"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0527, 0.034, -0.0408)
 mesh = SubResource("rc_mesh_48")
 surface_material_override/0 = SubResource("rc_eye")
 
-[node name="WhiskerR0" type="MeshInstance3D" parent="Legs/Model/Pelvis/Opening/Bottom/Face" groups=["no_tint"]]
+[node name="WhiskerR0" type="MeshInstance3D" parent="Legs/Model/Pelvis/Opening/Bottom/Face" unique_id=2003714587 groups=["no_tint"]]
 transform = Transform3D(0.9305, -0.1308, -0.342, 0.1392, 0.9903, 0, 0.3387, -0.0476, 0.9397, 0.085, -0.0298, -0.0723)
 mesh = SubResource("rc_mesh_49")
 surface_material_override/0 = SubResource("rc_white")
 
-[node name="WhiskerR1" type="MeshInstance3D" parent="Legs/Model/Pelvis/Opening/Bottom/Face" groups=["no_tint"]]
+[node name="WhiskerR1" type="MeshInstance3D" parent="Legs/Model/Pelvis/Opening/Bottom/Face" unique_id=1174933885 groups=["no_tint"]]
 transform = Transform3D(0.9345, 0.0982, -0.342, -0.1045, 0.9945, 0, 0.3401, 0.0358, 0.9397, 0.085, -0.0425, -0.0723)
 mesh = SubResource("rc_mesh_50")
 surface_material_override/0 = SubResource("rc_white")
 
-[node name="EarL" type="MeshInstance3D" parent="Legs/Model/Pelvis/Opening/Bottom" groups=["no_tint"]]
+[node name="EarL" type="MeshInstance3D" parent="Legs/Model/Pelvis/Opening/Bottom" unique_id=336255977 groups=["no_tint"]]
 transform = Transform3D(0.6556, -0.2649, 0.7071, 0.3746, 0.9272, 0, -0.6556, 0.2649, 0.7071, -0.085, 0.15, 0.05)
 mesh = SubResource("rc_mesh_51")
 surface_material_override/0 = SubResource("rc_fur")
 
-[node name="EarInL" type="MeshInstance3D" parent="Legs/Model/Pelvis/Opening/Bottom" groups=["no_tint"]]
+[node name="EarInL" type="MeshInstance3D" parent="Legs/Model/Pelvis/Opening/Bottom" unique_id=2092988480 groups=["no_tint"]]
 transform = Transform3D(0.6556, -0.2649, 0.7071, 0.3746, 0.9272, 0, -0.6556, 0.2649, 0.7071, -0.083, 0.145, 0.03)
 mesh = SubResource("rc_mesh_52")
 surface_material_override/0 = SubResource("rc_fur_dark")
 
-[node name="EarR" type="MeshInstance3D" parent="Legs/Model/Pelvis/Opening/Bottom" groups=["no_tint"]]
+[node name="EarR" type="MeshInstance3D" parent="Legs/Model/Pelvis/Opening/Bottom" unique_id=1906671588 groups=["no_tint"]]
 transform = Transform3D(0.6556, 0.2649, 0.7071, -0.3746, 0.9272, 0, -0.6556, -0.2649, 0.7071, 0.085, 0.15, 0.05)
 mesh = SubResource("rc_mesh_53")
 surface_material_override/0 = SubResource("rc_fur")
 
-[node name="EarInR" type="MeshInstance3D" parent="Legs/Model/Pelvis/Opening/Bottom" groups=["no_tint"]]
+[node name="EarInR" type="MeshInstance3D" parent="Legs/Model/Pelvis/Opening/Bottom" unique_id=1757455314 groups=["no_tint"]]
 transform = Transform3D(0.6556, 0.2649, 0.7071, -0.3746, 0.9272, 0, -0.6556, -0.2649, 0.7071, 0.083, 0.145, 0.03)
 mesh = SubResource("rc_mesh_54")
 surface_material_override/0 = SubResource("rc_fur_dark")
 
-[node name="Sweat" type="MeshInstance3D" parent="Legs/Model/Pelvis/Opening/Bottom" groups=["no_tint"]]
+[node name="Sweat" type="MeshInstance3D" parent="Legs/Model/Pelvis/Opening/Bottom" unique_id=1020128478 groups=["no_tint"]]
 transform = Transform3D(0.8, 0, 0, 0, 1.2, 0, 0, 0, 0.8, 0.13, 0.1, -0.045)
 mesh = SubResource("rc_mesh_55")
 surface_material_override/0 = SubResource("rc_sweat")
 
-[node name="Sweat2" type="MeshInstance3D" parent="Legs/Model/Pelvis/Opening/Bottom" groups=["no_tint"]]
+[node name="Sweat2" type="MeshInstance3D" parent="Legs/Model/Pelvis/Opening/Bottom" unique_id=252563163 groups=["no_tint"]]
 transform = Transform3D(0.8, 0, 0, 0, 1.2, 0, 0, 0, 0.8, -0.14, 0.06, -0.04)
 mesh = SubResource("rc_mesh_56")
 surface_material_override/0 = SubResource("rc_sweat")
 
-[node name="PawL" type="MeshInstance3D" parent="Legs/Model/Pelvis/Opening" groups=["no_tint"]]
+[node name="PawL" type="MeshInstance3D" parent="Legs/Model/Pelvis/Opening" unique_id=30023864 groups=["no_tint"]]
 transform = Transform3D(1, 0, 0, 0, 0.85, 0, 0, 0, 1.1, -0.172, 0, -0.045)
 mesh = SubResource("rc_mesh_57")
 surface_material_override/0 = SubResource("rc_paw")
 
-[node name="PawLToe0" type="MeshInstance3D" parent="Legs/Model/Pelvis/Opening" groups=["no_tint"]]
+[node name="PawLToe0" type="MeshInstance3D" parent="Legs/Model/Pelvis/Opening" unique_id=1865574816 groups=["no_tint"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.1958, -0.0095, -0.0877)
 mesh = SubResource("rc_mesh_58")
 surface_material_override/0 = SubResource("rc_paw")
 
-[node name="PawLToe1" type="MeshInstance3D" parent="Legs/Model/Pelvis/Opening" groups=["no_tint"]]
+[node name="PawLToe1" type="MeshInstance3D" parent="Legs/Model/Pelvis/Opening" unique_id=502815390 groups=["no_tint"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.172, -0.0095, -0.0877)
 mesh = SubResource("rc_mesh_59")
 surface_material_override/0 = SubResource("rc_paw")
 
-[node name="PawLToe2" type="MeshInstance3D" parent="Legs/Model/Pelvis/Opening" groups=["no_tint"]]
+[node name="PawLToe2" type="MeshInstance3D" parent="Legs/Model/Pelvis/Opening" unique_id=185146049 groups=["no_tint"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.1483, -0.0095, -0.0877)
 mesh = SubResource("rc_mesh_60")
 surface_material_override/0 = SubResource("rc_paw")
 
-[node name="PawR" type="MeshInstance3D" parent="Legs/Model/Pelvis/Opening" groups=["no_tint"]]
+[node name="PawR" type="MeshInstance3D" parent="Legs/Model/Pelvis/Opening" unique_id=1664641260 groups=["no_tint"]]
 transform = Transform3D(1, 0, 0, 0, 0.85, 0, 0, 0, 1.1, 0.172, 0, -0.045)
 mesh = SubResource("rc_mesh_61")
 surface_material_override/0 = SubResource("rc_paw")
 
-[node name="PawRToe0" type="MeshInstance3D" parent="Legs/Model/Pelvis/Opening" groups=["no_tint"]]
+[node name="PawRToe0" type="MeshInstance3D" parent="Legs/Model/Pelvis/Opening" unique_id=96152800 groups=["no_tint"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.1483, -0.0095, -0.0877)
 mesh = SubResource("rc_mesh_62")
 surface_material_override/0 = SubResource("rc_paw")
 
-[node name="PawRToe1" type="MeshInstance3D" parent="Legs/Model/Pelvis/Opening" groups=["no_tint"]]
+[node name="PawRToe1" type="MeshInstance3D" parent="Legs/Model/Pelvis/Opening" unique_id=1374689997 groups=["no_tint"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.172, -0.0095, -0.0877)
 mesh = SubResource("rc_mesh_63")
 surface_material_override/0 = SubResource("rc_paw")
 
-[node name="PawRToe2" type="MeshInstance3D" parent="Legs/Model/Pelvis/Opening" groups=["no_tint"]]
+[node name="PawRToe2" type="MeshInstance3D" parent="Legs/Model/Pelvis/Opening" unique_id=1535250569 groups=["no_tint"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.1958, -0.0095, -0.0877)
 mesh = SubResource("rc_mesh_64")
 surface_material_override/0 = SubResource("rc_paw")
 
-[node name="Belt" type="MeshInstance3D" parent="Legs/Model/Pelvis" groups=["no_tint"]]
+[node name="Belt" type="MeshInstance3D" parent="Legs/Model/Pelvis" unique_id=44177414 groups=["no_tint"]]
 transform = Transform3D(0.866, 0, 0.5, 0, 1, 0, -0.36, 0, 0.6235, 0, 0.035, 0)
 mesh = SubResource("rc_mesh_65")
 surface_material_override/0 = SubResource("rc_belt")
 
-[node name="Buckle" type="MeshInstance3D" parent="Legs/Model/Pelvis" groups=["no_tint"]]
+[node name="Buckle" type="MeshInstance3D" parent="Legs/Model/Pelvis" unique_id=380807812 groups=["no_tint"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.035, -0.2091)
 mesh = SubResource("rc_mesh_66")
 surface_material_override/0 = SubResource("rc_buckle")
 
-[node name="BuckleHole" type="MeshInstance3D" parent="Legs/Model/Pelvis" groups=["no_tint"]]
+[node name="BuckleHole" type="MeshInstance3D" parent="Legs/Model/Pelvis" unique_id=51784694 groups=["no_tint"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.035, -0.2111)
 mesh = SubResource("rc_mesh_67")
 surface_material_override/0 = SubResource("rc_belt")
 
-[node name="BeltTailL" type="MeshInstance3D" parent="Legs/Model/Pelvis" groups=["no_tint"]]
+[node name="BeltTailL" type="MeshInstance3D" parent="Legs/Model/Pelvis" unique_id=1106931977 groups=["no_tint"]]
 transform = Transform3D(0.9063, -0.4226, 0, 0.4226, 0.9063, 0, 0, 0, 1, -0.08, 0.01, -0.2071)
 mesh = SubResource("rc_mesh_68")
 surface_material_override/0 = SubResource("rc_belt")
 
-[node name="BeltTailR" type="MeshInstance3D" parent="Legs/Model/Pelvis" groups=["no_tint"]]
+[node name="BeltTailR" type="MeshInstance3D" parent="Legs/Model/Pelvis" unique_id=2007276260 groups=["no_tint"]]
 transform = Transform3D(0.9063, 0.4226, 0, -0.4226, 0.9063, 0, 0, 0, 1, 0.08, 0.01, -0.2071)
 mesh = SubResource("rc_mesh_69")
 surface_material_override/0 = SubResource("rc_belt")
 
-[node name="Tail" type="Node3D" parent="Legs/Model/Pelvis"]
+[node name="Tail" type="Node3D" parent="Legs/Model/Pelvis" unique_id=1479160785]
 transform = Transform3D(0.8192, -0.2693, 0.5064, 0, 0.8829, 0.4695, -0.5736, -0.3846, 0.7233, 0.18, -0.55, 0.2)
 
-[node name="S0" type="Node3D" parent="Legs/Model/Pelvis/Tail"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
+[node name="S0" type="Node3D" parent="Legs/Model/Pelvis/Tail" unique_id=1987086402]
 
-[node name="M" type="MeshInstance3D" parent="Legs/Model/Pelvis/Tail/S0" groups=["no_tint"]]
+[node name="M" type="MeshInstance3D" parent="Legs/Model/Pelvis/Tail/S0" unique_id=1490081872 groups=["no_tint"]]
 transform = Transform3D(1, 0, 0, 0, 0, -1, 0, 1, 0, 0, 0, 0.055)
 mesh = SubResource("rc_mesh_70")
 surface_material_override/0 = SubResource("rc_fur")
 
-[node name="S1" type="Node3D" parent="Legs/Model/Pelvis/Tail/S0"]
+[node name="S1" type="Node3D" parent="Legs/Model/Pelvis/Tail/S0" unique_id=906390153]
 transform = Transform3D(1, 0, 0, 0, 0.9781, -0.2079, 0, 0.2079, 0.9781, 0, 0, 0.11)
 
-[node name="M" type="MeshInstance3D" parent="Legs/Model/Pelvis/Tail/S0/S1" groups=["no_tint"]]
+[node name="M" type="MeshInstance3D" parent="Legs/Model/Pelvis/Tail/S0/S1" unique_id=1496181000 groups=["no_tint"]]
 transform = Transform3D(1, 0, 0, 0, 0, -1, 0, 1, 0, 0, 0, 0.055)
 mesh = SubResource("rc_mesh_71")
 surface_material_override/0 = SubResource("rc_fur_dark")
 
-[node name="S2" type="Node3D" parent="Legs/Model/Pelvis/Tail/S0/S1"]
+[node name="S2" type="Node3D" parent="Legs/Model/Pelvis/Tail/S0/S1" unique_id=1275295651]
 transform = Transform3D(1, 0, 0, 0, 0.9781, -0.2079, 0, 0.2079, 0.9781, 0, 0, 0.11)
 
-[node name="M" type="MeshInstance3D" parent="Legs/Model/Pelvis/Tail/S0/S1/S2" groups=["no_tint"]]
+[node name="M" type="MeshInstance3D" parent="Legs/Model/Pelvis/Tail/S0/S1/S2" unique_id=1700714062 groups=["no_tint"]]
 transform = Transform3D(1, 0, 0, 0, 0, -1, 0, 1, 0, 0, 0, 0.055)
 mesh = SubResource("rc_mesh_72")
 surface_material_override/0 = SubResource("rc_fur")
 
-[node name="S3" type="Node3D" parent="Legs/Model/Pelvis/Tail/S0/S1/S2"]
+[node name="S3" type="Node3D" parent="Legs/Model/Pelvis/Tail/S0/S1/S2" unique_id=1059192606]
 transform = Transform3D(1, 0, 0, 0, 0.9781, -0.2079, 0, 0.2079, 0.9781, 0, 0, 0.11)
 
-[node name="M" type="MeshInstance3D" parent="Legs/Model/Pelvis/Tail/S0/S1/S2/S3" groups=["no_tint"]]
+[node name="M" type="MeshInstance3D" parent="Legs/Model/Pelvis/Tail/S0/S1/S2/S3" unique_id=989203556 groups=["no_tint"]]
 transform = Transform3D(1, 0, 0, 0, 0, -1, 0, 1, 0, 0, 0, 0.055)
 mesh = SubResource("rc_mesh_73")
 surface_material_override/0 = SubResource("rc_fur_dark")
 
-[node name="S4" type="Node3D" parent="Legs/Model/Pelvis/Tail/S0/S1/S2/S3"]
+[node name="S4" type="Node3D" parent="Legs/Model/Pelvis/Tail/S0/S1/S2/S3" unique_id=535053909]
 transform = Transform3D(1, 0, 0, 0, 0.9781, -0.2079, 0, 0.2079, 0.9781, 0, 0, 0.11)
 
-[node name="M" type="MeshInstance3D" parent="Legs/Model/Pelvis/Tail/S0/S1/S2/S3/S4" groups=["no_tint"]]
+[node name="M" type="MeshInstance3D" parent="Legs/Model/Pelvis/Tail/S0/S1/S2/S3/S4" unique_id=1549606879 groups=["no_tint"]]
 transform = Transform3D(1, 0, 0, 0, 0, -1, 0, 1, 0, 0, 0, 0.055)
 mesh = SubResource("rc_mesh_74")
 surface_material_override/0 = SubResource("rc_fur")
 
-[node name="S5" type="Node3D" parent="Legs/Model/Pelvis/Tail/S0/S1/S2/S3/S4"]
+[node name="S5" type="Node3D" parent="Legs/Model/Pelvis/Tail/S0/S1/S2/S3/S4" unique_id=73181024]
 transform = Transform3D(1, 0, 0, 0, 0.9781, -0.2079, 0, 0.2079, 0.9781, 0, 0, 0.11)
 
-[node name="M" type="MeshInstance3D" parent="Legs/Model/Pelvis/Tail/S0/S1/S2/S3/S4/S5" groups=["no_tint"]]
+[node name="M" type="MeshInstance3D" parent="Legs/Model/Pelvis/Tail/S0/S1/S2/S3/S4/S5" unique_id=1179455380 groups=["no_tint"]]
 transform = Transform3D(1, 0, 0, 0, 0, -1, 0, 1, 0, 0, 0, 0.055)
 mesh = SubResource("rc_mesh_75")
 surface_material_override/0 = SubResource("rc_fur_dark")
 
-[node name="S6" type="Node3D" parent="Legs/Model/Pelvis/Tail/S0/S1/S2/S3/S4/S5"]
+[node name="S6" type="Node3D" parent="Legs/Model/Pelvis/Tail/S0/S1/S2/S3/S4/S5" unique_id=519298574]
 transform = Transform3D(1, 0, 0, 0, 0.9781, -0.2079, 0, 0.2079, 0.9781, 0, 0, 0.11)
 
-[node name="M" type="MeshInstance3D" parent="Legs/Model/Pelvis/Tail/S0/S1/S2/S3/S4/S5/S6" groups=["no_tint"]]
+[node name="M" type="MeshInstance3D" parent="Legs/Model/Pelvis/Tail/S0/S1/S2/S3/S4/S5/S6" unique_id=513085677 groups=["no_tint"]]
 transform = Transform3D(1, 0, 0, 0, 0, -1, 0, 1, 0, 0, 0, 0.055)
 mesh = SubResource("rc_mesh_76")
 surface_material_override/0 = SubResource("rc_fur")
 
-[node name="Tip" type="MeshInstance3D" parent="Legs/Model/Pelvis/Tail/S0/S1/S2/S3/S4/S5/S6" groups=["no_tint"]]
+[node name="Tip" type="MeshInstance3D" parent="Legs/Model/Pelvis/Tail/S0/S1/S2/S3/S4/S5/S6" unique_id=1820191815 groups=["no_tint"]]
 transform = Transform3D(1, 0, 0, 0, 0, -1, 0, 1, 0, 0, 0, 0.17)
 mesh = SubResource("rc_mesh_77")
 surface_material_override/0 = SubResource("rc_fur_dark")
 
-[node name="Base" type="MeshInstance3D" parent="Legs/Model/Pelvis/Tail/S0/S1/S2/S3/S4/S5/S6" groups=["no_tint"]]
+[node name="Base" type="MeshInstance3D" parent="Legs/Model/Pelvis/Tail/S0/S1/S2/S3/S4/S5/S6" unique_id=1355560054 groups=["no_tint"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.01)
 mesh = SubResource("rc_mesh_78")
 surface_material_override/0 = SubResource("rc_fur")
 
-[node name="LegsHurtbox" type="Area3D" parent="Legs" node_paths=PackedStringArray("health")]
+[node name="LegsHurtbox" type="Area3D" parent="Legs" unique_id=1538507140 node_paths=PackedStringArray("health")]
 collision_layer = 4
 collision_mask = 0
 monitoring = false
@@ -1367,508 +1350,507 @@ health = NodePath("../../Components/Health")
 zone = 2
 multiplier = 0.75
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Legs/LegsHurtbox"]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Legs/LegsHurtbox" unique_id=1408829875]
 
-[node name="Torso" type="Node3D" parent="."]
+[node name="Torso" type="Node3D" parent="." unique_id=1666033560]
 
-[node name="Model" type="Node3D" parent="Torso"]
+[node name="Model" type="Node3D" parent="Torso" unique_id=412669047]
 
-[node name="CoatChest" type="MeshInstance3D" parent="Torso/Model"]
+[node name="CoatChest" type="MeshInstance3D" parent="Torso/Model" unique_id=641225872]
 transform = Transform3D(0.866, 0, 0.5, 0, 1, 0, -0.36, 0, 0.6235, 0, 1.25, 0)
 mesh = SubResource("rc_mesh_79")
 
-[node name="Shoulders" type="MeshInstance3D" parent="Torso/Model"]
+[node name="Shoulders" type="MeshInstance3D" parent="Torso/Model" unique_id=39380530]
 transform = Transform3D(0.866, 0, 0.5, 0, 1, 0, -0.36, 0, 0.6235, 0, 1.53, 0)
 mesh = SubResource("rc_mesh_80")
 
-[node name="Shirt" type="MeshInstance3D" parent="Torso/Model" groups=["no_tint"]]
+[node name="Shirt" type="MeshInstance3D" parent="Torso/Model" unique_id=681145145 groups=["no_tint"]]
 transform = Transform3D(-1, 0, 0, 0, -1, 0, 0, 0, 1, 0, 1.36, -0.1714)
 mesh = SubResource("rc_mesh_81")
 surface_material_override/0 = SubResource("rc_shirt")
 
-[node name="Tie" type="MeshInstance3D" parent="Torso/Model" groups=["no_tint"]]
+[node name="Tie" type="MeshInstance3D" parent="Torso/Model" unique_id=948941961 groups=["no_tint"]]
 transform = Transform3D(-1, 0, 0, 0, -1, 0, 0, 0, 1, 0, 1.35, -0.1784)
 mesh = SubResource("rc_mesh_82")
 surface_material_override/0 = SubResource("rc_tie")
 
-[node name="TieKnot" type="MeshInstance3D" parent="Torso/Model" groups=["no_tint"]]
+[node name="TieKnot" type="MeshInstance3D" parent="Torso/Model" unique_id=768291973 groups=["no_tint"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.47, -0.1804)
 mesh = SubResource("rc_mesh_83")
 surface_material_override/0 = SubResource("rc_tie")
 
-[node name="LapelL" type="MeshInstance3D" parent="Torso/Model" groups=["team_dark"]]
+[node name="LapelL" type="MeshInstance3D" parent="Torso/Model" unique_id=712413591 groups=["team_dark"]]
 transform = Transform3D(-1, 0, 0, 0, -1, 0, 0, 0, 1, -0.09, 1.33, -0.1824)
 mesh = SubResource("rc_mesh_84")
 
-[node name="LapelNotchL" type="MeshInstance3D" parent="Torso/Model" groups=["team_dark"]]
+[node name="LapelNotchL" type="MeshInstance3D" parent="Torso/Model" unique_id=1546923417 groups=["team_dark"]]
 transform = Transform3D(0.8192, 0.5736, 0, -0.5736, 0.8192, 0, 0, 0, 1, -0.15, 1.46, -0.1804)
 mesh = SubResource("rc_mesh_85")
 
-[node name="LapelR" type="MeshInstance3D" parent="Torso/Model" groups=["team_dark"]]
+[node name="LapelR" type="MeshInstance3D" parent="Torso/Model" unique_id=56147786 groups=["team_dark"]]
 transform = Transform3D(-1, 0, 0, 0, -1, 0, 0, 0, 1, 0.09, 1.33, -0.1824)
 mesh = SubResource("rc_mesh_86")
 
-[node name="LapelNotchR" type="MeshInstance3D" parent="Torso/Model" groups=["team_dark"]]
+[node name="LapelNotchR" type="MeshInstance3D" parent="Torso/Model" unique_id=1967338995 groups=["team_dark"]]
 transform = Transform3D(0.8192, -0.5736, 0, 0.5736, 0.8192, 0, 0, 0, 1, 0.15, 1.46, -0.1804)
 mesh = SubResource("rc_mesh_87")
 
-[node name="ButtonL0" type="MeshInstance3D" parent="Torso/Model" groups=["no_tint"]]
+[node name="ButtonL0" type="MeshInstance3D" parent="Torso/Model" unique_id=1335104153 groups=["no_tint"]]
 transform = Transform3D(1, 0, 0, 0, 0, -1, 0, 1, 0, -0.075, 1.19, -0.1786)
 mesh = SubResource("rc_mesh_88")
 surface_material_override/0 = SubResource("rc_nose")
 
-[node name="ButtonR0" type="MeshInstance3D" parent="Torso/Model" groups=["no_tint"]]
+[node name="ButtonR0" type="MeshInstance3D" parent="Torso/Model" unique_id=801671836 groups=["no_tint"]]
 transform = Transform3D(1, 0, 0, 0, 0, -1, 0, 1, 0, 0.075, 1.19, -0.1786)
 mesh = SubResource("rc_mesh_89")
 surface_material_override/0 = SubResource("rc_nose")
 
-[node name="ButtonL1" type="MeshInstance3D" parent="Torso/Model" groups=["no_tint"]]
+[node name="ButtonL1" type="MeshInstance3D" parent="Torso/Model" unique_id=1180837889 groups=["no_tint"]]
 transform = Transform3D(1, 0, 0, 0, 0, -1, 0, 1, 0, -0.075, 1.1, -0.1759)
 mesh = SubResource("rc_mesh_90")
 surface_material_override/0 = SubResource("rc_nose")
 
-[node name="ButtonR1" type="MeshInstance3D" parent="Torso/Model" groups=["no_tint"]]
+[node name="ButtonR1" type="MeshInstance3D" parent="Torso/Model" unique_id=583251512 groups=["no_tint"]]
 transform = Transform3D(1, 0, 0, 0, 0, -1, 0, 1, 0, 0.075, 1.1, -0.1759)
 mesh = SubResource("rc_mesh_91")
 surface_material_override/0 = SubResource("rc_nose")
 
-[node name="ButtonL2" type="MeshInstance3D" parent="Torso/Model" groups=["no_tint"]]
+[node name="ButtonL2" type="MeshInstance3D" parent="Torso/Model" unique_id=1370316193 groups=["no_tint"]]
 transform = Transform3D(1, 0, 0, 0, 0, -1, 0, 1, 0, -0.075, 1.01, -0.1732)
 mesh = SubResource("rc_mesh_92")
 surface_material_override/0 = SubResource("rc_nose")
 
-[node name="ButtonR2" type="MeshInstance3D" parent="Torso/Model" groups=["no_tint"]]
+[node name="ButtonR2" type="MeshInstance3D" parent="Torso/Model" unique_id=1913296123 groups=["no_tint"]]
 transform = Transform3D(1, 0, 0, 0, 0, -1, 0, 1, 0, 0.075, 1.01, -0.1732)
 mesh = SubResource("rc_mesh_93")
 surface_material_override/0 = SubResource("rc_nose")
 
-[node name="ChestPocket" type="MeshInstance3D" parent="Torso/Model" groups=["team_dark"]]
+[node name="ChestPocket" type="MeshInstance3D" parent="Torso/Model" unique_id=817826202 groups=["team_dark"]]
 transform = Transform3D(0.9063, 0, 0.4226, 0, 1, 0, -0.4226, 0, 0.9063, -0.15, 1.3, -0.1584)
 mesh = SubResource("rc_mesh_94")
 
-[node name="StormFlap" type="MeshInstance3D" parent="Torso/Model" groups=["team_dark"]]
+[node name="StormFlap" type="MeshInstance3D" parent="Torso/Model" unique_id=708320351 groups=["team_dark"]]
 transform = Transform3D(0.9063, -0.0588, 0.4185, 0, 0.9903, 0.1392, -0.4226, -0.1261, 0.8975, 0.17, 1.44, -0.1384)
 mesh = SubResource("rc_mesh_95")
 
-[node name="EpauletL" type="MeshInstance3D" parent="Torso/Model" groups=["team_dark"]]
+[node name="EpauletL" type="MeshInstance3D" parent="Torso/Model" unique_id=580420592 groups=["team_dark"]]
 transform = Transform3D(0.9781, -0.2079, 0, 0.2079, 0.9781, 0, 0, 0, 1, -0.22, 1.585, 0)
 mesh = SubResource("rc_mesh_96")
 
-[node name="EpauletButtonL" type="MeshInstance3D" parent="Torso/Model" groups=["no_tint"]]
+[node name="EpauletButtonL" type="MeshInstance3D" parent="Torso/Model" unique_id=169541896 groups=["no_tint"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.14, 1.6, -0.02)
 mesh = SubResource("rc_mesh_97")
 surface_material_override/0 = SubResource("rc_nose")
 
-[node name="CollarL" type="MeshInstance3D" parent="Torso/Model" groups=["team_dark"]]
+[node name="CollarL" type="MeshInstance3D" parent="Torso/Model" unique_id=931663873 groups=["team_dark"]]
 transform = Transform3D(0.9781, -0.2079, 0, 0.2017, 0.9491, 0.2419, -0.0503, -0.2366, 0.9703, -0.13, 1.63, 0.07)
 mesh = SubResource("rc_mesh_98")
 
-[node name="EpauletR" type="MeshInstance3D" parent="Torso/Model" groups=["team_dark"]]
+[node name="EpauletR" type="MeshInstance3D" parent="Torso/Model" unique_id=179351335 groups=["team_dark"]]
 transform = Transform3D(0.9781, 0.2079, 0, -0.2079, 0.9781, 0, 0, 0, 1, 0.22, 1.585, 0)
 mesh = SubResource("rc_mesh_99")
 
-[node name="EpauletButtonR" type="MeshInstance3D" parent="Torso/Model" groups=["no_tint"]]
+[node name="EpauletButtonR" type="MeshInstance3D" parent="Torso/Model" unique_id=962594701 groups=["no_tint"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.14, 1.6, -0.02)
 mesh = SubResource("rc_mesh_100")
 surface_material_override/0 = SubResource("rc_nose")
 
-[node name="CollarR" type="MeshInstance3D" parent="Torso/Model" groups=["team_dark"]]
+[node name="CollarR" type="MeshInstance3D" parent="Torso/Model" unique_id=963695675 groups=["team_dark"]]
 transform = Transform3D(0.9781, 0.2079, 0, -0.2017, 0.9491, 0.2419, 0.0503, -0.2366, 0.9703, 0.13, 1.63, 0.07)
 mesh = SubResource("rc_mesh_101")
 
-[node name="ShoulderCapL" type="MeshInstance3D" parent="Torso/Model"]
+[node name="ShoulderCapL" type="MeshInstance3D" parent="Torso/Model" unique_id=1931896373]
 transform = Transform3D(1, 0, 0, 0, 0.8, 0, 0, 0, 1, -0.29, 1.5, 0)
 mesh = SubResource("rc_mesh_102")
 
-[node name="ShoulderCapR" type="MeshInstance3D" parent="Torso/Model"]
+[node name="ShoulderCapR" type="MeshInstance3D" parent="Torso/Model" unique_id=1619421241]
 transform = Transform3D(1, 0, 0, 0, 0.8, 0, 0, 0, 1, 0.29, 1.5, 0)
 mesh = SubResource("rc_mesh_103")
 
-[node name="BackYoke" type="MeshInstance3D" parent="Torso/Model" groups=["team_dark"]]
+[node name="BackYoke" type="MeshInstance3D" parent="Torso/Model" unique_id=228860705 groups=["team_dark"]]
 transform = Transform3D(1, 0, 0, 0, 0.9945, -0.1045, 0, 0.1045, 0.9945, 0, 1.45, 0.178)
 mesh = SubResource("rc_mesh_104")
 
-[node name="BackYokeHem" type="MeshInstance3D" parent="Torso/Model" groups=["no_tint"]]
+[node name="BackYokeHem" type="MeshInstance3D" parent="Torso/Model" unique_id=1249027810 groups=["no_tint"]]
 transform = Transform3D(1, 0, 0, 0, 0.9945, -0.1045, 0, 0.1045, 0.9945, 0, 1.375, 0.183)
 mesh = SubResource("rc_mesh_105")
 surface_material_override/0 = SubResource("rc_lining")
 
-[node name="RightElbow" type="MeshInstance3D" parent="Torso/Model"]
+[node name="RightElbow" type="MeshInstance3D" parent="Torso/Model" unique_id=1175839464]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.36, 1.27, -0.06)
 mesh = SubResource("rc_mesh_106")
 
-[node name="RightUpper" type="MeshInstance3D" parent="Torso/Model"]
+[node name="RightUpper" type="MeshInstance3D" parent="Torso/Model" unique_id=1793114380]
 transform = Transform3D(0.9676, 0.2447, -0.0618, 0.2524, -0.9382, 0.2368, 0, -0.2447, -0.9696, 0.33, 1.385, -0.03)
 mesh = SubResource("rc_mesh_107")
 
-[node name="RightLower" type="MeshInstance3D" parent="Torso/Model"]
+[node name="RightLower" type="MeshInstance3D" parent="Torso/Model" unique_id=1102230342]
 transform = Transform3D(0, -0.2883, -0.9575, 0.9536, -0.2883, 0.0868, -0.3011, -0.9131, 0.275, 0.33, 1.24, -0.155)
 mesh = SubResource("rc_mesh_108")
 
-[node name="RightCuff" type="MeshInstance3D" parent="Torso/Model" groups=["team_dark"]]
+[node name="RightCuff" type="MeshInstance3D" parent="Torso/Model" unique_id=1573148379 groups=["team_dark"]]
 transform = Transform3D(0, -0.2883, -0.9575, 0.9536, -0.2883, 0.0868, -0.3011, -0.9131, 0.275, 0.3087, 1.2187, -0.2226)
 mesh = SubResource("rc_mesh_109")
 
-[node name="RightCuffBuckle" type="MeshInstance3D" parent="Torso/Model" groups=["no_tint"]]
+[node name="RightCuffBuckle" type="MeshInstance3D" parent="Torso/Model" unique_id=19777071 groups=["no_tint"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.3087, 1.2887, -0.2226)
 mesh = SubResource("rc_mesh_110")
 surface_material_override/0 = SubResource("rc_buckle")
 
-[node name="RightPaw" type="MeshInstance3D" parent="Torso/Model" groups=["no_tint"]]
+[node name="RightPaw" type="MeshInstance3D" parent="Torso/Model" unique_id=1973066504 groups=["no_tint"]]
 transform = Transform3D(1, 0, 0, 0, 0.85, 0, 0, 0, 1.1, 0.3, 1.21, -0.25)
 mesh = SubResource("rc_mesh_111")
 surface_material_override/0 = SubResource("rc_paw")
 
-[node name="RightPawToe0" type="MeshInstance3D" parent="Torso/Model" groups=["no_tint"]]
+[node name="RightPawToe0" type="MeshInstance3D" parent="Torso/Model" unique_id=148113099 groups=["no_tint"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.275, 1.2, -0.295)
 mesh = SubResource("rc_mesh_112")
 surface_material_override/0 = SubResource("rc_paw")
 
-[node name="RightPawToe1" type="MeshInstance3D" parent="Torso/Model" groups=["no_tint"]]
+[node name="RightPawToe1" type="MeshInstance3D" parent="Torso/Model" unique_id=699095215 groups=["no_tint"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.3, 1.2, -0.295)
 mesh = SubResource("rc_mesh_113")
 surface_material_override/0 = SubResource("rc_paw")
 
-[node name="RightPawToe2" type="MeshInstance3D" parent="Torso/Model" groups=["no_tint"]]
+[node name="RightPawToe2" type="MeshInstance3D" parent="Torso/Model" unique_id=1357962533 groups=["no_tint"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.325, 1.2, -0.295)
 mesh = SubResource("rc_mesh_114")
 surface_material_override/0 = SubResource("rc_paw")
 
-[node name="LeftElbow" type="MeshInstance3D" parent="Torso/Model"]
+[node name="LeftElbow" type="MeshInstance3D" parent="Torso/Model" unique_id=581027011]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.24, 1.25, -0.28)
 mesh = SubResource("rc_mesh_115")
 
-[node name="LeftUpper" type="MeshInstance3D" parent="Torso/Model"]
+[node name="LeftUpper" type="MeshInstance3D" parent="Torso/Model" unique_id=1799910259]
 transform = Transform3D(0.9724, 0.1578, -0.1719, 0.2334, -0.6577, 0.7162, 0, -0.7366, -0.6763, -0.27, 1.375, -0.14)
 mesh = SubResource("rc_mesh_116")
 
-[node name="LeftLower" type="MeshInstance3D" parent="Torso/Model"]
+[node name="LeftLower" type="MeshInstance3D" parent="Torso/Model" unique_id=2005234941]
 transform = Transform3D(0.0238, 0.841, -0.5405, 0.9997, -0.02, 0.0129, 0, -0.5406, -0.8412, -0.03, 1.245, -0.415)
 mesh = SubResource("rc_mesh_117")
 
-[node name="LeftCuff" type="MeshInstance3D" parent="Torso/Model" groups=["team_dark"]]
+[node name="LeftCuff" type="MeshInstance3D" parent="Torso/Model" unique_id=1517551015 groups=["team_dark"]]
 transform = Transform3D(0.0238, 0.841, -0.5405, 0.9997, -0.02, 0.0129, 0, -0.5406, -0.8412, 0.1548, 1.2406, -0.5338)
 mesh = SubResource("rc_mesh_118")
 
-[node name="LeftCuffBuckle" type="MeshInstance3D" parent="Torso/Model" groups=["no_tint"]]
+[node name="LeftCuffBuckle" type="MeshInstance3D" parent="Torso/Model" unique_id=1690233738 groups=["no_tint"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.1548, 1.3106, -0.5338)
 mesh = SubResource("rc_mesh_119")
 surface_material_override/0 = SubResource("rc_buckle")
 
-[node name="LeftPaw" type="MeshInstance3D" parent="Torso/Model" groups=["no_tint"]]
+[node name="LeftPaw" type="MeshInstance3D" parent="Torso/Model" unique_id=2119158855 groups=["no_tint"]]
 transform = Transform3D(1, 0, 0, 0, 0.85, 0, 0, 0, 1.1, 0.18, 1.24, -0.55)
 mesh = SubResource("rc_mesh_120")
 surface_material_override/0 = SubResource("rc_paw")
 
-[node name="LeftPawToe0" type="MeshInstance3D" parent="Torso/Model" groups=["no_tint"]]
+[node name="LeftPawToe0" type="MeshInstance3D" parent="Torso/Model" unique_id=705963238 groups=["no_tint"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.155, 1.23, -0.595)
 mesh = SubResource("rc_mesh_121")
 surface_material_override/0 = SubResource("rc_paw")
 
-[node name="LeftPawToe1" type="MeshInstance3D" parent="Torso/Model" groups=["no_tint"]]
+[node name="LeftPawToe1" type="MeshInstance3D" parent="Torso/Model" unique_id=945091076 groups=["no_tint"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.18, 1.23, -0.595)
 mesh = SubResource("rc_mesh_122")
 surface_material_override/0 = SubResource("rc_paw")
 
-[node name="LeftPawToe2" type="MeshInstance3D" parent="Torso/Model" groups=["no_tint"]]
+[node name="LeftPawToe2" type="MeshInstance3D" parent="Torso/Model" unique_id=1759564065 groups=["no_tint"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.205, 1.23, -0.595)
 mesh = SubResource("rc_mesh_123")
 surface_material_override/0 = SubResource("rc_paw")
 
-[node name="Tail" type="Node3D" parent="Torso/Model"]
+[node name="Tail" type="Node3D" parent="Torso/Model" unique_id=1115909001]
 transform = Transform3D(0.766, 0.3687, -0.5265, 0, 0.8192, 0.5736, 0.6428, -0.4394, 0.6275, -0.2, 1.05, 0.16)
 
-[node name="S0" type="Node3D" parent="Torso/Model/Tail"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
+[node name="S0" type="Node3D" parent="Torso/Model/Tail" unique_id=607386342]
 
-[node name="M" type="MeshInstance3D" parent="Torso/Model/Tail/S0" groups=["no_tint"]]
+[node name="M" type="MeshInstance3D" parent="Torso/Model/Tail/S0" unique_id=1941847603 groups=["no_tint"]]
 transform = Transform3D(1, 0, 0, 0, 0, -1, 0, 1, 0, 0, 0, 0.055)
 mesh = SubResource("rc_mesh_124")
 surface_material_override/0 = SubResource("rc_fur")
 
-[node name="S1" type="Node3D" parent="Torso/Model/Tail/S0"]
+[node name="S1" type="Node3D" parent="Torso/Model/Tail/S0" unique_id=2036854857]
 transform = Transform3D(1, 0, 0, 0, 0.9781, -0.2079, 0, 0.2079, 0.9781, 0, 0, 0.11)
 
-[node name="M" type="MeshInstance3D" parent="Torso/Model/Tail/S0/S1" groups=["no_tint"]]
+[node name="M" type="MeshInstance3D" parent="Torso/Model/Tail/S0/S1" unique_id=2045956819 groups=["no_tint"]]
 transform = Transform3D(1, 0, 0, 0, 0, -1, 0, 1, 0, 0, 0, 0.055)
 mesh = SubResource("rc_mesh_125")
 surface_material_override/0 = SubResource("rc_fur_dark")
 
-[node name="S2" type="Node3D" parent="Torso/Model/Tail/S0/S1"]
+[node name="S2" type="Node3D" parent="Torso/Model/Tail/S0/S1" unique_id=932592869]
 transform = Transform3D(1, 0, 0, 0, 0.9781, -0.2079, 0, 0.2079, 0.9781, 0, 0, 0.11)
 
-[node name="M" type="MeshInstance3D" parent="Torso/Model/Tail/S0/S1/S2" groups=["no_tint"]]
+[node name="M" type="MeshInstance3D" parent="Torso/Model/Tail/S0/S1/S2" unique_id=859236311 groups=["no_tint"]]
 transform = Transform3D(1, 0, 0, 0, 0, -1, 0, 1, 0, 0, 0, 0.055)
 mesh = SubResource("rc_mesh_126")
 surface_material_override/0 = SubResource("rc_fur")
 
-[node name="S3" type="Node3D" parent="Torso/Model/Tail/S0/S1/S2"]
+[node name="S3" type="Node3D" parent="Torso/Model/Tail/S0/S1/S2" unique_id=1055137011]
 transform = Transform3D(1, 0, 0, 0, 0.9781, -0.2079, 0, 0.2079, 0.9781, 0, 0, 0.11)
 
-[node name="M" type="MeshInstance3D" parent="Torso/Model/Tail/S0/S1/S2/S3" groups=["no_tint"]]
+[node name="M" type="MeshInstance3D" parent="Torso/Model/Tail/S0/S1/S2/S3" unique_id=1845819937 groups=["no_tint"]]
 transform = Transform3D(1, 0, 0, 0, 0, -1, 0, 1, 0, 0, 0, 0.055)
 mesh = SubResource("rc_mesh_127")
 surface_material_override/0 = SubResource("rc_fur_dark")
 
-[node name="S4" type="Node3D" parent="Torso/Model/Tail/S0/S1/S2/S3"]
+[node name="S4" type="Node3D" parent="Torso/Model/Tail/S0/S1/S2/S3" unique_id=1888222610]
 transform = Transform3D(1, 0, 0, 0, 0.9781, -0.2079, 0, 0.2079, 0.9781, 0, 0, 0.11)
 
-[node name="M" type="MeshInstance3D" parent="Torso/Model/Tail/S0/S1/S2/S3/S4" groups=["no_tint"]]
+[node name="M" type="MeshInstance3D" parent="Torso/Model/Tail/S0/S1/S2/S3/S4" unique_id=587296387 groups=["no_tint"]]
 transform = Transform3D(1, 0, 0, 0, 0, -1, 0, 1, 0, 0, 0, 0.055)
 mesh = SubResource("rc_mesh_128")
 surface_material_override/0 = SubResource("rc_fur")
 
-[node name="S5" type="Node3D" parent="Torso/Model/Tail/S0/S1/S2/S3/S4"]
+[node name="S5" type="Node3D" parent="Torso/Model/Tail/S0/S1/S2/S3/S4" unique_id=1610274082]
 transform = Transform3D(1, 0, 0, 0, 0.9781, -0.2079, 0, 0.2079, 0.9781, 0, 0, 0.11)
 
-[node name="M" type="MeshInstance3D" parent="Torso/Model/Tail/S0/S1/S2/S3/S4/S5" groups=["no_tint"]]
+[node name="M" type="MeshInstance3D" parent="Torso/Model/Tail/S0/S1/S2/S3/S4/S5" unique_id=1803048086 groups=["no_tint"]]
 transform = Transform3D(1, 0, 0, 0, 0, -1, 0, 1, 0, 0, 0, 0.055)
 mesh = SubResource("rc_mesh_129")
 surface_material_override/0 = SubResource("rc_fur_dark")
 
-[node name="S6" type="Node3D" parent="Torso/Model/Tail/S0/S1/S2/S3/S4/S5"]
+[node name="S6" type="Node3D" parent="Torso/Model/Tail/S0/S1/S2/S3/S4/S5" unique_id=860235017]
 transform = Transform3D(1, 0, 0, 0, 0.9781, -0.2079, 0, 0.2079, 0.9781, 0, 0, 0.11)
 
-[node name="M" type="MeshInstance3D" parent="Torso/Model/Tail/S0/S1/S2/S3/S4/S5/S6" groups=["no_tint"]]
+[node name="M" type="MeshInstance3D" parent="Torso/Model/Tail/S0/S1/S2/S3/S4/S5/S6" unique_id=1953688127 groups=["no_tint"]]
 transform = Transform3D(1, 0, 0, 0, 0, -1, 0, 1, 0, 0, 0, 0.055)
 mesh = SubResource("rc_mesh_130")
 surface_material_override/0 = SubResource("rc_fur")
 
-[node name="Tip" type="MeshInstance3D" parent="Torso/Model/Tail/S0/S1/S2/S3/S4/S5/S6" groups=["no_tint"]]
+[node name="Tip" type="MeshInstance3D" parent="Torso/Model/Tail/S0/S1/S2/S3/S4/S5/S6" unique_id=1416184286 groups=["no_tint"]]
 transform = Transform3D(1, 0, 0, 0, 0, -1, 0, 1, 0, 0, 0, 0.17)
 mesh = SubResource("rc_mesh_131")
 surface_material_override/0 = SubResource("rc_fur_dark")
 
-[node name="Base" type="MeshInstance3D" parent="Torso/Model/Tail/S0/S1/S2/S3/S4/S5/S6" groups=["no_tint"]]
+[node name="Base" type="MeshInstance3D" parent="Torso/Model/Tail/S0/S1/S2/S3/S4/S5/S6" unique_id=2057216666 groups=["no_tint"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.01)
 mesh = SubResource("rc_mesh_132")
 surface_material_override/0 = SubResource("rc_fur")
 
-[node name="BodyHurtbox" type="Area3D" parent="Torso" node_paths=PackedStringArray("health")]
+[node name="BodyHurtbox" type="Area3D" parent="Torso" unique_id=803514118 node_paths=PackedStringArray("health")]
 collision_layer = 4
 collision_mask = 0
 monitoring = false
 script = ExtResource("7_hurt")
 health = NodePath("../../Components/Health")
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Torso/BodyHurtbox"]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Torso/BodyHurtbox" unique_id=83652530]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.8, 0)
 shape = SubResource("body_hurt_shape")
 
-[node name="Head" type="Node3D" parent="Torso"]
+[node name="Head" type="Node3D" parent="Torso" unique_id=881684647]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.6, 0)
 
-[node name="Model" type="Node3D" parent="Torso/Head"]
+[node name="Model" type="Node3D" parent="Torso/Head" unique_id=1058465511]
 
-[node name="Skull" type="MeshInstance3D" parent="Torso/Head/Model" groups=["no_tint"]]
+[node name="Skull" type="MeshInstance3D" parent="Torso/Head/Model" unique_id=736119181 groups=["no_tint"]]
 transform = Transform3D(1.1, 0, 0, 0, 0.85, 0, 0, 0, 0.95, 0, 0.03, 0.02)
 mesh = SubResource("rc_mesh_133")
 surface_material_override/0 = SubResource("rc_fur")
 
-[node name="CheekL" type="MeshInstance3D" parent="Torso/Head/Model" groups=["no_tint"]]
+[node name="CheekL" type="MeshInstance3D" parent="Torso/Head/Model" unique_id=676700731 groups=["no_tint"]]
 transform = Transform3D(-0.1736, 0.9848, 0, -0.9848, -0.1736, 0, 0, 0, 1, -0.19, -0.04, -0.01)
 mesh = SubResource("rc_mesh_134")
 surface_material_override/0 = SubResource("rc_fur")
 
-[node name="CheekLowL" type="MeshInstance3D" parent="Torso/Head/Model" groups=["no_tint"]]
+[node name="CheekLowL" type="MeshInstance3D" parent="Torso/Head/Model" unique_id=1502459997 groups=["no_tint"]]
 transform = Transform3D(-0.5, 0.866, 0, -0.866, -0.5, 0, 0, 0, 1, -0.17, -0.1, -0.04)
 mesh = SubResource("rc_mesh_135")
 surface_material_override/0 = SubResource("rc_fur_light")
 
-[node name="EarL" type="MeshInstance3D" parent="Torso/Head/Model" groups=["no_tint"]]
+[node name="EarL" type="MeshInstance3D" parent="Torso/Head/Model" unique_id=722307675 groups=["no_tint"]]
 transform = Transform3D(0.6725, -0.2185, 0.7071, 0.309, 0.9511, 0, -0.6725, 0.2185, 0.7071, -0.13, 0.2, 0.06)
 mesh = SubResource("rc_mesh_136")
 surface_material_override/0 = SubResource("rc_fur")
 
-[node name="EarInL" type="MeshInstance3D" parent="Torso/Head/Model" groups=["no_tint"]]
+[node name="EarInL" type="MeshInstance3D" parent="Torso/Head/Model" unique_id=1561454552 groups=["no_tint"]]
 transform = Transform3D(0.6725, -0.2185, 0.7071, 0.309, 0.9511, 0, -0.6725, 0.2185, 0.7071, -0.126, 0.19, 0.034)
 mesh = SubResource("rc_mesh_137")
 surface_material_override/0 = SubResource("rc_fur_dark")
 
-[node name="EarRimL" type="MeshInstance3D" parent="Torso/Head/Model" groups=["no_tint"]]
+[node name="EarRimL" type="MeshInstance3D" parent="Torso/Head/Model" unique_id=290882971 groups=["no_tint"]]
 transform = Transform3D(0.6725, -0.2185, 0.7071, 0.309, 0.9511, 0, -0.6725, 0.2185, 0.7071, -0.125, 0.15, 0.06)
 mesh = SubResource("rc_mesh_138")
 surface_material_override/0 = SubResource("rc_fur_light")
 
-[node name="CheekR" type="MeshInstance3D" parent="Torso/Head/Model" groups=["no_tint"]]
+[node name="CheekR" type="MeshInstance3D" parent="Torso/Head/Model" unique_id=1740087008 groups=["no_tint"]]
 transform = Transform3D(-0.1736, -0.9848, 0, 0.9848, -0.1736, 0, 0, 0, 1, 0.19, -0.04, -0.01)
 mesh = SubResource("rc_mesh_139")
 surface_material_override/0 = SubResource("rc_fur")
 
-[node name="CheekLowR" type="MeshInstance3D" parent="Torso/Head/Model" groups=["no_tint"]]
+[node name="CheekLowR" type="MeshInstance3D" parent="Torso/Head/Model" unique_id=1898998852 groups=["no_tint"]]
 transform = Transform3D(-0.5, -0.866, 0, 0.866, -0.5, 0, 0, 0, 1, 0.17, -0.1, -0.04)
 mesh = SubResource("rc_mesh_140")
 surface_material_override/0 = SubResource("rc_fur_light")
 
-[node name="EarR" type="MeshInstance3D" parent="Torso/Head/Model" groups=["no_tint"]]
+[node name="EarR" type="MeshInstance3D" parent="Torso/Head/Model" unique_id=1646088243 groups=["no_tint"]]
 transform = Transform3D(0.6725, 0.2185, 0.7071, -0.309, 0.9511, 0, -0.6725, -0.2185, 0.7071, 0.13, 0.2, 0.06)
 mesh = SubResource("rc_mesh_141")
 surface_material_override/0 = SubResource("rc_fur")
 
-[node name="EarInR" type="MeshInstance3D" parent="Torso/Head/Model" groups=["no_tint"]]
+[node name="EarInR" type="MeshInstance3D" parent="Torso/Head/Model" unique_id=1831918679 groups=["no_tint"]]
 transform = Transform3D(0.6725, 0.2185, 0.7071, -0.309, 0.9511, 0, -0.6725, -0.2185, 0.7071, 0.126, 0.19, 0.034)
 mesh = SubResource("rc_mesh_142")
 surface_material_override/0 = SubResource("rc_fur_dark")
 
-[node name="EarRimR" type="MeshInstance3D" parent="Torso/Head/Model" groups=["no_tint"]]
+[node name="EarRimR" type="MeshInstance3D" parent="Torso/Head/Model" unique_id=1839779575 groups=["no_tint"]]
 transform = Transform3D(0.6725, 0.2185, 0.7071, -0.309, 0.9511, 0, -0.6725, -0.2185, 0.7071, 0.125, 0.15, 0.06)
 mesh = SubResource("rc_mesh_143")
 surface_material_override/0 = SubResource("rc_fur_light")
 
-[node name="Chin" type="MeshInstance3D" parent="Torso/Head/Model" groups=["no_tint"]]
+[node name="Chin" type="MeshInstance3D" parent="Torso/Head/Model" unique_id=1253627208 groups=["no_tint"]]
 transform = Transform3D(1.2, 0, 0, 0, 0.6, 0, 0, 0, 1, 0, -0.11, -0.1)
 mesh = SubResource("rc_mesh_144")
 surface_material_override/0 = SubResource("rc_fur_light")
 
-[node name="Face" type="Node3D" parent="Torso/Head/Model"]
+[node name="Face" type="Node3D" parent="Torso/Head/Model" unique_id=1606031654]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.17)
 
-[node name="PatchL" type="MeshInstance3D" parent="Torso/Head/Model/Face" groups=["no_tint"]]
+[node name="PatchL" type="MeshInstance3D" parent="Torso/Head/Model/Face" unique_id=813864599 groups=["no_tint"]]
 transform = Transform3D(0.9781, -0.2079, 0, 0.2079, 0.9781, 0, 0, 0, 1, -0.075, 0.03, -0.004)
 mesh = SubResource("rc_mesh_145")
 surface_material_override/0 = SubResource("rc_mask")
 
-[node name="BrowL" type="MeshInstance3D" parent="Torso/Head/Model/Face" groups=["no_tint"]]
+[node name="BrowL" type="MeshInstance3D" parent="Torso/Head/Model/Face" unique_id=910343870 groups=["no_tint"]]
 transform = Transform3D(0.9903, -0.1392, 0, 0.1392, 0.9903, 0, 0, 0, 1, -0.08, 0.083, -0.01)
 mesh = SubResource("rc_mesh_146")
 surface_material_override/0 = SubResource("rc_white")
 
-[node name="EyeL" type="MeshInstance3D" parent="Torso/Head/Model/Face" groups=["no_tint"]]
+[node name="EyeL" type="MeshInstance3D" parent="Torso/Head/Model/Face" unique_id=1570875588 groups=["no_tint"]]
 transform = Transform3D(0.9848, -0.1736, 0, 0.1736, 0.9848, 0, 0, 0, 1, -0.075, 0.032, -0.03)
 mesh = SubResource("rc_mesh_147")
 surface_material_override/0 = SubResource("rc_eye")
 
-[node name="PupilL" type="MeshInstance3D" parent="Torso/Head/Model/Face" groups=["no_tint"]]
+[node name="PupilL" type="MeshInstance3D" parent="Torso/Head/Model/Face" unique_id=413497353 groups=["no_tint"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.06, 0.032, -0.042)
 mesh = SubResource("rc_mesh_148")
 surface_material_override/0 = SubResource("rc_nose")
 
-[node name="PatchR" type="MeshInstance3D" parent="Torso/Head/Model/Face" groups=["no_tint"]]
+[node name="PatchR" type="MeshInstance3D" parent="Torso/Head/Model/Face" unique_id=771693673 groups=["no_tint"]]
 transform = Transform3D(0.9781, 0.2079, 0, -0.2079, 0.9781, 0, 0, 0, 1, 0.075, 0.03, -0.004)
 mesh = SubResource("rc_mesh_149")
 surface_material_override/0 = SubResource("rc_mask")
 
-[node name="BrowR" type="MeshInstance3D" parent="Torso/Head/Model/Face" groups=["no_tint"]]
+[node name="BrowR" type="MeshInstance3D" parent="Torso/Head/Model/Face" unique_id=181395633 groups=["no_tint"]]
 transform = Transform3D(0.9903, 0.1392, 0, -0.1392, 0.9903, 0, 0, 0, 1, 0.08, 0.083, -0.01)
 mesh = SubResource("rc_mesh_150")
 surface_material_override/0 = SubResource("rc_white")
 
-[node name="EyeR" type="MeshInstance3D" parent="Torso/Head/Model/Face" groups=["no_tint"]]
+[node name="EyeR" type="MeshInstance3D" parent="Torso/Head/Model/Face" unique_id=1353308887 groups=["no_tint"]]
 transform = Transform3D(0.9848, 0.1736, 0, -0.1736, 0.9848, 0, 0, 0, 1, 0.075, 0.032, -0.03)
 mesh = SubResource("rc_mesh_151")
 surface_material_override/0 = SubResource("rc_eye")
 
-[node name="PupilR" type="MeshInstance3D" parent="Torso/Head/Model/Face" groups=["no_tint"]]
+[node name="PupilR" type="MeshInstance3D" parent="Torso/Head/Model/Face" unique_id=1974378073 groups=["no_tint"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.06, 0.032, -0.042)
 mesh = SubResource("rc_mesh_152")
 surface_material_override/0 = SubResource("rc_nose")
 
-[node name="Bridge" type="MeshInstance3D" parent="Torso/Head/Model/Face" groups=["no_tint"]]
+[node name="Bridge" type="MeshInstance3D" parent="Torso/Head/Model/Face" unique_id=1299934330 groups=["no_tint"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.02, -0.012)
 mesh = SubResource("rc_mesh_153")
 surface_material_override/0 = SubResource("rc_mask")
 
-[node name="Blaze" type="MeshInstance3D" parent="Torso/Head/Model/Face" groups=["no_tint"]]
+[node name="Blaze" type="MeshInstance3D" parent="Torso/Head/Model/Face" unique_id=1373151872 groups=["no_tint"]]
 transform = Transform3D(-1, 0, 0, 0, -1, 0, 0, 0, 1, 0, 0.11, -0.006)
 mesh = SubResource("rc_mesh_154")
 surface_material_override/0 = SubResource("rc_white")
 
-[node name="Snout" type="MeshInstance3D" parent="Torso/Head/Model/Face" groups=["no_tint"]]
+[node name="Snout" type="MeshInstance3D" parent="Torso/Head/Model/Face" unique_id=844841756 groups=["no_tint"]]
 transform = Transform3D(0.7071, -0.7071, 0, 0, 0, 1, -0.7071, -0.7071, 0, 0, -0.045, -0.07)
 mesh = SubResource("rc_mesh_155")
 surface_material_override/0 = SubResource("rc_white")
 
-[node name="Nose" type="MeshInstance3D" parent="Torso/Head/Model/Face" groups=["no_tint"]]
+[node name="Nose" type="MeshInstance3D" parent="Torso/Head/Model/Face" unique_id=518694397 groups=["no_tint"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.04, -0.152)
 mesh = SubResource("rc_mesh_156")
 surface_material_override/0 = SubResource("rc_nose")
 
-[node name="Mouth" type="MeshInstance3D" parent="Torso/Head/Model/Face" groups=["no_tint"]]
+[node name="Mouth" type="MeshInstance3D" parent="Torso/Head/Model/Face" unique_id=594713518 groups=["no_tint"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.085, -0.1)
 mesh = SubResource("rc_mesh_157")
 surface_material_override/0 = SubResource("rc_nose")
 
-[node name="GlintL" type="MeshInstance3D" parent="Torso/Head/Model/Face" groups=["no_tint"]]
+[node name="GlintL" type="MeshInstance3D" parent="Torso/Head/Model/Face" unique_id=710853117 groups=["no_tint"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.062, 0.04, -0.048)
 mesh = SubResource("rc_mesh_158")
 surface_material_override/0 = SubResource("rc_eye")
 
-[node name="WhiskerL0" type="MeshInstance3D" parent="Torso/Head/Model/Face" groups=["no_tint"]]
+[node name="WhiskerL0" type="MeshInstance3D" parent="Torso/Head/Model/Face" unique_id=664990862 groups=["no_tint"]]
 transform = Transform3D(0.9305, 0.1308, 0.342, -0.1392, 0.9903, 0, -0.3387, -0.0476, 0.9397, -0.1, -0.035, -0.085)
 mesh = SubResource("rc_mesh_159")
 surface_material_override/0 = SubResource("rc_white")
 
-[node name="WhiskerL1" type="MeshInstance3D" parent="Torso/Head/Model/Face" groups=["no_tint"]]
+[node name="WhiskerL1" type="MeshInstance3D" parent="Torso/Head/Model/Face" unique_id=493358398 groups=["no_tint"]]
 transform = Transform3D(0.9345, -0.0982, 0.342, 0.1045, 0.9945, 0, -0.3401, 0.0358, 0.9397, -0.1, -0.05, -0.085)
 mesh = SubResource("rc_mesh_160")
 surface_material_override/0 = SubResource("rc_white")
 
-[node name="GlintR" type="MeshInstance3D" parent="Torso/Head/Model/Face" groups=["no_tint"]]
+[node name="GlintR" type="MeshInstance3D" parent="Torso/Head/Model/Face" unique_id=535315090 groups=["no_tint"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.062, 0.04, -0.048)
 mesh = SubResource("rc_mesh_161")
 surface_material_override/0 = SubResource("rc_eye")
 
-[node name="WhiskerR0" type="MeshInstance3D" parent="Torso/Head/Model/Face" groups=["no_tint"]]
+[node name="WhiskerR0" type="MeshInstance3D" parent="Torso/Head/Model/Face" unique_id=1770538412 groups=["no_tint"]]
 transform = Transform3D(0.9305, -0.1308, -0.342, 0.1392, 0.9903, 0, 0.3387, -0.0476, 0.9397, 0.1, -0.035, -0.085)
 mesh = SubResource("rc_mesh_162")
 surface_material_override/0 = SubResource("rc_white")
 
-[node name="WhiskerR1" type="MeshInstance3D" parent="Torso/Head/Model/Face" groups=["no_tint"]]
+[node name="WhiskerR1" type="MeshInstance3D" parent="Torso/Head/Model/Face" unique_id=2069061137 groups=["no_tint"]]
 transform = Transform3D(0.9345, 0.0982, -0.342, -0.1045, 0.9945, 0, 0.3401, 0.0358, 0.9397, 0.1, -0.05, -0.085)
 mesh = SubResource("rc_mesh_163")
 surface_material_override/0 = SubResource("rc_white")
 
-[node name="Toothpick" type="MeshInstance3D" parent="Torso/Head/Model" groups=["no_tint"]]
+[node name="Toothpick" type="MeshInstance3D" parent="Torso/Head/Model" unique_id=1246203487 groups=["no_tint"]]
 transform = Transform3D(0.848, 0.5183, 0.1102, 0, 0.2079, -0.9781, -0.5299, 0.8295, 0.1763, 0.07, -0.09, -0.29)
 mesh = SubResource("rc_mesh_164")
 surface_material_override/0 = SubResource("rc_pick")
 
-[node name="Fedora" type="Node3D" parent="Torso/Head/Model"]
+[node name="Fedora" type="Node3D" parent="Torso/Head/Model" unique_id=960758216]
 transform = Transform3D(1, 0, 0, 0, 0.9903, 0.1392, 0, -0.1392, 0.9903, 0, 0.2, 0)
 
-[node name="Brim" type="MeshInstance3D" parent="Torso/Head/Model/Fedora"]
+[node name="Brim" type="MeshInstance3D" parent="Torso/Head/Model/Fedora" unique_id=1970126718]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 0.95, 0, 0, 0)
 mesh = SubResource("rc_mesh_165")
 
-[node name="BrimEdge" type="MeshInstance3D" parent="Torso/Head/Model/Fedora" groups=["team_dark"]]
+[node name="BrimEdge" type="MeshInstance3D" parent="Torso/Head/Model/Fedora" unique_id=1226840923 groups=["team_dark"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 0.95, 0, -0.014, 0)
 mesh = SubResource("rc_mesh_166")
 
-[node name="BrimSideL" type="MeshInstance3D" parent="Torso/Head/Model/Fedora"]
+[node name="BrimSideL" type="MeshInstance3D" parent="Torso/Head/Model/Fedora" unique_id=1341834024]
 transform = Transform3D(0.9511, 0.309, 0, -0.309, 0.9511, 0, 0, 0, 1, -0.2928, 0.0139, 0)
 mesh = SubResource("rc_mesh_167")
 
-[node name="BrimSideR" type="MeshInstance3D" parent="Torso/Head/Model/Fedora"]
+[node name="BrimSideR" type="MeshInstance3D" parent="Torso/Head/Model/Fedora" unique_id=1367858052]
 transform = Transform3D(0.9511, -0.309, 0, 0.309, 0.9511, 0, 0, 0, 1, 0.2928, 0.0139, 0)
 mesh = SubResource("rc_mesh_168")
 
-[node name="Crown" type="MeshInstance3D" parent="Torso/Head/Model/Fedora"]
+[node name="Crown" type="MeshInstance3D" parent="Torso/Head/Model/Fedora" unique_id=1948632881]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 0.85, 0, 0.11, 0.01)
 mesh = SubResource("rc_mesh_169")
 
-[node name="Pinch" type="MeshInstance3D" parent="Torso/Head/Model/Fedora"]
+[node name="Pinch" type="MeshInstance3D" parent="Torso/Head/Model/Fedora" unique_id=596919410]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.22, 0.01)
 mesh = SubResource("rc_mesh_170")
 
-[node name="Band" type="MeshInstance3D" parent="Torso/Head/Model/Fedora" groups=["no_tint"]]
+[node name="Band" type="MeshInstance3D" parent="Torso/Head/Model/Fedora" unique_id=849037907 groups=["no_tint"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 0.85, 0, 0.035, 0.01)
 mesh = SubResource("rc_mesh_171")
 surface_material_override/0 = SubResource("rc_band")
 
-[node name="Feather" type="MeshInstance3D" parent="Torso/Head/Model/Fedora" groups=["no_tint"]]
+[node name="Feather" type="MeshInstance3D" parent="Torso/Head/Model/Fedora" unique_id=2133968952 groups=["no_tint"]]
 transform = Transform3D(0.2289, 0.2542, 0.9397, -0.7431, 0.6691, 0, -0.6288, -0.6983, 0.342, 0.175, 0.085, 0.06)
 mesh = SubResource("rc_mesh_172")
 surface_material_override/0 = SubResource("rc_feather")
 
-[node name="FeatherSpine" type="MeshInstance3D" parent="Torso/Head/Model/Fedora" groups=["no_tint"]]
+[node name="FeatherSpine" type="MeshInstance3D" parent="Torso/Head/Model/Fedora" unique_id=503150713 groups=["no_tint"]]
 transform = Transform3D(0.2289, 0.2542, 0.9397, -0.7431, 0.6691, 0, -0.6288, -0.6983, 0.342, 0.177, 0.082, 0.06)
 mesh = SubResource("rc_mesh_173")
 surface_material_override/0 = SubResource("rc_band")
 
-[node name="ThirdPersonGun" type="MeshInstance3D" parent="Torso/Head/Model" groups=["no_tint"]]
+[node name="ThirdPersonGun" type="MeshInstance3D" parent="Torso/Head/Model" unique_id=866700251 groups=["no_tint"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.27, -0.38, -0.25)
 
-[node name="HeadHurtbox" type="Area3D" parent="Torso/Head" node_paths=PackedStringArray("health")]
+[node name="HeadHurtbox" type="Area3D" parent="Torso/Head" unique_id=297728708 node_paths=PackedStringArray("health")]
 collision_layer = 4
 collision_mask = 0
 monitoring = false
@@ -1876,25 +1858,25 @@ script = ExtResource("7_hurt")
 health = NodePath("../../../Components/Health")
 is_head = true
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Torso/Head/HeadHurtbox"]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Torso/Head/HeadHurtbox" unique_id=1957024064]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.08, 0)
 shape = SubResource("head_hurt_shape")
 
-[node name="CameraMount" type="RemoteTransform3D" parent="Torso/Head"]
+[node name="CameraMount" type="RemoteTransform3D" parent="Torso/Head" unique_id=2000341516]
 update_scale = false
 
-[node name="ViewModel" type="Node3D" parent="Torso/Head"]
+[node name="ViewModel" type="Node3D" parent="Torso/Head" unique_id=1635486494]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.3, -0.27, -0.5)
 
-[node name="GunMesh" type="MeshInstance3D" parent="Torso/Head/ViewModel"]
+[node name="GunMesh" type="MeshInstance3D" parent="Torso/Head/ViewModel" unique_id=759969650]
 cast_shadow = 0
 
-[node name="Muzzle" type="Marker3D" parent="Torso/Head/ViewModel"]
+[node name="Muzzle" type="Marker3D" parent="Torso/Head/ViewModel" unique_id=1756755798]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.4)
 
-[node name="Components" type="Node" parent="."]
+[node name="Components" type="Node" parent="." unique_id=1800055030]
 
-[node name="Movement" type="Node" parent="Components" node_paths=PackedStringArray("body", "legs", "torso", "collision")]
+[node name="Movement" type="Node" parent="Components" unique_id=1398936228 node_paths=PackedStringArray("body", "legs", "torso", "collision")]
 script = ExtResource("2_move")
 stats = ExtResource("8_mstats")
 body = NodePath("../..")
@@ -1902,14 +1884,14 @@ legs = NodePath("../../Legs")
 torso = NodePath("../../Torso")
 collision = NodePath("../../CollisionShape3D")
 
-[node name="Aim" type="Node" parent="Components" node_paths=PackedStringArray("torso", "head", "weapons")]
+[node name="Aim" type="Node" parent="Components" unique_id=1553881396 node_paths=PackedStringArray("torso", "head", "weapons")]
 script = ExtResource("3_aim")
 stats = ExtResource("9_astats")
 torso = NodePath("../../Torso")
 head = NodePath("../../Torso/Head")
 weapons = NodePath("../Weapons")
 
-[node name="Weapons" type="Node" parent="Components" node_paths=PackedStringArray("body", "aim_origin", "muzzle", "view_model", "third_person_gun", "movement")]
+[node name="Weapons" type="Node" parent="Components" unique_id=134332067 node_paths=PackedStringArray("body", "aim_origin", "muzzle", "view_model", "third_person_gun", "movement")]
 script = ExtResource("4_weap")
 loadout = Array[ExtResource("10_wdata")]([ExtResource("11_pistol"), ExtResource("12_shotgun"), ExtResource("13_sniper")])
 body = NodePath("../..")
@@ -1919,21 +1901,21 @@ view_model = NodePath("../../Torso/Head/ViewModel/GunMesh")
 third_person_gun = NodePath("../../Torso/Head/Model/ThirdPersonGun")
 movement = NodePath("../Movement")
 
-[node name="Health" type="Node" parent="Components"]
+[node name="Health" type="Node" parent="Components" unique_id=541431452]
 script = ExtResource("5_hp")
 
-[node name="Team" type="Node" parent="Components" node_paths=PackedStringArray("legs", "torso", "view_model_root")]
+[node name="Team" type="Node" parent="Components" unique_id=1390431524 node_paths=PackedStringArray("legs", "torso", "view_model_root")]
 script = ExtResource("6_team")
 team = ExtResource("14_team")
 legs = NodePath("../../Legs")
 torso = NodePath("../../Torso")
 view_model_root = NodePath("../../Torso/Head/ViewModel")
 
-[node name="Fx" type="Node" parent="Components" node_paths=PackedStringArray("duo")]
+[node name="Fx" type="Node" parent="Components" unique_id=846299107 node_paths=PackedStringArray("duo")]
 script = ExtResource("18_fx")
 duo = NodePath("../..")
 
-[node name="Hitboxes" type="Node" parent="Components" node_paths=PackedStringArray("head", "body", "legs", "movement", "team")]
+[node name="Hitboxes" type="Node" parent="Components" unique_id=1536272016 node_paths=PackedStringArray("head", "body", "legs", "movement", "team")]
 script = ExtResource("16_hitbox")
 profile = ExtResource("17_hbprofile")
 head = NodePath("../../Torso/Head/HeadHurtbox")
@@ -1942,4 +1924,4 @@ legs = NodePath("../../Legs/LegsHurtbox")
 movement = NodePath("../Movement")
 team = NodePath("../Team")
 
-[node name="Controllers" type="Node" parent="."]
+[node name="Controllers" type="Node" parent="." unique_id=1733617474]

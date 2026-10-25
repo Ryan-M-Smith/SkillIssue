@@ -1,19 +1,21 @@
 import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { Platform, ScrollView, StyleSheet, Text, TextInput, View, useWindowDimensions } from "react-native";
-import { DeviceMotion } from "expo-sensors";
+import { MotionSensor as DeviceMotion } from "@/service/motion-sensor";
 
 import { MotionController, emptyControls } from "@/service/motion-control-service";
 import { DebugLink, idleLinkStatus, type DebugLinkStatus } from "@/service/debug-link";
 import { MotionTally, directionOf, zeroCounts, type Counts, type MovementState } from "@/lib/motion-summary";
 import { defaultDebugRoom } from "@/lib/net/server-url";
+import { useMotionAccess } from "@/lib/motion-permission";
+import { MotionAccessPrompt } from "./motion-access";
 import type { GameControls, Grip, Role } from "@/types/motion";
-import { Body, Eyebrow, Panel, SlantButton, SplitBackground, Title } from "./kit";
+import { Body, Eyebrow, Panel, Script, SlantButton, SplitBackground, Title } from "./kit";
 import { fonts, ui } from "./theme";
 
 const movementGuide = [
 	["↕", "TILT TO MOVE", "Tilt 5–20° forward or back. Return to center to stop."],
-	["↔", "TIP TO STRAFE", "Tip one end down slightly to move sideways."],
-	["↻", "32° WHEEL TWIST", "Toggle sprint with a gentle twist. Center before twisting again."],
+	["↔", "TIP TO STRAFE", "Tip one end down about 4–12° to move sideways. Center to stop."],
+	["↻", "30° WHEEL TWIST", "Toggle sprint with a gentle twist. Center before twisting again."],
 	["↑", "FLICK BACK", "A short, quick flick toward you jumps or stands up."],
 	["↓", "FLICK FORWARD", "A short flick away toggles crouch."],
 ];
@@ -53,16 +55,18 @@ export function Practice({ serverUrl, onBack }: { serverUrl: string; onBack: () 
 	const debugRef = useRef<DebugLink | null>(null);
 	const lastDrawRef = useRef(0);
 
+	const { access, request } = useMotionAccess(true);
+	const allowed = access === "granted";
+
 	useEffect(() => {
+		// Access is asked for explicitly (MotionAccessPrompt); sensors start once it's granted.
+		if (!allowed) return;
 		let subscription: ReturnType<typeof DeviceMotion.addListener> | null = null;
 		let cancelled = false;
 		(async () => {
 			try {
-				const permission = await DeviceMotion.requestPermissionsAsync();
-				if (!permission.granted) throw new Error("Allow motion access in your phone’s settings, then reopen practice.");
-				if (!(await DeviceMotion.isAvailableAsync())) throw new Error("This device has no motion sensors. Use a phone to practice.");
 				if (cancelled) return;
-				DeviceMotion.setUpdateInterval(20);
+				DeviceMotion.setUpdateInterval(16);
 				subscription = DeviceMotion.addListener((reading) => {
 					const now = Date.now();
 					const output = controllerRef.current.process(reading, now);
@@ -81,7 +85,7 @@ export function Practice({ serverUrl, onBack }: { serverUrl: string; onBack: () 
 			}
 		})();
 		return () => { cancelled = true; subscription?.remove(); };
-	}, [sensorSession]);
+	}, [allowed, sensorSession]);
 	useEffect(() => () => { debugRef.current?.close(); }, []);
 
 	function resetCounts() {
@@ -98,10 +102,9 @@ export function Practice({ serverUrl, onBack }: { serverUrl: string; onBack: () 
 		setGrip(null);
 		setLastAction("HOLD STILL FOR A MOMENT");
 		debugRef.current?.sendEvent("recalibrate");
-		void DeviceMotion.requestPermissionsAsync().then(permission => {
-			if (permission.granted) { setSensorError(""); setSensorSession(session => session + 1); }
-			else setSensorError("Allow motion access in your phone’s browser settings, then tap RECENTER.");
-		}).catch(() => setSensorError("Motion sensors are unavailable on this device."));
+		void request().then(next => {
+			if (next === "granted") { setSensorError(""); setSensorSession(session => session + 1); }
+		});
 	}
 	function pickRole(next: Role) {
 		if (next === role) return;
@@ -139,14 +142,14 @@ export function Practice({ serverUrl, onBack }: { serverUrl: string; onBack: () 
 		<View style={styles.screen}>
 			<SplitBackground split={0.6} />
 			<View style={styles.header}>
-				<View><Eyebrow color={ui.gold}>NO LOBBY NEEDED</Eyebrow><Title size={25}>THE WARMUP</Title></View>
+				<View><Script size={17}>no lobby needed…</Script><Title size={25} depth={0.1}>THE WARMUP</Title></View>
 				<SlantButton label="BACK TO MENU" small onPress={onBack} />
 			</View>
 			<ScrollView contentContainerStyle={[styles.content, compact && styles.stack]} keyboardShouldPersistTaps="handled">
-				<Panel border={controls.ready ? ui.blue : ui.gold} style={[styles.live, compact && styles.stackedPanel]}>
+				<Panel style={[styles.live, compact && styles.stackedPanel, { borderLeftWidth: 4, borderLeftColor: controls.ready ? ui.ink : ui.muted }]}>
 					<View style={styles.roleRow}>
-						<SlantButton label="RUNNER" small color={role === "movement" ? ui.blue : undefined} onPress={() => pickRole("movement")} style={styles.grow} />
-						<SlantButton label="GUNNER" small color={role === "gunner" ? ui.red : undefined} onPress={() => pickRole("gunner")} style={styles.grow} />
+						<SlantButton label="RUNNER" small color={role === "movement" ? ui.ink : undefined} onPress={() => pickRole("movement")} style={styles.grow} />
+						<SlantButton label="GUNNER" small color={role === "gunner" ? ui.ink : undefined} onPress={() => pickRole("gunner")} style={styles.grow} />
 						<SlantButton label="RECENTER" small onPress={recalibrate} style={styles.grow} />
 					</View>
 					<Eyebrow color={controls.ready ? ui.ready : ui.gold}>{controls.ready ? `SENSORS LIVE · ${grip ?? "READY"}` : "HOLD STILL AT A COMFORTABLE ANGLE"}</Eyebrow>
@@ -158,7 +161,7 @@ export function Practice({ serverUrl, onBack }: { serverUrl: string; onBack: () 
 						<View style={styles.target}><View style={styles.crossH} /><View style={styles.crossV} /><View style={[styles.dot, { transform: [{ translateX: controls.lookX * 65 }, { translateY: -controls.lookY * 45 }] }]} /></View>
 						<Text style={styles.lastAction}>{controls.ready ? lastAction : "FIND YOUR NEUTRAL"}</Text>
 						<View style={styles.roleRow}>
-							<SlantButton label="FIRE" small color={ui.red} onPress={() => tap("fire", "FIRE")} style={styles.grow} />
+							<SlantButton label="FIRE" small primary onPress={() => tap("fire", "FIRE")} style={styles.grow} />
 							<SlantButton label="AIM" small onPress={() => tap("aim", "AIM")} style={styles.grow} />
 							<SlantButton label="RELOAD" small onPress={() => tap("reload", "RELOAD")} style={styles.grow} />
 							<SlantButton label="SWITCH" small onPress={() => tap("switch", "SWITCH GUN")} style={styles.grow} />
@@ -169,7 +172,7 @@ export function Practice({ serverUrl, onBack }: { serverUrl: string; onBack: () 
 					<SlantButton label="RESET STATS" small onPress={resetCounts} />
 				</Panel>
 				<Panel style={[styles.guide, compact && styles.stackedPanel]}>
-					<Eyebrow color={ui.gold}>YOUR PHONE IS THE CONTROLLER</Eyebrow>
+					<Script size={17}>your phone is the controller…</Script>
 					<Body color={ui.muted} size={13}>Hold it sideways, screen toward you. Start with small motions. Recenter whenever your grip changes.</Body>
 					{guide.map(([icon, title, hint]) => <View style={styles.guideRow} key={title}><Text style={styles.guideIcon}>{icon}</Text><View style={styles.grow}><Eyebrow color={ui.ink}>{title}</Eyebrow><Body size={12} color={ui.muted}>{hint}</Body></View></View>)}
 					<SlantButton label={showDebug ? "HIDE WEB DEBUGGER" : "WEB DEBUGGER"} small onPress={() => setShowDebug(!showDebug)} />
@@ -180,6 +183,7 @@ export function Practice({ serverUrl, onBack }: { serverUrl: string; onBack: () 
 					</View>}
 				</Panel>
 			</ScrollView>
+			{access !== "granted" && access !== "checking" && <MotionAccessPrompt access={access} onAllow={() => void request()} onBack={onBack} />}
 		</View>
 	);
 }
@@ -194,9 +198,9 @@ const styles = StyleSheet.create({
 	stackedPanel: { flex: 0, minHeight: 260 },
 	roleRow: { flexDirection: "row", gap: 8, alignItems: "center" },
 	grow: { flex: 1 },
-	state: { fontFamily: fonts.display, fontSize: 38, color: ui.ink },
+	state: { fontFamily: fonts.display, fontSize: 38, color: ui.ink, textShadowColor: "#2A2A2A", textShadowOffset: { width: 3, height: 4 }, textShadowRadius: 0 },
 	direction: { flexDirection: "row", gap: 12, alignItems: "center" },
-	arrow: { color: ui.blue, fontFamily: fonts.display, fontSize: 35, width: 40, textAlign: "center" },
+	arrow: { color: ui.ink, fontFamily: fonts.display, fontSize: 35, width: 40, textAlign: "center" },
 	track: { height: 5, backgroundColor: ui.panel2, borderRadius: 3, overflow: "hidden" },
 	trackFill: { height: "100%", backgroundColor: ui.ready },
 	stats: { flexDirection: "row", gap: 6 },
@@ -205,10 +209,10 @@ const styles = StyleSheet.create({
 	target: { height: 110, borderWidth: 1, borderColor: ui.line, borderRadius: 8, alignItems: "center", justifyContent: "center", overflow: "hidden" },
 	crossH: { position: "absolute", left: "10%", right: "10%", height: 1, backgroundColor: ui.line },
 	crossV: { position: "absolute", top: "10%", bottom: "10%", width: 1, backgroundColor: ui.line },
-	dot: { height: 14, width: 14, borderRadius: 7, backgroundColor: ui.red },
+	dot: { height: 14, width: 14, borderRadius: 7, backgroundColor: ui.ink },
 	lastAction: { fontFamily: fonts.display, fontSize: 20, color: ui.gold, textAlign: "center" },
 	guideRow: { flexDirection: "row", alignItems: "center", gap: 10 },
-	guideIcon: { color: ui.gold, fontFamily: fonts.display, fontSize: 24, width: 28, textAlign: "center" },
+	guideIcon: { color: ui.soft, fontFamily: fonts.display, fontSize: 24, width: 28, textAlign: "center" },
 	debug: { gap: 8, paddingTop: 8, borderTopWidth: 1, borderColor: ui.line },
 	input: { flex: 1, minWidth: 0, color: ui.ink, borderColor: ui.line, borderWidth: 1, borderRadius: 4, padding: 8, fontFamily: fonts.body, fontSize: 14 },
 });

@@ -22,9 +22,9 @@ func _process(delta: float) -> void:
 
 
 func _on_body_entered(body: Node3D) -> void:
-	
-	if body is PlayerMovement:
+	if body is Duo:
 		if ('health' in name) or ('Health' in name): 
+			print('has health')
 			if body.has_method("modify_health"):
 				print('Player got health')
 				body.modify_health(20)

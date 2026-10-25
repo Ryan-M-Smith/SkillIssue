@@ -257,3 +257,33 @@ test("a socket that errors again while closing doesn't recurse", () => {
 	assert.equal(errors, 1);
 	assert.equal(client.snapshot.stage, "connecting");
 });
+
+test("motion goes out as soon as a sample arrives, at most about every 15 ms", (t) => {
+	t.mock.timers.enable({ apis: ["setTimeout", "setInterval", "Date"], now: 1000 });
+	const { client, socket } = connect("movement");
+	const motions = () => socket.sent.filter((m) => m.type === "motion");
+	client.update(controls, reading as never);
+	assert.equal(motions().length, 1, "sent right away, not on the next tick");
+	assert.equal(motions()[0].payload.controls.moveY, 1);
+	client.update({ ...controls, moveY: 0.2 }, reading as never);
+	assert.equal(motions().length, 1, "a burst of samples is coalesced");
+	t.mock.timers.tick(16);
+	client.update({ ...controls, moveY: 0.3 }, reading as never);
+	assert.equal(motions().length, 2);
+	assert.equal(motions()[1].payload.controls.moveY, 0.3);
+	assert.equal("lookDX" in motions()[1].payload.controls, false, "the runner sends no look deltas");
+});
+
+test("the gunner sends every degree it turned, summed between messages", (t) => {
+	t.mock.timers.enable({ apis: ["setTimeout", "setInterval", "Date"], now: 1000 });
+	const { client, socket } = connect("aim");
+	const motions = () => socket.sent.filter((m) => m.type === "motion");
+	client.update({ ...controls, lookDX: 1.5, lookDY: -0.5 }, reading as never);
+	client.update({ ...controls, lookDX: 2, lookDY: 0.25 }, reading as never);
+	client.update({ ...controls, lookDX: 3, lookDY: 0 }, reading as never);
+	t.mock.timers.tick(16);
+	client.update({ ...controls, lookDX: 4, lookDY: 1 }, reading as never);
+	const sent = motions().map((m) => [m.payload.controls.lookDX, m.payload.controls.lookDY]);
+	assert.deepEqual(sent, [[1.5, -0.5], [9, 1.25]], "nothing is dropped or counted twice");
+	assert.equal(motions()[0].payload.controls.moveY, 0, "the gunner never moves");
+});

@@ -192,9 +192,10 @@ func _physics_process(delta: float) -> void:
 			if m != _last_move.get(id, Vector2.ZERO):
 				_last_move[id] = m
 				_emit(info, {"t": "move", "x": m.x, "y": m.y})
-		elif open and interp.aim_rate != Vector2.ZERO:
-			var d := interp.aim_rate * delta
-			_emit(info, {"t": "aim", "dx": d.x, "dy": d.y})
+		elif open:
+			var d := interp.take_aim(delta)
+			if d != Vector2.ZERO:
+				_emit(info, {"t": "aim", "dx": d.x, "dy": d.y})
 
 	for key in _timed.keys():
 		var t: Dictionary = _timed[key]

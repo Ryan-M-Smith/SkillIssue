@@ -299,6 +299,17 @@ func _run() -> void:
 	await _click(_find_button(current_scene, "MAIN MENU"))
 	if not _check(await _wait_for_scene(MENU) and not paused, "host-ended results return to usable main menu by mouse"):
 		return
+	# Gunner phones send the exact degrees turned; the camera turns by exactly that, once.
+	var interp = preload("res://scripts/network/motion_interpreter.gd").new()
+	var turn := {"moveX": 0.0, "moveY": 0.0, "lookX": 0.5, "lookY": 0.0, "lookDX": 12.0, "lookDY": -3.0}
+	if not _check(interp.feed({"controls": turn}, "gunner", 1000) and interp.feed({"controls": turn}, "gunner", 1010), "gunner look deltas are accepted"):
+		return
+	var aim: Vector2 = interp.take_aim(1.0 / 60.0)
+	if not _check(aim.is_equal_approx(Vector2(deg_to_rad(24.0), deg_to_rad(-6.0))) and interp.take_aim(1.0 / 60.0) == Vector2.ZERO, "look deltas turn the camera exactly once, ignoring the rate"):
+		return
+	interp.feed({"controls": {"moveX": 0.0, "moveY": 0.0, "lookX": 1.0, "lookY": 0.0}}, "gunner", 1020)
+	if not _check(is_equal_approx(interp.take_aim(0.5).x, deg_to_rad(65.0)), "phones that only send a rate still aim"):
+		return
 	print("GAMEPLAY_SMOKE_PASS ", _checks, " checks")
 	DirAccess.remove_absolute(ProjectSettings.globalize_path(GRAPHICS_TEST_CONFIG))
 	_finished = true

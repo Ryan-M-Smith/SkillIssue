@@ -1,148 +1,9 @@
-[gd_scene format=3]
+[gd_scene format=3 uid="uid://da44qqvk54hjo"]
 
-[ext_resource type="Shader" path="res://maps/noir_surface.gdshader" id="1_noir"]
-
-[sub_resource type="ShaderMaterial" id="m_floor"]
-shader = ExtResource("1_noir")
-shader_parameter/pattern = 1
-shader_parameter/base_color = Color(0.3, 0.3, 0.31, 1)
-
-[sub_resource type="ShaderMaterial" id="m_pitwall"]
-shader = ExtResource("1_noir")
-shader_parameter/pattern = 0
-shader_parameter/base_color = Color(0.6, 0.6, 0.6, 1)
-
-[sub_resource type="ShaderMaterial" id="m_ring"]
-shader = ExtResource("1_noir")
-shader_parameter/pattern = 0
-shader_parameter/base_color = Color(0.54, 0.54, 0.55, 1)
-
-[sub_resource type="ShaderMaterial" id="m_wall"]
-shader = ExtResource("1_noir")
-shader_parameter/pattern = 2
-shader_parameter/base_color = Color(0.52, 0.52, 0.53, 1)
-
-[sub_resource type="ShaderMaterial" id="m_porch"]
-shader = ExtResource("1_noir")
-shader_parameter/pattern = 0
-shader_parameter/base_color = Color(0.47, 0.47, 0.48, 1)
-
-[sub_resource type="ShaderMaterial" id="m_pillar"]
-shader = ExtResource("1_noir")
-shader_parameter/pattern = 0
-shader_parameter/base_color = Color(0.4, 0.4, 0.41, 1)
-
-[sub_resource type="ShaderMaterial" id="m_stairs"]
-shader = ExtResource("1_noir")
-shader_parameter/pattern = 0
-shader_parameter/base_color = Color(0.66, 0.66, 0.66, 1)
-
-[sub_resource type="ShaderMaterial" id="m_trim"]
-shader = ExtResource("1_noir")
-shader_parameter/pattern = 5
-shader_parameter/base_color = Color(0.86, 0.86, 0.86, 1)
-
-[sub_resource type="ShaderMaterial" id="m_rail"]
-shader = ExtResource("1_noir")
-shader_parameter/pattern = 5
-shader_parameter/base_color = Color(0.1, 0.1, 0.11, 1)
-
-[sub_resource type="ShaderMaterial" id="m_crate"]
-shader = ExtResource("1_noir")
-shader_parameter/pattern = 4
-shader_parameter/base_color = Color(0.5, 0.5, 0.5, 1)
-
-[sub_resource type="ShaderMaterial" id="m_container"]
-shader = ExtResource("1_noir")
-shader_parameter/pattern = 3
-shader_parameter/base_color = Color(0.28, 0.28, 0.29, 1)
-
-[sub_resource type="ShaderMaterial" id="m_container2"]
-shader = ExtResource("1_noir")
-shader_parameter/pattern = 3
-shader_parameter/base_color = Color(0.44, 0.44, 0.45, 1)
-
-[sub_resource type="ShaderMaterial" id="m_plinth"]
-shader = ExtResource("1_noir")
-shader_parameter/pattern = 5
-shader_parameter/base_color = Color(0.12, 0.12, 0.13, 1)
-
-[sub_resource type="ShaderMaterial" id="m_edge"]
-shader = ExtResource("1_noir")
-shader_parameter/pattern = 5
-shader_parameter/base_color = Color(0.07, 0.07, 0.08, 1)
-
-[sub_resource type="ShaderMaterial" id="m_building"]
-shader = ExtResource("1_noir")
-shader_parameter/pattern = 6
-shader_parameter/base_color = Color(0.2, 0.2, 0.22, 1)
-shader_parameter/lit_windows = 0.16
-
-[sub_resource type="ShaderMaterial" id="m_lamppost"]
-shader = ExtResource("1_noir")
-shader_parameter/pattern = 5
-shader_parameter/base_color = Color(0.06, 0.06, 0.07, 1)
-
-[sub_resource type="ShaderMaterial" id="m_grate"]
-shader = ExtResource("1_noir")
-shader_parameter/pattern = 5
-shader_parameter/base_color = Color(0.04, 0.04, 0.05, 1)
-
-[sub_resource type="StandardMaterial3D" id="m_bulb"]
-shading_mode = 0
-albedo_color = Color(1, 1, 1, 1)
-
-[sub_resource type="StandardMaterial3D" id="m_neon_red"]
-shading_mode = 0
-albedo_color = Color(1, 0.3, 0.3, 1)
-emission_enabled = true
-emission = Color(1, 0.18, 0.2, 1)
-emission_energy_multiplier = 3.0
-
-[sub_resource type="StandardMaterial3D" id="m_neon_blue"]
-shading_mode = 0
-albedo_color = Color(0.4, 0.6, 1, 1)
-emission_enabled = true
-emission = Color(0.25, 0.5, 1, 1)
-emission_energy_multiplier = 3.0
-
-[sub_resource type="StandardMaterial3D" id="m_sign"]
-shading_mode = 0
-albedo_color = Color(1, 0.93, 0.8, 1)
-
-[sub_resource type="SphereMesh" id="bulb_mesh"]
-material = SubResource("m_bulb")
-radius = 0.16
-height = 0.24
-radial_segments = 10
-rings = 5
-
-[sub_resource type="StandardMaterial3D" id="rain_mat"]
-transparency = 1
-shading_mode = 0
-billboard_mode = 2
-albedo_color = Color(0.85, 0.87, 0.9, 0.2)
-
-[sub_resource type="QuadMesh" id="rain_mesh"]
-material = SubResource("rain_mat")
-size = Vector2(0.025, 0.75)
-
-[sub_resource type="StandardMaterial3D" id="steam_mat"]
-transparency = 1
-shading_mode = 0
-billboard_mode = 3
-vertex_color_use_as_albedo = true
-albedo_color = Color(0.8, 0.82, 0.86, 0.1)
-particles_anim_h_frames = 1
-particles_anim_v_frames = 1
-
-[sub_resource type="QuadMesh" id="steam_mesh"]
-material = SubResource("steam_mat")
-size = Vector2(1.4, 1.4)
-
-[sub_resource type="Gradient" id="steam_fade"]
-offsets = PackedFloat32Array(0, 0.25, 1)
-colors = PackedColorArray(1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 0)
+[ext_resource type="PackedScene" uid="uid://mn3ill8ohpq7" path="res://entities/duo/duo.tscn" id="1_h7cbt"]
+[ext_resource type="Shader" uid="uid://cgckfvrrnc3jr" path="res://maps/noir_surface.gdshader" id="1_noir"]
+[ext_resource type="Script" uid="uid://b8f1jwth2v6eo" path="res://item_pickup.gd" id="2_kjx7f"]
+[ext_resource type="Material" uid="uid://dgdel63js7ym4" path="res://healthpickup.tres" id="3_h7cbt"]
 
 [sub_resource type="ProceduralSkyMaterial" id="sky_mat"]
 sky_top_color = Color(0.1, 0.1, 0.115, 1)
@@ -169,12 +30,87 @@ glow_bloom = 0.05
 glow_hdr_threshold = 1.2
 fog_enabled = true
 fog_light_color = Color(0.3, 0.305, 0.32, 1)
-fog_light_energy = 1.0
-fog_density = 0.01
 fog_sky_affect = 0.4
 adjustment_enabled = true
 adjustment_contrast = 1.08
-adjustment_saturation = 1.0
+
+[sub_resource type="ShaderMaterial" id="m_floor"]
+render_priority = 0
+shader = ExtResource("1_noir")
+shader_parameter/pattern = 1
+shader_parameter/base_color = Color(0.3, 0.3, 0.31, 1)
+shader_parameter/panel_size = 2.0
+shader_parameter/seam_strength = 0.28
+shader_parameter/wetness = 0.55
+shader_parameter/lit_windows = 0.35
+shader_parameter/window_color = Color(0.92, 0.93, 0.96, 1)
+
+[sub_resource type="ShaderMaterial" id="m_wall"]
+render_priority = 0
+shader = ExtResource("1_noir")
+shader_parameter/pattern = 2
+shader_parameter/base_color = Color(0.52, 0.52, 0.53, 1)
+shader_parameter/panel_size = 2.0
+shader_parameter/seam_strength = 0.28
+shader_parameter/wetness = 0.55
+shader_parameter/lit_windows = 0.35
+shader_parameter/window_color = Color(0.92, 0.93, 0.96, 1)
+
+[sub_resource type="StandardMaterial3D" id="m_trim"]
+albedo_color = Color(0.78, 0.78, 0.8, 1)
+roughness = 0.9
+
+[sub_resource type="StandardMaterial3D" id="m_edge"]
+albedo_color = Color(0.18, 0.18, 0.2, 1)
+roughness = 0.9
+
+[sub_resource type="ShaderMaterial" id="m_pitwall"]
+render_priority = 0
+shader = ExtResource("1_noir")
+shader_parameter/pattern = 0
+shader_parameter/base_color = Color(0.6, 0.6, 0.6, 1)
+shader_parameter/panel_size = 2.0
+shader_parameter/seam_strength = 0.28
+shader_parameter/wetness = 0.55
+shader_parameter/lit_windows = 0.35
+shader_parameter/window_color = Color(0.92, 0.93, 0.96, 1)
+
+[sub_resource type="ShaderMaterial" id="m_ring"]
+render_priority = 0
+shader = ExtResource("1_noir")
+shader_parameter/pattern = 0
+shader_parameter/base_color = Color(0.54, 0.54, 0.55, 1)
+shader_parameter/panel_size = 2.0
+shader_parameter/seam_strength = 0.28
+shader_parameter/wetness = 0.55
+shader_parameter/lit_windows = 0.35
+shader_parameter/window_color = Color(0.92, 0.93, 0.96, 1)
+
+[sub_resource type="ShaderMaterial" id="m_pillar"]
+render_priority = 0
+shader = ExtResource("1_noir")
+shader_parameter/pattern = 0
+shader_parameter/base_color = Color(0.4, 0.4, 0.41, 1)
+shader_parameter/panel_size = 2.0
+shader_parameter/seam_strength = 0.28
+shader_parameter/wetness = 0.55
+shader_parameter/lit_windows = 0.35
+shader_parameter/window_color = Color(0.92, 0.93, 0.96, 1)
+
+[sub_resource type="StandardMaterial3D" id="m_rail"]
+albedo_color = Color(0.28, 0.28, 0.3, 1)
+roughness = 0.9
+
+[sub_resource type="ShaderMaterial" id="m_stairs"]
+render_priority = 0
+shader = ExtResource("1_noir")
+shader_parameter/pattern = 0
+shader_parameter/base_color = Color(0.66, 0.66, 0.66, 1)
+shader_parameter/panel_size = 2.0
+shader_parameter/seam_strength = 0.28
+shader_parameter/wetness = 0.55
+shader_parameter/lit_windows = 0.35
+shader_parameter/window_color = Color(0.92, 0.93, 0.96, 1)
 
 [sub_resource type="BoxShape3D" id="ramp_1"]
 size = Vector3(7.2498, 0.3, 2)
@@ -200,2206 +136,2355 @@ size = Vector3(9.8433, 0.3, 3)
 [sub_resource type="BoxShape3D" id="ramp_8"]
 size = Vector3(9.8433, 0.3, 3)
 
-[node name="ThePit" type="Node3D"]
+[sub_resource type="ShaderMaterial" id="m_porch"]
+render_priority = 0
+shader = ExtResource("1_noir")
+shader_parameter/pattern = 0
+shader_parameter/base_color = Color(0.47, 0.47, 0.48, 1)
+shader_parameter/panel_size = 2.0
+shader_parameter/seam_strength = 0.28
+shader_parameter/wetness = 0.55
+shader_parameter/lit_windows = 0.35
+shader_parameter/window_color = Color(0.92, 0.93, 0.96, 1)
 
-[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+[sub_resource type="ShaderMaterial" id="m_container"]
+render_priority = 0
+shader = ExtResource("1_noir")
+shader_parameter/pattern = 3
+shader_parameter/base_color = Color(0.28, 0.28, 0.29, 1)
+shader_parameter/panel_size = 2.0
+shader_parameter/seam_strength = 0.28
+shader_parameter/wetness = 0.55
+shader_parameter/lit_windows = 0.35
+shader_parameter/window_color = Color(0.92, 0.93, 0.96, 1)
+
+[sub_resource type="ShaderMaterial" id="m_container2"]
+render_priority = 0
+shader = ExtResource("1_noir")
+shader_parameter/pattern = 3
+shader_parameter/base_color = Color(0.44, 0.44, 0.45, 1)
+shader_parameter/panel_size = 2.0
+shader_parameter/seam_strength = 0.28
+shader_parameter/wetness = 0.55
+shader_parameter/lit_windows = 0.35
+shader_parameter/window_color = Color(0.92, 0.93, 0.96, 1)
+
+[sub_resource type="ShaderMaterial" id="m_crate"]
+render_priority = 0
+shader = ExtResource("1_noir")
+shader_parameter/pattern = 4
+shader_parameter/base_color = Color(0.5, 0.5, 0.5, 1)
+shader_parameter/panel_size = 2.0
+shader_parameter/seam_strength = 0.28
+shader_parameter/wetness = 0.55
+shader_parameter/lit_windows = 0.35
+shader_parameter/window_color = Color(0.92, 0.93, 0.96, 1)
+
+[sub_resource type="StandardMaterial3D" id="m_plinth"]
+albedo_color = Color(0.22, 0.22, 0.24, 1)
+roughness = 0.9
+
+[sub_resource type="StandardMaterial3D" id="m_bulb"]
+shading_mode = 0
+
+[sub_resource type="SphereMesh" id="bulb_mesh"]
+material = SubResource("m_bulb")
+radius = 0.16
+height = 0.24
+radial_segments = 10
+rings = 5
+
+[sub_resource type="ShaderMaterial" id="m_lamppost"]
+render_priority = 0
+shader = ExtResource("1_noir")
+shader_parameter/pattern = 5
+shader_parameter/base_color = Color(0.06, 0.06, 0.07, 1)
+shader_parameter/panel_size = 2.0
+shader_parameter/seam_strength = 0.28
+shader_parameter/wetness = 0.55
+shader_parameter/lit_windows = 0.35
+shader_parameter/window_color = Color(0.92, 0.93, 0.96, 1)
+
+[sub_resource type="StandardMaterial3D" id="m_neon_blue"]
+shading_mode = 0
+albedo_color = Color(0.4, 0.6, 1, 1)
+
+[sub_resource type="StandardMaterial3D" id="m_neon_red"]
+shading_mode = 0
+albedo_color = Color(1, 0.3, 0.3, 1)
+
+[sub_resource type="ShaderMaterial" id="m_building"]
+render_priority = 0
+shader = ExtResource("1_noir")
+shader_parameter/pattern = 6
+shader_parameter/base_color = Color(0.2, 0.2, 0.22, 1)
+shader_parameter/panel_size = 2.0
+shader_parameter/seam_strength = 0.28
+shader_parameter/wetness = 0.55
+shader_parameter/lit_windows = 0.16
+shader_parameter/window_color = Color(0.92, 0.93, 0.96, 1)
+
+[sub_resource type="ShaderMaterial" id="m_grate"]
+render_priority = 0
+shader = ExtResource("1_noir")
+shader_parameter/pattern = 5
+shader_parameter/base_color = Color(0.04, 0.04, 0.05, 1)
+shader_parameter/panel_size = 2.0
+shader_parameter/seam_strength = 0.28
+shader_parameter/wetness = 0.55
+shader_parameter/lit_windows = 0.35
+shader_parameter/window_color = Color(0.92, 0.93, 0.96, 1)
+
+[sub_resource type="StandardMaterial3D" id="steam_mat"]
+transparency = 1
+shading_mode = 0
+vertex_color_use_as_albedo = true
+albedo_color = Color(0.8, 0.82, 0.86, 0.1)
+billboard_mode = 3
+particles_anim_h_frames = 1
+particles_anim_v_frames = 1
+particles_anim_loop = false
+
+[sub_resource type="QuadMesh" id="steam_mesh"]
+material = SubResource("steam_mat")
+size = Vector2(1.4, 1.4)
+
+[sub_resource type="Gradient" id="steam_fade"]
+offsets = PackedFloat32Array(0, 0.25, 1)
+colors = PackedColorArray(1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 0)
+
+[sub_resource type="StandardMaterial3D" id="rain_mat"]
+transparency = 1
+shading_mode = 0
+albedo_color = Color(0.85, 0.87, 0.9, 0.2)
+billboard_mode = 2
+
+[sub_resource type="QuadMesh" id="rain_mesh"]
+material = SubResource("rain_mat")
+size = Vector2(0.025, 0.75)
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_anpqv"]
+
+[node name="ThePit" type="Node3D" unique_id=1999990190]
+
+[node name="Duo" parent="." unique_id=219760218 instance=ExtResource("1_h7cbt")]
+visible = false
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=2069325392]
 environment = SubResource("env")
 
-[node name="Moon" type="DirectionalLight3D" parent="."]
+[node name="Moon" type="DirectionalLight3D" parent="." unique_id=252728701]
 transform = Transform3D(0.866, 0.25, 0.433, 0, 0.866, -0.5, -0.5, 0.433, 0.75, 0, 20, 0)
 light_color = Color(0.92, 0.93, 0.96, 1)
 light_energy = 0.95
 shadow_enabled = true
 
-[node name="Shell" type="Node3D" parent="."]
+[node name="Shell" type="Node3D" parent="." unique_id=828740289]
 
-[node name="Floor" type="CSGBox3D" parent="Shell"]
+[node name="Floor" type="CSGBox3D" parent="Shell" unique_id=237199562]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0)
 use_collision = true
 size = Vector3(46, 1, 46)
 material = SubResource("m_floor")
 
-[node name="Wall0" type="CSGBox3D" parent="Shell"]
+[node name="Wall0" type="CSGBox3D" parent="Shell" unique_id=1428665512]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 5.25, 22.5)
 use_collision = true
 size = Vector3(46, 10.5, 1)
 material = SubResource("m_wall")
 
-[node name="WallTrim0" type="CSGBox3D" parent="Shell"]
+[node name="WallTrim0" type="CSGBox3D" parent="Shell" unique_id=1336112064]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 8.175, 22.5)
 use_collision = true
 size = Vector3(46, 0.15, 1)
 material = SubResource("m_trim")
 
-[node name="Wall1" type="CSGBox3D" parent="Shell"]
+[node name="Wall1" type="CSGBox3D" parent="Shell" unique_id=1541802785]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 5.25, -22.5)
 use_collision = true
 size = Vector3(46, 10.5, 1)
 material = SubResource("m_wall")
 
-[node name="WallTrim1" type="CSGBox3D" parent="Shell"]
+[node name="WallTrim1" type="CSGBox3D" parent="Shell" unique_id=154049200]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 8.175, -22.5)
 use_collision = true
 size = Vector3(46, 0.15, 1)
 material = SubResource("m_trim")
 
-[node name="Wall2" type="CSGBox3D" parent="Shell"]
+[node name="Wall2" type="CSGBox3D" parent="Shell" unique_id=118410133]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 22.5, 5.25, 0)
 use_collision = true
 size = Vector3(1, 10.5, 44)
 material = SubResource("m_wall")
 
-[node name="WallTrim2" type="CSGBox3D" parent="Shell"]
+[node name="WallTrim2" type="CSGBox3D" parent="Shell" unique_id=1110832903]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 22.5, 8.175, 0)
 use_collision = true
 size = Vector3(1, 0.15, 44)
 material = SubResource("m_trim")
 
-[node name="Wall3" type="CSGBox3D" parent="Shell"]
+[node name="Wall3" type="CSGBox3D" parent="Shell" unique_id=1842913685]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -22.5, 5.25, 0)
 use_collision = true
 size = Vector3(1, 10.5, 44)
 material = SubResource("m_wall")
 
-[node name="WallTrim3" type="CSGBox3D" parent="Shell"]
+[node name="WallTrim3" type="CSGBox3D" parent="Shell" unique_id=277379089]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -22.5, 8.175, 0)
 use_collision = true
 size = Vector3(1, 0.15, 44)
 material = SubResource("m_trim")
 
-[node name="BaseRing0" type="CSGBox3D" parent="Shell"]
+[node name="BaseRing0" type="CSGBox3D" parent="Shell" unique_id=838329152]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.09, 21.96)
 use_collision = true
 size = Vector3(44, 0.18, 0.08)
 material = SubResource("m_edge")
 
-[node name="BasePorch0" type="CSGBox3D" parent="Shell"]
+[node name="BasePorch0" type="CSGBox3D" parent="Shell" unique_id=1914797830]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 6.59, 21.96)
 use_collision = true
 size = Vector3(44, 0.18, 0.08)
 material = SubResource("m_edge")
 
-[node name="BaseRing1" type="CSGBox3D" parent="Shell"]
+[node name="BaseRing1" type="CSGBox3D" parent="Shell" unique_id=1936199495]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.09, -21.96)
 use_collision = true
 size = Vector3(44, 0.18, 0.08)
 material = SubResource("m_edge")
 
-[node name="BasePorch1" type="CSGBox3D" parent="Shell"]
+[node name="BasePorch1" type="CSGBox3D" parent="Shell" unique_id=2064557771]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 6.59, -21.96)
 use_collision = true
 size = Vector3(44, 0.18, 0.08)
 material = SubResource("m_edge")
 
-[node name="BaseRing2" type="CSGBox3D" parent="Shell"]
+[node name="BaseRing2" type="CSGBox3D" parent="Shell" unique_id=1891445316]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 21.96, 3.09, 0)
 use_collision = true
 size = Vector3(0.08, 0.18, 44)
 material = SubResource("m_edge")
 
-[node name="BasePorch2" type="CSGBox3D" parent="Shell"]
+[node name="BasePorch2" type="CSGBox3D" parent="Shell" unique_id=850503470]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 21.96, 6.59, 0)
 use_collision = true
 size = Vector3(0.08, 0.18, 44)
 material = SubResource("m_edge")
 
-[node name="BaseRing3" type="CSGBox3D" parent="Shell"]
+[node name="BaseRing3" type="CSGBox3D" parent="Shell" unique_id=1180844180]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -21.96, 3.09, 0)
 use_collision = true
 size = Vector3(0.08, 0.18, 44)
 material = SubResource("m_edge")
 
-[node name="BasePorch3" type="CSGBox3D" parent="Shell"]
+[node name="BasePorch3" type="CSGBox3D" parent="Shell" unique_id=268695888]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -21.96, 6.59, 0)
 use_collision = true
 size = Vector3(0.08, 0.18, 44)
 material = SubResource("m_edge")
 
-[node name="CornerPost0" type="CSGBox3D" parent="Shell"]
+[node name="CornerPost0" type="CSGBox3D" parent="Shell" unique_id=2050664671]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 22, 5.25, 22)
 use_collision = true
 size = Vector3(0.24, 10.5, 0.24)
 material = SubResource("m_edge")
 
-[node name="CornerPost1" type="CSGBox3D" parent="Shell"]
+[node name="CornerPost1" type="CSGBox3D" parent="Shell" unique_id=581649136]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -22, 5.25, 22)
 use_collision = true
 size = Vector3(0.24, 10.5, 0.24)
 material = SubResource("m_edge")
 
-[node name="CornerPost2" type="CSGBox3D" parent="Shell"]
+[node name="CornerPost2" type="CSGBox3D" parent="Shell" unique_id=440085424]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 22, 5.25, -22)
 use_collision = true
 size = Vector3(0.24, 10.5, 0.24)
 material = SubResource("m_edge")
 
-[node name="CornerPost3" type="CSGBox3D" parent="Shell"]
+[node name="CornerPost3" type="CSGBox3D" parent="Shell" unique_id=1119719338]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -22, 5.25, -22)
 use_collision = true
 size = Vector3(0.24, 10.5, 0.24)
 material = SubResource("m_edge")
 
-[node name="Ring" type="Node3D" parent="."]
+[node name="Ring" type="Node3D" parent="." unique_id=501466319]
 
-[node name="BlockNorth" type="CSGBox3D" parent="Ring"]
+[node name="BlockNorth" type="CSGBox3D" parent="Ring" unique_id=564173893]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 15.5)
 use_collision = true
 size = Vector3(44, 3, 13)
 material = SubResource("m_pitwall")
 
-[node name="PitBaseNorth" type="CSGBox3D" parent="Ring"]
+[node name="PitBaseNorth" type="CSGBox3D" parent="Ring" unique_id=1235302559]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.09, 8.98)
 use_collision = true
 size = Vector3(18, 0.18, 0.08)
 material = SubResource("m_edge")
 
-[node name="EdgeTrimNorth" type="CSGBox3D" parent="Ring"]
+[node name="EdgeTrimNorth" type="CSGBox3D" parent="Ring" unique_id=486899833]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.945, 9.06)
 use_collision = true
 size = Vector3(18, 0.13, 0.12)
 material = SubResource("m_trim")
 
-[node name="BlockSouth" type="CSGBox3D" parent="Ring"]
+[node name="BlockSouth" type="CSGBox3D" parent="Ring" unique_id=191966294]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, -15.5)
 use_collision = true
 size = Vector3(44, 3, 13)
 material = SubResource("m_pitwall")
 
-[node name="PitBaseSouth" type="CSGBox3D" parent="Ring"]
+[node name="PitBaseSouth" type="CSGBox3D" parent="Ring" unique_id=783785048]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.09, -8.98)
 use_collision = true
 size = Vector3(18, 0.18, 0.08)
 material = SubResource("m_edge")
 
-[node name="EdgeTrimSouth" type="CSGBox3D" parent="Ring"]
+[node name="EdgeTrimSouth" type="CSGBox3D" parent="Ring" unique_id=457463012]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.945, -9.06)
 use_collision = true
 size = Vector3(18, 0.13, 0.12)
 material = SubResource("m_trim")
 
-[node name="DeckEast" type="CSGBox3D" parent="Ring"]
+[node name="DeckEast" type="CSGBox3D" parent="Ring" unique_id=1777794175]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15.5, 2.775, 0)
 use_collision = true
 size = Vector3(13, 0.45, 18)
 material = SubResource("m_ring")
 
-[node name="PillarEast0" type="CSGBox3D" parent="Ring"]
+[node name="PillarEast0" type="CSGBox3D" parent="Ring" unique_id=1433782700]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9.6, 1.275, 6)
 use_collision = true
 size = Vector3(0.9, 2.55, 0.9)
 material = SubResource("m_pillar")
 
-[node name="PillarEast1" type="CSGBox3D" parent="Ring"]
+[node name="PillarEast1" type="CSGBox3D" parent="Ring" unique_id=103784151]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9.6, 1.275, 0)
 use_collision = true
 size = Vector3(0.9, 2.55, 0.9)
 material = SubResource("m_pillar")
 
-[node name="PillarEast2" type="CSGBox3D" parent="Ring"]
+[node name="PillarEast2" type="CSGBox3D" parent="Ring" unique_id=26230992]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9.6, 1.275, -6)
 use_collision = true
 size = Vector3(0.9, 2.55, 0.9)
 material = SubResource("m_pillar")
 
-[node name="PillarEast3" type="CSGBox3D" parent="Ring"]
+[node name="PillarEast3" type="CSGBox3D" parent="Ring" unique_id=1387045270]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 16, 1.275, 6)
 use_collision = true
 size = Vector3(0.9, 2.55, 0.9)
 material = SubResource("m_pillar")
 
-[node name="PillarEast4" type="CSGBox3D" parent="Ring"]
+[node name="PillarEast4" type="CSGBox3D" parent="Ring" unique_id=1123014599]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 16, 1.275, -6)
 use_collision = true
 size = Vector3(0.9, 2.55, 0.9)
 material = SubResource("m_pillar")
 
-[node name="DeckWest" type="CSGBox3D" parent="Ring"]
+[node name="DeckWest" type="CSGBox3D" parent="Ring" unique_id=237919227]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -15.5, 2.775, 0)
 use_collision = true
 size = Vector3(13, 0.45, 18)
 material = SubResource("m_ring")
 
-[node name="PillarWest0" type="CSGBox3D" parent="Ring"]
+[node name="PillarWest0" type="CSGBox3D" parent="Ring" unique_id=1274543959]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9.6, 1.275, -6)
 use_collision = true
 size = Vector3(0.9, 2.55, 0.9)
 material = SubResource("m_pillar")
 
-[node name="PillarWest1" type="CSGBox3D" parent="Ring"]
+[node name="PillarWest1" type="CSGBox3D" parent="Ring" unique_id=811994321]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9.6, 1.275, 0)
 use_collision = true
 size = Vector3(0.9, 2.55, 0.9)
 material = SubResource("m_pillar")
 
-[node name="PillarWest2" type="CSGBox3D" parent="Ring"]
+[node name="PillarWest2" type="CSGBox3D" parent="Ring" unique_id=490882101]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9.6, 1.275, 6)
 use_collision = true
 size = Vector3(0.9, 2.55, 0.9)
 material = SubResource("m_pillar")
 
-[node name="PillarWest3" type="CSGBox3D" parent="Ring"]
+[node name="PillarWest3" type="CSGBox3D" parent="Ring" unique_id=283064464]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -16, 1.275, -6)
 use_collision = true
 size = Vector3(0.9, 2.55, 0.9)
 material = SubResource("m_pillar")
 
-[node name="PillarWest4" type="CSGBox3D" parent="Ring"]
+[node name="PillarWest4" type="CSGBox3D" parent="Ring" unique_id=786535524]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -16, 1.275, 6)
 use_collision = true
 size = Vector3(0.9, 2.55, 0.9)
 material = SubResource("m_pillar")
 
-[node name="Rails" type="Node3D" parent="."]
+[node name="Rails" type="Node3D" parent="." unique_id=185798397]
 
-[node name="PitRail00" type="CSGBox3D" parent="Rails"]
+[node name="PitRail00" type="CSGBox3D" parent="Rails" unique_id=1730334320]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.3, 3.5, 9.075)
 use_collision = true
 size = Vector3(5.4, 1, 0.15)
 material = SubResource("m_rail")
 
-[node name="PitRail01" type="CSGBox3D" parent="Rails"]
+[node name="PitRail01" type="CSGBox3D" parent="Rails" unique_id=724627573]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.8, 3.5, 9.075)
 use_collision = true
 size = Vector3(8.4, 1, 0.15)
 material = SubResource("m_rail")
 
-[node name="PitRail10" type="CSGBox3D" parent="Rails"]
+[node name="PitRail10" type="CSGBox3D" parent="Rails" unique_id=73726590]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9.075, 3.5, 6.3)
 use_collision = true
 size = Vector3(0.15, 1, 5.4)
 material = SubResource("m_rail")
 
-[node name="PitRail11" type="CSGBox3D" parent="Rails"]
+[node name="PitRail11" type="CSGBox3D" parent="Rails" unique_id=868443311]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9.075, 3.5, -4.8)
 use_collision = true
 size = Vector3(0.15, 1, 8.4)
 material = SubResource("m_rail")
 
-[node name="PitRail20" type="CSGBox3D" parent="Rails"]
+[node name="PitRail20" type="CSGBox3D" parent="Rails" unique_id=1859166455]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.3, 3.5, -9.075)
 use_collision = true
 size = Vector3(5.4, 1, 0.15)
 material = SubResource("m_rail")
 
-[node name="PitRail21" type="CSGBox3D" parent="Rails"]
+[node name="PitRail21" type="CSGBox3D" parent="Rails" unique_id=1679943820]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.8, 3.5, -9.075)
 use_collision = true
 size = Vector3(8.4, 1, 0.15)
 material = SubResource("m_rail")
 
-[node name="PitRail30" type="CSGBox3D" parent="Rails"]
+[node name="PitRail30" type="CSGBox3D" parent="Rails" unique_id=1400753602]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9.075, 3.5, -6.3)
 use_collision = true
 size = Vector3(0.15, 1, 5.4)
 material = SubResource("m_rail")
 
-[node name="PitRail31" type="CSGBox3D" parent="Rails"]
+[node name="PitRail31" type="CSGBox3D" parent="Rails" unique_id=1124389254]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9.075, 3.5, 4.8)
 use_collision = true
 size = Vector3(0.15, 1, 8.4)
 material = SubResource("m_rail")
 
-[node name="Stairs" type="Node3D" parent="."]
+[node name="Stairs" type="Node3D" parent="." unique_id=2051246809]
 
-[node name="PitStairs0" type="Node3D" parent="Stairs"]
+[node name="PitStairs0" type="Node3D" parent="Stairs" unique_id=1516987644]
 
-[node name="Step0" type="CSGBox3D" parent="Stairs/PitStairs0"]
+[node name="Step0" type="CSGBox3D" parent="Stairs/PitStairs0" unique_id=139602630]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.3, 0.15, 8)
 use_collision = true
 size = Vector3(6.6, 0.3, 2)
 material = SubResource("m_stairs")
 
-[node name="Step1" type="CSGBox3D" parent="Stairs/PitStairs0"]
+[node name="Step1" type="CSGBox3D" parent="Stairs/PitStairs0" unique_id=2127501461]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.97, 0.2995, 8)
 use_collision = true
 size = Vector3(5.94, 0.6, 2)
 material = SubResource("m_stairs")
 
-[node name="Step2" type="CSGBox3D" parent="Stairs/PitStairs0"]
+[node name="Step2" type="CSGBox3D" parent="Stairs/PitStairs0" unique_id=1525613661]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.64, 0.449, 8)
 use_collision = true
 size = Vector3(5.28, 0.9, 2)
 material = SubResource("m_stairs")
 
-[node name="Step3" type="CSGBox3D" parent="Stairs/PitStairs0"]
+[node name="Step3" type="CSGBox3D" parent="Stairs/PitStairs0" unique_id=1588015528]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.31, 0.5985, 8)
 use_collision = true
 size = Vector3(4.62, 1.2, 2)
 material = SubResource("m_stairs")
 
-[node name="Step4" type="CSGBox3D" parent="Stairs/PitStairs0"]
+[node name="Step4" type="CSGBox3D" parent="Stairs/PitStairs0" unique_id=1594885185]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.98, 0.748, 8)
 use_collision = true
 size = Vector3(3.96, 1.5, 2)
 material = SubResource("m_stairs")
 
-[node name="Step5" type="CSGBox3D" parent="Stairs/PitStairs0"]
+[node name="Step5" type="CSGBox3D" parent="Stairs/PitStairs0" unique_id=1423868250]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.65, 0.8975, 8)
 use_collision = true
 size = Vector3(3.3, 1.8, 2)
 material = SubResource("m_stairs")
 
-[node name="Step6" type="CSGBox3D" parent="Stairs/PitStairs0"]
+[node name="Step6" type="CSGBox3D" parent="Stairs/PitStairs0" unique_id=905072860]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.32, 1.047, 8)
 use_collision = true
 size = Vector3(2.64, 2.1, 2)
 material = SubResource("m_stairs")
 
-[node name="Step7" type="CSGBox3D" parent="Stairs/PitStairs0"]
+[node name="Step7" type="CSGBox3D" parent="Stairs/PitStairs0" unique_id=1379016703]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.99, 1.1965, 8)
 use_collision = true
 size = Vector3(1.98, 2.4, 2)
 material = SubResource("m_stairs")
 
-[node name="Step8" type="CSGBox3D" parent="Stairs/PitStairs0"]
+[node name="Step8" type="CSGBox3D" parent="Stairs/PitStairs0" unique_id=2059340863]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.66, 1.346, 8)
 use_collision = true
 size = Vector3(1.32, 2.7, 2)
 material = SubResource("m_stairs")
 
-[node name="Step9" type="CSGBox3D" parent="Stairs/PitStairs0"]
+[node name="Step9" type="CSGBox3D" parent="Stairs/PitStairs0" unique_id=1796812020]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.33, 1.4955, 8)
 use_collision = true
 size = Vector3(0.66, 3, 2)
 material = SubResource("m_stairs")
 
-[node name="Walk" type="StaticBody3D" parent="Stairs/PitStairs0"]
+[node name="Walk" type="StaticBody3D" parent="Stairs/PitStairs0" unique_id=1486467820]
 
-[node name="Shape" type="CollisionShape3D" parent="Stairs/PitStairs0/Walk"]
+[node name="Shape" type="CollisionShape3D" parent="Stairs/PitStairs0/Walk" unique_id=434410876]
 transform = Transform3D(0.9104, -0.4138, 0, 0.4138, 0.9104, 0, 0, 0, -1, -4.8979, 1.3634, 8)
 shape = SubResource("ramp_1")
 
-[node name="PitStairs1" type="Node3D" parent="Stairs"]
+[node name="PitStairs1" type="Node3D" parent="Stairs" unique_id=155269026]
 
-[node name="Step0" type="CSGBox3D" parent="Stairs/PitStairs1"]
+[node name="Step0" type="CSGBox3D" parent="Stairs/PitStairs1" unique_id=871677791]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8, 0.15, 4.3)
 use_collision = true
 size = Vector3(2, 0.3, 6.6)
 material = SubResource("m_stairs")
 
-[node name="Step1" type="CSGBox3D" parent="Stairs/PitStairs1"]
+[node name="Step1" type="CSGBox3D" parent="Stairs/PitStairs1" unique_id=1193258095]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8, 0.2995, 3.97)
 use_collision = true
 size = Vector3(2, 0.6, 5.94)
 material = SubResource("m_stairs")
 
-[node name="Step2" type="CSGBox3D" parent="Stairs/PitStairs1"]
+[node name="Step2" type="CSGBox3D" parent="Stairs/PitStairs1" unique_id=1368150410]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8, 0.449, 3.64)
 use_collision = true
 size = Vector3(2, 0.9, 5.28)
 material = SubResource("m_stairs")
 
-[node name="Step3" type="CSGBox3D" parent="Stairs/PitStairs1"]
+[node name="Step3" type="CSGBox3D" parent="Stairs/PitStairs1" unique_id=311288889]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8, 0.5985, 3.31)
 use_collision = true
 size = Vector3(2, 1.2, 4.62)
 material = SubResource("m_stairs")
 
-[node name="Step4" type="CSGBox3D" parent="Stairs/PitStairs1"]
+[node name="Step4" type="CSGBox3D" parent="Stairs/PitStairs1" unique_id=1399998789]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8, 0.748, 2.98)
 use_collision = true
 size = Vector3(2, 1.5, 3.96)
 material = SubResource("m_stairs")
 
-[node name="Step5" type="CSGBox3D" parent="Stairs/PitStairs1"]
+[node name="Step5" type="CSGBox3D" parent="Stairs/PitStairs1" unique_id=2033716508]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8, 0.8975, 2.65)
 use_collision = true
 size = Vector3(2, 1.8, 3.3)
 material = SubResource("m_stairs")
 
-[node name="Step6" type="CSGBox3D" parent="Stairs/PitStairs1"]
+[node name="Step6" type="CSGBox3D" parent="Stairs/PitStairs1" unique_id=1907830897]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8, 1.047, 2.32)
 use_collision = true
 size = Vector3(2, 2.1, 2.64)
 material = SubResource("m_stairs")
 
-[node name="Step7" type="CSGBox3D" parent="Stairs/PitStairs1"]
+[node name="Step7" type="CSGBox3D" parent="Stairs/PitStairs1" unique_id=831789077]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8, 1.1965, 1.99)
 use_collision = true
 size = Vector3(2, 2.4, 1.98)
 material = SubResource("m_stairs")
 
-[node name="Step8" type="CSGBox3D" parent="Stairs/PitStairs1"]
+[node name="Step8" type="CSGBox3D" parent="Stairs/PitStairs1" unique_id=1082407147]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8, 1.346, 1.66)
 use_collision = true
 size = Vector3(2, 2.7, 1.32)
 material = SubResource("m_stairs")
 
-[node name="Step9" type="CSGBox3D" parent="Stairs/PitStairs1"]
+[node name="Step9" type="CSGBox3D" parent="Stairs/PitStairs1" unique_id=479256898]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8, 1.4955, 1.33)
 use_collision = true
 size = Vector3(2, 3, 0.66)
 material = SubResource("m_stairs")
 
-[node name="Walk" type="StaticBody3D" parent="Stairs/PitStairs1"]
+[node name="Walk" type="StaticBody3D" parent="Stairs/PitStairs1" unique_id=1192359171]
 
-[node name="Shape" type="CollisionShape3D" parent="Stairs/PitStairs1/Walk"]
+[node name="Shape" type="CollisionShape3D" parent="Stairs/PitStairs1/Walk" unique_id=630089849]
 transform = Transform3D(0, 0, -1, 0.4138, 0.9104, 0, -0.9104, 0.4138, 0, 8, 1.3634, 4.8979)
 shape = SubResource("ramp_2")
 
-[node name="PitStairs2" type="Node3D" parent="Stairs"]
+[node name="PitStairs2" type="Node3D" parent="Stairs" unique_id=1192074458]
 
-[node name="Step0" type="CSGBox3D" parent="Stairs/PitStairs2"]
+[node name="Step0" type="CSGBox3D" parent="Stairs/PitStairs2" unique_id=951170757]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.3, 0.15, -8)
 use_collision = true
 size = Vector3(6.6, 0.3, 2)
 material = SubResource("m_stairs")
 
-[node name="Step1" type="CSGBox3D" parent="Stairs/PitStairs2"]
+[node name="Step1" type="CSGBox3D" parent="Stairs/PitStairs2" unique_id=1081319393]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.97, 0.2995, -8)
 use_collision = true
 size = Vector3(5.94, 0.6, 2)
 material = SubResource("m_stairs")
 
-[node name="Step2" type="CSGBox3D" parent="Stairs/PitStairs2"]
+[node name="Step2" type="CSGBox3D" parent="Stairs/PitStairs2" unique_id=46547480]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.64, 0.449, -8)
 use_collision = true
 size = Vector3(5.28, 0.9, 2)
 material = SubResource("m_stairs")
 
-[node name="Step3" type="CSGBox3D" parent="Stairs/PitStairs2"]
+[node name="Step3" type="CSGBox3D" parent="Stairs/PitStairs2" unique_id=748952078]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.31, 0.5985, -8)
 use_collision = true
 size = Vector3(4.62, 1.2, 2)
 material = SubResource("m_stairs")
 
-[node name="Step4" type="CSGBox3D" parent="Stairs/PitStairs2"]
+[node name="Step4" type="CSGBox3D" parent="Stairs/PitStairs2" unique_id=1178209922]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.98, 0.748, -8)
 use_collision = true
 size = Vector3(3.96, 1.5, 2)
 material = SubResource("m_stairs")
 
-[node name="Step5" type="CSGBox3D" parent="Stairs/PitStairs2"]
+[node name="Step5" type="CSGBox3D" parent="Stairs/PitStairs2" unique_id=2063047127]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.65, 0.8975, -8)
 use_collision = true
 size = Vector3(3.3, 1.8, 2)
 material = SubResource("m_stairs")
 
-[node name="Step6" type="CSGBox3D" parent="Stairs/PitStairs2"]
+[node name="Step6" type="CSGBox3D" parent="Stairs/PitStairs2" unique_id=1270302070]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.32, 1.047, -8)
 use_collision = true
 size = Vector3(2.64, 2.1, 2)
 material = SubResource("m_stairs")
 
-[node name="Step7" type="CSGBox3D" parent="Stairs/PitStairs2"]
+[node name="Step7" type="CSGBox3D" parent="Stairs/PitStairs2" unique_id=1968877313]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.99, 1.1965, -8)
 use_collision = true
 size = Vector3(1.98, 2.4, 2)
 material = SubResource("m_stairs")
 
-[node name="Step8" type="CSGBox3D" parent="Stairs/PitStairs2"]
+[node name="Step8" type="CSGBox3D" parent="Stairs/PitStairs2" unique_id=1994314257]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.66, 1.346, -8)
 use_collision = true
 size = Vector3(1.32, 2.7, 2)
 material = SubResource("m_stairs")
 
-[node name="Step9" type="CSGBox3D" parent="Stairs/PitStairs2"]
+[node name="Step9" type="CSGBox3D" parent="Stairs/PitStairs2" unique_id=1801138485]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.33, 1.4955, -8)
 use_collision = true
 size = Vector3(0.66, 3, 2)
 material = SubResource("m_stairs")
 
-[node name="Walk" type="StaticBody3D" parent="Stairs/PitStairs2"]
+[node name="Walk" type="StaticBody3D" parent="Stairs/PitStairs2" unique_id=22368811]
 
-[node name="Shape" type="CollisionShape3D" parent="Stairs/PitStairs2/Walk"]
+[node name="Shape" type="CollisionShape3D" parent="Stairs/PitStairs2/Walk" unique_id=288126723]
 transform = Transform3D(-0.9104, 0.4138, 0, 0.4138, 0.9104, 0, 0, 0, 1, 4.8979, 1.3634, -8)
 shape = SubResource("ramp_3")
 
-[node name="PitStairs3" type="Node3D" parent="Stairs"]
+[node name="PitStairs3" type="Node3D" parent="Stairs" unique_id=615120766]
 
-[node name="Step0" type="CSGBox3D" parent="Stairs/PitStairs3"]
+[node name="Step0" type="CSGBox3D" parent="Stairs/PitStairs3" unique_id=1056182723]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 0.15, -4.3)
 use_collision = true
 size = Vector3(2, 0.3, 6.6)
 material = SubResource("m_stairs")
 
-[node name="Step1" type="CSGBox3D" parent="Stairs/PitStairs3"]
+[node name="Step1" type="CSGBox3D" parent="Stairs/PitStairs3" unique_id=956133436]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 0.2995, -3.97)
 use_collision = true
 size = Vector3(2, 0.6, 5.94)
 material = SubResource("m_stairs")
 
-[node name="Step2" type="CSGBox3D" parent="Stairs/PitStairs3"]
+[node name="Step2" type="CSGBox3D" parent="Stairs/PitStairs3" unique_id=1771034938]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 0.449, -3.64)
 use_collision = true
 size = Vector3(2, 0.9, 5.28)
 material = SubResource("m_stairs")
 
-[node name="Step3" type="CSGBox3D" parent="Stairs/PitStairs3"]
+[node name="Step3" type="CSGBox3D" parent="Stairs/PitStairs3" unique_id=1583841314]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 0.5985, -3.31)
 use_collision = true
 size = Vector3(2, 1.2, 4.62)
 material = SubResource("m_stairs")
 
-[node name="Step4" type="CSGBox3D" parent="Stairs/PitStairs3"]
+[node name="Step4" type="CSGBox3D" parent="Stairs/PitStairs3" unique_id=831498694]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 0.748, -2.98)
 use_collision = true
 size = Vector3(2, 1.5, 3.96)
 material = SubResource("m_stairs")
 
-[node name="Step5" type="CSGBox3D" parent="Stairs/PitStairs3"]
+[node name="Step5" type="CSGBox3D" parent="Stairs/PitStairs3" unique_id=1690969088]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 0.8975, -2.65)
 use_collision = true
 size = Vector3(2, 1.8, 3.3)
 material = SubResource("m_stairs")
 
-[node name="Step6" type="CSGBox3D" parent="Stairs/PitStairs3"]
+[node name="Step6" type="CSGBox3D" parent="Stairs/PitStairs3" unique_id=949327170]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 1.047, -2.32)
 use_collision = true
 size = Vector3(2, 2.1, 2.64)
 material = SubResource("m_stairs")
 
-[node name="Step7" type="CSGBox3D" parent="Stairs/PitStairs3"]
+[node name="Step7" type="CSGBox3D" parent="Stairs/PitStairs3" unique_id=1219447197]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 1.1965, -1.99)
 use_collision = true
 size = Vector3(2, 2.4, 1.98)
 material = SubResource("m_stairs")
 
-[node name="Step8" type="CSGBox3D" parent="Stairs/PitStairs3"]
+[node name="Step8" type="CSGBox3D" parent="Stairs/PitStairs3" unique_id=1297554095]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 1.346, -1.66)
 use_collision = true
 size = Vector3(2, 2.7, 1.32)
 material = SubResource("m_stairs")
 
-[node name="Step9" type="CSGBox3D" parent="Stairs/PitStairs3"]
+[node name="Step9" type="CSGBox3D" parent="Stairs/PitStairs3" unique_id=1929318200]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 1.4955, -1.33)
 use_collision = true
 size = Vector3(2, 3, 0.66)
 material = SubResource("m_stairs")
 
-[node name="Walk" type="StaticBody3D" parent="Stairs/PitStairs3"]
+[node name="Walk" type="StaticBody3D" parent="Stairs/PitStairs3" unique_id=691190245]
 
-[node name="Shape" type="CollisionShape3D" parent="Stairs/PitStairs3/Walk"]
+[node name="Shape" type="CollisionShape3D" parent="Stairs/PitStairs3/Walk" unique_id=1244490431]
 transform = Transform3D(0, 0, 1, 0.4138, 0.9104, 0, 0.9104, -0.4138, 0, -8, 1.3634, -4.8979)
 shape = SubResource("ramp_4")
 
-[node name="Porches" type="Node3D" parent="."]
+[node name="PorchStairsNorth" type="Node3D" parent="Stairs" unique_id=21838822]
 
-[node name="PorchNorth" type="CSGBox3D" parent="Porches"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 6.3, 20.25)
-use_collision = true
-size = Vector3(16, 0.4, 3.5)
-material = SubResource("m_porch")
-
-[node name="PorchRailNorth" type="CSGBox3D" parent="Porches"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 7, 18.575)
-use_collision = true
-size = Vector3(16, 1, 0.15)
-material = SubResource("m_rail")
-
-[node name="PorchTrimNorth" type="CSGBox3D" parent="Porches"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 6.125, 18.575)
-use_collision = true
-size = Vector3(16, 0.15, 0.15)
-material = SubResource("m_trim")
-
-[node name="PorchPillarNorth0" type="CSGBox3D" parent="Porches"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7.4, 4.55, 18.9)
-use_collision = true
-size = Vector3(0.7, 3.1, 0.7)
-material = SubResource("m_pillar")
-
-[node name="PorchPillarNorth1" type="CSGBox3D" parent="Porches"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4.55, 18.9)
-use_collision = true
-size = Vector3(0.7, 3.1, 0.7)
-material = SubResource("m_pillar")
-
-[node name="PorchPillarNorth2" type="CSGBox3D" parent="Porches"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7.4, 4.55, 18.9)
-use_collision = true
-size = Vector3(0.7, 3.1, 0.7)
-material = SubResource("m_pillar")
-
-[node name="PorchStairsNorth" type="Node3D" parent="Stairs"]
-
-[node name="Step0" type="CSGBox3D" parent="Stairs/PorchStairsNorth"]
+[node name="Step0" type="CSGBox3D" parent="Stairs/PorchStairsNorth" unique_id=1006910256]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.6, 3.1458, 20.5)
 use_collision = true
 size = Vector3(9.2, 0.2917, 3)
 material = SubResource("m_stairs")
 
-[node name="Step1" type="CSGBox3D" parent="Stairs/PorchStairsNorth"]
+[node name="Step1" type="CSGBox3D" parent="Stairs/PorchStairsNorth" unique_id=223754451]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.2167, 3.2912, 20.5)
 use_collision = true
 size = Vector3(8.4333, 0.5833, 3)
 material = SubResource("m_stairs")
 
-[node name="Step2" type="CSGBox3D" parent="Stairs/PorchStairsNorth"]
+[node name="Step2" type="CSGBox3D" parent="Stairs/PorchStairsNorth" unique_id=914812632]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.8333, 3.4365, 20.5)
 use_collision = true
 size = Vector3(7.6667, 0.875, 3)
 material = SubResource("m_stairs")
 
-[node name="Step3" type="CSGBox3D" parent="Stairs/PorchStairsNorth"]
+[node name="Step3" type="CSGBox3D" parent="Stairs/PorchStairsNorth" unique_id=1369291914]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.45, 3.5818, 20.5)
 use_collision = true
 size = Vector3(6.9, 1.1667, 3)
 material = SubResource("m_stairs")
 
-[node name="Step4" type="CSGBox3D" parent="Stairs/PorchStairsNorth"]
+[node name="Step4" type="CSGBox3D" parent="Stairs/PorchStairsNorth" unique_id=774704634]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.0667, 3.7272, 20.5)
 use_collision = true
 size = Vector3(6.1333, 1.4583, 3)
 material = SubResource("m_stairs")
 
-[node name="Step5" type="CSGBox3D" parent="Stairs/PorchStairsNorth"]
+[node name="Step5" type="CSGBox3D" parent="Stairs/PorchStairsNorth" unique_id=1462814664]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10.6833, 3.8725, 20.5)
 use_collision = true
 size = Vector3(5.3667, 1.75, 3)
 material = SubResource("m_stairs")
 
-[node name="Step6" type="CSGBox3D" parent="Stairs/PorchStairsNorth"]
+[node name="Step6" type="CSGBox3D" parent="Stairs/PorchStairsNorth" unique_id=186588984]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10.3, 4.0178, 20.5)
 use_collision = true
 size = Vector3(4.6, 2.0417, 3)
 material = SubResource("m_stairs")
 
-[node name="Step7" type="CSGBox3D" parent="Stairs/PorchStairsNorth"]
+[node name="Step7" type="CSGBox3D" parent="Stairs/PorchStairsNorth" unique_id=1459882133]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9.9167, 4.1632, 20.5)
 use_collision = true
 size = Vector3(3.8333, 2.3333, 3)
 material = SubResource("m_stairs")
 
-[node name="Step8" type="CSGBox3D" parent="Stairs/PorchStairsNorth"]
+[node name="Step8" type="CSGBox3D" parent="Stairs/PorchStairsNorth" unique_id=558553089]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9.5333, 4.3085, 20.5)
 use_collision = true
 size = Vector3(3.0667, 2.625, 3)
 material = SubResource("m_stairs")
 
-[node name="Step9" type="CSGBox3D" parent="Stairs/PorchStairsNorth"]
+[node name="Step9" type="CSGBox3D" parent="Stairs/PorchStairsNorth" unique_id=2041114602]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9.15, 4.4538, 20.5)
 use_collision = true
 size = Vector3(2.3, 2.9167, 3)
 material = SubResource("m_stairs")
 
-[node name="Step10" type="CSGBox3D" parent="Stairs/PorchStairsNorth"]
+[node name="Step10" type="CSGBox3D" parent="Stairs/PorchStairsNorth" unique_id=1548543780]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8.7667, 4.5992, 20.5)
 use_collision = true
 size = Vector3(1.5333, 3.2083, 3)
 material = SubResource("m_stairs")
 
-[node name="Step11" type="CSGBox3D" parent="Stairs/PorchStairsNorth"]
+[node name="Step11" type="CSGBox3D" parent="Stairs/PorchStairsNorth" unique_id=916071546]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8.3833, 4.7445, 20.5)
 use_collision = true
 size = Vector3(0.7667, 3.5, 3)
 material = SubResource("m_stairs")
 
-[node name="Walk" type="StaticBody3D" parent="Stairs/PorchStairsNorth"]
+[node name="Walk" type="StaticBody3D" parent="Stairs/PorchStairsNorth" unique_id=1910118685]
 
-[node name="Shape" type="CollisionShape3D" parent="Stairs/PorchStairsNorth/Walk"]
+[node name="Shape" type="CollisionShape3D" parent="Stairs/PorchStairsNorth/Walk" unique_id=239885882]
 transform = Transform3D(-0.9346, 0.3556, 0, 0.3556, 0.9346, 0, 0, 0, 1, 13.3133, 4.6098, 20.5)
 shape = SubResource("ramp_5")
 
-[node name="PorchEast" type="CSGBox3D" parent="Porches"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 20.25, 6.3, 0)
-use_collision = true
-size = Vector3(3.5, 0.4, 16)
-material = SubResource("m_porch")
+[node name="PorchStairsEast" type="Node3D" parent="Stairs" unique_id=1710500025]
 
-[node name="PorchRailEast" type="CSGBox3D" parent="Porches"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 18.575, 7, 0)
-use_collision = true
-size = Vector3(0.15, 1, 16)
-material = SubResource("m_rail")
-
-[node name="PorchTrimEast" type="CSGBox3D" parent="Porches"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 18.575, 6.125, 0)
-use_collision = true
-size = Vector3(0.15, 0.15, 16)
-material = SubResource("m_trim")
-
-[node name="PorchPillarEast0" type="CSGBox3D" parent="Porches"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 18.9, 4.55, 7.4)
-use_collision = true
-size = Vector3(0.7, 3.1, 0.7)
-material = SubResource("m_pillar")
-
-[node name="PorchPillarEast1" type="CSGBox3D" parent="Porches"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 18.9, 4.55, 0)
-use_collision = true
-size = Vector3(0.7, 3.1, 0.7)
-material = SubResource("m_pillar")
-
-[node name="PorchPillarEast2" type="CSGBox3D" parent="Porches"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 18.9, 4.55, -7.4)
-use_collision = true
-size = Vector3(0.7, 3.1, 0.7)
-material = SubResource("m_pillar")
-
-[node name="PorchStairsEast" type="Node3D" parent="Stairs"]
-
-[node name="Step0" type="CSGBox3D" parent="Stairs/PorchStairsEast"]
+[node name="Step0" type="CSGBox3D" parent="Stairs/PorchStairsEast" unique_id=1915943823]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 20.5, 3.1458, -12.6)
 use_collision = true
 size = Vector3(3, 0.2917, 9.2)
 material = SubResource("m_stairs")
 
-[node name="Step1" type="CSGBox3D" parent="Stairs/PorchStairsEast"]
+[node name="Step1" type="CSGBox3D" parent="Stairs/PorchStairsEast" unique_id=1007077033]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 20.5, 3.2912, -12.2167)
 use_collision = true
 size = Vector3(3, 0.5833, 8.4333)
 material = SubResource("m_stairs")
 
-[node name="Step2" type="CSGBox3D" parent="Stairs/PorchStairsEast"]
+[node name="Step2" type="CSGBox3D" parent="Stairs/PorchStairsEast" unique_id=1588066971]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 20.5, 3.4365, -11.8333)
 use_collision = true
 size = Vector3(3, 0.875, 7.6667)
 material = SubResource("m_stairs")
 
-[node name="Step3" type="CSGBox3D" parent="Stairs/PorchStairsEast"]
+[node name="Step3" type="CSGBox3D" parent="Stairs/PorchStairsEast" unique_id=875772887]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 20.5, 3.5818, -11.45)
 use_collision = true
 size = Vector3(3, 1.1667, 6.9)
 material = SubResource("m_stairs")
 
-[node name="Step4" type="CSGBox3D" parent="Stairs/PorchStairsEast"]
+[node name="Step4" type="CSGBox3D" parent="Stairs/PorchStairsEast" unique_id=2023133982]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 20.5, 3.7272, -11.0667)
 use_collision = true
 size = Vector3(3, 1.4583, 6.1333)
 material = SubResource("m_stairs")
 
-[node name="Step5" type="CSGBox3D" parent="Stairs/PorchStairsEast"]
+[node name="Step5" type="CSGBox3D" parent="Stairs/PorchStairsEast" unique_id=614607803]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 20.5, 3.8725, -10.6833)
 use_collision = true
 size = Vector3(3, 1.75, 5.3667)
 material = SubResource("m_stairs")
 
-[node name="Step6" type="CSGBox3D" parent="Stairs/PorchStairsEast"]
+[node name="Step6" type="CSGBox3D" parent="Stairs/PorchStairsEast" unique_id=886174030]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 20.5, 4.0178, -10.3)
 use_collision = true
 size = Vector3(3, 2.0417, 4.6)
 material = SubResource("m_stairs")
 
-[node name="Step7" type="CSGBox3D" parent="Stairs/PorchStairsEast"]
+[node name="Step7" type="CSGBox3D" parent="Stairs/PorchStairsEast" unique_id=1667540291]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 20.5, 4.1632, -9.9167)
 use_collision = true
 size = Vector3(3, 2.3333, 3.8333)
 material = SubResource("m_stairs")
 
-[node name="Step8" type="CSGBox3D" parent="Stairs/PorchStairsEast"]
+[node name="Step8" type="CSGBox3D" parent="Stairs/PorchStairsEast" unique_id=726974796]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 20.5, 4.3085, -9.5333)
 use_collision = true
 size = Vector3(3, 2.625, 3.0667)
 material = SubResource("m_stairs")
 
-[node name="Step9" type="CSGBox3D" parent="Stairs/PorchStairsEast"]
+[node name="Step9" type="CSGBox3D" parent="Stairs/PorchStairsEast" unique_id=947194358]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 20.5, 4.4538, -9.15)
 use_collision = true
 size = Vector3(3, 2.9167, 2.3)
 material = SubResource("m_stairs")
 
-[node name="Step10" type="CSGBox3D" parent="Stairs/PorchStairsEast"]
+[node name="Step10" type="CSGBox3D" parent="Stairs/PorchStairsEast" unique_id=1793718272]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 20.5, 4.5992, -8.7667)
 use_collision = true
 size = Vector3(3, 3.2083, 1.5333)
 material = SubResource("m_stairs")
 
-[node name="Step11" type="CSGBox3D" parent="Stairs/PorchStairsEast"]
+[node name="Step11" type="CSGBox3D" parent="Stairs/PorchStairsEast" unique_id=39671365]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 20.5, 4.7445, -8.3833)
 use_collision = true
 size = Vector3(3, 3.5, 0.7667)
 material = SubResource("m_stairs")
 
-[node name="Walk" type="StaticBody3D" parent="Stairs/PorchStairsEast"]
+[node name="Walk" type="StaticBody3D" parent="Stairs/PorchStairsEast" unique_id=1199903096]
 
-[node name="Shape" type="CollisionShape3D" parent="Stairs/PorchStairsEast/Walk"]
+[node name="Shape" type="CollisionShape3D" parent="Stairs/PorchStairsEast/Walk" unique_id=1717787174]
 transform = Transform3D(0, 0, 1, 0.3556, 0.9346, 0, 0.9346, -0.3556, 0, 20.5, 4.6098, -13.3133)
 shape = SubResource("ramp_6")
 
-[node name="PorchSouth" type="CSGBox3D" parent="Porches"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 6.3, -20.25)
-use_collision = true
-size = Vector3(16, 0.4, 3.5)
-material = SubResource("m_porch")
+[node name="PorchStairsSouth" type="Node3D" parent="Stairs" unique_id=546736084]
 
-[node name="PorchRailSouth" type="CSGBox3D" parent="Porches"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 7, -18.575)
-use_collision = true
-size = Vector3(16, 1, 0.15)
-material = SubResource("m_rail")
-
-[node name="PorchTrimSouth" type="CSGBox3D" parent="Porches"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 6.125, -18.575)
-use_collision = true
-size = Vector3(16, 0.15, 0.15)
-material = SubResource("m_trim")
-
-[node name="PorchPillarSouth0" type="CSGBox3D" parent="Porches"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7.4, 4.55, -18.9)
-use_collision = true
-size = Vector3(0.7, 3.1, 0.7)
-material = SubResource("m_pillar")
-
-[node name="PorchPillarSouth1" type="CSGBox3D" parent="Porches"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4.55, -18.9)
-use_collision = true
-size = Vector3(0.7, 3.1, 0.7)
-material = SubResource("m_pillar")
-
-[node name="PorchPillarSouth2" type="CSGBox3D" parent="Porches"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7.4, 4.55, -18.9)
-use_collision = true
-size = Vector3(0.7, 3.1, 0.7)
-material = SubResource("m_pillar")
-
-[node name="PorchStairsSouth" type="Node3D" parent="Stairs"]
-
-[node name="Step0" type="CSGBox3D" parent="Stairs/PorchStairsSouth"]
+[node name="Step0" type="CSGBox3D" parent="Stairs/PorchStairsSouth" unique_id=699674635]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12.6, 3.1458, -20.5)
 use_collision = true
 size = Vector3(9.2, 0.2917, 3)
 material = SubResource("m_stairs")
 
-[node name="Step1" type="CSGBox3D" parent="Stairs/PorchStairsSouth"]
+[node name="Step1" type="CSGBox3D" parent="Stairs/PorchStairsSouth" unique_id=1493555979]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12.2167, 3.2912, -20.5)
 use_collision = true
 size = Vector3(8.4333, 0.5833, 3)
 material = SubResource("m_stairs")
 
-[node name="Step2" type="CSGBox3D" parent="Stairs/PorchStairsSouth"]
+[node name="Step2" type="CSGBox3D" parent="Stairs/PorchStairsSouth" unique_id=15193984]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -11.8333, 3.4365, -20.5)
 use_collision = true
 size = Vector3(7.6667, 0.875, 3)
 material = SubResource("m_stairs")
 
-[node name="Step3" type="CSGBox3D" parent="Stairs/PorchStairsSouth"]
+[node name="Step3" type="CSGBox3D" parent="Stairs/PorchStairsSouth" unique_id=1815839423]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -11.45, 3.5818, -20.5)
 use_collision = true
 size = Vector3(6.9, 1.1667, 3)
 material = SubResource("m_stairs")
 
-[node name="Step4" type="CSGBox3D" parent="Stairs/PorchStairsSouth"]
+[node name="Step4" type="CSGBox3D" parent="Stairs/PorchStairsSouth" unique_id=100632682]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -11.0667, 3.7272, -20.5)
 use_collision = true
 size = Vector3(6.1333, 1.4583, 3)
 material = SubResource("m_stairs")
 
-[node name="Step5" type="CSGBox3D" parent="Stairs/PorchStairsSouth"]
+[node name="Step5" type="CSGBox3D" parent="Stairs/PorchStairsSouth" unique_id=289990111]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10.6833, 3.8725, -20.5)
 use_collision = true
 size = Vector3(5.3667, 1.75, 3)
 material = SubResource("m_stairs")
 
-[node name="Step6" type="CSGBox3D" parent="Stairs/PorchStairsSouth"]
+[node name="Step6" type="CSGBox3D" parent="Stairs/PorchStairsSouth" unique_id=1804780126]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10.3, 4.0178, -20.5)
 use_collision = true
 size = Vector3(4.6, 2.0417, 3)
 material = SubResource("m_stairs")
 
-[node name="Step7" type="CSGBox3D" parent="Stairs/PorchStairsSouth"]
+[node name="Step7" type="CSGBox3D" parent="Stairs/PorchStairsSouth" unique_id=941273991]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9.9167, 4.1632, -20.5)
 use_collision = true
 size = Vector3(3.8333, 2.3333, 3)
 material = SubResource("m_stairs")
 
-[node name="Step8" type="CSGBox3D" parent="Stairs/PorchStairsSouth"]
+[node name="Step8" type="CSGBox3D" parent="Stairs/PorchStairsSouth" unique_id=1066606130]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9.5333, 4.3085, -20.5)
 use_collision = true
 size = Vector3(3.0667, 2.625, 3)
 material = SubResource("m_stairs")
 
-[node name="Step9" type="CSGBox3D" parent="Stairs/PorchStairsSouth"]
+[node name="Step9" type="CSGBox3D" parent="Stairs/PorchStairsSouth" unique_id=804732878]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9.15, 4.4538, -20.5)
 use_collision = true
 size = Vector3(2.3, 2.9167, 3)
 material = SubResource("m_stairs")
 
-[node name="Step10" type="CSGBox3D" parent="Stairs/PorchStairsSouth"]
+[node name="Step10" type="CSGBox3D" parent="Stairs/PorchStairsSouth" unique_id=461573088]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8.7667, 4.5992, -20.5)
 use_collision = true
 size = Vector3(1.5333, 3.2083, 3)
 material = SubResource("m_stairs")
 
-[node name="Step11" type="CSGBox3D" parent="Stairs/PorchStairsSouth"]
+[node name="Step11" type="CSGBox3D" parent="Stairs/PorchStairsSouth" unique_id=1781707066]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8.3833, 4.7445, -20.5)
 use_collision = true
 size = Vector3(0.7667, 3.5, 3)
 material = SubResource("m_stairs")
 
-[node name="Walk" type="StaticBody3D" parent="Stairs/PorchStairsSouth"]
+[node name="Walk" type="StaticBody3D" parent="Stairs/PorchStairsSouth" unique_id=36578003]
 
-[node name="Shape" type="CollisionShape3D" parent="Stairs/PorchStairsSouth/Walk"]
+[node name="Shape" type="CollisionShape3D" parent="Stairs/PorchStairsSouth/Walk" unique_id=440636012]
 transform = Transform3D(0.9346, -0.3556, 0, 0.3556, 0.9346, 0, 0, 0, -1, -13.3133, 4.6098, -20.5)
 shape = SubResource("ramp_7")
 
-[node name="PorchWest" type="CSGBox3D" parent="Porches"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -20.25, 6.3, 0)
-use_collision = true
-size = Vector3(3.5, 0.4, 16)
-material = SubResource("m_porch")
+[node name="PorchStairsWest" type="Node3D" parent="Stairs" unique_id=1827775987]
 
-[node name="PorchRailWest" type="CSGBox3D" parent="Porches"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -18.575, 7, 0)
-use_collision = true
-size = Vector3(0.15, 1, 16)
-material = SubResource("m_rail")
-
-[node name="PorchTrimWest" type="CSGBox3D" parent="Porches"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -18.575, 6.125, 0)
-use_collision = true
-size = Vector3(0.15, 0.15, 16)
-material = SubResource("m_trim")
-
-[node name="PorchPillarWest0" type="CSGBox3D" parent="Porches"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -18.9, 4.55, -7.4)
-use_collision = true
-size = Vector3(0.7, 3.1, 0.7)
-material = SubResource("m_pillar")
-
-[node name="PorchPillarWest1" type="CSGBox3D" parent="Porches"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -18.9, 4.55, 0)
-use_collision = true
-size = Vector3(0.7, 3.1, 0.7)
-material = SubResource("m_pillar")
-
-[node name="PorchPillarWest2" type="CSGBox3D" parent="Porches"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -18.9, 4.55, 7.4)
-use_collision = true
-size = Vector3(0.7, 3.1, 0.7)
-material = SubResource("m_pillar")
-
-[node name="PorchStairsWest" type="Node3D" parent="Stairs"]
-
-[node name="Step0" type="CSGBox3D" parent="Stairs/PorchStairsWest"]
+[node name="Step0" type="CSGBox3D" parent="Stairs/PorchStairsWest" unique_id=1935629168]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -20.5, 3.1458, 12.6)
 use_collision = true
 size = Vector3(3, 0.2917, 9.2)
 material = SubResource("m_stairs")
 
-[node name="Step1" type="CSGBox3D" parent="Stairs/PorchStairsWest"]
+[node name="Step1" type="CSGBox3D" parent="Stairs/PorchStairsWest" unique_id=794432286]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -20.5, 3.2912, 12.2167)
 use_collision = true
 size = Vector3(3, 0.5833, 8.4333)
 material = SubResource("m_stairs")
 
-[node name="Step2" type="CSGBox3D" parent="Stairs/PorchStairsWest"]
+[node name="Step2" type="CSGBox3D" parent="Stairs/PorchStairsWest" unique_id=2039740121]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -20.5, 3.4365, 11.8333)
 use_collision = true
 size = Vector3(3, 0.875, 7.6667)
 material = SubResource("m_stairs")
 
-[node name="Step3" type="CSGBox3D" parent="Stairs/PorchStairsWest"]
+[node name="Step3" type="CSGBox3D" parent="Stairs/PorchStairsWest" unique_id=1305759897]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -20.5, 3.5818, 11.45)
 use_collision = true
 size = Vector3(3, 1.1667, 6.9)
 material = SubResource("m_stairs")
 
-[node name="Step4" type="CSGBox3D" parent="Stairs/PorchStairsWest"]
+[node name="Step4" type="CSGBox3D" parent="Stairs/PorchStairsWest" unique_id=362124304]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -20.5, 3.7272, 11.0667)
 use_collision = true
 size = Vector3(3, 1.4583, 6.1333)
 material = SubResource("m_stairs")
 
-[node name="Step5" type="CSGBox3D" parent="Stairs/PorchStairsWest"]
+[node name="Step5" type="CSGBox3D" parent="Stairs/PorchStairsWest" unique_id=1801633824]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -20.5, 3.8725, 10.6833)
 use_collision = true
 size = Vector3(3, 1.75, 5.3667)
 material = SubResource("m_stairs")
 
-[node name="Step6" type="CSGBox3D" parent="Stairs/PorchStairsWest"]
+[node name="Step6" type="CSGBox3D" parent="Stairs/PorchStairsWest" unique_id=911751666]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -20.5, 4.0178, 10.3)
 use_collision = true
 size = Vector3(3, 2.0417, 4.6)
 material = SubResource("m_stairs")
 
-[node name="Step7" type="CSGBox3D" parent="Stairs/PorchStairsWest"]
+[node name="Step7" type="CSGBox3D" parent="Stairs/PorchStairsWest" unique_id=1792308812]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -20.5, 4.1632, 9.9167)
 use_collision = true
 size = Vector3(3, 2.3333, 3.8333)
 material = SubResource("m_stairs")
 
-[node name="Step8" type="CSGBox3D" parent="Stairs/PorchStairsWest"]
+[node name="Step8" type="CSGBox3D" parent="Stairs/PorchStairsWest" unique_id=847999132]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -20.5, 4.3085, 9.5333)
 use_collision = true
 size = Vector3(3, 2.625, 3.0667)
 material = SubResource("m_stairs")
 
-[node name="Step9" type="CSGBox3D" parent="Stairs/PorchStairsWest"]
+[node name="Step9" type="CSGBox3D" parent="Stairs/PorchStairsWest" unique_id=925751797]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -20.5, 4.4538, 9.15)
 use_collision = true
 size = Vector3(3, 2.9167, 2.3)
 material = SubResource("m_stairs")
 
-[node name="Step10" type="CSGBox3D" parent="Stairs/PorchStairsWest"]
+[node name="Step10" type="CSGBox3D" parent="Stairs/PorchStairsWest" unique_id=1550824149]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -20.5, 4.5992, 8.7667)
 use_collision = true
 size = Vector3(3, 3.2083, 1.5333)
 material = SubResource("m_stairs")
 
-[node name="Step11" type="CSGBox3D" parent="Stairs/PorchStairsWest"]
+[node name="Step11" type="CSGBox3D" parent="Stairs/PorchStairsWest" unique_id=998063602]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -20.5, 4.7445, 8.3833)
 use_collision = true
 size = Vector3(3, 3.5, 0.7667)
 material = SubResource("m_stairs")
 
-[node name="Walk" type="StaticBody3D" parent="Stairs/PorchStairsWest"]
+[node name="Walk" type="StaticBody3D" parent="Stairs/PorchStairsWest" unique_id=337771395]
 
-[node name="Shape" type="CollisionShape3D" parent="Stairs/PorchStairsWest/Walk"]
+[node name="Shape" type="CollisionShape3D" parent="Stairs/PorchStairsWest/Walk" unique_id=98498645]
 transform = Transform3D(0, 0, -1, 0.3556, 0.9346, 0, -0.9346, 0.3556, 0, -20.5, 4.6098, 13.3133)
 shape = SubResource("ramp_8")
 
-[node name="Cover" type="Node3D" parent="."]
+[node name="Porches" type="Node3D" parent="." unique_id=566526134]
 
-[node name="ContainerA" type="CSGBox3D" parent="Cover"]
+[node name="PorchNorth" type="CSGBox3D" parent="Porches" unique_id=862423302]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 6.3, 20.25)
+use_collision = true
+size = Vector3(16, 0.4, 3.5)
+material = SubResource("m_porch")
+
+[node name="PorchRailNorth" type="CSGBox3D" parent="Porches" unique_id=1133708499]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 7, 18.575)
+use_collision = true
+size = Vector3(16, 1, 0.15)
+material = SubResource("m_rail")
+
+[node name="PorchTrimNorth" type="CSGBox3D" parent="Porches" unique_id=1529333224]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 6.125, 18.575)
+use_collision = true
+size = Vector3(16, 0.15, 0.15)
+material = SubResource("m_trim")
+
+[node name="PorchPillarNorth0" type="CSGBox3D" parent="Porches" unique_id=1433779739]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7.4, 4.55, 18.9)
+use_collision = true
+size = Vector3(0.7, 3.1, 0.7)
+material = SubResource("m_pillar")
+
+[node name="PorchPillarNorth1" type="CSGBox3D" parent="Porches" unique_id=1598748971]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4.55, 18.9)
+use_collision = true
+size = Vector3(0.7, 3.1, 0.7)
+material = SubResource("m_pillar")
+
+[node name="PorchPillarNorth2" type="CSGBox3D" parent="Porches" unique_id=409150821]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7.4, 4.55, 18.9)
+use_collision = true
+size = Vector3(0.7, 3.1, 0.7)
+material = SubResource("m_pillar")
+
+[node name="PorchEast" type="CSGBox3D" parent="Porches" unique_id=2075616082]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 20.25, 6.3, 0)
+use_collision = true
+size = Vector3(3.5, 0.4, 16)
+material = SubResource("m_porch")
+
+[node name="PorchRailEast" type="CSGBox3D" parent="Porches" unique_id=1411615045]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 18.575, 7, 0)
+use_collision = true
+size = Vector3(0.15, 1, 16)
+material = SubResource("m_rail")
+
+[node name="PorchTrimEast" type="CSGBox3D" parent="Porches" unique_id=1459051466]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 18.575, 6.125, 0)
+use_collision = true
+size = Vector3(0.15, 0.15, 16)
+material = SubResource("m_trim")
+
+[node name="PorchPillarEast0" type="CSGBox3D" parent="Porches" unique_id=976980895]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 18.9, 4.55, 7.4)
+use_collision = true
+size = Vector3(0.7, 3.1, 0.7)
+material = SubResource("m_pillar")
+
+[node name="PorchPillarEast1" type="CSGBox3D" parent="Porches" unique_id=263119324]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 18.9, 4.55, 0)
+use_collision = true
+size = Vector3(0.7, 3.1, 0.7)
+material = SubResource("m_pillar")
+
+[node name="PorchPillarEast2" type="CSGBox3D" parent="Porches" unique_id=637910599]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 18.9, 4.55, -7.4)
+use_collision = true
+size = Vector3(0.7, 3.1, 0.7)
+material = SubResource("m_pillar")
+
+[node name="PorchSouth" type="CSGBox3D" parent="Porches" unique_id=822526329]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 6.3, -20.25)
+use_collision = true
+size = Vector3(16, 0.4, 3.5)
+material = SubResource("m_porch")
+
+[node name="PorchRailSouth" type="CSGBox3D" parent="Porches" unique_id=106043427]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 7, -18.575)
+use_collision = true
+size = Vector3(16, 1, 0.15)
+material = SubResource("m_rail")
+
+[node name="PorchTrimSouth" type="CSGBox3D" parent="Porches" unique_id=1921587039]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 6.125, -18.575)
+use_collision = true
+size = Vector3(16, 0.15, 0.15)
+material = SubResource("m_trim")
+
+[node name="PorchPillarSouth0" type="CSGBox3D" parent="Porches" unique_id=1385923025]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7.4, 4.55, -18.9)
+use_collision = true
+size = Vector3(0.7, 3.1, 0.7)
+material = SubResource("m_pillar")
+
+[node name="PorchPillarSouth1" type="CSGBox3D" parent="Porches" unique_id=1386526899]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4.55, -18.9)
+use_collision = true
+size = Vector3(0.7, 3.1, 0.7)
+material = SubResource("m_pillar")
+
+[node name="PorchPillarSouth2" type="CSGBox3D" parent="Porches" unique_id=103627265]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7.4, 4.55, -18.9)
+use_collision = true
+size = Vector3(0.7, 3.1, 0.7)
+material = SubResource("m_pillar")
+
+[node name="PorchWest" type="CSGBox3D" parent="Porches" unique_id=105043817]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -20.25, 6.3, 0)
+use_collision = true
+size = Vector3(3.5, 0.4, 16)
+material = SubResource("m_porch")
+
+[node name="PorchRailWest" type="CSGBox3D" parent="Porches" unique_id=1904478508]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -18.575, 7, 0)
+use_collision = true
+size = Vector3(0.15, 1, 16)
+material = SubResource("m_rail")
+
+[node name="PorchTrimWest" type="CSGBox3D" parent="Porches" unique_id=2054873709]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -18.575, 6.125, 0)
+use_collision = true
+size = Vector3(0.15, 0.15, 16)
+material = SubResource("m_trim")
+
+[node name="PorchPillarWest0" type="CSGBox3D" parent="Porches" unique_id=563544928]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -18.9, 4.55, -7.4)
+use_collision = true
+size = Vector3(0.7, 3.1, 0.7)
+material = SubResource("m_pillar")
+
+[node name="PorchPillarWest1" type="CSGBox3D" parent="Porches" unique_id=596914921]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -18.9, 4.55, 0)
+use_collision = true
+size = Vector3(0.7, 3.1, 0.7)
+material = SubResource("m_pillar")
+
+[node name="PorchPillarWest2" type="CSGBox3D" parent="Porches" unique_id=356542770]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -18.9, 4.55, 7.4)
+use_collision = true
+size = Vector3(0.7, 3.1, 0.7)
+material = SubResource("m_pillar")
+
+[node name="Cover" type="Node3D" parent="." unique_id=195378556]
+
+[node name="ContainerA" type="CSGBox3D" parent="Cover" unique_id=620810051]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.5, 1.3, -2.5)
 use_collision = true
 size = Vector3(2.4, 2.6, 6)
 material = SubResource("m_container")
 
-[node name="ContainerB" type="CSGBox3D" parent="Cover"]
+[node name="ContainerB" type="CSGBox3D" parent="Cover" unique_id=1959664711]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.5, 1.3, 2.5)
 use_collision = true
 size = Vector3(2.4, 2.6, 6)
 material = SubResource("m_container2")
 
-[node name="PitCrate0" type="CSGBox3D" parent="Cover"]
+[node name="PitCrate0" type="CSGBox3D" parent="Cover" unique_id=732664245]
 transform = Transform3D(0.9397, 0, 0.342, 0, 1, 0, -0.342, 0, 0.9397, -4.2, 1, -5)
 use_collision = true
 size = Vector3(2, 2, 2)
 material = SubResource("m_crate")
 
-[node name="PitCrate1" type="CSGBox3D" parent="Cover"]
+[node name="PitCrate1" type="CSGBox3D" parent="Cover" unique_id=847599518]
 transform = Transform3D(0.9397, 0, 0.342, 0, 1, 0, -0.342, 0, 0.9397, 4.2, 1, 5)
 use_collision = true
 size = Vector3(2, 2, 2)
 material = SubResource("m_crate")
 
-[node name="SniperPlinth" type="CSGBox3D" parent="Cover"]
+[node name="SniperPlinth" type="CSGBox3D" parent="Cover" unique_id=1697485846]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.2, 0)
 use_collision = true
 size = Vector3(1.6, 0.4, 1.6)
 material = SubResource("m_plinth")
 
-[node name="Ring0_0" type="CSGBox3D" parent="Cover"]
+[node name="Ring0_0" type="CSGBox3D" parent="Cover" unique_id=1591576488]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -14.5, 4, 13.5)
 use_collision = true
 size = Vector3(2, 2, 2)
 material = SubResource("m_crate")
 
-[node name="Ring0_1" type="CSGBox3D" parent="Cover"]
+[node name="Ring0_1" type="CSGBox3D" parent="Cover" unique_id=650971015]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14.5, 3.8, 12)
 use_collision = true
 size = Vector3(1.6, 1.6, 1.6)
 material = SubResource("m_crate")
 
-[node name="Ring0_2" type="CSGBox3D" parent="Cover"]
+[node name="Ring0_2" type="CSGBox3D" parent="Cover" unique_id=1832726463]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.5, 3.55, 15)
 use_collision = true
 size = Vector3(4, 1.1, 0.6)
 material = SubResource("m_pitwall")
 
-[node name="Ring2_0" type="CSGBox3D" parent="Cover"]
+[node name="Ring2_0" type="CSGBox3D" parent="Cover" unique_id=335128764]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14.5, 4, -13.5)
 use_collision = true
 size = Vector3(2, 2, 2)
 material = SubResource("m_crate")
 
-[node name="Ring2_1" type="CSGBox3D" parent="Cover"]
+[node name="Ring2_1" type="CSGBox3D" parent="Cover" unique_id=620156134]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -14.5, 3.8, -12)
 use_collision = true
 size = Vector3(1.6, 1.6, 1.6)
 material = SubResource("m_crate")
 
-[node name="Ring2_2" type="CSGBox3D" parent="Cover"]
+[node name="Ring2_2" type="CSGBox3D" parent="Cover" unique_id=1729645533]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.5, 3.55, -15)
 use_collision = true
 size = Vector3(4, 1.1, 0.6)
 material = SubResource("m_pitwall")
 
-[node name="DeckWall1" type="CSGBox3D" parent="Cover"]
+[node name="DeckWall1" type="CSGBox3D" parent="Cover" unique_id=921773887]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.8, 3.55, 0)
 use_collision = true
 size = Vector3(0.6, 1.1, 5)
 material = SubResource("m_pitwall")
 
-[node name="DeckWall3" type="CSGBox3D" parent="Cover"]
+[node name="DeckWall3" type="CSGBox3D" parent="Cover" unique_id=262679868]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.8, 3.55, 0)
 use_collision = true
 size = Vector3(0.6, 1.1, 5)
 material = SubResource("m_pitwall")
 
-[node name="PorchCrate0" type="CSGBox3D" parent="Cover"]
+[node name="PorchCrate0" type="CSGBox3D" parent="Cover" unique_id=800873929]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.5, 7.2, 20.4)
 use_collision = true
 size = Vector3(1.4, 1.4, 1.4)
 material = SubResource("m_crate")
 
-[node name="PorchCrate1" type="CSGBox3D" parent="Cover"]
+[node name="PorchCrate1" type="CSGBox3D" parent="Cover" unique_id=985766415]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 20.4, 7.2, 4.5)
 use_collision = true
 size = Vector3(1.4, 1.4, 1.4)
 material = SubResource("m_crate")
 
-[node name="PorchCrate2" type="CSGBox3D" parent="Cover"]
+[node name="PorchCrate2" type="CSGBox3D" parent="Cover" unique_id=23731327]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.5, 7.2, -20.4)
 use_collision = true
 size = Vector3(1.4, 1.4, 1.4)
 material = SubResource("m_crate")
 
-[node name="PorchCrate3" type="CSGBox3D" parent="Cover"]
+[node name="PorchCrate3" type="CSGBox3D" parent="Cover" unique_id=185305589]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -20.4, 7.2, -4.5)
 use_collision = true
 size = Vector3(1.4, 1.4, 1.4)
 material = SubResource("m_crate")
 
-[node name="PorchEndWall0" type="CSGBox3D" parent="Cover"]
+[node name="PorchEndWall0" type="CSGBox3D" parent="Cover" unique_id=1879386563]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7.6, 7.05, 19.9)
 use_collision = true
 size = Vector3(0.5, 1.1, 2.4)
 material = SubResource("m_pitwall")
 
-[node name="PorchColumn0" type="CSGBox3D" parent="Cover"]
+[node name="PorchColumn0" type="CSGBox3D" parent="Cover" unique_id=38450907]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.2, 7.6, 20.9)
 use_collision = true
 size = Vector3(0.8, 2.2, 0.8)
 material = SubResource("m_pillar")
 
-[node name="PorchCrateB0" type="CSGBox3D" parent="Cover"]
+[node name="PorchCrateB0" type="CSGBox3D" parent="Cover" unique_id=60489285]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.2, 7, 21.3)
 use_collision = true
-size = Vector3(1, 1, 1)
 material = SubResource("m_crate")
 
-[node name="PorchEndWall1" type="CSGBox3D" parent="Cover"]
+[node name="PorchEndWall1" type="CSGBox3D" parent="Cover" unique_id=1201823642]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 19.9, 7.05, 7.6)
 use_collision = true
 size = Vector3(2.4, 1.1, 0.5)
 material = SubResource("m_pitwall")
 
-[node name="PorchColumn1" type="CSGBox3D" parent="Cover"]
+[node name="PorchColumn1" type="CSGBox3D" parent="Cover" unique_id=139322230]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 20.9, 7.6, -2.2)
 use_collision = true
 size = Vector3(0.8, 2.2, 0.8)
 material = SubResource("m_pillar")
 
-[node name="PorchCrateB1" type="CSGBox3D" parent="Cover"]
+[node name="PorchCrateB1" type="CSGBox3D" parent="Cover" unique_id=747822292]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 21.3, 7, -5.2)
 use_collision = true
-size = Vector3(1, 1, 1)
 material = SubResource("m_crate")
 
-[node name="PorchEndWall2" type="CSGBox3D" parent="Cover"]
+[node name="PorchEndWall2" type="CSGBox3D" parent="Cover" unique_id=1516389191]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7.6, 7.05, -19.9)
 use_collision = true
 size = Vector3(0.5, 1.1, 2.4)
 material = SubResource("m_pitwall")
 
-[node name="PorchColumn2" type="CSGBox3D" parent="Cover"]
+[node name="PorchColumn2" type="CSGBox3D" parent="Cover" unique_id=1332717839]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.2, 7.6, -20.9)
 use_collision = true
 size = Vector3(0.8, 2.2, 0.8)
 material = SubResource("m_pillar")
 
-[node name="PorchCrateB2" type="CSGBox3D" parent="Cover"]
+[node name="PorchCrateB2" type="CSGBox3D" parent="Cover" unique_id=779003076]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.2, 7, -21.3)
 use_collision = true
-size = Vector3(1, 1, 1)
 material = SubResource("m_crate")
 
-[node name="PorchEndWall3" type="CSGBox3D" parent="Cover"]
+[node name="PorchEndWall3" type="CSGBox3D" parent="Cover" unique_id=730294370]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -19.9, 7.05, -7.6)
 use_collision = true
 size = Vector3(2.4, 1.1, 0.5)
 material = SubResource("m_pitwall")
 
-[node name="PorchColumn3" type="CSGBox3D" parent="Cover"]
+[node name="PorchColumn3" type="CSGBox3D" parent="Cover" unique_id=1392821604]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -20.9, 7.6, 2.2)
 use_collision = true
 size = Vector3(0.8, 2.2, 0.8)
 material = SubResource("m_pillar")
 
-[node name="PorchCrateB3" type="CSGBox3D" parent="Cover"]
+[node name="PorchCrateB3" type="CSGBox3D" parent="Cover" unique_id=792092704]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -21.3, 7, 5.2)
 use_collision = true
-size = Vector3(1, 1, 1)
 material = SubResource("m_crate")
 
-[node name="RingPillar0" type="CSGBox3D" parent="Cover"]
+[node name="RingPillar0" type="CSGBox3D" parent="Cover" unique_id=347311784]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6, 4.2, 12)
 use_collision = true
 size = Vector3(1, 2.4, 1)
 material = SubResource("m_pillar")
 
-[node name="RingLowWall0" type="CSGBox3D" parent="Cover"]
+[node name="RingLowWall0" type="CSGBox3D" parent="Cover" unique_id=677523355]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.5, 3.55, 16)
 use_collision = true
 size = Vector3(3, 1.1, 0.6)
 material = SubResource("m_pitwall")
 
-[node name="RingCrateA0" type="CSGBox3D" parent="Cover"]
+[node name="RingCrateA0" type="CSGBox3D" parent="Cover" unique_id=2035817978]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10.5, 3.8, 17.5)
 use_collision = true
 size = Vector3(1.6, 1.6, 1.6)
 material = SubResource("m_crate")
 
-[node name="RingCrateB0" type="CSGBox3D" parent="Cover"]
+[node name="RingCrateB0" type="CSGBox3D" parent="Cover" unique_id=995779456]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9, 3.5, 18.4)
 use_collision = true
-size = Vector3(1, 1, 1)
 material = SubResource("m_crate")
 
-[node name="RingPillarB0" type="CSGBox3D" parent="Cover"]
+[node name="RingPillarB0" type="CSGBox3D" parent="Cover" unique_id=839677467]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 4.2, 12.5)
 use_collision = true
 size = Vector3(1, 2.4, 1)
 material = SubResource("m_pillar")
 
-[node name="RingPillar2" type="CSGBox3D" parent="Cover"]
+[node name="RingPillar2" type="CSGBox3D" parent="Cover" unique_id=1317608470]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6, 4.2, -12)
 use_collision = true
 size = Vector3(1, 2.4, 1)
 material = SubResource("m_pillar")
 
-[node name="RingLowWall2" type="CSGBox3D" parent="Cover"]
+[node name="RingLowWall2" type="CSGBox3D" parent="Cover" unique_id=1687205515]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -11.5, 3.55, -16)
 use_collision = true
 size = Vector3(3, 1.1, 0.6)
 material = SubResource("m_pitwall")
 
-[node name="RingCrateA2" type="CSGBox3D" parent="Cover"]
+[node name="RingCrateA2" type="CSGBox3D" parent="Cover" unique_id=1058479790]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10.5, 3.8, -17.5)
 use_collision = true
 size = Vector3(1.6, 1.6, 1.6)
 material = SubResource("m_crate")
 
-[node name="RingCrateB2" type="CSGBox3D" parent="Cover"]
+[node name="RingCrateB2" type="CSGBox3D" parent="Cover" unique_id=1048077405]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9, 3.5, -18.4)
 use_collision = true
-size = Vector3(1, 1, 1)
 material = SubResource("m_crate")
 
-[node name="RingPillarB2" type="CSGBox3D" parent="Cover"]
+[node name="RingPillarB2" type="CSGBox3D" parent="Cover" unique_id=1662290148]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 4.2, -12.5)
 use_collision = true
 size = Vector3(1, 2.4, 1)
 material = SubResource("m_pillar")
 
-[node name="DeckCrateA1" type="CSGBox3D" parent="Cover"]
+[node name="DeckCrateA1" type="CSGBox3D" parent="Cover" unique_id=573457726]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 17.5, 3.8, 6)
 use_collision = true
 size = Vector3(1.6, 1.6, 1.6)
 material = SubResource("m_crate")
 
-[node name="DeckCrateB1" type="CSGBox3D" parent="Cover"]
+[node name="DeckCrateB1" type="CSGBox3D" parent="Cover" unique_id=2130837618]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.5, 3.7, -6)
 use_collision = true
 size = Vector3(1.4, 1.4, 1.4)
 material = SubResource("m_crate")
 
-[node name="DeckLowWall1" type="CSGBox3D" parent="Cover"]
+[node name="DeckLowWall1" type="CSGBox3D" parent="Cover" unique_id=24599624]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 16.5, 3.55, -5.5)
 use_collision = true
 size = Vector3(0.6, 1.1, 3)
 material = SubResource("m_pitwall")
 
-[node name="DeckPillar1" type="CSGBox3D" parent="Cover"]
+[node name="DeckPillar1" type="CSGBox3D" parent="Cover" unique_id=891301767]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.8, 4.2, 5)
 use_collision = true
 size = Vector3(1, 2.4, 1)
 material = SubResource("m_pillar")
 
-[node name="DeckCrateA3" type="CSGBox3D" parent="Cover"]
+[node name="DeckCrateA3" type="CSGBox3D" parent="Cover" unique_id=66826623]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -17.5, 3.8, -6)
 use_collision = true
 size = Vector3(1.6, 1.6, 1.6)
 material = SubResource("m_crate")
 
-[node name="DeckCrateB3" type="CSGBox3D" parent="Cover"]
+[node name="DeckCrateB3" type="CSGBox3D" parent="Cover" unique_id=1613205040]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -11.5, 3.7, 6)
 use_collision = true
 size = Vector3(1.4, 1.4, 1.4)
 material = SubResource("m_crate")
 
-[node name="DeckLowWall3" type="CSGBox3D" parent="Cover"]
+[node name="DeckLowWall3" type="CSGBox3D" parent="Cover" unique_id=1683122035]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -16.5, 3.55, 5.5)
 use_collision = true
 size = Vector3(0.6, 1.1, 3)
 material = SubResource("m_pitwall")
 
-[node name="DeckPillar3" type="CSGBox3D" parent="Cover"]
+[node name="DeckPillar3" type="CSGBox3D" parent="Cover" unique_id=773162782]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -11.8, 4.2, -5)
 use_collision = true
 size = Vector3(1, 2.4, 1)
 material = SubResource("m_pillar")
 
-[node name="Lights" type="Node3D" parent="."]
+[node name="CornerCrate1" type="CSGBox3D" parent="Cover" unique_id=1310047216]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 19.5, 3.9, -19.5)
+use_collision = true
+size = Vector3(1.8, 1.8, 1.8)
+material = SubResource("m_crate")
 
-[node name="Lamp0" type="OmniLight3D" parent="Lights"]
+[node name="CornerCrateSmall1" type="CSGBox3D" parent="Cover" unique_id=1166645675]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 17, 3.5, -20.6)
+use_collision = true
+material = SubResource("m_crate")
+
+[node name="CornerCrate3" type="CSGBox3D" parent="Cover" unique_id=1783545957]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -19.5, 3.9, 19.5)
+use_collision = true
+size = Vector3(1.8, 1.8, 1.8)
+material = SubResource("m_crate")
+
+[node name="CornerCrateSmall3" type="CSGBox3D" parent="Cover" unique_id=1350206777]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -17, 3.5, 20.6)
+use_collision = true
+material = SubResource("m_crate")
+
+[node name="Lights" type="Node3D" parent="." unique_id=1627347126]
+
+[node name="Lamp0" type="OmniLight3D" parent="Lights" unique_id=1111112692]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 8.35, 15.5)
 light_color = Color(0.95, 0.96, 1, 1)
 light_energy = 2.2
 omni_range = 15.0
 omni_attenuation = 1.2
 
-[node name="Lamp0Bulb" type="MeshInstance3D" parent="Lights"]
+[node name="Lamp0Bulb" type="MeshInstance3D" parent="Lights" unique_id=2021916815]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 8.6, 15.5)
 mesh = SubResource("bulb_mesh")
 
-[node name="Dressing" type="Node3D" parent="."]
-
-[node name="Lamp0Shade" type="CSGBox3D" parent="Dressing" groups=["visual_only"]]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 8.75, 15.5)
-size = Vector3(0.6, 0.1, 0.6)
-material = SubResource("m_lamppost")
-
-[node name="Cable0" type="CSGBox3D" parent="Dressing" groups=["visual_only"]]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 8.875, 18.75)
-size = Vector3(0.06, 0.05, 6.5)
-material = SubResource("m_lamppost")
-
-[node name="Lamp1" type="OmniLight3D" parent="Lights"]
+[node name="Lamp1" type="OmniLight3D" parent="Lights" unique_id=1300193413]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15.5, 8.35, 0)
 light_color = Color(0.95, 0.96, 1, 1)
 light_energy = 2.2
 omni_range = 15.0
 omni_attenuation = 1.2
 
-[node name="Lamp1Bulb" type="MeshInstance3D" parent="Lights"]
+[node name="Lamp1Bulb" type="MeshInstance3D" parent="Lights" unique_id=1183143483]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15.5, 8.6, 0)
 mesh = SubResource("bulb_mesh")
 
-[node name="Lamp1Shade" type="CSGBox3D" parent="Dressing" groups=["visual_only"]]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15.5, 8.75, 0)
-size = Vector3(0.6, 0.1, 0.6)
-material = SubResource("m_lamppost")
-
-[node name="Cable1" type="CSGBox3D" parent="Dressing" groups=["visual_only"]]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 18.75, 8.875, 0)
-size = Vector3(6.5, 0.05, 0.06)
-material = SubResource("m_lamppost")
-
-[node name="Lamp2" type="OmniLight3D" parent="Lights"]
+[node name="Lamp2" type="OmniLight3D" parent="Lights" unique_id=194279473]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 8.35, -15.5)
 light_color = Color(0.95, 0.96, 1, 1)
 light_energy = 2.2
 omni_range = 15.0
 omni_attenuation = 1.2
 
-[node name="Lamp2Bulb" type="MeshInstance3D" parent="Lights"]
+[node name="Lamp2Bulb" type="MeshInstance3D" parent="Lights" unique_id=1798851041]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 8.6, -15.5)
 mesh = SubResource("bulb_mesh")
 
-[node name="Lamp2Shade" type="CSGBox3D" parent="Dressing" groups=["visual_only"]]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 8.75, -15.5)
-size = Vector3(0.6, 0.1, 0.6)
-material = SubResource("m_lamppost")
-
-[node name="Cable2" type="CSGBox3D" parent="Dressing" groups=["visual_only"]]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 8.875, -18.75)
-size = Vector3(0.06, 0.05, 6.5)
-material = SubResource("m_lamppost")
-
-[node name="Lamp3" type="OmniLight3D" parent="Lights"]
+[node name="Lamp3" type="OmniLight3D" parent="Lights" unique_id=1586931268]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -15.5, 8.35, 0)
 light_color = Color(0.95, 0.96, 1, 1)
 light_energy = 2.2
 omni_range = 15.0
 omni_attenuation = 1.2
 
-[node name="Lamp3Bulb" type="MeshInstance3D" parent="Lights"]
+[node name="Lamp3Bulb" type="MeshInstance3D" parent="Lights" unique_id=962753137]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -15.5, 8.6, 0)
 mesh = SubResource("bulb_mesh")
 
-[node name="Lamp3Shade" type="CSGBox3D" parent="Dressing" groups=["visual_only"]]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -15.5, 8.75, 0)
-size = Vector3(0.6, 0.1, 0.6)
-material = SubResource("m_lamppost")
-
-[node name="Cable3" type="CSGBox3D" parent="Dressing" groups=["visual_only"]]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -18.75, 8.875, 0)
-size = Vector3(6.5, 0.05, 0.06)
-material = SubResource("m_lamppost")
-
-[node name="PitLamp00" type="OmniLight3D" parent="Lights"]
+[node name="PitLamp00" type="OmniLight3D" parent="Lights" unique_id=1876901164]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, 2.3, 8.55)
 light_color = Color(0.95, 0.96, 1, 1)
 light_energy = 1.4
 omni_range = 9.0
 omni_attenuation = 1.2
 
-[node name="PitLamp00Bulb" type="MeshInstance3D" parent="Lights"]
+[node name="PitLamp00Bulb" type="MeshInstance3D" parent="Lights" unique_id=1791597236]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, 2.55, 8.55)
 mesh = SubResource("bulb_mesh")
 
-[node name="PitLamp00Shade" type="CSGBox3D" parent="Dressing" groups=["visual_only"]]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, 2.7, 8.55)
-size = Vector3(0.6, 0.1, 0.6)
-material = SubResource("m_lamppost")
-
-[node name="PitLampArm00" type="CSGBox3D" parent="Dressing" groups=["visual_only"]]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, 2.82, 8.775)
-size = Vector3(0.12, 0.08, 0.45)
-material = SubResource("m_lamppost")
-
-[node name="PitLamp01" type="OmniLight3D" parent="Lights"]
+[node name="PitLamp01" type="OmniLight3D" parent="Lights" unique_id=1433474707]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 2.3, 8.55)
 light_color = Color(0.95, 0.96, 1, 1)
 light_energy = 1.4
 omni_range = 9.0
 omni_attenuation = 1.2
 
-[node name="PitLamp01Bulb" type="MeshInstance3D" parent="Lights"]
+[node name="PitLamp01Bulb" type="MeshInstance3D" parent="Lights" unique_id=71386861]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 2.55, 8.55)
 mesh = SubResource("bulb_mesh")
 
-[node name="PitLamp01Shade" type="CSGBox3D" parent="Dressing" groups=["visual_only"]]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 2.7, 8.55)
-size = Vector3(0.6, 0.1, 0.6)
-material = SubResource("m_lamppost")
-
-[node name="PitLampArm01" type="CSGBox3D" parent="Dressing" groups=["visual_only"]]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 2.82, 8.775)
-size = Vector3(0.12, 0.08, 0.45)
-material = SubResource("m_lamppost")
-
-[node name="DeckLamp10" type="OmniLight3D" parent="Lights"]
+[node name="DeckLamp10" type="OmniLight3D" parent="Lights" unique_id=1318630546]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15, 2, 5)
 light_color = Color(0.95, 0.96, 1, 1)
 light_energy = 1.1
 omni_range = 7.5
 omni_attenuation = 1.2
 
-[node name="DeckLamp10Bulb" type="MeshInstance3D" parent="Lights"]
+[node name="DeckLamp10Bulb" type="MeshInstance3D" parent="Lights" unique_id=163681004]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15, 2.25, 5)
 mesh = SubResource("bulb_mesh")
 
-[node name="DeckLamp10Shade" type="CSGBox3D" parent="Dressing" groups=["visual_only"]]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15, 2.4, 5)
-size = Vector3(0.6, 0.1, 0.6)
-material = SubResource("m_lamppost")
-
-[node name="DeckLamp11" type="OmniLight3D" parent="Lights"]
+[node name="DeckLamp11" type="OmniLight3D" parent="Lights" unique_id=651570229]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15, 2, -5)
 light_color = Color(0.95, 0.96, 1, 1)
 light_energy = 1.1
 omni_range = 7.5
 omni_attenuation = 1.2
 
-[node name="DeckLamp11Bulb" type="MeshInstance3D" parent="Lights"]
+[node name="DeckLamp11Bulb" type="MeshInstance3D" parent="Lights" unique_id=1980099572]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15, 2.25, -5)
 mesh = SubResource("bulb_mesh")
 
-[node name="DeckLamp11Shade" type="CSGBox3D" parent="Dressing" groups=["visual_only"]]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15, 2.4, -5)
-size = Vector3(0.6, 0.1, 0.6)
-material = SubResource("m_lamppost")
-
-[node name="PitLamp20" type="OmniLight3D" parent="Lights"]
+[node name="PitLamp20" type="OmniLight3D" parent="Lights" unique_id=1508749235]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 2.3, -8.55)
 light_color = Color(0.95, 0.96, 1, 1)
 light_energy = 1.4
 omni_range = 9.0
 omni_attenuation = 1.2
 
-[node name="PitLamp20Bulb" type="MeshInstance3D" parent="Lights"]
+[node name="PitLamp20Bulb" type="MeshInstance3D" parent="Lights" unique_id=626838509]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 2.55, -8.55)
 mesh = SubResource("bulb_mesh")
 
-[node name="PitLamp20Shade" type="CSGBox3D" parent="Dressing" groups=["visual_only"]]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 2.7, -8.55)
-size = Vector3(0.6, 0.1, 0.6)
-material = SubResource("m_lamppost")
-
-[node name="PitLampArm20" type="CSGBox3D" parent="Dressing" groups=["visual_only"]]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 2.82, -8.775)
-size = Vector3(0.12, 0.08, 0.45)
-material = SubResource("m_lamppost")
-
-[node name="PitLamp21" type="OmniLight3D" parent="Lights"]
+[node name="PitLamp21" type="OmniLight3D" parent="Lights" unique_id=1232969094]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, 2.3, -8.55)
 light_color = Color(0.95, 0.96, 1, 1)
 light_energy = 1.4
 omni_range = 9.0
 omni_attenuation = 1.2
 
-[node name="PitLamp21Bulb" type="MeshInstance3D" parent="Lights"]
+[node name="PitLamp21Bulb" type="MeshInstance3D" parent="Lights" unique_id=1548504036]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, 2.55, -8.55)
 mesh = SubResource("bulb_mesh")
 
-[node name="PitLamp21Shade" type="CSGBox3D" parent="Dressing" groups=["visual_only"]]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, 2.7, -8.55)
-size = Vector3(0.6, 0.1, 0.6)
-material = SubResource("m_lamppost")
-
-[node name="PitLampArm21" type="CSGBox3D" parent="Dressing" groups=["visual_only"]]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, 2.82, -8.775)
-size = Vector3(0.12, 0.08, 0.45)
-material = SubResource("m_lamppost")
-
-[node name="DeckLamp30" type="OmniLight3D" parent="Lights"]
+[node name="DeckLamp30" type="OmniLight3D" parent="Lights" unique_id=1229493303]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -15, 2, -5)
 light_color = Color(0.95, 0.96, 1, 1)
 light_energy = 1.1
 omni_range = 7.5
 omni_attenuation = 1.2
 
-[node name="DeckLamp30Bulb" type="MeshInstance3D" parent="Lights"]
+[node name="DeckLamp30Bulb" type="MeshInstance3D" parent="Lights" unique_id=1862302184]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -15, 2.25, -5)
 mesh = SubResource("bulb_mesh")
 
-[node name="DeckLamp30Shade" type="CSGBox3D" parent="Dressing" groups=["visual_only"]]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -15, 2.4, -5)
-size = Vector3(0.6, 0.1, 0.6)
-material = SubResource("m_lamppost")
-
-[node name="DeckLamp31" type="OmniLight3D" parent="Lights"]
+[node name="DeckLamp31" type="OmniLight3D" parent="Lights" unique_id=637609823]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -15, 2, 5)
 light_color = Color(0.95, 0.96, 1, 1)
 light_energy = 1.1
 omni_range = 7.5
 omni_attenuation = 1.2
 
-[node name="DeckLamp31Bulb" type="MeshInstance3D" parent="Lights"]
+[node name="DeckLamp31Bulb" type="MeshInstance3D" parent="Lights" unique_id=1015023919]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -15, 2.25, 5)
 mesh = SubResource("bulb_mesh")
 
-[node name="DeckLamp31Shade" type="CSGBox3D" parent="Dressing" groups=["visual_only"]]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -15, 2.4, 5)
-size = Vector3(0.6, 0.1, 0.6)
-material = SubResource("m_lamppost")
-
-[node name="SpawnLamp0" type="OmniLight3D" parent="Lights"]
+[node name="SpawnLamp0" type="OmniLight3D" parent="Lights" unique_id=255149253]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 19, 5, 19)
 light_color = Color(0.95, 0.96, 1, 1)
-light_energy = 1.0
 omni_range = 7.0
 omni_attenuation = 1.2
 
-[node name="SpawnLamp0Bulb" type="MeshInstance3D" parent="Lights"]
+[node name="SpawnLamp0Bulb" type="MeshInstance3D" parent="Lights" unique_id=382550232]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 19, 5.25, 19)
 mesh = SubResource("bulb_mesh")
 
-[node name="SpawnLamp0Shade" type="CSGBox3D" parent="Dressing" groups=["visual_only"]]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 19, 5.4, 19)
-size = Vector3(0.6, 0.1, 0.6)
-material = SubResource("m_lamppost")
-
-[node name="BlueNeon" type="OmniLight3D" parent="Lights"]
+[node name="BlueNeon" type="OmniLight3D" parent="Lights" unique_id=2055501372]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 19, 4.6, 19)
 light_color = Color(0.3, 0.55, 1, 1)
 light_energy = 0.7
 omni_range = 6.0
 
-[node name="BlueNeonStrip0" type="CSGBox3D" parent="Dressing" groups=["visual_only"]]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 18.3, 5.45, 16.085)
-size = Vector3(4.2, 0.08, 0.07)
-material = SubResource("m_neon_blue")
-
-[node name="BlueNeonStrip1" type="CSGBox3D" parent="Dressing" groups=["visual_only"]]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 16.085, 5.45, 17.45)
-size = Vector3(0.07, 0.08, 2.5)
-material = SubResource("m_neon_blue")
-
-[node name="SpawnLamp2" type="OmniLight3D" parent="Lights"]
+[node name="SpawnLamp2" type="OmniLight3D" parent="Lights" unique_id=2087756140]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -19, 5, -19)
 light_color = Color(0.95, 0.96, 1, 1)
-light_energy = 1.0
 omni_range = 7.0
 omni_attenuation = 1.2
 
-[node name="SpawnLamp2Bulb" type="MeshInstance3D" parent="Lights"]
+[node name="SpawnLamp2Bulb" type="MeshInstance3D" parent="Lights" unique_id=1756142176]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -19, 5.25, -19)
 mesh = SubResource("bulb_mesh")
 
-[node name="SpawnLamp2Shade" type="CSGBox3D" parent="Dressing" groups=["visual_only"]]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -19, 5.4, -19)
-size = Vector3(0.6, 0.1, 0.6)
-material = SubResource("m_lamppost")
-
-[node name="RedNeon" type="OmniLight3D" parent="Lights"]
+[node name="RedNeon" type="OmniLight3D" parent="Lights" unique_id=68757421]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -19, 4.6, -19)
 light_color = Color(1, 0.25, 0.25, 1)
 light_energy = 0.7
 omni_range = 6.0
 
-[node name="RedNeonStrip0" type="CSGBox3D" parent="Dressing" groups=["visual_only"]]
+[node name="Dressing" type="Node3D" parent="." unique_id=652241539]
+
+[node name="Lamp0Shade" type="CSGBox3D" parent="Dressing" unique_id=716921984 groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 8.75, 15.5)
+size = Vector3(0.6, 0.1, 0.6)
+material = SubResource("m_lamppost")
+
+[node name="Cable0" type="CSGBox3D" parent="Dressing" unique_id=1830561644 groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 8.875, 18.75)
+size = Vector3(0.06, 0.05, 6.5)
+material = SubResource("m_lamppost")
+
+[node name="Lamp1Shade" type="CSGBox3D" parent="Dressing" unique_id=208245140 groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15.5, 8.75, 0)
+size = Vector3(0.6, 0.1, 0.6)
+material = SubResource("m_lamppost")
+
+[node name="Cable1" type="CSGBox3D" parent="Dressing" unique_id=828474414 groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 18.75, 8.875, 0)
+size = Vector3(6.5, 0.05, 0.06)
+material = SubResource("m_lamppost")
+
+[node name="Lamp2Shade" type="CSGBox3D" parent="Dressing" unique_id=132356943 groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 8.75, -15.5)
+size = Vector3(0.6, 0.1, 0.6)
+material = SubResource("m_lamppost")
+
+[node name="Cable2" type="CSGBox3D" parent="Dressing" unique_id=1907090187 groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 8.875, -18.75)
+size = Vector3(0.06, 0.05, 6.5)
+material = SubResource("m_lamppost")
+
+[node name="Lamp3Shade" type="CSGBox3D" parent="Dressing" unique_id=654254336 groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -15.5, 8.75, 0)
+size = Vector3(0.6, 0.1, 0.6)
+material = SubResource("m_lamppost")
+
+[node name="Cable3" type="CSGBox3D" parent="Dressing" unique_id=1332993434 groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -18.75, 8.875, 0)
+size = Vector3(6.5, 0.05, 0.06)
+material = SubResource("m_lamppost")
+
+[node name="PitLamp00Shade" type="CSGBox3D" parent="Dressing" unique_id=619136215 groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, 2.7, 8.55)
+size = Vector3(0.6, 0.1, 0.6)
+material = SubResource("m_lamppost")
+
+[node name="PitLampArm00" type="CSGBox3D" parent="Dressing" unique_id=246634845 groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, 2.82, 8.775)
+size = Vector3(0.12, 0.08, 0.45)
+material = SubResource("m_lamppost")
+
+[node name="PitLamp01Shade" type="CSGBox3D" parent="Dressing" unique_id=309353113 groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 2.7, 8.55)
+size = Vector3(0.6, 0.1, 0.6)
+material = SubResource("m_lamppost")
+
+[node name="PitLampArm01" type="CSGBox3D" parent="Dressing" unique_id=1591895389 groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 2.82, 8.775)
+size = Vector3(0.12, 0.08, 0.45)
+material = SubResource("m_lamppost")
+
+[node name="DeckLamp10Shade" type="CSGBox3D" parent="Dressing" unique_id=739431090 groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15, 2.4, 5)
+size = Vector3(0.6, 0.1, 0.6)
+material = SubResource("m_lamppost")
+
+[node name="DeckLamp11Shade" type="CSGBox3D" parent="Dressing" unique_id=1860871149 groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15, 2.4, -5)
+size = Vector3(0.6, 0.1, 0.6)
+material = SubResource("m_lamppost")
+
+[node name="PitLamp20Shade" type="CSGBox3D" parent="Dressing" unique_id=381243709 groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 2.7, -8.55)
+size = Vector3(0.6, 0.1, 0.6)
+material = SubResource("m_lamppost")
+
+[node name="PitLampArm20" type="CSGBox3D" parent="Dressing" unique_id=340735613 groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 2.82, -8.775)
+size = Vector3(0.12, 0.08, 0.45)
+material = SubResource("m_lamppost")
+
+[node name="PitLamp21Shade" type="CSGBox3D" parent="Dressing" unique_id=509706171 groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, 2.7, -8.55)
+size = Vector3(0.6, 0.1, 0.6)
+material = SubResource("m_lamppost")
+
+[node name="PitLampArm21" type="CSGBox3D" parent="Dressing" unique_id=1074304407 groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, 2.82, -8.775)
+size = Vector3(0.12, 0.08, 0.45)
+material = SubResource("m_lamppost")
+
+[node name="DeckLamp30Shade" type="CSGBox3D" parent="Dressing" unique_id=519194915 groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -15, 2.4, -5)
+size = Vector3(0.6, 0.1, 0.6)
+material = SubResource("m_lamppost")
+
+[node name="DeckLamp31Shade" type="CSGBox3D" parent="Dressing" unique_id=1815951098 groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -15, 2.4, 5)
+size = Vector3(0.6, 0.1, 0.6)
+material = SubResource("m_lamppost")
+
+[node name="SpawnLamp0Shade" type="CSGBox3D" parent="Dressing" unique_id=1147526257 groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 19, 5.4, 19)
+size = Vector3(0.6, 0.1, 0.6)
+material = SubResource("m_lamppost")
+
+[node name="BlueNeonStrip0" type="CSGBox3D" parent="Dressing" unique_id=1873282673 groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 18.3, 5.45, 16.085)
+size = Vector3(4.2, 0.08, 0.07)
+material = SubResource("m_neon_blue")
+
+[node name="BlueNeonStrip1" type="CSGBox3D" parent="Dressing" unique_id=489557613 groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 16.085, 5.45, 17.45)
+size = Vector3(0.07, 0.08, 2.5)
+material = SubResource("m_neon_blue")
+
+[node name="SpawnLamp2Shade" type="CSGBox3D" parent="Dressing" unique_id=1704016918 groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -19, 5.4, -19)
+size = Vector3(0.6, 0.1, 0.6)
+material = SubResource("m_lamppost")
+
+[node name="RedNeonStrip0" type="CSGBox3D" parent="Dressing" unique_id=2081151184 groups=["visual_only"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -18.3, 5.45, -16.085)
 size = Vector3(4.2, 0.08, 0.07)
 material = SubResource("m_neon_red")
 
-[node name="RedNeonStrip1" type="CSGBox3D" parent="Dressing" groups=["visual_only"]]
+[node name="RedNeonStrip1" type="CSGBox3D" parent="Dressing" unique_id=50407998 groups=["visual_only"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -16.085, 5.45, -17.45)
 size = Vector3(0.07, 0.08, 2.5)
 material = SubResource("m_neon_red")
 
-[node name="Window00" type="CSGBox3D" parent="Dressing" groups=["visual_only"]]
+[node name="Window00" type="CSGBox3D" parent="Dressing" unique_id=114046745 groups=["visual_only"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -16, 9.2, 21.98)
 size = Vector3(2, 1.6, 0.04)
 material = SubResource("m_building")
 
-[node name="Window01" type="CSGBox3D" parent="Dressing" groups=["visual_only"]]
+[node name="Window01" type="CSGBox3D" parent="Dressing" unique_id=1210946362 groups=["visual_only"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -11, 9.2, 21.98)
 size = Vector3(2, 1.6, 0.04)
 material = SubResource("m_building")
 
-[node name="Window02" type="CSGBox3D" parent="Dressing" groups=["visual_only"]]
+[node name="Window02" type="CSGBox3D" parent="Dressing" unique_id=2114470916 groups=["visual_only"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11, 9.2, 21.98)
 size = Vector3(2, 1.6, 0.04)
 material = SubResource("m_building")
 
-[node name="Window03" type="CSGBox3D" parent="Dressing" groups=["visual_only"]]
+[node name="Window03" type="CSGBox3D" parent="Dressing" unique_id=1141595827 groups=["visual_only"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 16, 9.2, 21.98)
 size = Vector3(2, 1.6, 0.04)
 material = SubResource("m_building")
 
-[node name="Window10" type="CSGBox3D" parent="Dressing" groups=["visual_only"]]
+[node name="Window10" type="CSGBox3D" parent="Dressing" unique_id=270055739 groups=["visual_only"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 21.98, 9.2, 16)
 size = Vector3(0.04, 1.6, 2)
 material = SubResource("m_building")
 
-[node name="Window11" type="CSGBox3D" parent="Dressing" groups=["visual_only"]]
+[node name="Window11" type="CSGBox3D" parent="Dressing" unique_id=1317043500 groups=["visual_only"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 21.98, 9.2, 11)
 size = Vector3(0.04, 1.6, 2)
 material = SubResource("m_building")
 
-[node name="Window12" type="CSGBox3D" parent="Dressing" groups=["visual_only"]]
+[node name="Window12" type="CSGBox3D" parent="Dressing" unique_id=1969739684 groups=["visual_only"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 21.98, 9.2, -11)
 size = Vector3(0.04, 1.6, 2)
 material = SubResource("m_building")
 
-[node name="Window13" type="CSGBox3D" parent="Dressing" groups=["visual_only"]]
+[node name="Window13" type="CSGBox3D" parent="Dressing" unique_id=1260535299 groups=["visual_only"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 21.98, 9.2, -16)
 size = Vector3(0.04, 1.6, 2)
 material = SubResource("m_building")
 
-[node name="Window20" type="CSGBox3D" parent="Dressing" groups=["visual_only"]]
+[node name="Window20" type="CSGBox3D" parent="Dressing" unique_id=1148188556 groups=["visual_only"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 16, 9.2, -21.98)
 size = Vector3(2, 1.6, 0.04)
 material = SubResource("m_building")
 
-[node name="Window21" type="CSGBox3D" parent="Dressing" groups=["visual_only"]]
+[node name="Window21" type="CSGBox3D" parent="Dressing" unique_id=1806113099 groups=["visual_only"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11, 9.2, -21.98)
 size = Vector3(2, 1.6, 0.04)
 material = SubResource("m_building")
 
-[node name="Window22" type="CSGBox3D" parent="Dressing" groups=["visual_only"]]
+[node name="Window22" type="CSGBox3D" parent="Dressing" unique_id=330220259 groups=["visual_only"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -11, 9.2, -21.98)
 size = Vector3(2, 1.6, 0.04)
 material = SubResource("m_building")
 
-[node name="Window23" type="CSGBox3D" parent="Dressing" groups=["visual_only"]]
+[node name="Window23" type="CSGBox3D" parent="Dressing" unique_id=113970067 groups=["visual_only"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -16, 9.2, -21.98)
 size = Vector3(2, 1.6, 0.04)
 material = SubResource("m_building")
 
-[node name="Window30" type="CSGBox3D" parent="Dressing" groups=["visual_only"]]
+[node name="Window30" type="CSGBox3D" parent="Dressing" unique_id=1909998547 groups=["visual_only"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -21.98, 9.2, -16)
 size = Vector3(0.04, 1.6, 2)
 material = SubResource("m_building")
 
-[node name="Window31" type="CSGBox3D" parent="Dressing" groups=["visual_only"]]
+[node name="Window31" type="CSGBox3D" parent="Dressing" unique_id=171599936 groups=["visual_only"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -21.98, 9.2, -11)
 size = Vector3(0.04, 1.6, 2)
 material = SubResource("m_building")
 
-[node name="Window32" type="CSGBox3D" parent="Dressing" groups=["visual_only"]]
+[node name="Window32" type="CSGBox3D" parent="Dressing" unique_id=1198211577 groups=["visual_only"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -21.98, 9.2, 11)
 size = Vector3(0.04, 1.6, 2)
 material = SubResource("m_building")
 
-[node name="Window33" type="CSGBox3D" parent="Dressing" groups=["visual_only"]]
+[node name="Window33" type="CSGBox3D" parent="Dressing" unique_id=403291520 groups=["visual_only"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -21.98, 9.2, 16)
 size = Vector3(0.04, 1.6, 2)
 material = SubResource("m_building")
 
-[node name="Skyline" type="Node3D" parent="."]
-
-[node name="Bldg0_4" type="CSGBox3D" parent="Skyline" groups=["visual_only"]]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -32.1904, 13.0093, 32.6699)
-size = Vector3(7.6192, 28.0187, 14.4705)
-material = SubResource("m_building")
-
-[node name="Bldg0_12" type="CSGBox3D" parent="Skyline" groups=["visual_only"]]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -24.0045, 6.875, 34.8232)
-size = Vector3(6.29, 15.7499, 14.4427)
-material = SubResource("m_building")
-
-[node name="Tank0_12" type="CSGBox3D" parent="Skyline" groups=["visual_only"]]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -24.0045, 17.6499, 34.8232)
-size = Vector3(2.4, 2.6, 2.4)
-material = SubResource("m_container2")
-
-[node name="TankLeg0_12_-0.9_-0.9" type="CSGBox3D" parent="Skyline" groups=["visual_only"]]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -24.9045, 15.5499, 33.9232)
-size = Vector3(0.2, 1.6, 0.2)
-material = SubResource("m_lamppost")
-
-[node name="TankLeg0_12_0.9_0.9" type="CSGBox3D" parent="Skyline" groups=["visual_only"]]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -23.1045, 15.5499, 35.7232)
-size = Vector3(0.2, 1.6, 0.2)
-material = SubResource("m_lamppost")
-
-[node name="TankLeg0_12_-0.9_0.9" type="CSGBox3D" parent="Skyline" groups=["visual_only"]]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -24.9045, 15.5499, 35.7232)
-size = Vector3(0.2, 1.6, 0.2)
-material = SubResource("m_lamppost")
-
-[node name="TankLeg0_12_0.9_-0.9" type="CSGBox3D" parent="Skyline" groups=["visual_only"]]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -23.1045, 15.5499, 33.9232)
-size = Vector3(0.2, 1.6, 0.2)
-material = SubResource("m_lamppost")
-
-[node name="Bldg0_19" type="CSGBox3D" parent="Skyline" groups=["visual_only"]]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -16.1167, 7.738, 35.1503)
-size = Vector3(8.1226, 17.476, 17.6217)
-material = SubResource("m_building")
-
-[node name="Bldg0_30" type="CSGBox3D" parent="Skyline" groups=["visual_only"]]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.2173, 16.2626, 33.3298)
-size = Vector3(8.8855, 34.5251, 16.1006)
-material = SubResource("m_building")
-
-[node name="Bldg0_40" type="CSGBox3D" parent="Skyline" groups=["visual_only"]]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.6653, 9.5848, 34.8018)
-size = Vector3(6.7213, 21.1696, 9.81)
-material = SubResource("m_building")
-
-[node name="Tank0_40" type="CSGBox3D" parent="Skyline" groups=["visual_only"]]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.6653, 23.0696, 34.8018)
-size = Vector3(2.4, 2.6, 2.4)
-material = SubResource("m_container2")
-
-[node name="TankLeg0_40_-0.9_-0.9" type="CSGBox3D" parent="Skyline" groups=["visual_only"]]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.7653, 20.9696, 33.9018)
-size = Vector3(0.2, 1.6, 0.2)
-material = SubResource("m_lamppost")
-
-[node name="TankLeg0_40_0.9_0.9" type="CSGBox3D" parent="Skyline" groups=["visual_only"]]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.5653, 20.9696, 35.7018)
-size = Vector3(0.2, 1.6, 0.2)
-material = SubResource("m_lamppost")
-
-[node name="TankLeg0_40_-0.9_0.9" type="CSGBox3D" parent="Skyline" groups=["visual_only"]]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.7653, 20.9696, 35.7018)
-size = Vector3(0.2, 1.6, 0.2)
-material = SubResource("m_lamppost")
-
-[node name="TankLeg0_40_0.9_-0.9" type="CSGBox3D" parent="Skyline" groups=["visual_only"]]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.5653, 20.9696, 33.9018)
-size = Vector3(0.2, 1.6, 0.2)
-material = SubResource("m_lamppost")
-
-[node name="Bldg0_48" type="CSGBox3D" parent="Skyline" groups=["visual_only"]]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.2865, 11.9774, 33.3056)
-size = Vector3(9.1946, 25.9549, 15.8577)
-material = SubResource("m_building")
-
-[node name="Tank0_48" type="CSGBox3D" parent="Skyline" groups=["visual_only"]]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.2865, 27.8549, 33.3056)
-size = Vector3(2.4, 2.6, 2.4)
-material = SubResource("m_container2")
-
-[node name="TankLeg0_48_-0.9_-0.9" type="CSGBox3D" parent="Skyline" groups=["visual_only"]]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.3865, 25.7549, 32.4056)
-size = Vector3(0.2, 1.6, 0.2)
-material = SubResource("m_lamppost")
-
-[node name="TankLeg0_48_0.9_0.9" type="CSGBox3D" parent="Skyline" groups=["visual_only"]]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14.1865, 25.7549, 34.2056)
-size = Vector3(0.2, 1.6, 0.2)
-material = SubResource("m_lamppost")
-
-[node name="TankLeg0_48_-0.9_0.9" type="CSGBox3D" parent="Skyline" groups=["visual_only"]]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.3865, 25.7549, 34.2056)
-size = Vector3(0.2, 1.6, 0.2)
-material = SubResource("m_lamppost")
-
-[node name="TankLeg0_48_0.9_-0.9" type="CSGBox3D" parent="Skyline" groups=["visual_only"]]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14.1865, 25.7549, 32.4056)
-size = Vector3(0.2, 1.6, 0.2)
-material = SubResource("m_lamppost")
-
-[node name="Bldg0_58" type="CSGBox3D" parent="Skyline" groups=["visual_only"]]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 23.4967, 9.6415, 35.0395)
-size = Vector3(9.402, 21.2829, 13.0522)
-material = SubResource("m_building")
-
-[node name="Bldg0_69" type="CSGBox3D" parent="Skyline" groups=["visual_only"]]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 34.2832, 8.941, 35.8203)
-size = Vector3(9.9719, 19.8819, 14.7474)
-material = SubResource("m_building")
-
-[node name="Bldg1_4" type="CSGBox3D" parent="Skyline" groups=["visual_only"]]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 33.218, 16.3017, 31.1764)
-size = Vector3(15.0192, 34.6035, 9.6472)
-material = SubResource("m_building")
-
-[node name="Bldg1_15" type="CSGBox3D" parent="Skyline" groups=["visual_only"]]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 35.4715, 6.8921, 20.9585)
-size = Vector3(12.9245, 15.7841, 6.7599)
-material = SubResource("m_building")
-
-[node name="Bldg1_24" type="CSGBox3D" parent="Skyline" groups=["visual_only"]]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 34.7244, 13.453, 10.7438)
-size = Vector3(12.3163, 28.9059, 10.3774)
-material = SubResource("m_building")
-
-[node name="Bldg1_35" type="CSGBox3D" parent="Skyline" groups=["visual_only"]]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 36.8265, 11.241, -0.9572)
-size = Vector3(15.6832, 24.482, 10.1998)
-material = SubResource("m_building")
-
-[node name="Tank1_35" type="CSGBox3D" parent="Skyline" groups=["visual_only"]]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 36.8265, 26.382, -0.9572)
-size = Vector3(2.4, 2.6, 2.4)
-material = SubResource("m_container2")
-
-[node name="TankLeg1_35_-0.9_-0.9" type="CSGBox3D" parent="Skyline" groups=["visual_only"]]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 35.9265, 24.282, -1.8572)
-size = Vector3(0.2, 1.6, 0.2)
-material = SubResource("m_lamppost")
-
-[node name="TankLeg1_35_0.9_0.9" type="CSGBox3D" parent="Skyline" groups=["visual_only"]]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 37.7265, 24.282, -0.0572)
-size = Vector3(0.2, 1.6, 0.2)
-material = SubResource("m_lamppost")
-
-[node name="TankLeg1_35_-0.9_0.9" type="CSGBox3D" parent="Skyline" groups=["visual_only"]]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 35.9265, 24.282, -0.0572)
-size = Vector3(0.2, 1.6, 0.2)
-material = SubResource("m_lamppost")
-
-[node name="TankLeg1_35_0.9_-0.9" type="CSGBox3D" parent="Skyline" groups=["visual_only"]]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 37.7265, 24.282, -1.8572)
-size = Vector3(0.2, 1.6, 0.2)
-material = SubResource("m_lamppost")
-
-[node name="Bldg1_47" type="CSGBox3D" parent="Skyline" groups=["visual_only"]]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 35.8331, 14.7192, -12.5779)
-size = Vector3(18.251, 31.4385, 9.2356)
-material = SubResource("m_building")
-
-[node name="Bldg1_59" type="CSGBox3D" parent="Skyline" groups=["visual_only"]]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 33.7364, 8.1805, -22.0895)
-size = Vector3(16.0676, 18.361, 6.1128)
-material = SubResource("m_building")
-
-[node name="Tank1_59" type="CSGBox3D" parent="Skyline" groups=["visual_only"]]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 33.7364, 20.261, -22.0895)
-size = Vector3(2.4, 2.6, 2.4)
-material = SubResource("m_container2")
-
-[node name="TankLeg1_59_-0.9_-0.9" type="CSGBox3D" parent="Skyline" groups=["visual_only"]]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 32.8364, 18.161, -22.9895)
-size = Vector3(0.2, 1.6, 0.2)
-material = SubResource("m_lamppost")
-
-[node name="TankLeg1_59_0.9_0.9" type="CSGBox3D" parent="Skyline" groups=["visual_only"]]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 34.6364, 18.161, -21.1895)
-size = Vector3(0.2, 1.6, 0.2)
-material = SubResource("m_lamppost")
-
-[node name="TankLeg1_59_-0.9_0.9" type="CSGBox3D" parent="Skyline" groups=["visual_only"]]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 32.8364, 18.161, -21.1895)
-size = Vector3(0.2, 1.6, 0.2)
-material = SubResource("m_lamppost")
-
-[node name="TankLeg1_59_0.9_-0.9" type="CSGBox3D" parent="Skyline" groups=["visual_only"]]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 34.6364, 18.161, -22.9895)
-size = Vector3(0.2, 1.6, 0.2)
-material = SubResource("m_lamppost")
-
-[node name="Bldg1_67" type="CSGBox3D" parent="Skyline" groups=["visual_only"]]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 35.3571, 10.4095, -30.5057)
-size = Vector3(10.2572, 22.819, 6.6467)
-material = SubResource("m_building")
-
-[node name="Tank1_67" type="CSGBox3D" parent="Skyline" groups=["visual_only"]]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 35.3571, 24.719, -30.5057)
-size = Vector3(2.4, 2.6, 2.4)
-material = SubResource("m_container2")
-
-[node name="TankLeg1_67_-0.9_-0.9" type="CSGBox3D" parent="Skyline" groups=["visual_only"]]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 34.4571, 22.619, -31.4057)
-size = Vector3(0.2, 1.6, 0.2)
-material = SubResource("m_lamppost")
-
-[node name="TankLeg1_67_0.9_0.9" type="CSGBox3D" parent="Skyline" groups=["visual_only"]]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 36.2571, 22.619, -29.6057)
-size = Vector3(0.2, 1.6, 0.2)
-material = SubResource("m_lamppost")
-
-[node name="TankLeg1_67_-0.9_0.9" type="CSGBox3D" parent="Skyline" groups=["visual_only"]]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 34.4571, 22.619, -29.6057)
-size = Vector3(0.2, 1.6, 0.2)
-material = SubResource("m_lamppost")
-
-[node name="TankLeg1_67_0.9_-0.9" type="CSGBox3D" parent="Skyline" groups=["visual_only"]]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 36.2571, 22.619, -31.4057)
-size = Vector3(0.2, 1.6, 0.2)
-material = SubResource("m_lamppost")
-
-[node name="Bldg1_75" type="CSGBox3D" parent="Skyline" groups=["visual_only"]]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 37.2421, 14.6928, -39.601)
-size = Vector3(14.1164, 31.3856, 8.7472)
-material = SubResource("m_building")
-
-[node name="Tank1_75" type="CSGBox3D" parent="Skyline" groups=["visual_only"]]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 37.2421, 33.2856, -39.601)
-size = Vector3(2.4, 2.6, 2.4)
-material = SubResource("m_container2")
-
-[node name="TankLeg1_75_-0.9_-0.9" type="CSGBox3D" parent="Skyline" groups=["visual_only"]]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 36.3421, 31.1856, -40.501)
-size = Vector3(0.2, 1.6, 0.2)
-material = SubResource("m_lamppost")
-
-[node name="TankLeg1_75_0.9_0.9" type="CSGBox3D" parent="Skyline" groups=["visual_only"]]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 38.1421, 31.1856, -38.701)
-size = Vector3(0.2, 1.6, 0.2)
-material = SubResource("m_lamppost")
-
-[node name="TankLeg1_75_-0.9_0.9" type="CSGBox3D" parent="Skyline" groups=["visual_only"]]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 36.3421, 31.1856, -38.701)
-size = Vector3(0.2, 1.6, 0.2)
-material = SubResource("m_lamppost")
-
-[node name="TankLeg1_75_0.9_-0.9" type="CSGBox3D" parent="Skyline" groups=["visual_only"]]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 38.1421, 31.1856, -40.501)
-size = Vector3(0.2, 1.6, 0.2)
-material = SubResource("m_lamppost")
-
-[node name="Bldg2_4" type="CSGBox3D" parent="Skyline" groups=["visual_only"]]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 32.1031, 16.0773, -35.1053)
-size = Vector3(7.7939, 34.1546, 18.3996)
-material = SubResource("m_building")
-
-[node name="Tank2_4" type="CSGBox3D" parent="Skyline" groups=["visual_only"]]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 32.1031, 36.0546, -35.1053)
-size = Vector3(2.4, 2.6, 2.4)
-material = SubResource("m_container2")
-
-[node name="TankLeg2_4_-0.9_-0.9" type="CSGBox3D" parent="Skyline" groups=["visual_only"]]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 31.2031, 33.9546, -36.0053)
-size = Vector3(0.2, 1.6, 0.2)
-material = SubResource("m_lamppost")
-
-[node name="TankLeg2_4_0.9_0.9" type="CSGBox3D" parent="Skyline" groups=["visual_only"]]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 33.0031, 33.9546, -34.2053)
-size = Vector3(0.2, 1.6, 0.2)
-material = SubResource("m_lamppost")
-
-[node name="TankLeg2_4_-0.9_0.9" type="CSGBox3D" parent="Skyline" groups=["visual_only"]]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 31.2031, 33.9546, -34.2053)
-size = Vector3(0.2, 1.6, 0.2)
-material = SubResource("m_lamppost")
-
-[node name="TankLeg2_4_0.9_-0.9" type="CSGBox3D" parent="Skyline" groups=["visual_only"]]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 33.0031, 33.9546, -36.0053)
-size = Vector3(0.2, 1.6, 0.2)
-material = SubResource("m_lamppost")
-
-[node name="Bldg2_12" type="CSGBox3D" parent="Skyline" groups=["visual_only"]]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 23.6589, 12.3912, -34.2431)
-size = Vector3(7.1667, 26.7825, 15.3333)
-material = SubResource("m_building")
-
-[node name="Tank2_12" type="CSGBox3D" parent="Skyline" groups=["visual_only"]]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 23.6589, 28.6825, -34.2431)
-size = Vector3(2.4, 2.6, 2.4)
-material = SubResource("m_container2")
-
-[node name="TankLeg2_12_-0.9_-0.9" type="CSGBox3D" parent="Skyline" groups=["visual_only"]]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 22.7589, 26.5825, -35.1431)
-size = Vector3(0.2, 1.6, 0.2)
-material = SubResource("m_lamppost")
-
-[node name="TankLeg2_12_0.9_0.9" type="CSGBox3D" parent="Skyline" groups=["visual_only"]]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 24.5589, 26.5825, -33.3431)
-size = Vector3(0.2, 1.6, 0.2)
-material = SubResource("m_lamppost")
-
-[node name="TankLeg2_12_-0.9_0.9" type="CSGBox3D" parent="Skyline" groups=["visual_only"]]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 22.7589, 26.5825, -33.3431)
-size = Vector3(0.2, 1.6, 0.2)
-material = SubResource("m_lamppost")
-
-[node name="TankLeg2_12_0.9_-0.9" type="CSGBox3D" parent="Skyline" groups=["visual_only"]]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 24.5589, 26.5825, -35.1431)
-size = Vector3(0.2, 1.6, 0.2)
-material = SubResource("m_lamppost")
-
-[node name="Bldg2_21" type="CSGBox3D" parent="Skyline" groups=["visual_only"]]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14.8145, 16.031, -35.7705)
-size = Vector3(7.8463, 34.062, 13.2551)
-material = SubResource("m_building")
-
-[node name="Bldg2_30" type="CSGBox3D" parent="Skyline" groups=["visual_only"]]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.4657, 15.4953, -34.5019)
-size = Vector3(9.381, 32.9907, 9.6441)
-material = SubResource("m_building")
-
-[node name="Bldg2_42" type="CSGBox3D" parent="Skyline" groups=["visual_only"]]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.3015, 7.5354, -35.0998)
-size = Vector3(7.9619, 17.0707, 12.5881)
-material = SubResource("m_building")
-
-[node name="Tank2_42" type="CSGBox3D" parent="Skyline" groups=["visual_only"]]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.3015, 18.9707, -35.0998)
-size = Vector3(2.4, 2.6, 2.4)
-material = SubResource("m_container2")
-
-[node name="TankLeg2_42_-0.9_-0.9" type="CSGBox3D" parent="Skyline" groups=["visual_only"]]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7.2015, 16.8707, -35.9998)
-size = Vector3(0.2, 1.6, 0.2)
-material = SubResource("m_lamppost")
-
-[node name="TankLeg2_42_0.9_0.9" type="CSGBox3D" parent="Skyline" groups=["visual_only"]]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.4015, 16.8707, -34.1998)
-size = Vector3(0.2, 1.6, 0.2)
-material = SubResource("m_lamppost")
-
-[node name="TankLeg2_42_-0.9_0.9" type="CSGBox3D" parent="Skyline" groups=["visual_only"]]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7.2015, 16.8707, -34.1998)
-size = Vector3(0.2, 1.6, 0.2)
-material = SubResource("m_lamppost")
-
-[node name="TankLeg2_42_0.9_-0.9" type="CSGBox3D" parent="Skyline" groups=["visual_only"]]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.4015, 16.8707, -35.9998)
-size = Vector3(0.2, 1.6, 0.2)
-material = SubResource("m_lamppost")
-
-[node name="Bldg2_50" type="CSGBox3D" parent="Skyline" groups=["visual_only"]]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -14.439, 9.9005, -32.6446)
-size = Vector3(7.0438, 21.8011, 14.6584)
-material = SubResource("m_building")
-
-[node name="Tank2_50" type="CSGBox3D" parent="Skyline" groups=["visual_only"]]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -14.439, 23.7011, -32.6446)
-size = Vector3(2.4, 2.6, 2.4)
-material = SubResource("m_container2")
-
-[node name="TankLeg2_50_-0.9_-0.9" type="CSGBox3D" parent="Skyline" groups=["visual_only"]]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -15.339, 21.6011, -33.5446)
-size = Vector3(0.2, 1.6, 0.2)
-material = SubResource("m_lamppost")
-
-[node name="TankLeg2_50_0.9_0.9" type="CSGBox3D" parent="Skyline" groups=["visual_only"]]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.539, 21.6011, -31.7446)
-size = Vector3(0.2, 1.6, 0.2)
-material = SubResource("m_lamppost")
-
-[node name="TankLeg2_50_-0.9_0.9" type="CSGBox3D" parent="Skyline" groups=["visual_only"]]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -15.339, 21.6011, -31.7446)
-size = Vector3(0.2, 1.6, 0.2)
-material = SubResource("m_lamppost")
-
-[node name="TankLeg2_50_0.9_-0.9" type="CSGBox3D" parent="Skyline" groups=["visual_only"]]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.539, 21.6011, -33.5446)
-size = Vector3(0.2, 1.6, 0.2)
-material = SubResource("m_lamppost")
-
-[node name="Bldg2_58" type="CSGBox3D" parent="Skyline" groups=["visual_only"]]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -22.0171, 6.755, -35.7138)
-size = Vector3(6.5073, 15.51, 10.9357)
-material = SubResource("m_building")
-
-[node name="Bldg2_66" type="CSGBox3D" parent="Skyline" groups=["visual_only"]]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -29.6985, 10.1416, -33.4107)
-size = Vector3(7.2613, 22.2833, 15.3473)
-material = SubResource("m_building")
-
-[node name="Bldg2_75" type="CSGBox3D" parent="Skyline" groups=["visual_only"]]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -39.9804, 7.3588, -33.7581)
-size = Vector3(8.3299, 16.7177, 16.2899)
-material = SubResource("m_building")
-
-[node name="Bldg3_4" type="CSGBox3D" parent="Skyline" groups=["visual_only"]]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -35.3373, 6.731, -30.9279)
-size = Vector3(9.2627, 15.4619, 10.1443)
-material = SubResource("m_building")
-
-[node name="Bldg3_14" type="CSGBox3D" parent="Skyline" groups=["visual_only"]]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -35.0166, 11.7811, -20.7046)
-size = Vector3(8.2912, 25.5622, 8.7159)
-material = SubResource("m_building")
-
-[node name="Bldg3_25" type="CSGBox3D" parent="Skyline" groups=["visual_only"]]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -35.4159, 8.1704, -10.8015)
-size = Vector3(11.5686, 18.3408, 7.3056)
-material = SubResource("m_building")
-
-[node name="Bldg3_34" type="CSGBox3D" parent="Skyline" groups=["visual_only"]]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -35.6239, 14.6151, -1.2664)
-size = Vector3(9.4287, 31.2302, 7.6483)
-material = SubResource("m_building")
-
-[node name="Bldg3_44" type="CSGBox3D" parent="Skyline" groups=["visual_only"]]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -35.7725, 8.7674, 9.7157)
-size = Vector3(15.3334, 19.5348, 10.0917)
-material = SubResource("m_building")
-
-[node name="Bldg3_55" type="CSGBox3D" parent="Skyline" groups=["visual_only"]]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -34.9158, 9.0917, 18.3894)
-size = Vector3(11.5214, 20.1835, 6.1397)
-material = SubResource("m_building")
-
-[node name="Bldg3_62" type="CSGBox3D" parent="Skyline" groups=["visual_only"]]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -36.058, 16.05, 28.1962)
-size = Vector3(17.7404, 34.1, 10.6851)
-material = SubResource("m_building")
-
-[node name="Tank3_62" type="CSGBox3D" parent="Skyline" groups=["visual_only"]]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -36.058, 36, 28.1962)
-size = Vector3(2.4, 2.6, 2.4)
-material = SubResource("m_container2")
-
-[node name="TankLeg3_62_-0.9_-0.9" type="CSGBox3D" parent="Skyline" groups=["visual_only"]]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -36.958, 33.9, 27.2962)
-size = Vector3(0.2, 1.6, 0.2)
-material = SubResource("m_lamppost")
-
-[node name="TankLeg3_62_0.9_0.9" type="CSGBox3D" parent="Skyline" groups=["visual_only"]]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -35.158, 33.9, 29.0962)
-size = Vector3(0.2, 1.6, 0.2)
-material = SubResource("m_lamppost")
-
-[node name="TankLeg3_62_-0.9_0.9" type="CSGBox3D" parent="Skyline" groups=["visual_only"]]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -36.958, 33.9, 29.0962)
-size = Vector3(0.2, 1.6, 0.2)
-material = SubResource("m_lamppost")
-
-[node name="TankLeg3_62_0.9_-0.9" type="CSGBox3D" parent="Skyline" groups=["visual_only"]]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -35.158, 33.9, 27.2962)
-size = Vector3(0.2, 1.6, 0.2)
-material = SubResource("m_lamppost")
-
-[node name="Bldg3_74" type="CSGBox3D" parent="Skyline" groups=["visual_only"]]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -35.314, 12.7407, 37.9842)
-size = Vector3(9.8244, 27.4813, 6.9835)
-material = SubResource("m_building")
-
-[node name="Signs" type="Node3D" parent="."]
-
-[node name="SignHotel" type="Label3D" parent="Signs"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12, 8.9, -21.88)
-pixel_size = 0.006
-shaded = false
-modulate = Color(2.4, 0.5, 0.55, 1)
-outline_modulate = Color(0.05, 0.05, 0.06, 1)
-outline_size = 18
-font_size = 220
-text = "HOTEL"
-
-[node name="SignBar" type="Label3D" parent="Signs"]
-transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, 12, 8.9, 21.88)
-pixel_size = 0.006
-shaded = false
-modulate = Color(0.6, 1.1, 2.6, 1)
-outline_modulate = Color(0.05, 0.05, 0.06, 1)
-outline_size = 18
-font_size = 150
-text = "BAR & GRILL"
-
-[node name="Grate0" type="CSGBox3D" parent="Dressing" groups=["visual_only"]]
+[node name="Grate0" type="CSGBox3D" parent="Dressing" unique_id=572397342 groups=["visual_only"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7.4, 0.0105, -7.4)
 size = Vector3(1.2, 0.019, 1.2)
 material = SubResource("m_grate")
 
-[node name="Weather" type="Node3D" parent="."]
+[node name="Grate2" type="CSGBox3D" parent="Dressing" unique_id=101184395 groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7.4, 0.0105, 7.4)
+size = Vector3(1.2, 0.019, 1.2)
+material = SubResource("m_grate")
 
-[node name="Steam0" type="CPUParticles3D" parent="Weather"]
+[node name="Skyline" type="Node3D" parent="." unique_id=2099797334]
+
+[node name="Bldg0_4" type="CSGBox3D" parent="Skyline" unique_id=1078645474 groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -32.1904, 13.0093, 32.6699)
+size = Vector3(7.6192, 28.0187, 14.4705)
+material = SubResource("m_building")
+
+[node name="Bldg0_12" type="CSGBox3D" parent="Skyline" unique_id=1029200087 groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -24.0045, 6.875, 34.8232)
+size = Vector3(6.29, 15.7499, 14.4427)
+material = SubResource("m_building")
+
+[node name="Tank0_12" type="CSGBox3D" parent="Skyline" unique_id=994188220 groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -24.0045, 17.6499, 34.8232)
+size = Vector3(2.4, 2.6, 2.4)
+material = SubResource("m_container2")
+
+[node name="TankLeg0_12_-0.9_-0.9" type="CSGBox3D" parent="Skyline" unique_id=2004972766 groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -24.9045, 15.5499, 33.9232)
+size = Vector3(0.2, 1.6, 0.2)
+material = SubResource("m_lamppost")
+
+[node name="TankLeg0_12_0.9_0.9" type="CSGBox3D" parent="Skyline" unique_id=553687271 groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -23.1045, 15.5499, 35.7232)
+size = Vector3(0.2, 1.6, 0.2)
+material = SubResource("m_lamppost")
+
+[node name="TankLeg0_12_-0.9_0.9" type="CSGBox3D" parent="Skyline" unique_id=1087822198 groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -24.9045, 15.5499, 35.7232)
+size = Vector3(0.2, 1.6, 0.2)
+material = SubResource("m_lamppost")
+
+[node name="TankLeg0_12_0.9_-0.9" type="CSGBox3D" parent="Skyline" unique_id=1930661625 groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -23.1045, 15.5499, 33.9232)
+size = Vector3(0.2, 1.6, 0.2)
+material = SubResource("m_lamppost")
+
+[node name="Bldg0_19" type="CSGBox3D" parent="Skyline" unique_id=1541068115 groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -16.1167, 7.738, 35.1503)
+size = Vector3(8.1226, 17.476, 17.6217)
+material = SubResource("m_building")
+
+[node name="Bldg0_30" type="CSGBox3D" parent="Skyline" unique_id=1532288940 groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.2173, 16.2626, 33.3298)
+size = Vector3(8.8855, 34.5251, 16.1006)
+material = SubResource("m_building")
+
+[node name="Bldg0_40" type="CSGBox3D" parent="Skyline" unique_id=348435799 groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.6653, 9.5848, 34.8018)
+size = Vector3(6.7213, 21.1696, 9.81)
+material = SubResource("m_building")
+
+[node name="Tank0_40" type="CSGBox3D" parent="Skyline" unique_id=2141134541 groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.6653, 23.0696, 34.8018)
+size = Vector3(2.4, 2.6, 2.4)
+material = SubResource("m_container2")
+
+[node name="TankLeg0_40_-0.9_-0.9" type="CSGBox3D" parent="Skyline" unique_id=506264984 groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.7653, 20.9696, 33.9018)
+size = Vector3(0.2, 1.6, 0.2)
+material = SubResource("m_lamppost")
+
+[node name="TankLeg0_40_0.9_0.9" type="CSGBox3D" parent="Skyline" unique_id=1855695350 groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.5653, 20.9696, 35.7018)
+size = Vector3(0.2, 1.6, 0.2)
+material = SubResource("m_lamppost")
+
+[node name="TankLeg0_40_-0.9_0.9" type="CSGBox3D" parent="Skyline" unique_id=341717991 groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.7653, 20.9696, 35.7018)
+size = Vector3(0.2, 1.6, 0.2)
+material = SubResource("m_lamppost")
+
+[node name="TankLeg0_40_0.9_-0.9" type="CSGBox3D" parent="Skyline" unique_id=806022677 groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.5653, 20.9696, 33.9018)
+size = Vector3(0.2, 1.6, 0.2)
+material = SubResource("m_lamppost")
+
+[node name="Bldg0_48" type="CSGBox3D" parent="Skyline" unique_id=1694461623 groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.2865, 11.9774, 33.3056)
+size = Vector3(9.1946, 25.9549, 15.8577)
+material = SubResource("m_building")
+
+[node name="Tank0_48" type="CSGBox3D" parent="Skyline" unique_id=1635326229 groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.2865, 27.8549, 33.3056)
+size = Vector3(2.4, 2.6, 2.4)
+material = SubResource("m_container2")
+
+[node name="TankLeg0_48_-0.9_-0.9" type="CSGBox3D" parent="Skyline" unique_id=331763522 groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.3865, 25.7549, 32.4056)
+size = Vector3(0.2, 1.6, 0.2)
+material = SubResource("m_lamppost")
+
+[node name="TankLeg0_48_0.9_0.9" type="CSGBox3D" parent="Skyline" unique_id=694229177 groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14.1865, 25.7549, 34.2056)
+size = Vector3(0.2, 1.6, 0.2)
+material = SubResource("m_lamppost")
+
+[node name="TankLeg0_48_-0.9_0.9" type="CSGBox3D" parent="Skyline" unique_id=848936027 groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.3865, 25.7549, 34.2056)
+size = Vector3(0.2, 1.6, 0.2)
+material = SubResource("m_lamppost")
+
+[node name="TankLeg0_48_0.9_-0.9" type="CSGBox3D" parent="Skyline" unique_id=968616680 groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14.1865, 25.7549, 32.4056)
+size = Vector3(0.2, 1.6, 0.2)
+material = SubResource("m_lamppost")
+
+[node name="Bldg0_58" type="CSGBox3D" parent="Skyline" unique_id=1036845220 groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 23.4967, 9.6415, 35.0395)
+size = Vector3(9.402, 21.2829, 13.0522)
+material = SubResource("m_building")
+
+[node name="Bldg0_69" type="CSGBox3D" parent="Skyline" unique_id=1172774723 groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 34.2832, 8.941, 35.8203)
+size = Vector3(9.9719, 19.8819, 14.7474)
+material = SubResource("m_building")
+
+[node name="Bldg1_4" type="CSGBox3D" parent="Skyline" unique_id=1726295116 groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 33.218, 16.3017, 31.1764)
+size = Vector3(15.0192, 34.6035, 9.6472)
+material = SubResource("m_building")
+
+[node name="Bldg1_15" type="CSGBox3D" parent="Skyline" unique_id=1843031121 groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 35.4715, 6.8921, 20.9585)
+size = Vector3(12.9245, 15.7841, 6.7599)
+material = SubResource("m_building")
+
+[node name="Bldg1_24" type="CSGBox3D" parent="Skyline" unique_id=2021151309 groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 34.7244, 13.453, 10.7438)
+size = Vector3(12.3163, 28.9059, 10.3774)
+material = SubResource("m_building")
+
+[node name="Bldg1_35" type="CSGBox3D" parent="Skyline" unique_id=808933410 groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 36.8265, 11.241, -0.9572)
+size = Vector3(15.6832, 24.482, 10.1998)
+material = SubResource("m_building")
+
+[node name="Tank1_35" type="CSGBox3D" parent="Skyline" unique_id=1794042144 groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 36.8265, 26.382, -0.9572)
+size = Vector3(2.4, 2.6, 2.4)
+material = SubResource("m_container2")
+
+[node name="TankLeg1_35_-0.9_-0.9" type="CSGBox3D" parent="Skyline" unique_id=851513050 groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 35.9265, 24.282, -1.8572)
+size = Vector3(0.2, 1.6, 0.2)
+material = SubResource("m_lamppost")
+
+[node name="TankLeg1_35_0.9_0.9" type="CSGBox3D" parent="Skyline" unique_id=221310605 groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 37.7265, 24.282, -0.0572)
+size = Vector3(0.2, 1.6, 0.2)
+material = SubResource("m_lamppost")
+
+[node name="TankLeg1_35_-0.9_0.9" type="CSGBox3D" parent="Skyline" unique_id=1903705066 groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 35.9265, 24.282, -0.0572)
+size = Vector3(0.2, 1.6, 0.2)
+material = SubResource("m_lamppost")
+
+[node name="TankLeg1_35_0.9_-0.9" type="CSGBox3D" parent="Skyline" unique_id=1829079784 groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 37.7265, 24.282, -1.8572)
+size = Vector3(0.2, 1.6, 0.2)
+material = SubResource("m_lamppost")
+
+[node name="Bldg1_47" type="CSGBox3D" parent="Skyline" unique_id=771492077 groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 35.8331, 14.7192, -12.5779)
+size = Vector3(18.251, 31.4385, 9.2356)
+material = SubResource("m_building")
+
+[node name="Bldg1_59" type="CSGBox3D" parent="Skyline" unique_id=58058246 groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 33.7364, 8.1805, -22.0895)
+size = Vector3(16.0676, 18.361, 6.1128)
+material = SubResource("m_building")
+
+[node name="Tank1_59" type="CSGBox3D" parent="Skyline" unique_id=1943657130 groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 33.7364, 20.261, -22.0895)
+size = Vector3(2.4, 2.6, 2.4)
+material = SubResource("m_container2")
+
+[node name="TankLeg1_59_-0.9_-0.9" type="CSGBox3D" parent="Skyline" unique_id=841647060 groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 32.8364, 18.161, -22.9895)
+size = Vector3(0.2, 1.6, 0.2)
+material = SubResource("m_lamppost")
+
+[node name="TankLeg1_59_0.9_0.9" type="CSGBox3D" parent="Skyline" unique_id=1539129843 groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 34.6364, 18.161, -21.1895)
+size = Vector3(0.2, 1.6, 0.2)
+material = SubResource("m_lamppost")
+
+[node name="TankLeg1_59_-0.9_0.9" type="CSGBox3D" parent="Skyline" unique_id=1356242309 groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 32.8364, 18.161, -21.1895)
+size = Vector3(0.2, 1.6, 0.2)
+material = SubResource("m_lamppost")
+
+[node name="TankLeg1_59_0.9_-0.9" type="CSGBox3D" parent="Skyline" unique_id=676626338 groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 34.6364, 18.161, -22.9895)
+size = Vector3(0.2, 1.6, 0.2)
+material = SubResource("m_lamppost")
+
+[node name="Bldg1_67" type="CSGBox3D" parent="Skyline" unique_id=82527307 groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 35.3571, 10.4095, -30.5057)
+size = Vector3(10.2572, 22.819, 6.6467)
+material = SubResource("m_building")
+
+[node name="Tank1_67" type="CSGBox3D" parent="Skyline" unique_id=1478442293 groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 35.3571, 24.719, -30.5057)
+size = Vector3(2.4, 2.6, 2.4)
+material = SubResource("m_container2")
+
+[node name="TankLeg1_67_-0.9_-0.9" type="CSGBox3D" parent="Skyline" unique_id=1000583928 groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 34.4571, 22.619, -31.4057)
+size = Vector3(0.2, 1.6, 0.2)
+material = SubResource("m_lamppost")
+
+[node name="TankLeg1_67_0.9_0.9" type="CSGBox3D" parent="Skyline" unique_id=723925866 groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 36.2571, 22.619, -29.6057)
+size = Vector3(0.2, 1.6, 0.2)
+material = SubResource("m_lamppost")
+
+[node name="TankLeg1_67_-0.9_0.9" type="CSGBox3D" parent="Skyline" unique_id=72702615 groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 34.4571, 22.619, -29.6057)
+size = Vector3(0.2, 1.6, 0.2)
+material = SubResource("m_lamppost")
+
+[node name="TankLeg1_67_0.9_-0.9" type="CSGBox3D" parent="Skyline" unique_id=863999838 groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 36.2571, 22.619, -31.4057)
+size = Vector3(0.2, 1.6, 0.2)
+material = SubResource("m_lamppost")
+
+[node name="Bldg1_75" type="CSGBox3D" parent="Skyline" unique_id=1057628998 groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 37.2421, 14.6928, -39.601)
+size = Vector3(14.1164, 31.3856, 8.7472)
+material = SubResource("m_building")
+
+[node name="Tank1_75" type="CSGBox3D" parent="Skyline" unique_id=782495200 groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 37.2421, 33.2856, -39.601)
+size = Vector3(2.4, 2.6, 2.4)
+material = SubResource("m_container2")
+
+[node name="TankLeg1_75_-0.9_-0.9" type="CSGBox3D" parent="Skyline" unique_id=1986062714 groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 36.3421, 31.1856, -40.501)
+size = Vector3(0.2, 1.6, 0.2)
+material = SubResource("m_lamppost")
+
+[node name="TankLeg1_75_0.9_0.9" type="CSGBox3D" parent="Skyline" unique_id=111334844 groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 38.1421, 31.1856, -38.701)
+size = Vector3(0.2, 1.6, 0.2)
+material = SubResource("m_lamppost")
+
+[node name="TankLeg1_75_-0.9_0.9" type="CSGBox3D" parent="Skyline" unique_id=1533799896 groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 36.3421, 31.1856, -38.701)
+size = Vector3(0.2, 1.6, 0.2)
+material = SubResource("m_lamppost")
+
+[node name="TankLeg1_75_0.9_-0.9" type="CSGBox3D" parent="Skyline" unique_id=1796220619 groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 38.1421, 31.1856, -40.501)
+size = Vector3(0.2, 1.6, 0.2)
+material = SubResource("m_lamppost")
+
+[node name="Bldg2_4" type="CSGBox3D" parent="Skyline" unique_id=84869177 groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 32.1031, 16.0773, -35.1053)
+size = Vector3(7.7939, 34.1546, 18.3996)
+material = SubResource("m_building")
+
+[node name="Tank2_4" type="CSGBox3D" parent="Skyline" unique_id=1880430711 groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 32.1031, 36.0546, -35.1053)
+size = Vector3(2.4, 2.6, 2.4)
+material = SubResource("m_container2")
+
+[node name="TankLeg2_4_-0.9_-0.9" type="CSGBox3D" parent="Skyline" unique_id=1745079713 groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 31.2031, 33.9546, -36.0053)
+size = Vector3(0.2, 1.6, 0.2)
+material = SubResource("m_lamppost")
+
+[node name="TankLeg2_4_0.9_0.9" type="CSGBox3D" parent="Skyline" unique_id=781656754 groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 33.0031, 33.9546, -34.2053)
+size = Vector3(0.2, 1.6, 0.2)
+material = SubResource("m_lamppost")
+
+[node name="TankLeg2_4_-0.9_0.9" type="CSGBox3D" parent="Skyline" unique_id=690899050 groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 31.2031, 33.9546, -34.2053)
+size = Vector3(0.2, 1.6, 0.2)
+material = SubResource("m_lamppost")
+
+[node name="TankLeg2_4_0.9_-0.9" type="CSGBox3D" parent="Skyline" unique_id=166679547 groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 33.0031, 33.9546, -36.0053)
+size = Vector3(0.2, 1.6, 0.2)
+material = SubResource("m_lamppost")
+
+[node name="Bldg2_12" type="CSGBox3D" parent="Skyline" unique_id=1945555524 groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 23.6589, 12.3912, -34.2431)
+size = Vector3(7.1667, 26.7825, 15.3333)
+material = SubResource("m_building")
+
+[node name="Tank2_12" type="CSGBox3D" parent="Skyline" unique_id=2119896265 groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 23.6589, 28.6825, -34.2431)
+size = Vector3(2.4, 2.6, 2.4)
+material = SubResource("m_container2")
+
+[node name="TankLeg2_12_-0.9_-0.9" type="CSGBox3D" parent="Skyline" unique_id=1114696177 groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 22.7589, 26.5825, -35.1431)
+size = Vector3(0.2, 1.6, 0.2)
+material = SubResource("m_lamppost")
+
+[node name="TankLeg2_12_0.9_0.9" type="CSGBox3D" parent="Skyline" unique_id=584365989 groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 24.5589, 26.5825, -33.3431)
+size = Vector3(0.2, 1.6, 0.2)
+material = SubResource("m_lamppost")
+
+[node name="TankLeg2_12_-0.9_0.9" type="CSGBox3D" parent="Skyline" unique_id=2126402368 groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 22.7589, 26.5825, -33.3431)
+size = Vector3(0.2, 1.6, 0.2)
+material = SubResource("m_lamppost")
+
+[node name="TankLeg2_12_0.9_-0.9" type="CSGBox3D" parent="Skyline" unique_id=1084721867 groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 24.5589, 26.5825, -35.1431)
+size = Vector3(0.2, 1.6, 0.2)
+material = SubResource("m_lamppost")
+
+[node name="Bldg2_21" type="CSGBox3D" parent="Skyline" unique_id=1511151400 groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14.8145, 16.031, -35.7705)
+size = Vector3(7.8463, 34.062, 13.2551)
+material = SubResource("m_building")
+
+[node name="Bldg2_30" type="CSGBox3D" parent="Skyline" unique_id=1636625304 groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.4657, 15.4953, -34.5019)
+size = Vector3(9.381, 32.9907, 9.6441)
+material = SubResource("m_building")
+
+[node name="Bldg2_42" type="CSGBox3D" parent="Skyline" unique_id=1507338529 groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.3015, 7.5354, -35.0998)
+size = Vector3(7.9619, 17.0707, 12.5881)
+material = SubResource("m_building")
+
+[node name="Tank2_42" type="CSGBox3D" parent="Skyline" unique_id=1426229421 groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.3015, 18.9707, -35.0998)
+size = Vector3(2.4, 2.6, 2.4)
+material = SubResource("m_container2")
+
+[node name="TankLeg2_42_-0.9_-0.9" type="CSGBox3D" parent="Skyline" unique_id=1412651022 groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7.2015, 16.8707, -35.9998)
+size = Vector3(0.2, 1.6, 0.2)
+material = SubResource("m_lamppost")
+
+[node name="TankLeg2_42_0.9_0.9" type="CSGBox3D" parent="Skyline" unique_id=2031591702 groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.4015, 16.8707, -34.1998)
+size = Vector3(0.2, 1.6, 0.2)
+material = SubResource("m_lamppost")
+
+[node name="TankLeg2_42_-0.9_0.9" type="CSGBox3D" parent="Skyline" unique_id=338975650 groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7.2015, 16.8707, -34.1998)
+size = Vector3(0.2, 1.6, 0.2)
+material = SubResource("m_lamppost")
+
+[node name="TankLeg2_42_0.9_-0.9" type="CSGBox3D" parent="Skyline" unique_id=1652921627 groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.4015, 16.8707, -35.9998)
+size = Vector3(0.2, 1.6, 0.2)
+material = SubResource("m_lamppost")
+
+[node name="Bldg2_50" type="CSGBox3D" parent="Skyline" unique_id=1292193834 groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -14.439, 9.9005, -32.6446)
+size = Vector3(7.0438, 21.8011, 14.6584)
+material = SubResource("m_building")
+
+[node name="Tank2_50" type="CSGBox3D" parent="Skyline" unique_id=1971094170 groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -14.439, 23.7011, -32.6446)
+size = Vector3(2.4, 2.6, 2.4)
+material = SubResource("m_container2")
+
+[node name="TankLeg2_50_-0.9_-0.9" type="CSGBox3D" parent="Skyline" unique_id=430572296 groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -15.339, 21.6011, -33.5446)
+size = Vector3(0.2, 1.6, 0.2)
+material = SubResource("m_lamppost")
+
+[node name="TankLeg2_50_0.9_0.9" type="CSGBox3D" parent="Skyline" unique_id=1559890932 groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.539, 21.6011, -31.7446)
+size = Vector3(0.2, 1.6, 0.2)
+material = SubResource("m_lamppost")
+
+[node name="TankLeg2_50_-0.9_0.9" type="CSGBox3D" parent="Skyline" unique_id=489179701 groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -15.339, 21.6011, -31.7446)
+size = Vector3(0.2, 1.6, 0.2)
+material = SubResource("m_lamppost")
+
+[node name="TankLeg2_50_0.9_-0.9" type="CSGBox3D" parent="Skyline" unique_id=384920622 groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.539, 21.6011, -33.5446)
+size = Vector3(0.2, 1.6, 0.2)
+material = SubResource("m_lamppost")
+
+[node name="Bldg2_58" type="CSGBox3D" parent="Skyline" unique_id=1600767335 groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -22.0171, 6.755, -35.7138)
+size = Vector3(6.5073, 15.51, 10.9357)
+material = SubResource("m_building")
+
+[node name="Bldg2_66" type="CSGBox3D" parent="Skyline" unique_id=1660465666 groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -29.6985, 10.1416, -33.4107)
+size = Vector3(7.2613, 22.2833, 15.3473)
+material = SubResource("m_building")
+
+[node name="Bldg2_75" type="CSGBox3D" parent="Skyline" unique_id=498496173 groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -39.9804, 7.3588, -33.7581)
+size = Vector3(8.3299, 16.7177, 16.2899)
+material = SubResource("m_building")
+
+[node name="Bldg3_4" type="CSGBox3D" parent="Skyline" unique_id=1646640028 groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -35.3373, 6.731, -30.9279)
+size = Vector3(9.2627, 15.4619, 10.1443)
+material = SubResource("m_building")
+
+[node name="Bldg3_14" type="CSGBox3D" parent="Skyline" unique_id=1041801123 groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -35.0166, 11.7811, -20.7046)
+size = Vector3(8.2912, 25.5622, 8.7159)
+material = SubResource("m_building")
+
+[node name="Bldg3_25" type="CSGBox3D" parent="Skyline" unique_id=917729867 groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -35.4159, 8.1704, -10.8015)
+size = Vector3(11.5686, 18.3408, 7.3056)
+material = SubResource("m_building")
+
+[node name="Bldg3_34" type="CSGBox3D" parent="Skyline" unique_id=955833916 groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -35.6239, 14.6151, -1.2664)
+size = Vector3(9.4287, 31.2302, 7.6483)
+material = SubResource("m_building")
+
+[node name="Bldg3_44" type="CSGBox3D" parent="Skyline" unique_id=271169638 groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -35.7725, 8.7674, 9.7157)
+size = Vector3(15.3334, 19.5348, 10.0917)
+material = SubResource("m_building")
+
+[node name="Bldg3_55" type="CSGBox3D" parent="Skyline" unique_id=738334064 groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -34.9158, 9.0917, 18.3894)
+size = Vector3(11.5214, 20.1835, 6.1397)
+material = SubResource("m_building")
+
+[node name="Bldg3_62" type="CSGBox3D" parent="Skyline" unique_id=1453805888 groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -36.058, 16.05, 28.1962)
+size = Vector3(17.7404, 34.1, 10.6851)
+material = SubResource("m_building")
+
+[node name="Tank3_62" type="CSGBox3D" parent="Skyline" unique_id=709180684 groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -36.058, 36, 28.1962)
+size = Vector3(2.4, 2.6, 2.4)
+material = SubResource("m_container2")
+
+[node name="TankLeg3_62_-0.9_-0.9" type="CSGBox3D" parent="Skyline" unique_id=1888379819 groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -36.958, 33.9, 27.2962)
+size = Vector3(0.2, 1.6, 0.2)
+material = SubResource("m_lamppost")
+
+[node name="TankLeg3_62_0.9_0.9" type="CSGBox3D" parent="Skyline" unique_id=567511331 groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -35.158, 33.9, 29.0962)
+size = Vector3(0.2, 1.6, 0.2)
+material = SubResource("m_lamppost")
+
+[node name="TankLeg3_62_-0.9_0.9" type="CSGBox3D" parent="Skyline" unique_id=1913487334 groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -36.958, 33.9, 29.0962)
+size = Vector3(0.2, 1.6, 0.2)
+material = SubResource("m_lamppost")
+
+[node name="TankLeg3_62_0.9_-0.9" type="CSGBox3D" parent="Skyline" unique_id=60947301 groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -35.158, 33.9, 27.2962)
+size = Vector3(0.2, 1.6, 0.2)
+material = SubResource("m_lamppost")
+
+[node name="Bldg3_74" type="CSGBox3D" parent="Skyline" unique_id=464974717 groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -35.314, 12.7407, 37.9842)
+size = Vector3(9.8244, 27.4813, 6.9835)
+material = SubResource("m_building")
+
+[node name="Signs" type="Node3D" parent="." unique_id=369755387]
+
+[node name="SignHotel" type="Label3D" parent="Signs" unique_id=1432896531]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12, 8.9, -21.88)
+pixel_size = 0.006
+modulate = Color(2.4, 0.5, 0.55, 1)
+outline_modulate = Color(0.05, 0.05, 0.06, 1)
+text = "HOTEL"
+font_size = 220
+outline_size = 18
+
+[node name="SignBar" type="Label3D" parent="Signs" unique_id=2106373554]
+transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, 12, 8.9, 21.88)
+pixel_size = 0.006
+modulate = Color(0.6, 1.1, 2.6, 1)
+outline_modulate = Color(0.05, 0.05, 0.06, 1)
+text = "BAR & GRILL"
+font_size = 150
+outline_size = 18
+
+[node name="Weather" type="Node3D" parent="." unique_id=1285546073]
+
+[node name="Steam0" type="CPUParticles3D" parent="Weather" unique_id=1581519583]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7.4, 0.2, -7.4)
 amount = 16
 lifetime = 4.0
@@ -2416,12 +2501,7 @@ scale_amount_min = 0.8
 scale_amount_max = 2.2
 color_ramp = SubResource("steam_fade")
 
-[node name="Grate2" type="CSGBox3D" parent="Dressing" groups=["visual_only"]]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7.4, 0.0105, 7.4)
-size = Vector3(1.2, 0.019, 1.2)
-material = SubResource("m_grate")
-
-[node name="Steam2" type="CPUParticles3D" parent="Weather"]
+[node name="Steam2" type="CPUParticles3D" parent="Weather" unique_id=1102857391]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7.4, 0.2, 7.4)
 amount = 16
 lifetime = 4.0
@@ -2438,7 +2518,7 @@ scale_amount_min = 0.8
 scale_amount_max = 2.2
 color_ramp = SubResource("steam_fade")
 
-[node name="Rain" type="CPUParticles3D" parent="Weather"]
+[node name="Rain" type="CPUParticles3D" parent="Weather" unique_id=756801931]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 16, 0)
 amount = 2600
 lifetime = 0.95
@@ -2452,117 +2532,150 @@ gravity = Vector3(0, -20, 0)
 initial_velocity_min = 15.0
 initial_velocity_max = 19.0
 
-[node name="Spawns" type="Node3D" parent="."]
+[node name="Spawns" type="Node3D" parent="." unique_id=1689965896]
 
-[node name="SpawnRooms" type="Node3D" parent="."]
+[node name="BlueSpawn0" type="Marker3D" parent="Spawns" unique_id=1103918650 groups=["spawn_team_a"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 17.6, 3.1, 17.4)
+metadata/face_yaw = 151.9
 
-[node name="BlueWallFront" type="CSGBox3D" parent="SpawnRooms"]
+[node name="BlueSpawn1" type="Marker3D" parent="Spawns" unique_id=1336894229 groups=["spawn_team_a"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 19, 3.1, 18.1)
+metadata/face_yaw = 127.5
+
+[node name="RedSpawn0" type="Marker3D" parent="Spawns" unique_id=1530739560 groups=["spawn_team_b"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -17.6, 3.1, -17.4)
+metadata/face_yaw = -28.1
+
+[node name="RedSpawn1" type="Marker3D" parent="Spawns" unique_id=1119843992 groups=["spawn_team_b"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -19, 3.1, -18.1)
+metadata/face_yaw = -52.5
+
+[node name="SpawnRooms" type="Node3D" parent="." unique_id=462442402]
+
+[node name="BlueWallFront" type="CSGBox3D" parent="SpawnRooms" unique_id=904937006]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 18.3, 4.3, 16.4)
 use_collision = true
 size = Vector3(4.2, 2.6, 0.4)
 material = SubResource("m_pitwall")
 
-[node name="BlueWallSide" type="CSGBox3D" parent="SpawnRooms"]
+[node name="BlueWallSide" type="CSGBox3D" parent="SpawnRooms" unique_id=2117536293]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 16.4, 4.3, 17.45)
 use_collision = true
 size = Vector3(0.4, 2.6, 2.5)
 material = SubResource("m_pitwall")
 
-[node name="BlueRoof" type="CSGBox3D" parent="SpawnRooms"]
+[node name="BlueRoof" type="CSGBox3D" parent="SpawnRooms" unique_id=1682100748]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 19.1, 5.75, 19.1)
 use_collision = true
 size = Vector3(5.8, 0.3, 5.8)
 material = SubResource("m_porch")
 
-[node name="BlueRoofTrim" type="CSGBox3D" parent="SpawnRooms"]
+[node name="BlueRoofTrim" type="CSGBox3D" parent="SpawnRooms" unique_id=1345005362]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 19.1, 5.735, 16.275)
 use_collision = true
 size = Vector3(5.8, 0.37, 0.15)
 material = SubResource("m_trim")
 
-[node name="BlueDoorCrate" type="CSGBox3D" parent="SpawnRooms"]
+[node name="BlueDoorCrate" type="CSGBox3D" parent="SpawnRooms" unique_id=798041654]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 18.6, 3.6, 14.6)
 use_collision = true
 size = Vector3(1.2, 1.2, 1.2)
 material = SubResource("m_crate")
 
-[node name="BlueSpawn0" type="Marker3D" parent="Spawns" groups=["spawn_team_a"]]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 17.6, 3.1, 17.4)
-metadata/face_yaw = 151.9
-
-[node name="BlueSpawn1" type="Marker3D" parent="Spawns" groups=["spawn_team_a"]]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 19, 3.1, 18.1)
-metadata/face_yaw = 127.5
-
-[node name="RedWallFront" type="CSGBox3D" parent="SpawnRooms"]
+[node name="RedWallFront" type="CSGBox3D" parent="SpawnRooms" unique_id=965813173]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -18.3, 4.3, -16.4)
 use_collision = true
 size = Vector3(4.2, 2.6, 0.4)
 material = SubResource("m_pitwall")
 
-[node name="RedWallSide" type="CSGBox3D" parent="SpawnRooms"]
+[node name="RedWallSide" type="CSGBox3D" parent="SpawnRooms" unique_id=1078066255]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -16.4, 4.3, -17.45)
 use_collision = true
 size = Vector3(0.4, 2.6, 2.5)
 material = SubResource("m_pitwall")
 
-[node name="RedRoof" type="CSGBox3D" parent="SpawnRooms"]
+[node name="RedRoof" type="CSGBox3D" parent="SpawnRooms" unique_id=1275609636]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -19.1, 5.75, -19.1)
 use_collision = true
 size = Vector3(5.8, 0.3, 5.8)
 material = SubResource("m_porch")
 
-[node name="RedRoofTrim" type="CSGBox3D" parent="SpawnRooms"]
+[node name="RedRoofTrim" type="CSGBox3D" parent="SpawnRooms" unique_id=1740536726]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -19.1, 5.735, -16.275)
 use_collision = true
 size = Vector3(5.8, 0.37, 0.15)
 material = SubResource("m_trim")
 
-[node name="RedDoorCrate" type="CSGBox3D" parent="SpawnRooms"]
+[node name="RedDoorCrate" type="CSGBox3D" parent="SpawnRooms" unique_id=1315059877]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -18.6, 3.6, -14.6)
 use_collision = true
 size = Vector3(1.2, 1.2, 1.2)
 material = SubResource("m_crate")
 
-[node name="RedSpawn0" type="Marker3D" parent="Spawns" groups=["spawn_team_b"]]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -17.6, 3.1, -17.4)
-metadata/face_yaw = -28.1
+[node name="GunSpots" type="Node3D" parent="." unique_id=274915102]
 
-[node name="RedSpawn1" type="Marker3D" parent="Spawns" groups=["spawn_team_b"]]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -19, 3.1, -18.1)
-metadata/face_yaw = -52.5
-
-[node name="CornerCrate1" type="CSGBox3D" parent="Cover"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 19.5, 3.9, -19.5)
-use_collision = true
-size = Vector3(1.8, 1.8, 1.8)
-material = SubResource("m_crate")
-
-[node name="CornerCrateSmall1" type="CSGBox3D" parent="Cover"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 17, 3.5, -20.6)
-use_collision = true
-size = Vector3(1, 1, 1)
-material = SubResource("m_crate")
-
-[node name="CornerCrate3" type="CSGBox3D" parent="Cover"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -19.5, 3.9, 19.5)
-use_collision = true
-size = Vector3(1.8, 1.8, 1.8)
-material = SubResource("m_crate")
-
-[node name="CornerCrateSmall3" type="CSGBox3D" parent="Cover"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -17, 3.5, 20.6)
-use_collision = true
-size = Vector3(1, 1, 1)
-material = SubResource("m_crate")
-
-[node name="GunSpots" type="Node3D" parent="."]
-
-[node name="SniperSpot" type="Area3D" parent="GunSpots"]
+[node name="SniperSpot" type="Area3D" parent="GunSpots" unique_id=2051335663]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.05, 0)
 
-[node name="ShotgunSpotBlue" type="Area3D" parent="GunSpots"]
+[node name="ShotgunSpotBlue" type="Area3D" parent="GunSpots" unique_id=2103576921]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 7.2, 20.3)
 
-[node name="ShotgunSpotRed" type="Area3D" parent="GunSpots"]
+[node name="ShotgunSpotRed" type="Area3D" parent="GunSpots" unique_id=1069576181]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 7.2, -20.3)
+
+[node name="HealthPickupObject" type="Area3D" parent="." unique_id=136840695]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 4, 12)
+collision_layer = 7
+collision_mask = 7
+script = ExtResource("2_kjx7f")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="HealthPickupObject" unique_id=641089873]
+shape = SubResource("SphereShape3D_anpqv")
+
+[node name="Pickup" type="CSGSphere3D" parent="HealthPickupObject/CollisionShape3D" unique_id=1261841243]
+rings = 16
+material = ExtResource("3_h7cbt")
+
+[node name="HealthPickupObject3" type="Area3D" parent="." unique_id=1203832592]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12, 4, 0)
+collision_layer = 7
+collision_mask = 7
+script = ExtResource("2_kjx7f")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="HealthPickupObject3" unique_id=31569541]
+shape = SubResource("SphereShape3D_anpqv")
+
+[node name="Pickup" type="CSGSphere3D" parent="HealthPickupObject3/CollisionShape3D" unique_id=613149719]
+rings = 16
+material = ExtResource("3_h7cbt")
+
+[node name="HealthPickupObject4" type="Area3D" parent="." unique_id=1599241148]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12, 4, 0)
+collision_layer = 7
+collision_mask = 7
+script = ExtResource("2_kjx7f")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="HealthPickupObject4" unique_id=1581609730]
+shape = SubResource("SphereShape3D_anpqv")
+
+[node name="Pickup" type="CSGSphere3D" parent="HealthPickupObject4/CollisionShape3D" unique_id=238512575]
+rings = 16
+material = ExtResource("3_h7cbt")
+
+[node name="HealthPickupObject2" type="Area3D" parent="." unique_id=1167086384]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 4, -12)
+collision_layer = 7
+collision_mask = 7
+script = ExtResource("2_kjx7f")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="HealthPickupObject2" unique_id=535514939]
+shape = SubResource("SphereShape3D_anpqv")
+
+[node name="Pickup" type="CSGSphere3D" parent="HealthPickupObject2/CollisionShape3D" unique_id=1078362093]
+rings = 16
+material = ExtResource("3_h7cbt")
+
+[connection signal="body_entered" from="HealthPickupObject" to="HealthPickupObject" method="_on_body_entered"]
+[connection signal="body_entered" from="HealthPickupObject3" to="HealthPickupObject3" method="_on_body_entered"]
+[connection signal="body_entered" from="HealthPickupObject4" to="HealthPickupObject4" method="_on_body_entered"]
+[connection signal="body_entered" from="HealthPickupObject2" to="HealthPickupObject2" method="_on_body_entered"]

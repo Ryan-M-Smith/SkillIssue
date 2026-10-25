@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { StyleSheet, TextInput, View } from "react-native";
 
 import { Body, Eyebrow, Script, SlantButton, SplitBackground, Title } from "./kit";
@@ -7,21 +6,16 @@ import { fonts, ui } from "./theme";
 export function MainMenu({
 	name,
 	onName,
-	serverUrl,
-	onServerUrl,
 	onJoin,
 	onPractice,
 	notice,
 }: {
 	name: string;
 	onName: (name: string) => void;
-	serverUrl: string;
-	onServerUrl: (url: string) => void;
 	onJoin: () => void;
 	onPractice: () => void;
 	notice?: string | null;
 }) {
-	const [settings, setSettings] = useState(false);
 	return (
 		<View style={styles.screen}>
 			<SplitBackground split={0.62} />
@@ -53,22 +47,6 @@ export function MainMenu({
 					autoCorrect={false}
 					maxLength={16}
 				/>
-				<SlantButton label={settings ? "HIDE SETTINGS" : "SETTINGS"} small onPress={() => setSettings(!settings)} />
-				{settings && (
-					<View style={{ gap: 6 }}>
-						<Eyebrow>Practice debug stream</Eyebrow>
-						<TextInput
-							style={styles.input}
-							value={serverUrl}
-							onChangeText={onServerUrl}
-							autoCapitalize="none"
-							autoCorrect={false}
-							placeholder="ws://192.168.1.20:8080"
-							placeholderTextColor={ui.muted}
-						/>
-						<Body size={12} color={ui.muted}>Only for streaming Practice motion to the web debugger. Lobbies are found automatically.</Body>
-					</View>
-				)}
 			</View>
 		</View>
 	);

@@ -69,7 +69,7 @@ extends Node
 @export var build_test_arena_if_empty := true
 ## The map's CSG boxes don't have "Use Collision" ticked yet. Turn it on at runtime so you
 ## can walk on the map (spawn pads are skipped so you don't spawn on top of them).
-@export var make_map_csg_solid := true
+@export var make_map_csg_solid := false # changed line
 ## Adds a sun + sky at runtime if the world has no light / environment.
 @export var add_light_if_missing := true
 ## Start with the F3 debug view on.
@@ -528,6 +528,7 @@ func _start_match() -> void:
 	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 	GameSession.state_changed.connect(_on_session_state_changed)
 	MatchStats.begin(duos)
+	MvpService.clear()
 	Music.play("match")
 	_update_score()
 	_send_status()
@@ -587,6 +588,7 @@ func _end_match(reason: String) -> void:
 	if scores[0] != scores[1]:
 		winner = 0 if scores[0] > scores[1] else 1
 	MatchStats.finish(winner, scores, reason)
+	MvpService.begin()   # judge + badge start now, so they're ready when the results open
 	if NetworkClient.is_connected_to_server() and GameSession.is_playing():
 		GameSession.end_match(winner, scores, MatchStats.to_protocol(), reason)
 	_show_banner(winner)

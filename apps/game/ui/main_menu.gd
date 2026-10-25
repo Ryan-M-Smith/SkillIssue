@@ -150,7 +150,7 @@ func _build_how_to_play() -> Control:
 		["Tip an end down", "Strafe left / right"],
 		["Flick forward", "Crouch (again to stand)"],
 		["Flick back", "Jump"],
-		["Twist 32 degrees, return to center", "Sprint on / off"],
+		["Twist 30 degrees, return to center", "Sprint on / off"],
 	]))
 	for l in [UiKit.label("Phones join with the 6-character code shown in the lobby, pick a team and role, then tap Ready. The match starts when all four are ready.", 20, UiKit.BODY, UiKit.MUTED)]:
 		l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART

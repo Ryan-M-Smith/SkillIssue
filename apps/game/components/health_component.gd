@@ -46,7 +46,14 @@ func apply_damage(amount: float, source: Node = null) -> void:
 	if hp <= 0.0:
 		dead = true
 		died.emit(source)
+		
+func test_damage() -> void:
+	apply_damage(5.0)
 
+func heal(amount: float, source: Node = null) -> void:
+	print('heal for: ', amount)
+	hp = minf(hp + amount, 100.0)
+	health_changed.emit(hp, max_health)
 
 func kill(source: Node = null) -> void:
 	apply_damage(hp, source)

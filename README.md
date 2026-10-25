@@ -35,12 +35,12 @@ If the game loses its server session during a match, it returns to a fresh lobby
 
 ## Controls and practice
 
-Hold the phone sideways, screen toward you, at a comfortable tilted angle. Hold still briefly to calibrate.
+Hold the phone sideways, screen toward you, at a comfortable tilted angle. It calibrates by itself in a moment (no perfectly still hands needed), slowly follows your grip while you rest, and re-calibrates on its own if you change grip, so **Recenter** is rarely needed. The first time, the app asks for motion access; if it was turned off, it shows how to turn it back on in Settings.
 
 | Phone | Motion | Action |
 | --- | --- | --- |
 | Runner | Gentle forward/back tilt; tip either end down | Walk and strafe |
-| Runner | Twist about 32 degrees like a wheel, then return to center | Toggle sprint |
+| Runner | Twist about 30 degrees like a wheel, then return to center | Toggle sprint |
 | Runner | Quick flick away / toward you | Toggle crouch / jump or stand |
 | Gunner | Turn the phone left / right / up / down | Camera follows (not inverted) |
 | Gunner | Hold **FIRE** | Shoot |
@@ -59,6 +59,8 @@ Weapons have real magazines: pistol **12 / 1.25 s reload**, shotgun **6 / 1.8 s*
 The results screen opens with "and the winner is…" and the winning team (**Red Team** / **Blue Team**, or **Nobody** on a draw), then shows five final stats per team (kills, KDR, accuracy, damage dealt, distance traveled in meters) beside the **Match MVP**. Any of the four players can be MVP: Gunners usually for KDR, kills or damage; Runners for distance or for being so hard to hit that the other team scored little or shot poorly. In a draw the bar is higher, and the screen can say **No MVP**.
 
 The game sends the finished match to the control plane (`POST /api/mvp`), which asks Gemini to judge it. Set `GEMINI_API_KEY` (and optionally `GEMINI_MODEL`, default `gemini-flash-latest`) in the Vercel environment for `apps/landing`; the key never ships in the game. If the endpoint is unconfigured, slow (12 s) or offline, the game picks with its own rule and labels the card "Judged offline".
+
+The MVP also gets a **raccoon badge** made for their accolade: Gemini draws it (`POST /api/mvp/badge`, image model `GEMINI_IMAGE_MODEL`, default `gemini-3.1-flash-image` with `gemini-2.5-flash-image` as fallback) and the card develops it into a team-colored medallion. With no MVP, the card shows Gemini's noir scene: tumbleweeds rolling through a rainy alley while a sly black-and-white raccoon lurks in a doorway. That picture is Gemini-only; if it doesn't arrive, the card simply has no picture. Judging and drawing start at the final whistle (`MvpService`), during the end banner, so they're usually ready when the results open; offline, an MVP's medal shows a drawn raccoon.
 
 ## Graphics
 
