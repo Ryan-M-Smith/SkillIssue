@@ -68,7 +68,7 @@ export function MovementHud({
 				</View>
 			</View>
 			<View style={styles.footer}>
-				<Text style={[styles.hint, { flex: 1 }]}>Tilt to walk · tip to strafe · flick forward crouch · flick back jump · twist 32° to toggle sprint, then center</Text>
+				<Text style={[styles.hint, { flex: 1 }]}>Tilt to walk · tip to strafe · flick forward crouch · flick back jump · twist 30° to toggle sprint, then center</Text>
 				{onRecalibrate && <SlantButton label="RECENTER" small onPress={onRecalibrate} />}
 			</View>
 		</View>

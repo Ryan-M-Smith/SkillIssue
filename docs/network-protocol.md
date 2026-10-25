@@ -50,7 +50,7 @@ After a match, the game posts its final numbers to the control plane, `POST /api
 
 ## Input and safety
 
-Phones send `motion` at 30 Hz and gesture events as `environment` messages. The server derives `sender` from the socket, overwrites any claimed identity, and forwards input only during `playing`. Role ownership is checked at the server and in Godot's `InputRouter`.
+Phones send `motion` as soon as each sensor sample is processed (about 60 Hz, at most one per 15 ms, with a 20 Hz heartbeat) and gesture events as `environment` messages. The server derives `sender` from the socket, overwrites any claimed identity, and forwards input only during `playing`. Role ownership is checked at the server and in Godot's `InputRouter`.
 
 ```json
 {"type":"motion","timestamp":1720000000000,"payload":{"controls":{"moveX":0.25,"moveY":0.5,"lookX":0,"lookY":0}}}
@@ -72,9 +72,9 @@ The game clears movement and held actions after **250 ms** without valid input, 
 
 ## Motion model and weapons
 
-Phones calibrate from a short still hold, using gravity to detect the grip. Movement has a **5-degree deadzone** and reaches full speed at **20 degrees**. Slow tilts walk/strafe; a forward flick toggles crouch and a backward flick jumps or stands up. A **32-degree wheel twist** toggles sprint without a speed threshold, rearms below **12 degrees**, and has a **350 ms** debounce. Crouch and sprint are exclusive.
+Phones calibrate from a short, loose hold (or the average pose after 1.6 s), using gravity to detect the grip. Neutral slowly follows a phone resting inside the deadzone, and holding a very different pose for over a second re-calibrates, so players don't have to. Movement has a **5-degree deadzone** (3.5 to stop) and reaches full speed at **20 degrees**, read straight from the OS's fused gravity. Slow tilts walk/strafe; a forward flick toggles crouch and a backward flick jumps or stands up, firing as the flick turns back (a fast one-way tilt is just walking). A **30-degree wheel twist** toggles sprint without a speed threshold, rearms below **12 degrees**, and has a **350 ms** debounce. Twisting and tipping an end down both turn gravity in the screen plane, so the gyroscope separates them: twisting no longer strafes, and gravity bounds the twist so it can't drift. Crouch and sprint are exclusive.
 
-The gunner (aim phone) only turns to aim: its gyro becomes `controls.lookX` / `lookY` (+X = turn right, +Y = look up, matching the game's `aim_delta`). Shooting, aiming down sights (`scope`), reloading and switching guns (`weapon` with the next owned slot) are on-screen buttons. The companion maps iOS and Android rotation-rate axes before interpreting them.
+The gunner (aim phone) only turns to aim: yaw is the turn about true vertical and pitch about the level left-right axis. Each message carries `controls.lookDX` / `lookDY`, the degrees turned since the previous message, which the game applies exactly once (1:1 with the phone, uncapped); `lookX` / `lookY` (rates, 1 = 130°/s; +X = turn right, +Y = look up) remain for older games. Shooting, aiming down sights (`scope`), reloading and switching guns (`weapon` with the next owned slot) are on-screen buttons. The companion maps iOS and Android rotation-rate axes before interpreting them.
 
 | Weapon | Magazine | Reload |
 | --- | --- | --- |

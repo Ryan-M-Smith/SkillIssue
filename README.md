@@ -35,12 +35,12 @@ If the game loses its server session during a match, it returns to a fresh lobby
 
 ## Controls and practice
 
-Hold the phone sideways, screen toward you, at a comfortable tilted angle. Hold still briefly to calibrate.
+Hold the phone sideways, screen toward you, at a comfortable tilted angle. It calibrates by itself in a moment (no perfectly still hands needed), slowly follows your grip while you rest, and re-calibrates on its own if you change grip, so **Recenter** is rarely needed. The first time, the app asks for motion access; if it was turned off, it shows how to turn it back on in Settings.
 
 | Phone | Motion | Action |
 | --- | --- | --- |
 | Runner | Gentle forward/back tilt; tip either end down | Walk and strafe |
-| Runner | Twist about 32 degrees like a wheel, then return to center | Toggle sprint |
+| Runner | Twist about 30 degrees like a wheel, then return to center | Toggle sprint |
 | Runner | Quick flick away / toward you | Toggle crouch / jump or stand |
 | Gunner | Turn the phone left / right / up / down | Camera follows (not inverted) |
 | Gunner | Hold **FIRE** | Shoot |

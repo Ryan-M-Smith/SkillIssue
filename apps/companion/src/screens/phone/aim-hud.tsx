@@ -44,7 +44,7 @@ export function AimHud({ view, controls, weapon, firing = false, onFire, onAim, 
 						<View style={[styles.dot, { backgroundColor: color, transform: [{ translateX: controls.lookX * 50 }, { translateY: -controls.lookY * 50 }] }]} />
 					</View>
 					<Text style={[styles.action, { color: firing ? ui.gold : ui.ink }]}>{firing ? "FIRING" : controls.ready ? "TURN THE PHONE TO AIM" : "HOLD STILL"}</Text>
-					<Body color={ui.muted} size={12} style={styles.center}>The camera follows your phone. Recenter if it drifts.</Body>
+					<Body color={ui.muted} size={12} style={styles.center}>The camera turns exactly as far as your phone does.</Body>
 				</Panel>
 				<Panel style={styles.side}>
 					<View style={styles.weaponHeader}>
