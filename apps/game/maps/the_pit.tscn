@@ -1,68 +1,156 @@
 [gd_scene format=3]
 
-[ext_resource type="Shader" path="res://maps/grid_surface.gdshader" id="1_grid"]
+[ext_resource type="Shader" path="res://maps/noir_surface.gdshader" id="1_noir"]
 
 [sub_resource type="ShaderMaterial" id="m_floor"]
-shader = ExtResource("1_grid")
-shader_parameter/base_color = Color(0.34, 0.34, 0.36, 1)
+shader = ExtResource("1_noir")
+shader_parameter/pattern = 1
+shader_parameter/base_color = Color(0.3, 0.3, 0.31, 1)
 
 [sub_resource type="ShaderMaterial" id="m_pitwall"]
-shader = ExtResource("1_grid")
-shader_parameter/base_color = Color(0.5, 0.5, 0.52, 1)
+shader = ExtResource("1_noir")
+shader_parameter/pattern = 0
+shader_parameter/base_color = Color(0.6, 0.6, 0.6, 1)
 
 [sub_resource type="ShaderMaterial" id="m_ring"]
-shader = ExtResource("1_grid")
-shader_parameter/base_color = Color(0.55, 0.55, 0.57, 1)
+shader = ExtResource("1_noir")
+shader_parameter/pattern = 0
+shader_parameter/base_color = Color(0.54, 0.54, 0.55, 1)
 
 [sub_resource type="ShaderMaterial" id="m_wall"]
-shader = ExtResource("1_grid")
-shader_parameter/base_color = Color(0.62, 0.62, 0.64, 1)
+shader = ExtResource("1_noir")
+shader_parameter/pattern = 2
+shader_parameter/base_color = Color(0.52, 0.52, 0.53, 1)
 
 [sub_resource type="ShaderMaterial" id="m_porch"]
-shader = ExtResource("1_grid")
-shader_parameter/base_color = Color(0.47, 0.47, 0.49, 1)
+shader = ExtResource("1_noir")
+shader_parameter/pattern = 0
+shader_parameter/base_color = Color(0.47, 0.47, 0.48, 1)
 
 [sub_resource type="ShaderMaterial" id="m_pillar"]
-shader = ExtResource("1_grid")
-shader_parameter/base_color = Color(0.4, 0.4, 0.42, 1)
+shader = ExtResource("1_noir")
+shader_parameter/pattern = 0
+shader_parameter/base_color = Color(0.4, 0.4, 0.41, 1)
 
 [sub_resource type="ShaderMaterial" id="m_stairs"]
-shader = ExtResource("1_grid")
-shader_parameter/base_color = Color(0.58, 0.58, 0.6, 1)
+shader = ExtResource("1_noir")
+shader_parameter/pattern = 0
+shader_parameter/base_color = Color(0.66, 0.66, 0.66, 1)
 
-[sub_resource type="StandardMaterial3D" id="m_trim"]
-albedo_color = Color(0.78, 0.78, 0.8, 1)
-roughness = 0.9
+[sub_resource type="ShaderMaterial" id="m_trim"]
+shader = ExtResource("1_noir")
+shader_parameter/pattern = 5
+shader_parameter/base_color = Color(0.86, 0.86, 0.86, 1)
 
-[sub_resource type="StandardMaterial3D" id="m_rail"]
-albedo_color = Color(0.28, 0.28, 0.3, 1)
-roughness = 0.9
+[sub_resource type="ShaderMaterial" id="m_rail"]
+shader = ExtResource("1_noir")
+shader_parameter/pattern = 5
+shader_parameter/base_color = Color(0.1, 0.1, 0.11, 1)
 
 [sub_resource type="ShaderMaterial" id="m_crate"]
-shader = ExtResource("1_grid")
-shader_parameter/base_color = Color(0.45, 0.45, 0.47, 1)
+shader = ExtResource("1_noir")
+shader_parameter/pattern = 4
+shader_parameter/base_color = Color(0.5, 0.5, 0.5, 1)
 
 [sub_resource type="ShaderMaterial" id="m_container"]
-shader = ExtResource("1_grid")
-shader_parameter/base_color = Color(0.38, 0.38, 0.4, 1)
+shader = ExtResource("1_noir")
+shader_parameter/pattern = 3
+shader_parameter/base_color = Color(0.28, 0.28, 0.29, 1)
 
 [sub_resource type="ShaderMaterial" id="m_container2"]
-shader = ExtResource("1_grid")
-shader_parameter/base_color = Color(0.42, 0.42, 0.44, 1)
+shader = ExtResource("1_noir")
+shader_parameter/pattern = 3
+shader_parameter/base_color = Color(0.44, 0.44, 0.45, 1)
 
-[sub_resource type="StandardMaterial3D" id="m_plinth"]
-albedo_color = Color(0.22, 0.22, 0.24, 1)
-roughness = 0.9
+[sub_resource type="ShaderMaterial" id="m_plinth"]
+shader = ExtResource("1_noir")
+shader_parameter/pattern = 5
+shader_parameter/base_color = Color(0.12, 0.12, 0.13, 1)
 
-[sub_resource type="StandardMaterial3D" id="m_edge"]
-albedo_color = Color(0.18, 0.18, 0.2, 1)
-roughness = 0.9
+[sub_resource type="ShaderMaterial" id="m_edge"]
+shader = ExtResource("1_noir")
+shader_parameter/pattern = 5
+shader_parameter/base_color = Color(0.07, 0.07, 0.08, 1)
+
+[sub_resource type="ShaderMaterial" id="m_building"]
+shader = ExtResource("1_noir")
+shader_parameter/pattern = 6
+shader_parameter/base_color = Color(0.2, 0.2, 0.22, 1)
+shader_parameter/lit_windows = 0.16
+
+[sub_resource type="ShaderMaterial" id="m_lamppost"]
+shader = ExtResource("1_noir")
+shader_parameter/pattern = 5
+shader_parameter/base_color = Color(0.06, 0.06, 0.07, 1)
+
+[sub_resource type="ShaderMaterial" id="m_grate"]
+shader = ExtResource("1_noir")
+shader_parameter/pattern = 5
+shader_parameter/base_color = Color(0.04, 0.04, 0.05, 1)
+
+[sub_resource type="StandardMaterial3D" id="m_bulb"]
+shading_mode = 0
+albedo_color = Color(1, 1, 1, 1)
+
+[sub_resource type="StandardMaterial3D" id="m_neon_red"]
+shading_mode = 0
+albedo_color = Color(1, 0.3, 0.3, 1)
+emission_enabled = true
+emission = Color(1, 0.18, 0.2, 1)
+emission_energy_multiplier = 3.0
+
+[sub_resource type="StandardMaterial3D" id="m_neon_blue"]
+shading_mode = 0
+albedo_color = Color(0.4, 0.6, 1, 1)
+emission_enabled = true
+emission = Color(0.25, 0.5, 1, 1)
+emission_energy_multiplier = 3.0
+
+[sub_resource type="StandardMaterial3D" id="m_sign"]
+shading_mode = 0
+albedo_color = Color(1, 0.93, 0.8, 1)
+
+[sub_resource type="SphereMesh" id="bulb_mesh"]
+material = SubResource("m_bulb")
+radius = 0.16
+height = 0.24
+radial_segments = 10
+rings = 5
+
+[sub_resource type="StandardMaterial3D" id="rain_mat"]
+transparency = 1
+shading_mode = 0
+billboard_mode = 2
+albedo_color = Color(0.85, 0.87, 0.9, 0.2)
+
+[sub_resource type="QuadMesh" id="rain_mesh"]
+material = SubResource("rain_mat")
+size = Vector2(0.025, 0.75)
+
+[sub_resource type="StandardMaterial3D" id="steam_mat"]
+transparency = 1
+shading_mode = 0
+billboard_mode = 3
+vertex_color_use_as_albedo = true
+albedo_color = Color(0.8, 0.82, 0.86, 0.1)
+particles_anim_h_frames = 1
+particles_anim_v_frames = 1
+
+[sub_resource type="QuadMesh" id="steam_mesh"]
+material = SubResource("steam_mat")
+size = Vector2(1.4, 1.4)
+
+[sub_resource type="Gradient" id="steam_fade"]
+offsets = PackedFloat32Array(0, 0.25, 1)
+colors = PackedColorArray(1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 0)
 
 [sub_resource type="ProceduralSkyMaterial" id="sky_mat"]
-sky_top_color = Color(0.42, 0.44, 0.48, 1)
-sky_horizon_color = Color(0.62, 0.63, 0.66, 1)
-ground_bottom_color = Color(0.2, 0.2, 0.22, 1)
-ground_horizon_color = Color(0.62, 0.63, 0.66, 1)
+sky_top_color = Color(0.1, 0.1, 0.115, 1)
+sky_horizon_color = Color(0.34, 0.345, 0.36, 1)
+sky_curve = 0.12
+ground_bottom_color = Color(0.03, 0.03, 0.04, 1)
+ground_horizon_color = Color(0.34, 0.345, 0.36, 1)
+sun_angle_max = 1.0
 
 [sub_resource type="Sky" id="sky"]
 sky_material = SubResource("sky_mat")
@@ -71,8 +159,22 @@ sky_material = SubResource("sky_mat")
 background_mode = 2
 sky = SubResource("sky")
 ambient_light_source = 2
-ambient_light_color = Color(0.6, 0.6, 0.64, 1)
-ambient_light_energy = 0.9
+ambient_light_color = Color(0.6, 0.61, 0.64, 1)
+ambient_light_energy = 0.85
+tonemap_mode = 2
+tonemap_exposure = 1.05
+glow_enabled = true
+glow_intensity = 0.6
+glow_bloom = 0.05
+glow_hdr_threshold = 1.2
+fog_enabled = true
+fog_light_color = Color(0.3, 0.305, 0.32, 1)
+fog_light_energy = 1.0
+fog_density = 0.01
+fog_sky_affect = 0.4
+adjustment_enabled = true
+adjustment_contrast = 1.08
+adjustment_saturation = 1.0
 
 [sub_resource type="BoxShape3D" id="ramp_1"]
 size = Vector3(7.2498, 0.3, 2)
@@ -103,9 +205,10 @@ size = Vector3(9.8433, 0.3, 3)
 [node name="WorldEnvironment" type="WorldEnvironment" parent="."]
 environment = SubResource("env")
 
-[node name="Sun" type="DirectionalLight3D" parent="."]
+[node name="Moon" type="DirectionalLight3D" parent="."]
 transform = Transform3D(0.866, 0.25, 0.433, 0, 0.866, -0.5, -0.5, 0.433, 0.75, 0, 20, 0)
-light_color = Color(1, 1, 1, 1)
+light_color = Color(0.92, 0.93, 0.96, 1)
+light_energy = 0.95
 shadow_enabled = true
 
 [node name="Shell" type="Node3D" parent="."]
@@ -1420,29 +1523,934 @@ use_collision = true
 size = Vector3(1, 2.4, 1)
 material = SubResource("m_pillar")
 
-[node name="Lamp0" type="OmniLight3D" parent="."]
+[node name="Lights" type="Node3D" parent="."]
+
+[node name="Lamp0" type="OmniLight3D" parent="Lights"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 8.35, 15.5)
+light_color = Color(0.95, 0.96, 1, 1)
+light_energy = 2.2
+omni_range = 15.0
+omni_attenuation = 1.2
+
+[node name="Lamp0Bulb" type="MeshInstance3D" parent="Lights"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 8.6, 15.5)
-light_color = Color(1, 1, 1, 1)
-light_energy = 1.4
-omni_range = 16.0
+mesh = SubResource("bulb_mesh")
 
-[node name="Lamp1" type="OmniLight3D" parent="."]
+[node name="Dressing" type="Node3D" parent="."]
+
+[node name="Lamp0Shade" type="CSGBox3D" parent="Dressing" groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 8.75, 15.5)
+size = Vector3(0.6, 0.1, 0.6)
+material = SubResource("m_lamppost")
+
+[node name="Cable0" type="CSGBox3D" parent="Dressing" groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 8.875, 18.75)
+size = Vector3(0.06, 0.05, 6.5)
+material = SubResource("m_lamppost")
+
+[node name="Lamp1" type="OmniLight3D" parent="Lights"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15.5, 8.35, 0)
+light_color = Color(0.95, 0.96, 1, 1)
+light_energy = 2.2
+omni_range = 15.0
+omni_attenuation = 1.2
+
+[node name="Lamp1Bulb" type="MeshInstance3D" parent="Lights"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15.5, 8.6, 0)
-light_color = Color(1, 1, 1, 1)
-light_energy = 1.4
-omni_range = 16.0
+mesh = SubResource("bulb_mesh")
 
-[node name="Lamp2" type="OmniLight3D" parent="."]
+[node name="Lamp1Shade" type="CSGBox3D" parent="Dressing" groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15.5, 8.75, 0)
+size = Vector3(0.6, 0.1, 0.6)
+material = SubResource("m_lamppost")
+
+[node name="Cable1" type="CSGBox3D" parent="Dressing" groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 18.75, 8.875, 0)
+size = Vector3(6.5, 0.05, 0.06)
+material = SubResource("m_lamppost")
+
+[node name="Lamp2" type="OmniLight3D" parent="Lights"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 8.35, -15.5)
+light_color = Color(0.95, 0.96, 1, 1)
+light_energy = 2.2
+omni_range = 15.0
+omni_attenuation = 1.2
+
+[node name="Lamp2Bulb" type="MeshInstance3D" parent="Lights"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 8.6, -15.5)
-light_color = Color(1, 1, 1, 1)
-light_energy = 1.4
-omni_range = 16.0
+mesh = SubResource("bulb_mesh")
 
-[node name="Lamp3" type="OmniLight3D" parent="."]
+[node name="Lamp2Shade" type="CSGBox3D" parent="Dressing" groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 8.75, -15.5)
+size = Vector3(0.6, 0.1, 0.6)
+material = SubResource("m_lamppost")
+
+[node name="Cable2" type="CSGBox3D" parent="Dressing" groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 8.875, -18.75)
+size = Vector3(0.06, 0.05, 6.5)
+material = SubResource("m_lamppost")
+
+[node name="Lamp3" type="OmniLight3D" parent="Lights"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -15.5, 8.35, 0)
+light_color = Color(0.95, 0.96, 1, 1)
+light_energy = 2.2
+omni_range = 15.0
+omni_attenuation = 1.2
+
+[node name="Lamp3Bulb" type="MeshInstance3D" parent="Lights"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -15.5, 8.6, 0)
-light_color = Color(1, 1, 1, 1)
+mesh = SubResource("bulb_mesh")
+
+[node name="Lamp3Shade" type="CSGBox3D" parent="Dressing" groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -15.5, 8.75, 0)
+size = Vector3(0.6, 0.1, 0.6)
+material = SubResource("m_lamppost")
+
+[node name="Cable3" type="CSGBox3D" parent="Dressing" groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -18.75, 8.875, 0)
+size = Vector3(6.5, 0.05, 0.06)
+material = SubResource("m_lamppost")
+
+[node name="PitLamp00" type="OmniLight3D" parent="Lights"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, 2.3, 8.55)
+light_color = Color(0.95, 0.96, 1, 1)
 light_energy = 1.4
-omni_range = 16.0
+omni_range = 9.0
+omni_attenuation = 1.2
+
+[node name="PitLamp00Bulb" type="MeshInstance3D" parent="Lights"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, 2.55, 8.55)
+mesh = SubResource("bulb_mesh")
+
+[node name="PitLamp00Shade" type="CSGBox3D" parent="Dressing" groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, 2.7, 8.55)
+size = Vector3(0.6, 0.1, 0.6)
+material = SubResource("m_lamppost")
+
+[node name="PitLampArm00" type="CSGBox3D" parent="Dressing" groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, 2.82, 8.775)
+size = Vector3(0.12, 0.08, 0.45)
+material = SubResource("m_lamppost")
+
+[node name="PitLamp01" type="OmniLight3D" parent="Lights"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 2.3, 8.55)
+light_color = Color(0.95, 0.96, 1, 1)
+light_energy = 1.4
+omni_range = 9.0
+omni_attenuation = 1.2
+
+[node name="PitLamp01Bulb" type="MeshInstance3D" parent="Lights"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 2.55, 8.55)
+mesh = SubResource("bulb_mesh")
+
+[node name="PitLamp01Shade" type="CSGBox3D" parent="Dressing" groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 2.7, 8.55)
+size = Vector3(0.6, 0.1, 0.6)
+material = SubResource("m_lamppost")
+
+[node name="PitLampArm01" type="CSGBox3D" parent="Dressing" groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 2.82, 8.775)
+size = Vector3(0.12, 0.08, 0.45)
+material = SubResource("m_lamppost")
+
+[node name="DeckLamp10" type="OmniLight3D" parent="Lights"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15, 2, 5)
+light_color = Color(0.95, 0.96, 1, 1)
+light_energy = 1.1
+omni_range = 7.5
+omni_attenuation = 1.2
+
+[node name="DeckLamp10Bulb" type="MeshInstance3D" parent="Lights"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15, 2.25, 5)
+mesh = SubResource("bulb_mesh")
+
+[node name="DeckLamp10Shade" type="CSGBox3D" parent="Dressing" groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15, 2.4, 5)
+size = Vector3(0.6, 0.1, 0.6)
+material = SubResource("m_lamppost")
+
+[node name="DeckLamp11" type="OmniLight3D" parent="Lights"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15, 2, -5)
+light_color = Color(0.95, 0.96, 1, 1)
+light_energy = 1.1
+omni_range = 7.5
+omni_attenuation = 1.2
+
+[node name="DeckLamp11Bulb" type="MeshInstance3D" parent="Lights"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15, 2.25, -5)
+mesh = SubResource("bulb_mesh")
+
+[node name="DeckLamp11Shade" type="CSGBox3D" parent="Dressing" groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15, 2.4, -5)
+size = Vector3(0.6, 0.1, 0.6)
+material = SubResource("m_lamppost")
+
+[node name="PitLamp20" type="OmniLight3D" parent="Lights"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 2.3, -8.55)
+light_color = Color(0.95, 0.96, 1, 1)
+light_energy = 1.4
+omni_range = 9.0
+omni_attenuation = 1.2
+
+[node name="PitLamp20Bulb" type="MeshInstance3D" parent="Lights"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 2.55, -8.55)
+mesh = SubResource("bulb_mesh")
+
+[node name="PitLamp20Shade" type="CSGBox3D" parent="Dressing" groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 2.7, -8.55)
+size = Vector3(0.6, 0.1, 0.6)
+material = SubResource("m_lamppost")
+
+[node name="PitLampArm20" type="CSGBox3D" parent="Dressing" groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 2.82, -8.775)
+size = Vector3(0.12, 0.08, 0.45)
+material = SubResource("m_lamppost")
+
+[node name="PitLamp21" type="OmniLight3D" parent="Lights"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, 2.3, -8.55)
+light_color = Color(0.95, 0.96, 1, 1)
+light_energy = 1.4
+omni_range = 9.0
+omni_attenuation = 1.2
+
+[node name="PitLamp21Bulb" type="MeshInstance3D" parent="Lights"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, 2.55, -8.55)
+mesh = SubResource("bulb_mesh")
+
+[node name="PitLamp21Shade" type="CSGBox3D" parent="Dressing" groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, 2.7, -8.55)
+size = Vector3(0.6, 0.1, 0.6)
+material = SubResource("m_lamppost")
+
+[node name="PitLampArm21" type="CSGBox3D" parent="Dressing" groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, 2.82, -8.775)
+size = Vector3(0.12, 0.08, 0.45)
+material = SubResource("m_lamppost")
+
+[node name="DeckLamp30" type="OmniLight3D" parent="Lights"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -15, 2, -5)
+light_color = Color(0.95, 0.96, 1, 1)
+light_energy = 1.1
+omni_range = 7.5
+omni_attenuation = 1.2
+
+[node name="DeckLamp30Bulb" type="MeshInstance3D" parent="Lights"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -15, 2.25, -5)
+mesh = SubResource("bulb_mesh")
+
+[node name="DeckLamp30Shade" type="CSGBox3D" parent="Dressing" groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -15, 2.4, -5)
+size = Vector3(0.6, 0.1, 0.6)
+material = SubResource("m_lamppost")
+
+[node name="DeckLamp31" type="OmniLight3D" parent="Lights"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -15, 2, 5)
+light_color = Color(0.95, 0.96, 1, 1)
+light_energy = 1.1
+omni_range = 7.5
+omni_attenuation = 1.2
+
+[node name="DeckLamp31Bulb" type="MeshInstance3D" parent="Lights"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -15, 2.25, 5)
+mesh = SubResource("bulb_mesh")
+
+[node name="DeckLamp31Shade" type="CSGBox3D" parent="Dressing" groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -15, 2.4, 5)
+size = Vector3(0.6, 0.1, 0.6)
+material = SubResource("m_lamppost")
+
+[node name="SpawnLamp0" type="OmniLight3D" parent="Lights"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 19, 5, 19)
+light_color = Color(0.95, 0.96, 1, 1)
+light_energy = 1.0
+omni_range = 7.0
+omni_attenuation = 1.2
+
+[node name="SpawnLamp0Bulb" type="MeshInstance3D" parent="Lights"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 19, 5.25, 19)
+mesh = SubResource("bulb_mesh")
+
+[node name="SpawnLamp0Shade" type="CSGBox3D" parent="Dressing" groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 19, 5.4, 19)
+size = Vector3(0.6, 0.1, 0.6)
+material = SubResource("m_lamppost")
+
+[node name="BlueNeon" type="OmniLight3D" parent="Lights"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 19, 4.6, 19)
+light_color = Color(0.3, 0.55, 1, 1)
+light_energy = 0.7
+omni_range = 6.0
+
+[node name="BlueNeonStrip0" type="CSGBox3D" parent="Dressing" groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 18.3, 5.45, 16.085)
+size = Vector3(4.2, 0.08, 0.07)
+material = SubResource("m_neon_blue")
+
+[node name="BlueNeonStrip1" type="CSGBox3D" parent="Dressing" groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 16.085, 5.45, 17.45)
+size = Vector3(0.07, 0.08, 2.5)
+material = SubResource("m_neon_blue")
+
+[node name="SpawnLamp2" type="OmniLight3D" parent="Lights"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -19, 5, -19)
+light_color = Color(0.95, 0.96, 1, 1)
+light_energy = 1.0
+omni_range = 7.0
+omni_attenuation = 1.2
+
+[node name="SpawnLamp2Bulb" type="MeshInstance3D" parent="Lights"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -19, 5.25, -19)
+mesh = SubResource("bulb_mesh")
+
+[node name="SpawnLamp2Shade" type="CSGBox3D" parent="Dressing" groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -19, 5.4, -19)
+size = Vector3(0.6, 0.1, 0.6)
+material = SubResource("m_lamppost")
+
+[node name="RedNeon" type="OmniLight3D" parent="Lights"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -19, 4.6, -19)
+light_color = Color(1, 0.25, 0.25, 1)
+light_energy = 0.7
+omni_range = 6.0
+
+[node name="RedNeonStrip0" type="CSGBox3D" parent="Dressing" groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -18.3, 5.45, -16.085)
+size = Vector3(4.2, 0.08, 0.07)
+material = SubResource("m_neon_red")
+
+[node name="RedNeonStrip1" type="CSGBox3D" parent="Dressing" groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -16.085, 5.45, -17.45)
+size = Vector3(0.07, 0.08, 2.5)
+material = SubResource("m_neon_red")
+
+[node name="Window00" type="CSGBox3D" parent="Dressing" groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -16, 9.2, 21.98)
+size = Vector3(2, 1.6, 0.04)
+material = SubResource("m_building")
+
+[node name="Window01" type="CSGBox3D" parent="Dressing" groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -11, 9.2, 21.98)
+size = Vector3(2, 1.6, 0.04)
+material = SubResource("m_building")
+
+[node name="Window02" type="CSGBox3D" parent="Dressing" groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11, 9.2, 21.98)
+size = Vector3(2, 1.6, 0.04)
+material = SubResource("m_building")
+
+[node name="Window03" type="CSGBox3D" parent="Dressing" groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 16, 9.2, 21.98)
+size = Vector3(2, 1.6, 0.04)
+material = SubResource("m_building")
+
+[node name="Window10" type="CSGBox3D" parent="Dressing" groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 21.98, 9.2, 16)
+size = Vector3(0.04, 1.6, 2)
+material = SubResource("m_building")
+
+[node name="Window11" type="CSGBox3D" parent="Dressing" groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 21.98, 9.2, 11)
+size = Vector3(0.04, 1.6, 2)
+material = SubResource("m_building")
+
+[node name="Window12" type="CSGBox3D" parent="Dressing" groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 21.98, 9.2, -11)
+size = Vector3(0.04, 1.6, 2)
+material = SubResource("m_building")
+
+[node name="Window13" type="CSGBox3D" parent="Dressing" groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 21.98, 9.2, -16)
+size = Vector3(0.04, 1.6, 2)
+material = SubResource("m_building")
+
+[node name="Window20" type="CSGBox3D" parent="Dressing" groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 16, 9.2, -21.98)
+size = Vector3(2, 1.6, 0.04)
+material = SubResource("m_building")
+
+[node name="Window21" type="CSGBox3D" parent="Dressing" groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11, 9.2, -21.98)
+size = Vector3(2, 1.6, 0.04)
+material = SubResource("m_building")
+
+[node name="Window22" type="CSGBox3D" parent="Dressing" groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -11, 9.2, -21.98)
+size = Vector3(2, 1.6, 0.04)
+material = SubResource("m_building")
+
+[node name="Window23" type="CSGBox3D" parent="Dressing" groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -16, 9.2, -21.98)
+size = Vector3(2, 1.6, 0.04)
+material = SubResource("m_building")
+
+[node name="Window30" type="CSGBox3D" parent="Dressing" groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -21.98, 9.2, -16)
+size = Vector3(0.04, 1.6, 2)
+material = SubResource("m_building")
+
+[node name="Window31" type="CSGBox3D" parent="Dressing" groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -21.98, 9.2, -11)
+size = Vector3(0.04, 1.6, 2)
+material = SubResource("m_building")
+
+[node name="Window32" type="CSGBox3D" parent="Dressing" groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -21.98, 9.2, 11)
+size = Vector3(0.04, 1.6, 2)
+material = SubResource("m_building")
+
+[node name="Window33" type="CSGBox3D" parent="Dressing" groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -21.98, 9.2, 16)
+size = Vector3(0.04, 1.6, 2)
+material = SubResource("m_building")
+
+[node name="Skyline" type="Node3D" parent="."]
+
+[node name="Bldg0_4" type="CSGBox3D" parent="Skyline" groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -32.1904, 13.0093, 32.6699)
+size = Vector3(7.6192, 28.0187, 14.4705)
+material = SubResource("m_building")
+
+[node name="Bldg0_12" type="CSGBox3D" parent="Skyline" groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -24.0045, 6.875, 34.8232)
+size = Vector3(6.29, 15.7499, 14.4427)
+material = SubResource("m_building")
+
+[node name="Tank0_12" type="CSGBox3D" parent="Skyline" groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -24.0045, 17.6499, 34.8232)
+size = Vector3(2.4, 2.6, 2.4)
+material = SubResource("m_container2")
+
+[node name="TankLeg0_12_-0.9_-0.9" type="CSGBox3D" parent="Skyline" groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -24.9045, 15.5499, 33.9232)
+size = Vector3(0.2, 1.6, 0.2)
+material = SubResource("m_lamppost")
+
+[node name="TankLeg0_12_0.9_0.9" type="CSGBox3D" parent="Skyline" groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -23.1045, 15.5499, 35.7232)
+size = Vector3(0.2, 1.6, 0.2)
+material = SubResource("m_lamppost")
+
+[node name="TankLeg0_12_-0.9_0.9" type="CSGBox3D" parent="Skyline" groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -24.9045, 15.5499, 35.7232)
+size = Vector3(0.2, 1.6, 0.2)
+material = SubResource("m_lamppost")
+
+[node name="TankLeg0_12_0.9_-0.9" type="CSGBox3D" parent="Skyline" groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -23.1045, 15.5499, 33.9232)
+size = Vector3(0.2, 1.6, 0.2)
+material = SubResource("m_lamppost")
+
+[node name="Bldg0_19" type="CSGBox3D" parent="Skyline" groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -16.1167, 7.738, 35.1503)
+size = Vector3(8.1226, 17.476, 17.6217)
+material = SubResource("m_building")
+
+[node name="Bldg0_30" type="CSGBox3D" parent="Skyline" groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.2173, 16.2626, 33.3298)
+size = Vector3(8.8855, 34.5251, 16.1006)
+material = SubResource("m_building")
+
+[node name="Bldg0_40" type="CSGBox3D" parent="Skyline" groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.6653, 9.5848, 34.8018)
+size = Vector3(6.7213, 21.1696, 9.81)
+material = SubResource("m_building")
+
+[node name="Tank0_40" type="CSGBox3D" parent="Skyline" groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.6653, 23.0696, 34.8018)
+size = Vector3(2.4, 2.6, 2.4)
+material = SubResource("m_container2")
+
+[node name="TankLeg0_40_-0.9_-0.9" type="CSGBox3D" parent="Skyline" groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.7653, 20.9696, 33.9018)
+size = Vector3(0.2, 1.6, 0.2)
+material = SubResource("m_lamppost")
+
+[node name="TankLeg0_40_0.9_0.9" type="CSGBox3D" parent="Skyline" groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.5653, 20.9696, 35.7018)
+size = Vector3(0.2, 1.6, 0.2)
+material = SubResource("m_lamppost")
+
+[node name="TankLeg0_40_-0.9_0.9" type="CSGBox3D" parent="Skyline" groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.7653, 20.9696, 35.7018)
+size = Vector3(0.2, 1.6, 0.2)
+material = SubResource("m_lamppost")
+
+[node name="TankLeg0_40_0.9_-0.9" type="CSGBox3D" parent="Skyline" groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.5653, 20.9696, 33.9018)
+size = Vector3(0.2, 1.6, 0.2)
+material = SubResource("m_lamppost")
+
+[node name="Bldg0_48" type="CSGBox3D" parent="Skyline" groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.2865, 11.9774, 33.3056)
+size = Vector3(9.1946, 25.9549, 15.8577)
+material = SubResource("m_building")
+
+[node name="Tank0_48" type="CSGBox3D" parent="Skyline" groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.2865, 27.8549, 33.3056)
+size = Vector3(2.4, 2.6, 2.4)
+material = SubResource("m_container2")
+
+[node name="TankLeg0_48_-0.9_-0.9" type="CSGBox3D" parent="Skyline" groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.3865, 25.7549, 32.4056)
+size = Vector3(0.2, 1.6, 0.2)
+material = SubResource("m_lamppost")
+
+[node name="TankLeg0_48_0.9_0.9" type="CSGBox3D" parent="Skyline" groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14.1865, 25.7549, 34.2056)
+size = Vector3(0.2, 1.6, 0.2)
+material = SubResource("m_lamppost")
+
+[node name="TankLeg0_48_-0.9_0.9" type="CSGBox3D" parent="Skyline" groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.3865, 25.7549, 34.2056)
+size = Vector3(0.2, 1.6, 0.2)
+material = SubResource("m_lamppost")
+
+[node name="TankLeg0_48_0.9_-0.9" type="CSGBox3D" parent="Skyline" groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14.1865, 25.7549, 32.4056)
+size = Vector3(0.2, 1.6, 0.2)
+material = SubResource("m_lamppost")
+
+[node name="Bldg0_58" type="CSGBox3D" parent="Skyline" groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 23.4967, 9.6415, 35.0395)
+size = Vector3(9.402, 21.2829, 13.0522)
+material = SubResource("m_building")
+
+[node name="Bldg0_69" type="CSGBox3D" parent="Skyline" groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 34.2832, 8.941, 35.8203)
+size = Vector3(9.9719, 19.8819, 14.7474)
+material = SubResource("m_building")
+
+[node name="Bldg1_4" type="CSGBox3D" parent="Skyline" groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 33.218, 16.3017, 31.1764)
+size = Vector3(15.0192, 34.6035, 9.6472)
+material = SubResource("m_building")
+
+[node name="Bldg1_15" type="CSGBox3D" parent="Skyline" groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 35.4715, 6.8921, 20.9585)
+size = Vector3(12.9245, 15.7841, 6.7599)
+material = SubResource("m_building")
+
+[node name="Bldg1_24" type="CSGBox3D" parent="Skyline" groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 34.7244, 13.453, 10.7438)
+size = Vector3(12.3163, 28.9059, 10.3774)
+material = SubResource("m_building")
+
+[node name="Bldg1_35" type="CSGBox3D" parent="Skyline" groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 36.8265, 11.241, -0.9572)
+size = Vector3(15.6832, 24.482, 10.1998)
+material = SubResource("m_building")
+
+[node name="Tank1_35" type="CSGBox3D" parent="Skyline" groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 36.8265, 26.382, -0.9572)
+size = Vector3(2.4, 2.6, 2.4)
+material = SubResource("m_container2")
+
+[node name="TankLeg1_35_-0.9_-0.9" type="CSGBox3D" parent="Skyline" groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 35.9265, 24.282, -1.8572)
+size = Vector3(0.2, 1.6, 0.2)
+material = SubResource("m_lamppost")
+
+[node name="TankLeg1_35_0.9_0.9" type="CSGBox3D" parent="Skyline" groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 37.7265, 24.282, -0.0572)
+size = Vector3(0.2, 1.6, 0.2)
+material = SubResource("m_lamppost")
+
+[node name="TankLeg1_35_-0.9_0.9" type="CSGBox3D" parent="Skyline" groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 35.9265, 24.282, -0.0572)
+size = Vector3(0.2, 1.6, 0.2)
+material = SubResource("m_lamppost")
+
+[node name="TankLeg1_35_0.9_-0.9" type="CSGBox3D" parent="Skyline" groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 37.7265, 24.282, -1.8572)
+size = Vector3(0.2, 1.6, 0.2)
+material = SubResource("m_lamppost")
+
+[node name="Bldg1_47" type="CSGBox3D" parent="Skyline" groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 35.8331, 14.7192, -12.5779)
+size = Vector3(18.251, 31.4385, 9.2356)
+material = SubResource("m_building")
+
+[node name="Bldg1_59" type="CSGBox3D" parent="Skyline" groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 33.7364, 8.1805, -22.0895)
+size = Vector3(16.0676, 18.361, 6.1128)
+material = SubResource("m_building")
+
+[node name="Tank1_59" type="CSGBox3D" parent="Skyline" groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 33.7364, 20.261, -22.0895)
+size = Vector3(2.4, 2.6, 2.4)
+material = SubResource("m_container2")
+
+[node name="TankLeg1_59_-0.9_-0.9" type="CSGBox3D" parent="Skyline" groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 32.8364, 18.161, -22.9895)
+size = Vector3(0.2, 1.6, 0.2)
+material = SubResource("m_lamppost")
+
+[node name="TankLeg1_59_0.9_0.9" type="CSGBox3D" parent="Skyline" groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 34.6364, 18.161, -21.1895)
+size = Vector3(0.2, 1.6, 0.2)
+material = SubResource("m_lamppost")
+
+[node name="TankLeg1_59_-0.9_0.9" type="CSGBox3D" parent="Skyline" groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 32.8364, 18.161, -21.1895)
+size = Vector3(0.2, 1.6, 0.2)
+material = SubResource("m_lamppost")
+
+[node name="TankLeg1_59_0.9_-0.9" type="CSGBox3D" parent="Skyline" groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 34.6364, 18.161, -22.9895)
+size = Vector3(0.2, 1.6, 0.2)
+material = SubResource("m_lamppost")
+
+[node name="Bldg1_67" type="CSGBox3D" parent="Skyline" groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 35.3571, 10.4095, -30.5057)
+size = Vector3(10.2572, 22.819, 6.6467)
+material = SubResource("m_building")
+
+[node name="Tank1_67" type="CSGBox3D" parent="Skyline" groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 35.3571, 24.719, -30.5057)
+size = Vector3(2.4, 2.6, 2.4)
+material = SubResource("m_container2")
+
+[node name="TankLeg1_67_-0.9_-0.9" type="CSGBox3D" parent="Skyline" groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 34.4571, 22.619, -31.4057)
+size = Vector3(0.2, 1.6, 0.2)
+material = SubResource("m_lamppost")
+
+[node name="TankLeg1_67_0.9_0.9" type="CSGBox3D" parent="Skyline" groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 36.2571, 22.619, -29.6057)
+size = Vector3(0.2, 1.6, 0.2)
+material = SubResource("m_lamppost")
+
+[node name="TankLeg1_67_-0.9_0.9" type="CSGBox3D" parent="Skyline" groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 34.4571, 22.619, -29.6057)
+size = Vector3(0.2, 1.6, 0.2)
+material = SubResource("m_lamppost")
+
+[node name="TankLeg1_67_0.9_-0.9" type="CSGBox3D" parent="Skyline" groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 36.2571, 22.619, -31.4057)
+size = Vector3(0.2, 1.6, 0.2)
+material = SubResource("m_lamppost")
+
+[node name="Bldg1_75" type="CSGBox3D" parent="Skyline" groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 37.2421, 14.6928, -39.601)
+size = Vector3(14.1164, 31.3856, 8.7472)
+material = SubResource("m_building")
+
+[node name="Tank1_75" type="CSGBox3D" parent="Skyline" groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 37.2421, 33.2856, -39.601)
+size = Vector3(2.4, 2.6, 2.4)
+material = SubResource("m_container2")
+
+[node name="TankLeg1_75_-0.9_-0.9" type="CSGBox3D" parent="Skyline" groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 36.3421, 31.1856, -40.501)
+size = Vector3(0.2, 1.6, 0.2)
+material = SubResource("m_lamppost")
+
+[node name="TankLeg1_75_0.9_0.9" type="CSGBox3D" parent="Skyline" groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 38.1421, 31.1856, -38.701)
+size = Vector3(0.2, 1.6, 0.2)
+material = SubResource("m_lamppost")
+
+[node name="TankLeg1_75_-0.9_0.9" type="CSGBox3D" parent="Skyline" groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 36.3421, 31.1856, -38.701)
+size = Vector3(0.2, 1.6, 0.2)
+material = SubResource("m_lamppost")
+
+[node name="TankLeg1_75_0.9_-0.9" type="CSGBox3D" parent="Skyline" groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 38.1421, 31.1856, -40.501)
+size = Vector3(0.2, 1.6, 0.2)
+material = SubResource("m_lamppost")
+
+[node name="Bldg2_4" type="CSGBox3D" parent="Skyline" groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 32.1031, 16.0773, -35.1053)
+size = Vector3(7.7939, 34.1546, 18.3996)
+material = SubResource("m_building")
+
+[node name="Tank2_4" type="CSGBox3D" parent="Skyline" groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 32.1031, 36.0546, -35.1053)
+size = Vector3(2.4, 2.6, 2.4)
+material = SubResource("m_container2")
+
+[node name="TankLeg2_4_-0.9_-0.9" type="CSGBox3D" parent="Skyline" groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 31.2031, 33.9546, -36.0053)
+size = Vector3(0.2, 1.6, 0.2)
+material = SubResource("m_lamppost")
+
+[node name="TankLeg2_4_0.9_0.9" type="CSGBox3D" parent="Skyline" groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 33.0031, 33.9546, -34.2053)
+size = Vector3(0.2, 1.6, 0.2)
+material = SubResource("m_lamppost")
+
+[node name="TankLeg2_4_-0.9_0.9" type="CSGBox3D" parent="Skyline" groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 31.2031, 33.9546, -34.2053)
+size = Vector3(0.2, 1.6, 0.2)
+material = SubResource("m_lamppost")
+
+[node name="TankLeg2_4_0.9_-0.9" type="CSGBox3D" parent="Skyline" groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 33.0031, 33.9546, -36.0053)
+size = Vector3(0.2, 1.6, 0.2)
+material = SubResource("m_lamppost")
+
+[node name="Bldg2_12" type="CSGBox3D" parent="Skyline" groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 23.6589, 12.3912, -34.2431)
+size = Vector3(7.1667, 26.7825, 15.3333)
+material = SubResource("m_building")
+
+[node name="Tank2_12" type="CSGBox3D" parent="Skyline" groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 23.6589, 28.6825, -34.2431)
+size = Vector3(2.4, 2.6, 2.4)
+material = SubResource("m_container2")
+
+[node name="TankLeg2_12_-0.9_-0.9" type="CSGBox3D" parent="Skyline" groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 22.7589, 26.5825, -35.1431)
+size = Vector3(0.2, 1.6, 0.2)
+material = SubResource("m_lamppost")
+
+[node name="TankLeg2_12_0.9_0.9" type="CSGBox3D" parent="Skyline" groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 24.5589, 26.5825, -33.3431)
+size = Vector3(0.2, 1.6, 0.2)
+material = SubResource("m_lamppost")
+
+[node name="TankLeg2_12_-0.9_0.9" type="CSGBox3D" parent="Skyline" groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 22.7589, 26.5825, -33.3431)
+size = Vector3(0.2, 1.6, 0.2)
+material = SubResource("m_lamppost")
+
+[node name="TankLeg2_12_0.9_-0.9" type="CSGBox3D" parent="Skyline" groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 24.5589, 26.5825, -35.1431)
+size = Vector3(0.2, 1.6, 0.2)
+material = SubResource("m_lamppost")
+
+[node name="Bldg2_21" type="CSGBox3D" parent="Skyline" groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14.8145, 16.031, -35.7705)
+size = Vector3(7.8463, 34.062, 13.2551)
+material = SubResource("m_building")
+
+[node name="Bldg2_30" type="CSGBox3D" parent="Skyline" groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.4657, 15.4953, -34.5019)
+size = Vector3(9.381, 32.9907, 9.6441)
+material = SubResource("m_building")
+
+[node name="Bldg2_42" type="CSGBox3D" parent="Skyline" groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.3015, 7.5354, -35.0998)
+size = Vector3(7.9619, 17.0707, 12.5881)
+material = SubResource("m_building")
+
+[node name="Tank2_42" type="CSGBox3D" parent="Skyline" groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.3015, 18.9707, -35.0998)
+size = Vector3(2.4, 2.6, 2.4)
+material = SubResource("m_container2")
+
+[node name="TankLeg2_42_-0.9_-0.9" type="CSGBox3D" parent="Skyline" groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7.2015, 16.8707, -35.9998)
+size = Vector3(0.2, 1.6, 0.2)
+material = SubResource("m_lamppost")
+
+[node name="TankLeg2_42_0.9_0.9" type="CSGBox3D" parent="Skyline" groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.4015, 16.8707, -34.1998)
+size = Vector3(0.2, 1.6, 0.2)
+material = SubResource("m_lamppost")
+
+[node name="TankLeg2_42_-0.9_0.9" type="CSGBox3D" parent="Skyline" groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7.2015, 16.8707, -34.1998)
+size = Vector3(0.2, 1.6, 0.2)
+material = SubResource("m_lamppost")
+
+[node name="TankLeg2_42_0.9_-0.9" type="CSGBox3D" parent="Skyline" groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.4015, 16.8707, -35.9998)
+size = Vector3(0.2, 1.6, 0.2)
+material = SubResource("m_lamppost")
+
+[node name="Bldg2_50" type="CSGBox3D" parent="Skyline" groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -14.439, 9.9005, -32.6446)
+size = Vector3(7.0438, 21.8011, 14.6584)
+material = SubResource("m_building")
+
+[node name="Tank2_50" type="CSGBox3D" parent="Skyline" groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -14.439, 23.7011, -32.6446)
+size = Vector3(2.4, 2.6, 2.4)
+material = SubResource("m_container2")
+
+[node name="TankLeg2_50_-0.9_-0.9" type="CSGBox3D" parent="Skyline" groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -15.339, 21.6011, -33.5446)
+size = Vector3(0.2, 1.6, 0.2)
+material = SubResource("m_lamppost")
+
+[node name="TankLeg2_50_0.9_0.9" type="CSGBox3D" parent="Skyline" groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.539, 21.6011, -31.7446)
+size = Vector3(0.2, 1.6, 0.2)
+material = SubResource("m_lamppost")
+
+[node name="TankLeg2_50_-0.9_0.9" type="CSGBox3D" parent="Skyline" groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -15.339, 21.6011, -31.7446)
+size = Vector3(0.2, 1.6, 0.2)
+material = SubResource("m_lamppost")
+
+[node name="TankLeg2_50_0.9_-0.9" type="CSGBox3D" parent="Skyline" groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.539, 21.6011, -33.5446)
+size = Vector3(0.2, 1.6, 0.2)
+material = SubResource("m_lamppost")
+
+[node name="Bldg2_58" type="CSGBox3D" parent="Skyline" groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -22.0171, 6.755, -35.7138)
+size = Vector3(6.5073, 15.51, 10.9357)
+material = SubResource("m_building")
+
+[node name="Bldg2_66" type="CSGBox3D" parent="Skyline" groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -29.6985, 10.1416, -33.4107)
+size = Vector3(7.2613, 22.2833, 15.3473)
+material = SubResource("m_building")
+
+[node name="Bldg2_75" type="CSGBox3D" parent="Skyline" groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -39.9804, 7.3588, -33.7581)
+size = Vector3(8.3299, 16.7177, 16.2899)
+material = SubResource("m_building")
+
+[node name="Bldg3_4" type="CSGBox3D" parent="Skyline" groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -35.3373, 6.731, -30.9279)
+size = Vector3(9.2627, 15.4619, 10.1443)
+material = SubResource("m_building")
+
+[node name="Bldg3_14" type="CSGBox3D" parent="Skyline" groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -35.0166, 11.7811, -20.7046)
+size = Vector3(8.2912, 25.5622, 8.7159)
+material = SubResource("m_building")
+
+[node name="Bldg3_25" type="CSGBox3D" parent="Skyline" groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -35.4159, 8.1704, -10.8015)
+size = Vector3(11.5686, 18.3408, 7.3056)
+material = SubResource("m_building")
+
+[node name="Bldg3_34" type="CSGBox3D" parent="Skyline" groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -35.6239, 14.6151, -1.2664)
+size = Vector3(9.4287, 31.2302, 7.6483)
+material = SubResource("m_building")
+
+[node name="Bldg3_44" type="CSGBox3D" parent="Skyline" groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -35.7725, 8.7674, 9.7157)
+size = Vector3(15.3334, 19.5348, 10.0917)
+material = SubResource("m_building")
+
+[node name="Bldg3_55" type="CSGBox3D" parent="Skyline" groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -34.9158, 9.0917, 18.3894)
+size = Vector3(11.5214, 20.1835, 6.1397)
+material = SubResource("m_building")
+
+[node name="Bldg3_62" type="CSGBox3D" parent="Skyline" groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -36.058, 16.05, 28.1962)
+size = Vector3(17.7404, 34.1, 10.6851)
+material = SubResource("m_building")
+
+[node name="Tank3_62" type="CSGBox3D" parent="Skyline" groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -36.058, 36, 28.1962)
+size = Vector3(2.4, 2.6, 2.4)
+material = SubResource("m_container2")
+
+[node name="TankLeg3_62_-0.9_-0.9" type="CSGBox3D" parent="Skyline" groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -36.958, 33.9, 27.2962)
+size = Vector3(0.2, 1.6, 0.2)
+material = SubResource("m_lamppost")
+
+[node name="TankLeg3_62_0.9_0.9" type="CSGBox3D" parent="Skyline" groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -35.158, 33.9, 29.0962)
+size = Vector3(0.2, 1.6, 0.2)
+material = SubResource("m_lamppost")
+
+[node name="TankLeg3_62_-0.9_0.9" type="CSGBox3D" parent="Skyline" groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -36.958, 33.9, 29.0962)
+size = Vector3(0.2, 1.6, 0.2)
+material = SubResource("m_lamppost")
+
+[node name="TankLeg3_62_0.9_-0.9" type="CSGBox3D" parent="Skyline" groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -35.158, 33.9, 27.2962)
+size = Vector3(0.2, 1.6, 0.2)
+material = SubResource("m_lamppost")
+
+[node name="Bldg3_74" type="CSGBox3D" parent="Skyline" groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -35.314, 12.7407, 37.9842)
+size = Vector3(9.8244, 27.4813, 6.9835)
+material = SubResource("m_building")
+
+[node name="Signs" type="Node3D" parent="."]
+
+[node name="SignHotel" type="Label3D" parent="Signs"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12, 8.9, -21.88)
+pixel_size = 0.006
+shaded = false
+modulate = Color(2.4, 0.5, 0.55, 1)
+outline_modulate = Color(0.05, 0.05, 0.06, 1)
+outline_size = 18
+font_size = 220
+text = "HOTEL"
+
+[node name="SignBar" type="Label3D" parent="Signs"]
+transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, 12, 8.9, 21.88)
+pixel_size = 0.006
+shaded = false
+modulate = Color(0.6, 1.1, 2.6, 1)
+outline_modulate = Color(0.05, 0.05, 0.06, 1)
+outline_size = 18
+font_size = 150
+text = "BAR & GRILL"
+
+[node name="Grate0" type="CSGBox3D" parent="Dressing" groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7.4, 0.0105, -7.4)
+size = Vector3(1.2, 0.019, 1.2)
+material = SubResource("m_grate")
+
+[node name="Weather" type="Node3D" parent="."]
+
+[node name="Steam0" type="CPUParticles3D" parent="Weather"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7.4, 0.2, -7.4)
+amount = 16
+lifetime = 4.0
+preprocess = 4.0
+mesh = SubResource("steam_mesh")
+emission_shape = 1
+emission_sphere_radius = 0.4
+direction = Vector3(0, 1, 0)
+spread = 12.0
+gravity = Vector3(0.15, 0.25, 0)
+initial_velocity_min = 0.5
+initial_velocity_max = 0.9
+scale_amount_min = 0.8
+scale_amount_max = 2.2
+color_ramp = SubResource("steam_fade")
+
+[node name="Grate2" type="CSGBox3D" parent="Dressing" groups=["visual_only"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7.4, 0.0105, 7.4)
+size = Vector3(1.2, 0.019, 1.2)
+material = SubResource("m_grate")
+
+[node name="Steam2" type="CPUParticles3D" parent="Weather"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7.4, 0.2, 7.4)
+amount = 16
+lifetime = 4.0
+preprocess = 4.0
+mesh = SubResource("steam_mesh")
+emission_shape = 1
+emission_sphere_radius = 0.4
+direction = Vector3(0, 1, 0)
+spread = 12.0
+gravity = Vector3(0.15, 0.25, 0)
+initial_velocity_min = 0.5
+initial_velocity_max = 0.9
+scale_amount_min = 0.8
+scale_amount_max = 2.2
+color_ramp = SubResource("steam_fade")
+
+[node name="Rain" type="CPUParticles3D" parent="Weather"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 16, 0)
+amount = 2600
+lifetime = 0.95
+preprocess = 1.0
+mesh = SubResource("rain_mesh")
+emission_shape = 3
+emission_box_extents = Vector3(24, 1, 24)
+direction = Vector3(0.08, -1, 0)
+spread = 1.5
+gravity = Vector3(0, -20, 0)
+initial_velocity_min = 15.0
+initial_velocity_max = 19.0
 
 [node name="Spawns" type="Node3D" parent="."]
 

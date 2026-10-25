@@ -15,7 +15,7 @@ func _ready() -> void:
 	var winner: int = r.get("winner", -1)
 	var scores: Array = r.get("scores", [0, 0])
 	var split := 0.5 if winner < 0 else (0.78 if winner == 0 else 0.22)
-	add_child(UiKit.background(split, 1.4))
+	add_child(UiKit.background(split, 1.0))
 
 	var margin := MarginContainer.new()
 	margin.set_anchors_preset(Control.PRESET_FULL_RECT)
@@ -30,9 +30,14 @@ func _ready() -> void:
 	margin.add_child(col)
 
 	col.add_child(UiKit.eyebrow("MATCH COMPLETE / %s" % _reason_text(r.get("reason", "")), UiKit.GOLD))
-	var banner := UiKit.display("DRAW" if winner < 0 else "%s WINS" % UiKit.team_name(winner), 86,
-		UiKit.INK if winner < 0 else UiKit.team_color(winner))
+	col.add_child(UiKit.script_line("and the winner is…" if winner >= 0 else "and nobody walks away clean…", 34, UiKit.MUTED))
+	var banner := UiKit.title_3d("DRAW" if winner < 0 else "%s WINS" % UiKit.team_name(winner), 104)
 	col.add_child(banner)
+	var bar := ColorRect.new()   # the one strong stripe of team color on this screen
+	bar.color = UiKit.INK if winner < 0 else UiKit.team_color(winner)
+	bar.custom_minimum_size = Vector2(220, 5)
+	bar.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
+	col.add_child(bar)
 	banner.pivot_offset = Vector2(0, 60)
 	banner.scale = Vector2(0.85, 0.85)
 	banner.modulate.a = 0.0
@@ -42,9 +47,11 @@ func _ready() -> void:
 
 	var score := HBoxContainer.new()
 	score.add_theme_constant_override("separation", 28)
-	score.add_child(UiKit.display("BLUE  %d" % scores[0], 56, UiKit.BLUE))
+	score.add_child(UiKit.display("BLUE", 44, UiKit.MUTED))
+	score.add_child(UiKit.display("%d" % scores[0], 56, UiKit.BLUE))
 	score.add_child(UiKit.display("—", 56, UiKit.MUTED))
-	score.add_child(UiKit.display("%d  RED" % scores[1], 56, UiKit.RED))
+	score.add_child(UiKit.display("%d" % scores[1], 56, UiKit.RED))
+	score.add_child(UiKit.display("RED", 44, UiKit.MUTED))
 	col.add_child(score)
 
 	var table := PanelContainer.new()
@@ -59,9 +66,9 @@ func _ready() -> void:
 	rows.add_theme_constant_override("separation", 6)
 	scroll.add_child(rows)
 	var head := HBoxContainer.new()
-	head.add_child(_cell(UiKit.display("BLUE", 28, UiKit.BLUE), 220, HORIZONTAL_ALIGNMENT_RIGHT))
+	head.add_child(_cell(UiKit.display("BLUE", 28, UiKit.INK), 220, HORIZONTAL_ALIGNMENT_RIGHT))
 	head.add_child(_cell(UiKit.eyebrow("Team stats"), 0, HORIZONTAL_ALIGNMENT_CENTER, true))
-	head.add_child(_cell(UiKit.display("RED", 28, UiKit.RED), 220, HORIZONTAL_ALIGNMENT_LEFT))
+	head.add_child(_cell(UiKit.display("RED", 28, UiKit.INK), 220, HORIZONTAL_ALIGNMENT_LEFT))
 	rows.add_child(head)
 
 	var t: Array = MatchStats.teams
@@ -136,13 +143,13 @@ func _stat_row(parent: Control, title: String, blue: float, red: float, fmt := "
 
 func _versus_bar(blue: float, red: float) -> Control:
 	var bar := HBoxContainer.new()
-	bar.custom_minimum_size.y = 10
+	bar.custom_minimum_size.y = 4
 	bar.add_theme_constant_override("separation", 3)
 	var total := blue + red
 	var share := 0.5 if total <= 0.0 else blue / total
 	for side in 2:
 		var piece := ColorRect.new()
-		piece.color = UiKit.BLUE if side == 0 else UiKit.RED
+		piece.color = Color(UiKit.BLUE if side == 0 else UiKit.RED, 0.75)
 		if total <= 0.0:
 			piece.color.a = 0.25
 		piece.size_flags_horizontal = Control.SIZE_EXPAND_FILL
