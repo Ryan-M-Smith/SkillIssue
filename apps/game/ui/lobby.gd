@@ -8,8 +8,8 @@ const GAME_SCENE := "res://modes/duo_sandbox.tscn"
 const COUNTDOWN := 3
 
 var _status: Label
+var _error := ""          # why the lobby couldn't open; shown until Retry
 var _code_row: HBoxContainer
-var _address: Label
 var _slots := {}          # "team:role" -> {"panel", "name", "badge"}
 var _waiting: Label
 var _footer: Label
@@ -43,6 +43,7 @@ func _ready() -> void:
 
 
 func _open_lobby() -> void:
+	_error = ""
 	_retry.visible = false
 	_refresh()
 	await GameSession.create_lobby()
@@ -86,13 +87,10 @@ func _build() -> void:
 	code_text.alignment = BoxContainer.ALIGNMENT_CENTER
 	code_text.add_child(UiKit.eyebrow("Join code"))
 	code_text.add_child(UiKit.label("Open the Skill Issue app → Join a Lobby → enter this code.", 22))
-	_address = UiKit.label("", 20, UiKit.BODY, UiKit.MUTED)
-	_address.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	code_text.add_child(_address)
-	_copy_ticket = UiKit.button("COPY LOBBY TICKET")
+	_copy_ticket = UiKit.button("COPY CODE")
 	_copy_ticket.pressed.connect(func():
-		DisplayServer.clipboard_set(_join_ticket())
-		_status.text = "Ticket copied. Paste it into Join a Lobby on your phone.")
+		DisplayServer.clipboard_set(GameSession.pairing_code)
+		_status.text = "Code copied.")
 	_status = UiKit.label("", 20, UiKit.BODY_SEMI, UiKit.GOLD)
 	_status.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	code_text.add_child(_status)
@@ -164,15 +162,16 @@ func _refresh() -> void:
 	if LobbyServer.state == "failed":
 		_status.text = LobbyServer.message
 		_retry.visible = true
+	elif not server_ok and not _error.is_empty():
+		_status.text = _error
+		_retry.visible = true
 	elif not server_ok:
-		_status.text = "Connecting to %s…" % NetworkClient.url if not NetworkClient.url.is_empty() else "Opening the lobby…"
+		_status.text = "Connecting to the Skill Issue servers…"
 	elif GameSession.pairing_code.is_empty():
 		_status.text = "Opening the lobby…"
 	else:
 		_status.text = ""
 		_retry.visible = false
-	var ticket_note := "Use this ticket on each phone." if not NetworkClient.is_local() else "Same Wi-Fi. Paste this ticket to connect without a server address."
-	_address.text = "Lobby ticket: %s\n%s" % [_join_ticket(), ticket_note] if server_ok else ""
 	_copy_ticket.disabled = not server_ok or GameSession.pairing_code.is_empty()
 
 	var waiting := PackedStringArray()
@@ -235,23 +234,13 @@ func _render_slot(team: int, role: String, player: Dictionary) -> void:
 		s.panel.add_theme_stylebox_override("panel", UiKit.panel_box(Color(c.r, c.g, c.b, 0.5), Color(0, 0, 0, 0.3)))
 
 
-func _phone_address() -> String:
-	var urls := LobbyServer.lan_urls()
-	return urls[0] if not urls.is_empty() else LobbyServer.server_url()
-
-
-func _join_ticket() -> String:
-	var url := NetworkClient.url.trim_suffix("/")
-	if NetworkClient.is_local() or url.begins_with("ws://127.") or url.begins_with("ws://localhost:") or url.begins_with("ws://[::1]:"):
-		return LobbyServer.join_ticket(GameSession.pairing_code)
-	return "%s%scode=%s" % [url, "&" if url.contains("?") else "?", GameSession.pairing_code]
-
-
 func _on_server_status() -> void:
 	_refresh()
 
 
 func _on_server_error(error: String) -> void:
+	if not NetworkClient.is_connected_to_server():
+		_error = error
 	_status.text = error
 	_retry.visible = not NetworkClient.is_connected_to_server()
 

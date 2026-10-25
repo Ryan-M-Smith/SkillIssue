@@ -4,15 +4,9 @@ Protocol version **1** is shared by the embedded Godot server, optional Node rel
 
 ## Finding a game
 
-**Create a Lobby** starts `LobbyServer` inside Godot on port 8080 and attaches `NetworkClient` in-process. Phones use WebSocket connections. If the Node relay already holds that port, Godot connects to it instead. `-- --server=ws://host:port` or the `network/server_url` project setting overrides the game server.
+Every lobby lives on the Skill Issue relay (`apps/server`, deployed behind `wss://`). **Create a Lobby** asks the control plane (`network/control_plane_url`, default `https://skillissue.vodka`) for a game with `POST /api/games`, then connects to the returned `wss://…/games/<gameId>` route and receives the six-character code. There is no local fallback: if the relay can't be reached, the lobby screen shows why and offers Retry. For development, `-- --server=ws://host:port` connects to a given server, and clearing the control-plane setting hosts the lobby inside the game (`LobbyServer`, port 8080).
 
-The companion chooses a host in this order: `EXPO_PUBLIC_GAME_SERVER`, browser hostname on web, or the Expo LAN host on a phone. When none is available, it leaves the host unset. A six-character code works when that host is reachable. The Godot lobby also displays and copies a complete ticket:
-
-```text
-192.168.1.20:8080/T6YYH9
-```
-
-The phone accepts that ticket, `ws://host:port/CODE`, or a registered app link such as `skillissue://join?server=ws%3A%2F%2F192.168.1.20%3A8080&code=T6YYH9`. The ticket is parsed locally into the server URL and pairing code; the wire protocol still sends only the code. `companion:` app links are also accepted. Expo tunnels do not tunnel the game server. Phones and the host must be able to reach one another; HTTPS browser pages require `wss://`.
+The Godot lobby shows only the code (**Copy Code** copies it). A phone joins with just that code: the companion asks the same control plane for the relay (`GET /api/connection`, or `EXPO_PUBLIC_GAME_SERVER` when set), connects to it, and sends `join_game` with the code. The relay finds the lobby by code on any route. App links `skillissue://join?code=<CODE>` fill in the code.
 
 Phone joining has a **10-second** deadline and a visible retry path. Godot WebSocket connection attempts have a **6-second** deadline and reconnect with backoff. The embedded in-process transport needs no socket handshake.
 

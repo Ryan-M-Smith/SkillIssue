@@ -25,27 +25,27 @@ export function EnterCode({ code, onCode, onJoin, onBack, busy, error }: {
 				<SlantButton label={busy ? "CANCEL" : "BACK"} small onPress={onBack} />
 			</View>
 			<View style={styles.entry}>
-				<Eyebrow>Lobby code or full ticket</Eyebrow>
+				<Eyebrow>Lobby code</Eyebrow>
 				<TextInput
 					value={code}
 					onChangeText={onCode}
 					autoFocus
-					autoCapitalize="none"
+					autoCapitalize="characters"
 					autoCorrect={false}
 					editable={!busy}
-					maxLength={512}
-					placeholder="ABC123  or  wss://game.example.com/ABC123"
+					maxLength={7}
+					placeholder="ABC123"
 					placeholderTextColor={ui.muted}
-					accessibilityLabel="Lobby code or ticket"
+					accessibilityLabel="Lobby code"
 					returnKeyType="go"
 					style={styles.input}
 					onSubmitEditing={() => valid && !busy && onJoin()}
 				/>
-				<Body size={14} color={ui.muted}>Use the code with a configured public server, or paste the full ticket from the game lobby.</Body>
+				<Body size={14} color={ui.muted}>The 6-character code on the game screen.</Body>
 			</View>
 			<View style={styles.foot}>
 				<Body size={14} color={error ? ui.red : ui.muted} style={{ flex: 1 }}>
-					{error ?? (busy ? "Finding your lobby… You can cancel or retry if the host is unavailable." : "Pick a team and role after joining, then ready up.")}
+					{error ?? (busy ? "Joining your lobby…" : "Pick a team and role after joining, then ready up.")}
 				</Body>
 				<SlantButton label={busy ? "JOINING…" : error ? "RETRY" : "JOIN"} primary disabled={busy || !valid} onPress={onJoin} style={{ minWidth: 160 }} />
 			</View>

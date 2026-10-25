@@ -17,15 +17,13 @@ In Godot, open `apps/game` and press **F5** to launch the main menu, then **Crea
 
 ## Join a match
 
-1. Keep the phone and game computer on the same Wi-Fi.
-2. Choose **Join a Lobby** and enter the six-character lobby code.
+1. Make sure the phone is online (Wi-Fi or mobile data).
+2. Choose **Join a Lobby** and enter the six-character code from the game screen.
 3. Pick a team and role, then tap **Ready**. All four ready phones start a three-second countdown.
 
-The app finds the host from `EXPO_PUBLIC_GAME_SERVER`, the browser hostname, or the Expo LAN host. The last two work when the game runs on that computer. If detection is unavailable, paste the full ticket shown in the Godot lobby, such as `192.168.1.20:8080/T6YYH9`. There is no fabricated fallback IP or mandatory URL field; Settings provides an optional host override.
+Every lobby lives on the Skill Issue relay. The app finds it from the control plane (`https://skillissue.vodka/api/connection`; override with `EXPO_PUBLIC_CONTROL_PLANE`, or set the relay directly with `EXPO_PUBLIC_GAME_SERVER`). There is no LAN fallback and no address to type. `skillissue://join?code=<CODE>` links fill in the code.
 
-The input also accepts `ws://host:port/CODE`. Native builds registered with the app's schemes support `skillissue://join?server=<encoded-ws-url>&code=<CODE>` and `companion:` links. An Expo tunnel delivers the app but does not expose the local game server. HTTPS browser pages require `wss://`; use the native app for a direct local `ws://` connection.
-
-Joining times out after ten seconds and offers a retry instead of waiting indefinitely. Keep the lobby open and copy a fresh ticket if needed. If the game host leaves, rejoin its new lobby. **Play Again** on the game computer keeps the existing lobby and clears ready flags.
+Joining times out after ten seconds and offers a retry instead of waiting indefinitely. If the game host leaves, rejoin its new lobby. **Play Again** on the game computer keeps the existing lobby and clears ready flags.
 
 ## Motion controls
 
@@ -67,4 +65,4 @@ npm run typecheck
 npm run lint
 ```
 
-The test suite covers calibrated movement/gestures, joining and retry cleanup, tickets, feedback and network authority. Set `GODOT_BIN` to a Godot executable to enable the embedded-server integration tests; import `apps/game` first on a fresh checkout. Node.js 24 is recommended for the network tests' native TypeScript support. The [root README](../../README.md) includes the headless gameplay smoke command and keyboard controls; [the protocol document](../../docs/network-protocol.md) details the wire messages.
+The test suite covers calibrated movement/gestures, joining and retry cleanup, lobby codes and relay lookup, feedback and network authority. Set `GODOT_BIN` to a Godot executable to enable the embedded-server integration tests; import `apps/game` first on a fresh checkout. Node.js 24 is recommended for the network tests' native TypeScript support. The [root README](../../README.md) includes the headless gameplay smoke command and keyboard controls; [the protocol document](../../docs/network-protocol.md) details the wire messages.

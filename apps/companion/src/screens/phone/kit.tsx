@@ -1,12 +1,19 @@
 import type { ReactNode } from "react";
 import { Pressable, StyleSheet, Text, View, type StyleProp, type TextStyle, type ViewStyle } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { fonts, ui } from "./theme";
 
-/** Full-screen blue | red background with a slanted, glowing seam. */
+/**
+ * Full-screen blue | red background with a slanted, glowing seam. It reaches past the
+ * safe-area padding to the screen's edges (under the camera cutout and gesture bar),
+ * while the screen's controls stay inside it.
+ */
 export function SplitBackground({ split = 0.5 }: { split?: number }) {
+	const insets = useSafeAreaInsets();
+	const bleed = { top: -insets.top, bottom: -insets.bottom, left: -insets.left, right: -insets.right };
 	return (
-		<View style={[StyleSheet.absoluteFill, { overflow: "hidden" }]} pointerEvents="none">
+		<View style={[StyleSheet.absoluteFill, bleed, { overflow: "hidden" }]} pointerEvents="none">
 			<View style={[StyleSheet.absoluteFill, { backgroundColor: ui.bg }]} />
 			<View style={[styles.half, { left: 0, right: `${(1 - split) * 100}%`, backgroundColor: "rgba(59, 140, 255, 0.10)" }]} />
 			<View style={[styles.half, { left: `${split * 100}%`, right: 0, backgroundColor: "rgba(255, 74, 74, 0.10)" }]} />

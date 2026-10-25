@@ -96,25 +96,34 @@ export class LobbyClient {
 		try { socket = new WebSocket(this.url); }
 		catch { this.fail("Invalid host address. Paste the full lobby ticket from the game screen."); return; }
 		this.socket = socket;
+		// The connection is gone (closed, failed, or timed out): retry, unless the host ended it.
+		// Called from every path, since not every runtime fires close after an error.
+		const dropped = () => {
+			if (this.socket !== socket) return;
+			if (this.view.stage === "ended" && this.view.result?.reason === "host") { this.leave(); return; }
+			this.socket = null;
+			this.scheduleReconnect(this.view.error ?? "Connection lost. Retrying...");
+		};
 		this.joinTimer = setTimeout(() => {
 			if (this.socket === socket && this.view.stage === "connecting") {
 				socket.close();
+				dropped();
 			}
 		}, 10000);
 		socket.onopen = () => {
 			if (this.socket === socket) this.send({ type: "join_game", protocolVersion: 1, pairingCode: code.trim().toUpperCase(), name: name.trim().slice(0, 16) || "Player" });
 		};
 		socket.onmessage = (event) => { if (this.socket === socket) this.receive(String(event.data)); };
+		let closing = false;
 		socket.onerror = () => {
-			if (this.socket === socket && this.view.stage === "ended" && this.view.result?.reason === "host") { this.leave(); return; }
+			// Closing a socket that's still connecting fires another error on web and Node;
+			// close once, or the handlers recurse until the stack overflows.
+			if (closing) return;
+			closing = true;
 			if (this.socket === socket) socket.close();
+			dropped();
 		};
-		socket.onclose = () => {
-			if (this.socket !== socket) return;
-			if (this.view.stage === "ended" && this.view.result?.reason === "host") { this.leave(); return; }
-			this.socket = null;
-			this.scheduleReconnect(this.view.error ?? "Connection lost. Retrying...");
-		};
+		socket.onclose = dropped;
 		this.timer = setInterval(() => this.sendMotion(), 1000 / motionHz);
 	}
 

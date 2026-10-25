@@ -93,16 +93,6 @@ func lan_urls() -> PackedStringArray:
 	return PackedStringArray(sorted)
 
 
-## One value a phone can paste: the LAN address and lobby code travel together.
-func join_ticket(code: String = "") -> String:
-	var urls := lan_urls()
-	if urls.is_empty():
-		return ""
-	if code.is_empty() and _session != null:
-		code = str(_session.pairingCode)
-	return "%s/%s" % [urls[0].trim_prefix("ws://"), code]
-
-
 ## Starts listening if it isn't already. If something else holds the port (say, the Node
 ## server started by hand), the state becomes "external" and the game connects to that.
 func ensure_running() -> void:

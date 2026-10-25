@@ -8,7 +8,8 @@ import { MotionController, emptyControls } from "@/service/motion-control-servic
 import { LobbyClient, idleLobby, type ControllerRole, type LobbyView, type TeamId } from "@/service/lobby-client";
 import { MotionTally, directionOf, zeroCounts, type Counts, type MovementState } from "@/lib/motion-summary";
 import { defaultDebugServerUrl } from "@/lib/net/server-url";
-import { parseJoinTicket } from "@/lib/net/join-ticket";
+import { normalizeLobbyCode } from "@/lib/net/lobby-code";
+import { publicGameServer } from "@/lib/net/relay";
 import type { GameControls, Role } from "@/types/motion";
 
 import { AimHud } from "./phone/aim-hud";
@@ -49,6 +50,7 @@ export default function PhoneApp() {
 	const activeControls = screen === "match" && (view.stage === "lobby" || view.stage === "playing");
 
 	const clientRef = useRef<LobbyClient | null>(null);
+	const joinAttemptRef = useRef(0);
 	const roleRef = useRef<Role>("movement");
 	const controllerRef = useRef(new MotionController("movement", Platform.OS));
 	const tallyRef = useRef(new MotionTally());
@@ -63,11 +65,10 @@ export default function PhoneApp() {
 			try {
 				const url = new URL(link);
 				if (!url.searchParams.has("code")) return;
-				const target = parseJoinTicket(`skillissue://join?${url.searchParams.toString()}`, defaultDebugServerUrl());
+				const linkCode = normalizeLobbyCode(url.searchParams.get("code") ?? "");
 				clientRef.current?.leave();
 				clientRef.current = null;
-				setCode(target.code);
-				setServerUrl(target.serverUrl);
+				setCode(linkCode);
 				setScreen("code");
 				setJoinError(null);
 			} catch (e) {
@@ -146,23 +147,37 @@ export default function PhoneApp() {
 		setView(next);
 	}
 
-	function join() {
+	/** Every lobby lives on the Skill Issue relay: find it, then join with the code. */
+	async function join() {
+		const attempt = ++joinAttemptRef.current;
+		clientRef.current?.leave();
+		clientRef.current = null;
+		let lobbyCode: string;
 		try {
-			const target = parseJoinTicket(code, serverUrl);
-			setJoinError(null);
-			recenter();
-			setServerUrl(target.serverUrl);
-			clientRef.current?.leave();
-			const client = new LobbyClient(target.serverUrl, Platform.OS, onLobbyChange);
-			clientRef.current = client;
-			setScreen("match");
-			client.join(target.code, name || "Player");
+			lobbyCode = normalizeLobbyCode(code);
 		} catch (e) {
-			setJoinError(e instanceof Error ? e.message : "This lobby ticket is invalid.");
+			setJoinError((e as Error).message);
+			return;
 		}
+		setJoinError(null);
+		recenter();
+		setScreen("match");
+		onLobbyChange({ ...idleLobby, stage: "connecting", code: lobbyCode });
+		const relay = await publicGameServer();
+		if (attempt !== joinAttemptRef.current) return; // cancelled or replaced
+		if (!relay) {
+			onLobbyChange(idleLobby);
+			setScreen("code");
+			setJoinError("Can't reach the Skill Issue servers. Check your internet connection and try again.");
+			return;
+		}
+		const client = new LobbyClient(relay, Platform.OS, onLobbyChange);
+		clientRef.current = client;
+		client.join(lobbyCode, name || "Player");
 	}
 
 	function leave() {
+		joinAttemptRef.current += 1;
 		clientRef.current?.leave();
 		clientRef.current = null;
 		setView(idleLobby);
@@ -191,7 +206,7 @@ export default function PhoneApp() {
 			<EnterCode
 				code={code}
 				onCode={(value) => { setCode(value); setJoinError(null); }}
-				onJoin={join}
+				onJoin={() => void join()}
 				onBack={leave}
 				busy={screen === "match" && view.stage === "connecting"}
 				error={joinError ?? (screen === "match" ? view.error : null)}
