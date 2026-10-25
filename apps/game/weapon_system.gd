@@ -49,10 +49,11 @@ func SwitchWeapon(new: int) -> void:
 	
 	pass
 	
-func AddAmmo(weapon: int, amt: int) -> void:
+func addAmmo(weapon: int, amt: int) -> void:
 	
 	if weapon in WeaponList:
 		WeaponAmmo[weapon] += amt
+		print("weapon: ", weapon, " got, ", amt)
 	
 	pass
 
