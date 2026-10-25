@@ -1,4 +1,4 @@
-import { aimFromTilt } from "@/lib/math/tilt-aim";
+import { gyroAim } from "@/lib/math/gyro-aim";
 import type {
 	Action,
 	GameControls,
@@ -50,11 +50,20 @@ export type { GameControls, MotionDebug, Role } from "@/types/motion";
  * filter; flicks fire at the turn of the flick, not after the phone has come
  * all the way back.
  *
+ * WALKING GOES WHERE THE PHONE TIPS
+ *
+ * Forward and side tilt are read as one direction, not two separate sticks: tip
+ * the top-right corner away and the character walks forward-right, at a speed set
+ * by how far it's tipped. (Side tips are still more sensitive, since the wrists
+ * can't roll as far.)
+ *
  * GUNNER PHONE
  *
- * Only aims: the gyroscope turns the camera. `lookDX`/`lookDY` carry the exact
- * camera degrees this sample after mouse-style sensitivity; `lookX`
- * and `lookY` are the same as rates (1 = 130°/s) for older games.
+ * Only aims, 1:1: the view turns by exactly what the phone turned. Turning about
+ * true vertical (turning your body, or the phone in your hands) turns the view;
+ * tipping the top toward you / away looks up / down. Hold still and the view
+ * holds still. `lookDX`/`lookDY` carry the exact camera degrees this sample;
+ * `lookX` and `lookY` are the same as rates (1 = 130°/s) for older games.
  */
 
 const settings = {
@@ -72,6 +81,7 @@ const settings = {
 	strafeExitDeg: 3,
 	strafeFullSpeedDeg: 12,
 	strafeCurve: 0.7,
+	axisQuietDeg: 0.6, // tilt on the other axis below ~1.2° is tremor, not a diagonal
 	curve: 0.85, // < 1 eases small tilts in faster
 	jitterTau: 0.025, // s, light filter on the output
 
@@ -175,14 +185,29 @@ function finite(v: MotionVector | null | undefined) {
 	return !v || (Number.isFinite(v.x) && Number.isFinite(v.y) && Number.isFinite(v.z));
 }
 
-function tiltToMovement(degrees: number, wasActive: boolean, strafe = false): { value: number; active: boolean } {
-	const enter = strafe ? settings.strafeEnterDeg : settings.enterDeg;
-	const exit = strafe ? settings.strafeExitDeg : settings.exitDeg;
-	const full = strafe ? settings.strafeFullSpeedDeg : settings.fullSpeedDeg;
-	const abs = Math.abs(degrees);
-	if (abs < (wasActive ? exit : enter)) return { value: 0, active: false };
-	const portion = clamp((abs - exit) / (full - exit), 0, 1);
-	return { value: Math.sign(degrees) * Math.pow(portion, strafe ? settings.strafeCurve : settings.curve), active: true };
+/**
+ * Held tilt to a walk vector, read as one direction: the way the phone tips is the way the
+ * character goes, diagonals included. Deadzone and full speed are ellipses (side tips need
+ * less wrist), so on either axis alone this matches the old per-axis feel exactly.
+ */
+function tiltToMovement(rightDeg: number, forwardDeg: number, wasActive: boolean): Move & { active: boolean } {
+	// Hand tremor on the axis you aren't tipping shouldn't nudge the walk off line.
+	const settle = (deg: number) => deg * clamp((Math.abs(deg) - settings.axisQuietDeg) / settings.axisQuietDeg, 0, 1);
+	// Tilt in "fractions of full speed", so the full-speed ellipse becomes the unit circle.
+	const sx = settle(rightDeg) / settings.strafeFullSpeedDeg;
+	const sy = settle(forwardDeg) / settings.fullSpeedDeg;
+	const size = Math.hypot(sx, sy);
+	if (!(size > 0)) return { x: 0, y: 0, active: false };
+	const ux = sx / size;
+	const uy = sy / size;
+	// Where the enter / exit ellipses cross this direction.
+	const edge = (side: number, forward: number) =>
+		1 / Math.hypot((ux * settings.strafeFullSpeedDeg) / side, (uy * settings.fullSpeedDeg) / forward);
+	const exit = edge(settings.strafeExitDeg, settings.exitDeg);
+	if (size < (wasActive ? exit : edge(settings.strafeEnterDeg, settings.enterDeg))) return { x: 0, y: 0, active: false };
+	const curve = settings.strafeCurve * ux * ux + settings.curve * uy * uy;
+	const speed = Math.pow(clamp((size - exit) / (1 - exit), 0, 1), curve);
+	return { x: ux * speed || 0, y: uy * speed || 0, active: true }; // || 0: no -0
 }
 
 export const emptyControls: GameControls = {
@@ -230,8 +255,7 @@ export class MotionController {
 	private crouching = false;
 	private sprinting = false;
 	private move: Move = still;
-	private walkX = false;
-	private walkY = false;
+	private walking = false;
 	private flick: Flick | null = null;
 	private quietUntil = 0;
 	private lockedUntil = 0;
@@ -268,8 +292,7 @@ export class MotionController {
 		this.crouching = false;
 		this.sprinting = false;
 		this.move = still;
-		this.walkX = false;
-		this.walkY = false;
+		this.walking = false;
 		this.flick = null;
 		this.quietUntil = 0;
 		this.lockedUntil = 0;
@@ -319,8 +342,10 @@ export class MotionController {
 		this.lastSampleAt = t;
 
 		const rawGyro = rate ? deviceRotationRate(rate, this.platform) : null;
-		if (rawGyro && magnitude(rawGyro) < 3 && (!this.frame || magnitude(rawGyro) < settings.gyroBiasQuietRate)) {
-			// Learn small zero-rate offsets at rest, without absorbing deliberate turns.
+		const residual = rawGyro ? Math.hypot(rawGyro.x - this.gyroBias.x, rawGyro.y - this.gyroBias.y, rawGyro.z - this.gyroBias.z) : Infinity;
+		if (rawGyro && magnitude(rawGyro) < 3 && (!this.frame || residual < settings.gyroBiasQuietRate)) {
+			// Learn small zero-rate offsets at rest (and keep following them as they wander),
+			// without absorbing deliberate turns: 1:1 aim would otherwise creep on its own.
 			const k = 1 - Math.exp(-dt / (this.frame ? 5 : 0.06));
 			this.gyroBias = {
 				x: this.gyroBias.x + k * (rawGyro.x - this.gyroBias.x),
@@ -350,7 +375,7 @@ export class MotionController {
 
 		return this.role === "movement"
 			? this.processMovement(gravity, frame, gyro, rates, speed, t, dt)
-			: this.processGunner(gravity, frame, dt);
+			: this.processGunner(gyro, gravity, frame, dt);
 	}
 
 	/** Output while a sample is unusable: keep stances, stop moving. */
@@ -487,14 +512,10 @@ export class MotionController {
 			action = this.updateFlick(rates, t, dt);
 		}
 
-		const atNeutral = Math.abs(forwardDeg) < settings.enterDeg && Math.abs(rightDeg) < settings.strafeEnterDeg;
-		const x = tiltToMovement(rightDeg, this.walkX, true);
-		const y = tiltToMovement(forwardDeg, this.walkY);
-		this.walkX = x.active;
-		this.walkY = y.active;
-		let target: Move = { x: x.value, y: y.value };
-		const size = Math.hypot(target.x, target.y);
-		if (size > 1) target = { x: target.x / size, y: target.y / size };
+		const atNeutral = Math.hypot(rightDeg / settings.strafeEnterDeg, forwardDeg / settings.enterDeg) < 1;
+		const walk = tiltToMovement(rightDeg, forwardDeg, this.walking);
+		this.walking = walk.active;
+		let target: Move = { x: walk.x, y: walk.y };
 		if (this.flick) {
 			// Mid-flick: never walk more than before it (a flick isn't a walk), but stopping
 			// shows at once.
@@ -612,14 +633,20 @@ export class MotionController {
 
 	// -------------------- GUNNER PHONE --------------------
 
-	/** Screen tilt steers the view continuously; return the phone to neutral to stop. */
-	private processGunner(gravity: MotionVector, frame: Frame, dt: number): GameControls {
+	/**
+	 * 1:1 gyro aim. Yaw is the turn about true vertical (current gravity), so turning your body
+	 * turns the view fully however far the phone is tilted back; pitch is about the phone's own
+	 * left-right axis, levelled, so tipping the top toward you looks up.
+	 */
+	private processGunner(gyro: MotionVector | null, gravity: MotionVector, frame: Frame, dt: number): GameControls {
 		const output: GameControls = { ...emptyControls, ready: true };
-		// Tipping the top edge back toward you looks up; tipping it away looks down (like aiming
-		// through a viewfinder). This is the opposite sign of the Runner, where away walks forward.
-		const vertical = axes.forwardSign * rotationAbout(frame.down, gravity, frame.right);
-		const horizontal = axes.rightSign * rotationAbout(frame.down, gravity, frame.away);
-		const aim = aimFromTilt(horizontal, vertical);
+		if (!gyro) return output;
+		const up = scale(gravity, -1);
+		const lean = dot(frame.right, up);
+		const flat = { x: frame.right.x - lean * up.x, y: frame.right.y - lean * up.y, z: frame.right.z - lean * up.z };
+		const right = magnitude(flat) > 0.3 ? normalize(flat) : frame.right;
+		// Each sample's exact turn goes straight out: no phone-side smoothing to lag behind.
+		const aim = gyroAim(axes.gunnerYawSign * dot(gyro, up), axes.gunnerPitchSign * dot(gyro, right));
 		output.lookX = clamp(aim.x / settings.aimMaxRate);
 		output.lookY = clamp(aim.y / settings.aimMaxRate);
 		output.lookDX = aim.x * dt;

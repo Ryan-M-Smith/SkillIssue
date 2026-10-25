@@ -14,14 +14,14 @@ import { Body, Eyebrow, Panel, Script, SlantButton, SplitBackground, Title } fro
 import { fonts, ui } from "./theme";
 
 const movementGuide = [
-	["↕", "TILT TO MOVE", "Tilt 5–20° forward or back. Return to center to stop."],
+	["↕", "TIP TO MOVE", "Tip the phone the way you want to go: top away walks forward, toward you walks back, a corner walks diagonally. Further = faster. Center to stop."],
 	["↔", "TIP TO STRAFE", "Tip one end down about 4–12° to move sideways. Center to stop."],
 	["↻", "40° WHEEL TWIST", "Hold a deliberate wheel twist briefly to toggle sprint. Pause at center before twisting again."],
 	["↑", "FLICK BACK", "A short, quick flick toward you jumps or stands up."],
 	["↓", "FLICK FORWARD", "A short flick away toggles crouch."],
 ];
 const gunnerGuide = [
-	["◎", "TILT TO AIM", "Tip the top of the phone toward you to look up, away to look down. Dip the left or right end to look that way. Level out to stop."],
+	["◎", "POINT TO AIM", "The view turns exactly as the phone does: turn left or right to look around, tip the top toward you to look up, away to look down. Hold still and the view holds."],
 	["●", "FIRE", "Hold the FIRE button to shoot."],
 	["⊕", "AIM", "Tap AIM to aim down sights (scope with the sniper). Tap again to stop."],
 	["↻", "RELOAD · SWITCH", "Tap RELOAD for a fresh magazine, SWITCH for your next gun."],

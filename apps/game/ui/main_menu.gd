@@ -138,7 +138,7 @@ func _build_how_to_play() -> Control:
 	cols.add_theme_constant_override("separation", 28)
 	box.add_child(cols)
 	cols.add_child(_how_column("GUNNER · AIM PHONE", UiKit.RED, [
-		["Tilt the phone", "Steer the view (top toward you = up)"],
+		["Point the phone", "The view turns exactly as the phone does"],
 		["Hold FIRE", "Shoot"],
 		["Tap AIM", "Aim down sights / scope"],
 		["Tap RELOAD", "Reload"],
@@ -146,7 +146,7 @@ func _build_how_to_play() -> Control:
 		["Pick up guns on the map", "Unlock them"],
 	]))
 	cols.add_child(_how_column("RUNNER · MOVEMENT PHONE", UiKit.BLUE, [
-		["Tilt top away / toward you", "Walk forward / back"],
+		["Tip the phone the way to go", "Walk there (diagonals too)"],
 		["Tip an end down", "Strafe left / right"],
 		["Flick forward", "Crouch (again to stand)"],
 		["Flick back", "Jump"],

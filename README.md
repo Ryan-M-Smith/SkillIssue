@@ -39,10 +39,10 @@ Hold the phone sideways, screen toward you, at a comfortable tilted angle. It ca
 
 | Phone | Motion | Action |
 | --- | --- | --- |
-| Runner | Gentle forward/back tilt; tip either end down | Walk and strafe |
+| Runner | Tip the phone the way you want to go (top away = forward, an end down = that side, a corner = diagonal) | Walk, strafe and walk diagonally; how far you tip sets the speed |
 | Runner | Twist about 30 degrees like a wheel, then return to center | Toggle sprint |
 | Runner | Quick flick away / toward you | Toggle crouch / jump or stand |
-| Gunner | Tilt: top toward you / away, or dip an end | Look up / down / left / right; level out to stop |
+| Gunner | Point the phone: turn left / right, tip the top toward you / away | The view turns exactly as the phone does (1:1); hold still to hold the view |
 | Gunner | Hold **FIRE** | Shoot |
 | Gunner | Tap **AIM** | Aim down sights / sniper scope |
 | Gunner | Tap **RELOAD** | Reload |
