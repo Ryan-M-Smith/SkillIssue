@@ -121,6 +121,15 @@ func _run() -> void:
 		return
 	await _move(blue, away)
 	blue.health.reset()
+	# Bullets fly through health packs: the same ray a gun casts (its hit_mask, areas included),
+	# straight through the center of a pack nobody has taken (a taken one is switched off).
+	var idle: Node3D = current_scene.find_child("HealthPickupObject3", true, false)
+	var through := PhysicsRayQueryParameters3D.create(idle.global_position + Vector3(-2, 0, 0),
+		idle.global_position + Vector3(2, 0, 0), blue.weapons.hit_mask)
+	through.collide_with_areas = true
+	var blocker: Dictionary = idle.get_world_3d().direct_space_state.intersect_ray(through)
+	if not _check(blocker.is_empty() or blocker.collider != idle, "bullets pass through health packs"):
+		return
 
 	# --- shooting effects (red shoots blue from 2 m, like gameplay_smoke). A big health pool
 	# keeps Blue standing through the test shots, and makes the one-shot check stricter.
