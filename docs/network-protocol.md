@@ -64,8 +64,24 @@ How Godot reads the server's messages:
 - Teams `1` / `2` become game teams `0` (blue, left screen) / `1` (red, right screen). Roles `movement` / `aim` become `mover` / `gunner` internally.
 - `lobby_state` is the source of truth for assignments; `controller_disconnected` clears that controller's held input immediately.
 - Input from a `sender` that isn't in the current assignments is dropped. So is input a role doesn't own: the aim phone can't `jump`, the movement phone can't `shoot`.
-- `pressed` on `environment` drives held controls (`shoot`, `crouch`). `jump` fires on press only. `sprint`, `reload` and `interact` are accepted but not implemented in the game yet.
+- `pressed` on `environment` drives held controls (`shoot`, `crouch`, `sprint`). `jump` fires on press only. A `sprint` without `pressed` toggles sprint. `reload` and `interact` are accepted but not implemented in the game yet.
+- Sprint only speeds up forward movement and is ignored while crouched.
 - A message with an unknown `type` or invalid JSON is counted and ignored.
+
+## Movement phone gestures
+
+The companion (`apps/companion/src/service/motion-control-service.ts`) turns phone motion into these controls. The phone is held at about 45°; the pose it is held still in at start is neutral. Slow, held tilts move; fast tilts are gestures.
+
+| Phone motion | Game control | Message |
+| --- | --- | --- |
+| Slowly tilt the top away / toward you and hold | Walk forward / backward | `motion` (`moveY`) |
+| Slowly press the right / left side down and hold | Strafe right / left | `motion` (`moveX`) |
+| Back to neutral | Stop | `motion` (zero) |
+| Quick flick forward | Crouch on, flick again for off | `environment` `crouch`, `pressed` = new state |
+| Quick flick back | Jump. While crouched it only stands up | `environment` `jump`, `pressed: true` (or `crouch`, `pressed: false`) |
+| Quick side-to-side shake | Sprint on, shake again for off | `environment` `sprint`, `pressed` = new state |
+
+Only one gesture registers at a time. After one fires, gestures are locked for 1 s and until the phone settles again, and the gesture's own motion never becomes walking. Crouch and sprint are exclusive: starting one ends the other.
 
 ### Proposed additions (not in the server yet)
 

@@ -1,7 +1,7 @@
 ## Autoload `InputRouter`: network events → the right team's PhoneDuoController.
 ## Looks up each event's sender in GameSession (the server-authorized table), checks the
 ## sender's role may send it, and re-emits it in the small format PhoneDuoController reads:
-##   mover:  {t:"move", x, y}  {t:"btn", b:"jump"|"crouch", v:0|1}
+##   mover:  {t:"move", x, y}  {t:"btn", b:"jump"|"crouch"|"sprint", v:0|1}
 ##   gunner: {t:"aim", dx, dy} {t:"btn", b:"fire"|"scope", v:0|1}  {t:"weapon", i}
 ## `broadcast` and `role` events are GameSession's job; this node only routes input.
 extends Node
@@ -20,7 +20,7 @@ const ACTIONS_BY_ROLE := {
 }
 const ANY_ROLE_ACTIONS := ["ready", "interact", "none"]
 ## Valid protocol actions the Duo can't do yet. Accepted and counted, nothing happens.
-const UNSUPPORTED_ACTIONS := ["sprint", "reload", "interact", "none"]
+const UNSUPPORTED_ACTIONS := ["reload", "interact", "none"]
 
 const Motion := preload("res://scripts/network/motion_interpreter.gd")
 
@@ -34,6 +34,7 @@ const Motion := preload("res://scripts/network/motion_interpreter.gd")
 var _motion := {}          ## controller_id -> Motion
 var _last_move := {}       ## controller_id -> Vector2 last sent to the Duo
 var _timed := {}           ## "id:button" -> {left, team, role, button}: auto-release for taps
+var _sprinting := {}       ## controller_id -> bool, for `sprint` taps without `pressed` (toggle)
 var _last_action_ts := {}  ## "id:action" -> timestamp, to drop retransmitted one-shots
 var _stats := {
 	"motion": 0, "actions": 0, "unsupported": 0, "dropped": 0,
@@ -122,6 +123,14 @@ func _handle_environment(event: Dictionary) -> void:
 				_emit(info, {"t": "btn", "b": "jump", "v": 1})
 		"crouch":
 			_button(id, info, "crouch", pressed, has_pressed, tap_crouch_seconds)
+		"sprint":
+			# The companion toggles sprint and sends the new state as `pressed`.
+			# Without `pressed`, each sprint event flips it here instead.
+			var on: bool = pressed if has_pressed else not _sprinting.get(id, false)
+			if on and not _gameplay_open():
+				return
+			_sprinting[id] = on
+			_emit(info, {"t": "btn", "b": "sprint", "v": 1 if on else 0})
 		"shoot":
 			_button(id, info, "fire", pressed, has_pressed, tap_fire_seconds)
 		"scope":
@@ -183,12 +192,14 @@ func _physics_process(delta: float) -> void:
 func _on_controller_assigned(id: String, _team: int, _role: String) -> void:
 	_motion[id] = Motion.new()   # fresh: recalibrates on its first reading
 	_last_move.erase(id)
+	_sprinting.erase(id)
 
 
 ## Disconnect or reassignment: forget the controller and clear that role's input.
 func _on_controller_removed(id: String, team: int, role: String) -> void:
 	_motion.erase(id)
 	_last_move.erase(id)
+	_sprinting.erase(id)
 	for key in _timed.keys():
 		if (key as String).begins_with(id + ":"):
 			_timed.erase(key)

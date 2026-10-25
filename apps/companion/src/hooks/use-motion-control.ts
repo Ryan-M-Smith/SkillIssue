@@ -25,6 +25,8 @@ function addSample(samples: Vector3[], sample: Vector3): Vector3[] {
 const emptyCounts: Counts = {
     jump: 0,
     crouch: 0,
+    stand: 0,
+    sprint: 0,
     shoot: 0,
 };
 
