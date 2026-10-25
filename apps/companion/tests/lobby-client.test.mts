@@ -77,6 +77,30 @@ test("join retries after timeout and permits a new attempt", (t) => {
 	client.join("DEF456", "Tester");
 	assert.equal(client.snapshot.stage, "connecting");
 });
+test("a first join that can't reach the server says so and stops after 3 tries", (t) => {
+	t.mock.timers.enable({ apis: ["setTimeout", "setInterval", "Date"], now: 1000 });
+	const client = new LobbyClient("wss://relay.example.com", "ios"); clients.push(client);
+	client.join("ABC123", "Tester");
+	Socket.instances[0].close();
+	assert.equal(client.snapshot.error, "Can't reach the game server (relay.example.com). Retrying…");
+	t.mock.timers.tick(500);
+	assert.equal(client.snapshot.error, "Can't reach the game server (relay.example.com). Retrying…", "the error stays visible while retrying");
+	Socket.instances[1].close();
+	t.mock.timers.tick(1000);
+	Socket.instances[2].close();
+	assert.equal(client.snapshot.stage, "closed");
+	assert.equal(client.snapshot.error, "Can't reach the game server (relay.example.com). Check your internet connection, then try again.");
+	t.mock.timers.tick(20000);
+	assert.equal(Socket.instances.length, 3, "no more retries after giving up");
+});
+test("a server that accepts the socket but never answers the join is named", (t) => {
+	t.mock.timers.enable({ apis: ["setTimeout", "setInterval", "Date"], now: 1000 });
+	const client = new LobbyClient("wss://relay.example.com", "ios"); clients.push(client);
+	client.join("ABC123", "Tester");
+	Socket.instances[0].onopen?.();
+	t.mock.timers.tick(10001);
+	assert.match(client.snapshot.error!, /Connected to relay\.example\.com, but it didn't answer the join/);
+});
 test("obsolete socket messages and errors cannot replace a retried connection", () => {
 	const { client, socket: old } = connect();
 	client.join("DEF456", "Tester");
