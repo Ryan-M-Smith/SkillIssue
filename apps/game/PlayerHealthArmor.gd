@@ -12,6 +12,8 @@ func _ready() -> void:
 
 func addHealth(add: int) -> void:
 	
+	print('health added: ', add)
+	
 	var new_hp = health + add
 	
 	if new_hp > MAX_HEALTH:
@@ -21,6 +23,8 @@ func addHealth(add: int) -> void:
 	health = new_hp
 	
 func addArmor(add: int) -> void:
+	
+	print('armor added: ', add)
 	
 	var new_arm = armor + add
 	
