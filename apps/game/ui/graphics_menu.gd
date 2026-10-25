@@ -1,14 +1,15 @@
 extends CanvasLayer
 ## One modal shared by the main menu and the in-match menu. From the main menu it also
-## holds the match setting (players needed); in a match only graphics can change.
+## holds the match setting (player count); in a match only graphics can change.
 
 signal closed()
 
-## Show the "Players needed" row (main menu). Set before the node enters the tree.
+## Show the "Player Count" row (main menu). Set before the node enters the tree.
 var match_settings := false
 
 var _shade: ColorRect
-var _players: OptionButton
+var _players: HSlider
+var _players_value: Label
 var _resolution: OptionButton
 var _scale: OptionButton
 var _mode: OptionButton
@@ -38,10 +39,25 @@ func _ready() -> void:
 	col.add_child(UiKit.eyebrow("MATCH / DISPLAY / QUALITY" if match_settings else "DISPLAY / QUALITY", UiKit.GOLD))
 	col.add_child(UiKit.display("SETTINGS" if match_settings else "GRAPHICS", 56))
 	if match_settings:
-		_players = OptionButton.new()
-		for text in ["1 phone (testing)", "2 phones", "3 phones", "4 phones (full match)"]:
-			_players.add_item(text)
-		_add_row(col, "Players needed", _players)
+		# Phones a match needs before it can start: 1 (testing) to 4 (full match).
+		var slider_row := HBoxContainer.new()
+		slider_row.add_theme_constant_override("separation", 18)
+		_players = HSlider.new()
+		_players.min_value = 1
+		_players.max_value = 4
+		_players.step = 1
+		_players.tick_count = 4
+		_players.ticks_on_borders = true
+		_players.value = 4
+		_players.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		_players.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+		slider_row.add_child(_players)
+		_players_value = UiKit.display("4", 32)
+		_players_value.custom_minimum_size.x = 28
+		_players_value.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+		slider_row.add_child(_players_value)
+		_players.value_changed.connect(func(v: float): _players_value.text = str(int(v)))
+		_add_row(col, "Player Count", slider_row)
 	_resolution = OptionButton.new()
 	for size_value in GraphicsSettings.RESOLUTIONS:
 		var suffix := " / 4K" if size_value == Vector2i(3840, 2160) else (" / QHD" if size_value == Vector2i(2560, 1440) else (" / 3:2" if size_value == Vector2i(2160, 1440) else ""))
@@ -78,7 +94,7 @@ func _ready() -> void:
 		_mode.select(0)
 		_vsync.button_pressed = true
 		if _players:
-			_players.select(3)
+			_players.value = 4
 		_status.text = "Default settings selected. Apply to save.")
 	buttons.add_child(reset)
 	var apply := UiKit.button("APPLY", true)
@@ -109,7 +125,7 @@ func open_menu() -> void:
 	_mode.select(GraphicsSettings.window_mode)
 	_vsync.button_pressed = GraphicsSettings.vsync
 	if _players:
-		_players.select(GameSession.players_needed - 1)
+		_players.value = GameSession.players_needed
 	_status.text = ""
 	_shade.visible = true
 	(_players if _players else _resolution).grab_focus()
@@ -127,7 +143,7 @@ func close_menu() -> void:
 func _apply() -> void:
 	var error := GraphicsSettings.apply_settings(GraphicsSettings.RESOLUTIONS[_resolution.selected], GraphicsSettings.SCALES[_scale.selected], _mode.selected, _vsync.button_pressed)
 	if _players:
-		var saved := GameSession.set_players_needed(_players.selected + 1)
+		var saved := GameSession.set_players_needed(int(_players.value))
 		if error == OK:
 			error = saved
 	_status.text = "Settings applied and saved." if error == OK else "Applied, but settings could not be saved (%s)." % error_string(error)

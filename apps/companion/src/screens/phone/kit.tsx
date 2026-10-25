@@ -1,30 +1,9 @@
 import type { ReactNode } from "react";
 import { Pressable, StyleSheet, Text, View, type StyleProp, type TextStyle, type ViewStyle } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { fonts, ui } from "./theme";
 
-/**
- * Full-screen blue | red background with a slanted, glowing seam. It reaches past the
- * safe-area padding to the screen's edges (under the camera cutout and gesture bar),
- * while the screen's controls stay inside it.
- */
-export function SplitBackground({ split = 0.5 }: { split?: number }) {
-	const insets = useSafeAreaInsets();
-	const bleed = { top: -insets.top, bottom: -insets.bottom, left: -insets.left, right: -insets.right };
-	return (
-		<View style={[StyleSheet.absoluteFill, bleed, { overflow: "hidden" }]} pointerEvents="none">
-			<View style={[StyleSheet.absoluteFill, { backgroundColor: ui.bg }]} />
-			<View style={[styles.half, { left: 0, right: `${(1 - split) * 100}%`, backgroundColor: "rgba(59, 140, 255, 0.10)" }]} />
-			<View style={[styles.half, { left: `${split * 100}%`, right: 0, backgroundColor: "rgba(255, 74, 74, 0.10)" }]} />
-			<View style={[styles.seam, { left: `${split * 100}%` }]}>
-				<View style={[styles.glow, { width: 28, backgroundColor: "rgba(59, 140, 255, 0.10)", left: -28 }]} />
-				<View style={[styles.glow, { width: 28, backgroundColor: "rgba(255, 74, 74, 0.10)", left: 2 }]} />
-				<View style={[styles.glow, { width: 2, backgroundColor: "rgba(255, 255, 255, 0.85)", left: 0 }]} />
-			</View>
-		</View>
-	);
-}
+export { SplitBackground } from "./split-background";
 
 export function Title({ children, size = 34, color = ui.ink, style }: { children: ReactNode; size?: number; color?: string; style?: StyleProp<TextStyle> }) {
 	return <Text style={[{ fontFamily: fonts.display, fontSize: size, color, letterSpacing: 0.5 }, style]}>{children}</Text>;
@@ -87,9 +66,6 @@ export function Panel({ children, border = ui.line, fill = ui.panel, style }: { 
 }
 
 const styles = StyleSheet.create({
-	half: { position: "absolute", top: 0, bottom: 0 },
-	seam: { position: "absolute", top: "-20%", bottom: "-20%", width: 0, transform: [{ rotate: "14deg" }] },
-	glow: { position: "absolute", top: 0, bottom: 0 },
 	eyebrow: { fontFamily: fonts.bodyBold, fontSize: 11, letterSpacing: 1.6, textTransform: "uppercase" },
 	button: {
 		paddingVertical: 12,

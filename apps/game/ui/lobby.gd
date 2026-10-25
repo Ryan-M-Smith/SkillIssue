@@ -189,7 +189,7 @@ func _refresh() -> void:
 			_render_slot(team, role, GameSession.player_at(team, role))
 	_waiting.text = ("Choosing a spot: " + ", ".join(waiting)) if not waiting.is_empty() else ""
 	if _countdown < 0.0 and not _loading:
-		# The host's Settings → Players needed decides `need` (the server reports it back).
+		# The host's Settings → Player Count decides `need` (the server reports it back).
 		var need := GameSession.min_players
 		_footer.text = "%d / %d READY" % [ready, maxi(need, slotted)] if server_ok else ""
 		_footer.add_theme_color_override("font_color", UiKit.INK)
