@@ -19,6 +19,13 @@ npm run server:start
 PUBLIC_WS_URL=wss://game.example.com npm run server:start
 ```
 
+For Render, use npm from the repository root. No pnpm or Corepack setup is required:
+
+```text
+Build: npm install
+Start: npm run server:start
+```
+
 Start Godot with the external server override:
 
 ```text

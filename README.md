@@ -25,7 +25,9 @@ The Next.js control-plane site lives in `apps/landing`: run `pnpm landing:dev`, 
 
 The landing page loads a Tiger Data leaderboard once on page load; use its reset/load button for another read. Configure `TIGER_DATABASE_URL` in Vercel and create the documented `leaderboard_entries` table; see [Tiger Data leaderboard](docs/tiger-data.md).
 
-Godot can ask the landing API to provision a game with `POST /api/games`, then connect to the returned unique `/games/<gameId>` WSS route. Configure `network/control_plane_url` or pass `-- --control-plane=https://landing.example.com`. The relay still owns persistent WebSocket traffic; Vercel owns provisioning and metadata.
+Godot now asks `https://skillissue.vodka/api/games` to provision a game, then connects to the returned unique `/games/<gameId>` WSS route. The default can be overridden with `-- --control-plane=https://landing.example.com`. The relay still owns persistent WebSocket traffic; Vercel owns provisioning and metadata.
+
+When deploying `apps/server` on Render, use `npm install` as the build command and `npm run server:start` as the start command. No pnpm or Corepack setup is required.
 
 Joining fails with a useful retry message after ten seconds. Keep the lobby open and use a fresh ticket when retrying. An HTTPS browser page needs a `wss://` host; the native app can connect directly to the local `ws://` game.
 

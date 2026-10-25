@@ -34,6 +34,10 @@ window/size/window_height_override=1080
 window/stretch/mode="canvas_items"
 window/stretch/aspect="expand"
 
+[network]
+
+control_plane_url="https://skillissue.vodka"
+
 [global_group]
 
 Player=""

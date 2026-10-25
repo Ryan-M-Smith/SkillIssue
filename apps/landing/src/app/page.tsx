@@ -71,7 +71,7 @@ export default function Home() {
                 </div>
             </section>
 
-            <footer className={styles.footer}><span><span className={styles.blueText}>SKILL</span><span className={styles.redText}>ISSUE</span> / 2v2 REMOTE ARENA</span><span>MOVE TOGETHER. SHOOT TOGETHER.</span></footer>
+            <footer className={styles.footer}><span><span className={styles.blueText}>SKILL</span><span className={styles.redText}>ISSUE</span> / HackPSU Fall 2026</span><span>&copy; 2026 Aditya Pratap Singh, Brian Podolskiy, Kenneth Tran, Michael Shepherd, Ryan Smith</span></footer>
         </main>
     );
 }
