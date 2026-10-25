@@ -108,7 +108,7 @@ test("raw Android sensors move and aim correctly in both landscape grips", () =>
 				assert.ok(right < -0.93, `${grip}: raw Android left strafe matches right (${right})`);
 			} else {
 				for (let i = 0; i < 25; i++) { pose.yaw -= 1.2; right += step().lookDX!; }
-				assert.ok(right > 28 && right < 34, `${grip}: raw radians must use the full-turn gyro response, got ${right}`);
+				assert.ok(right > 36 && right < 44, `${grip}: raw radians must use the full-turn gyro response, got ${right}`);
 			}
 		}
 	}

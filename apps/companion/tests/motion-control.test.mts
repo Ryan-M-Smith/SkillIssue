@@ -299,15 +299,15 @@ test("gunner wrist turns sweep the view with mouse-style sensitivity", () => {
 			const out = model.process(rig.step(pose, 16).reading as never, (now += 16));
 			dx += out.lookDX ?? 0; dy += out.lookDY ?? 0;
 		}
-		assert.ok(dx > 28 && dx < 34, `${grip} ${platform}: turned ${dx.toFixed(1)}° for 30°`);
+		assert.ok(dx > 36 && dx < 44, `${grip} ${platform}: a steady 30° turn turned ${dx.toFixed(1)}°, a little more than the phone`);
 		assert.ok(Math.abs(dy) < 2);
-		// A flick faster than the old 130°/s cap still turns all the way.
+		// A quick wrist snap turns up to 3×: a 60° flick is a 180° about-face.
 		dx = 0;
 		for (let i = 1; i <= 6; i++) {
 			pose.yaw = -30 - i * 10; // 600°/s
 			dx += model.process(rig.step(pose, 16).reading as never, (now += 16)).lookDX ?? 0;
 		}
-		assert.ok(Math.abs(dx - 90) < 8, `${grip} ${platform}: a fast flick turned ${dx.toFixed(1)}° for 60°`);
+		assert.ok(Math.abs(dx - 180) < 10, `${grip} ${platform}: a fast flick turned ${dx.toFixed(1)}° for 60°`);
 	}
 });
 
@@ -360,6 +360,34 @@ test("a full physical phone rotation remains a continuous full camera turn", () 
 			pose.yaw = -i * 2;
 			cameraTurn += model.process(rig.step(pose, 16).reading as never, (now += 16)).lookDX ?? 0;
 		}
-		assert.ok(cameraTurn >= 400 && cameraTurn <= 470, `${platform}/${grip}: full turn mapped to ${cameraTurn.toFixed(1)} degrees`);
+		assert.ok(cameraTurn >= 650 && cameraTurn <= 800, `${platform}/${grip}: full turn mapped to ${cameraTurn.toFixed(1)} degrees`);
+	}
+});
+
+test("holding an end dipped keeps the gunner turning that way; level stops; small dips don't", () => {
+	for (const [grip, platform] of grips) {
+		const rig = new PhoneRig(grip, platform);
+		rig.random = seeded(11);
+		const model = new MotionController("gunner", platform);
+		let now = 0;
+		const pose = neutral();
+		const step = () => model.process(rig.step(pose, 16).reading as never, (now += 16));
+		for (let i = 0; i < 40; i++) step();
+		const held = (right: number, ms: number) => {
+			const from = pose.right;
+			for (let i = 1; i <= 15; i++) { pose.right = from + (right - from) * i / 15; step(); } // ease in
+			let dx = 0, dy = 0;
+			for (let t = 0; t < ms; t += 16) { const o = step(); dx += o.lookDX; dy += o.lookDY; }
+			return { dx, dy };
+		};
+		const small = held(8, 1000);
+		assert.ok(Math.abs(small.dx) < 3, `${grip} ${platform}: holding a small 8° dip doesn't turn (${small.dx.toFixed(1)})`);
+		const right = held(35, 1500);
+		assert.ok(right.dx > 150, `${grip} ${platform}: holding the right end dipped turns right (${right.dx.toFixed(0)}° in 1.5 s)`);
+		assert.ok(Math.abs(right.dy) < 10, `${grip} ${platform}: without tipping the view up or down (${right.dy.toFixed(1)})`);
+		const level = held(0, 500);
+		assert.ok(Math.abs(level.dx) < 3, `${grip} ${platform}: level stops (${level.dx.toFixed(1)})`);
+		const left = held(-35, 1500);
+		assert.ok(left.dx < -150, `${grip} ${platform}: and left (${left.dx.toFixed(0)})`);
 	}
 });
