@@ -1,4 +1,4 @@
-# SkillIssue
+# Skill Issue
 
 A 2v2 game where each team is one character driven by two phones held sideways like a controller: one phone moves, the other aims and shoots. Blue vs Red on one split screen. First to 10 kills, or whoever leads after 5 minutes.
 
