@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import {
 	Pressable,
 	ScrollView,
@@ -38,6 +38,9 @@ const actionText: Record<Exclude<Action, null>, string> = {
 	stand: "STAND UP",
 	sprint: "SPRINT",
 	shoot: "SHOOT",
+	reload: "RELOAD",
+	weapon_next: "NEXT WEAPON",
+	scope: "SCOPE",
 };
 
 const zeroDebug: MotionDebug = {
@@ -83,18 +86,21 @@ const keepReadings = 500; // 10 s at 50 Hz
 
 const fmt = (n: number, places = 1) => (Number.isFinite(n) ? n.toFixed(places) : "0");
 const fmtVec = (v: MotionVector, places = 1) => `${fmt(v.x, places)}  ${fmt(v.y, places)}  ${fmt(v.z, places)}`;
+const subscribeHydration = () => () => {};
+const clientSnapshot = () => true;
+const serverSnapshot = () => false;
 
 /** Web: shows what the connected phone's motion model sees, with a live 3D view. */
 export default function DebugDashboard() {
 	const { width } = useWindowDimensions();
 	// The web build is server-rendered without a window; pick the wide layout
 	// only after hydrating so the first client render matches the server's.
-	const [hydrated, setHydrated] = useState(false);
-	useEffect(() => setHydrated(true), []);
+	const hydrated = useSyncExternalStore(subscribeHydration, clientSnapshot, serverSnapshot);
 	const wide = hydrated && width >= 980;
 
-	// Filled in after mount: the server render has no window to read it from.
-	const [serverUrl, setServerUrl] = useState("");
+	// Read the browser host only after hydration; an explicit edit takes priority.
+	const [serverUrlOverride, setServerUrl] = useState<string | null>(null);
+	const serverUrl = serverUrlOverride ?? (hydrated ? defaultDebugServerUrl() : "");
 	const [room, setRoom] = useState(defaultDebugRoom);
 	const [link, setLink] = useState<DebugLinkStatus>(idleLinkStatus);
 	const [linkOn, setLinkOn] = useState(false);
@@ -229,7 +235,6 @@ export default function DebugDashboard() {
 	// Connect on open; close on leave.
 	useEffect(() => {
 		const url = defaultDebugServerUrl();
-		setServerUrl(url);
 		toggleLink(url);
 		return () => linkRef.current?.close();
 		// eslint-disable-next-line react-hooks/exhaustive-deps
@@ -250,7 +255,7 @@ export default function DebugDashboard() {
 				<View style={{ flexShrink: 1 }}>
 					<Text style={styles.overline}>SKILLISSUE · WEB DEBUGGER</Text>
 					<Text style={styles.title}>Motion Debugger</Text>
-					<Text style={styles.hint}>What the phone's motion model sees, live. Same code as the phone, fed with the phone's own sensor stream.</Text>
+					<Text style={styles.hint}>What the phone’s motion model sees, live. Same code as the phone, fed with the phone’s own sensor stream.</Text>
 				</View>
 				<View style={styles.connect}>
 					<TextInput style={[styles.input, { minWidth: 220 }]} value={serverUrl} onChangeText={setServerUrl} editable={!linkOn} autoCapitalize="none" autoCorrect={false} aria-label="Server address" />
@@ -265,7 +270,7 @@ export default function DebugDashboard() {
 				<Text style={[styles.statusText, phoneOnline && { color: colors.green }]}>{statusText}</Text>
 				{link.state === "connected" && !phoneOnline && link.addresses.length > 0 && (
 					<Text style={styles.hint}>
-						On the phone, connect to {link.addresses.join(" or ")} with room "{room}".
+						On the phone, connect to {link.addresses.join(" or ")} with room “{room}”.
 					</Text>
 				)}
 			</View>
@@ -280,7 +285,7 @@ export default function DebugDashboard() {
 							<Value name="FAST MOTION" value={debug.burst.toUpperCase()} />
 						</View>
 						<Text style={styles.hint}>
-							You're behind the phone. Blue is the pitch axis (forward and back, jump, crouch), orange the side axis (strafe), green the screen's Z axis (twist for sprint). Turning about the vertical is drawn from the gyro and eases back to centre.
+							You’re behind the phone. Blue is the pitch axis (forward and back, jump, crouch), orange the side axis (strafe), green the screen’s Z axis (twist for sprint). Turning about the vertical is drawn from the gyro and eases back to centre.
 						</Text>
 						<View style={styles.buttons}>
 							<Pressable style={styles.button} onPress={resetView}><Text style={styles.buttonText}>RECALIBRATE VIEW</Text></Pressable>
@@ -350,7 +355,7 @@ export default function DebugDashboard() {
 						<Text style={styles.raw}>GYRO °/s  X Y Z:  {fmtVec(snap.gyro)}</Text>
 						<Text style={styles.raw}>LINEAR ACCEL m/s²:  {fmtVec(snap.accel)}</Text>
 						<Text style={styles.raw}>GRAVITY (unit):  {fmtVec(snap.gravity, 2)}</Text>
-						<Text style={styles.hint}>Gyro is mapped to the phone's own X / Y / Z axes for {snap.platform}.</Text>
+						<Text style={styles.hint}>Gyro is mapped to the phone’s own X / Y / Z axes for {snap.platform}.</Text>
 					</Panel>
 				</View>
 			</View>

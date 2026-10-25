@@ -89,6 +89,8 @@ export type TeamStats = {
     crouches: number;
     /** Seconds spent sprinting. */
     sprintTime: number;
+    /** Highest consecutive kill count before a death in this match. */
+    bestStreak?: number;
 };
 
 /** Game host -> server -> phones while playing: the live score and clock. */
@@ -115,6 +117,19 @@ export type EndGameMessage = {
 export type ResetLobbyMessage = {
     type: "reset_lobby";
     protocolVersion: typeof protocolVersion;
+};
+
+/** Host-only feedback, routed by the server to one controller in this lobby. */
+export type ToControllerMessage = {
+    type: "to_controller";
+    controllerId: string;
+    message: Record<string, unknown>;
+};
+
+/** State and hit feedback from the game to its assigned phone. */
+export type ControllerFeedbackMessage = {
+    type: "controller_feedback";
+    message: Record<string, unknown>;
 };
 
 export type StartGameMessage = {
@@ -148,6 +163,7 @@ export type ClientMessage =
     | MatchStatusMessage
     | EndGameMessage
     | ResetLobbyMessage
+    | ToControllerMessage
     | MotionInputMessage
     | EnvironmentInputMessage;
 
@@ -232,6 +248,7 @@ export type AuthorizedInputMessage =
     | (EnvironmentInputMessage & { sender: string });
 
 export type ServerMessage =
+    | ControllerFeedbackMessage
     | GameRegisteredMessage
     | LobbyJoinedMessage
     | MatchStatusMessage

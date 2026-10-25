@@ -5,6 +5,8 @@
 [resource]
 script = ExtResource("1")
 display_name = "Shotgun"
+magazine_size = 6
+reload_seconds = 1.8
 damage = 11.0
 pellets = 9
 spread_degrees = 6.0

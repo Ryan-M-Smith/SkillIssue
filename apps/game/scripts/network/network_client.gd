@@ -19,7 +19,11 @@ const URL_ARG := "--server="                ## optional command-line override: -
 const KNOWN_TYPES: PackedStringArray = [
 	"game_registered", "lobby_state", "controller_assigned", "controller_disconnected",
 	"join_rejected", "broadcast", "role", "motion", "environment",
+	"match_status", "match_ended",
 ]
+const CONNECTION_TIMEOUT_MS := 6000
+const MAX_PACKETS_PER_FRAME := 128
+const MAX_MESSAGE_BYTES := 65536
 
 ## Off: the game connects when a lobby is created (GameSession.create_lobby).
 @export var auto_connect := false
@@ -37,6 +41,7 @@ var _retry_in := 0.0
 var _retry_delay := 0.0
 var _warned_types := {}
 var _stats_timer := 0.0
+var _attempt_started_msec := 0
 
 ## Read with get_stats(). Counts reset with reset_stats().
 var _stats := {
@@ -54,7 +59,11 @@ func _ready() -> void:
 
 func connect_to_server(new_url: String) -> void:
 	disconnect_from_server()
-	url = new_url
+	url = new_url.strip_edges()
+	if not (url.begins_with("ws://") or url.begins_with("wss://")):
+		network_error.emit("Server addresses must start with ws:// or wss://.")
+		return
+	_retry_delay = reconnect_delay
 	_want_connection = true
 	_open()
 
@@ -136,11 +145,18 @@ func _process(delta: float) -> void:
 	match state:
 		WebSocketPeer.STATE_OPEN:
 			if not _connected:
+				_ws.set_no_delay(true)
 				_set_connected(true)
 				_retry_delay = reconnect_delay
 				send_message("hello", {"clientType": "game"})
-			while _ws.get_available_packet_count() > 0:
+			var count := 0
+			while _ws.get_available_packet_count() > 0 and count < MAX_PACKETS_PER_FRAME:
+				count += 1
 				_handle_packet(_ws.get_packet())
+		WebSocketPeer.STATE_CONNECTING:
+			if Time.get_ticks_msec() - _attempt_started_msec > CONNECTION_TIMEOUT_MS:
+				_ws.close()
+				network_error.emit("Connection timed out. Check the server address and local network.")
 		WebSocketPeer.STATE_CLOSED:
 			if _connected:
 				network_error.emit("connection closed (%d %s)" % [_ws.get_close_code(), _ws.get_close_reason()])
@@ -161,6 +177,10 @@ func _process(delta: float) -> void:
 
 func _open() -> void:
 	_ws = WebSocketPeer.new()
+	_ws.inbound_buffer_size = MAX_MESSAGE_BYTES
+	_ws.max_queued_packets = MAX_PACKETS_PER_FRAME
+	_ws.heartbeat_interval = 10.0
+	_attempt_started_msec = Time.get_ticks_msec()
 	var err := _ws.connect_to_url(url)
 	# Whether connect_to_url failed or the attempt later closes, try again with backoff.
 	_retry_in = _retry_delay
@@ -182,6 +202,9 @@ func _set_connected(on: bool) -> void:
 
 func _handle_packet(bytes: PackedByteArray) -> void:
 	_stats.packets += 1
+	if bytes.size() > MAX_MESSAGE_BYTES:
+		_reject("message exceeds size limit")
+		return
 	var text := bytes.get_string_from_utf8()
 	var json := JSON.new()
 	if json.parse(text) != OK:
@@ -227,7 +250,7 @@ func _validate(value: Variant) -> Dictionary:
 		_reject("'sender' is not a string (type %s)" % type)
 		return {}
 	var timestamp: Variant = raw.get("timestamp", 0)
-	if typeof(timestamp) != TYPE_FLOAT and typeof(timestamp) != TYPE_INT:
+	if not (typeof(timestamp) in [TYPE_FLOAT, TYPE_INT]) or not is_finite(float(timestamp)):
 		_reject("'timestamp' is not a number (type %s)" % type)
 		return {}
 	var merged: Dictionary = (payload as Dictionary).duplicate()

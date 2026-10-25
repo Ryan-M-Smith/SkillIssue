@@ -28,7 +28,7 @@ grow_vertical = 2
 layout_mode = 2
 size_flags_horizontal = 3
 stretch = true
-stretch_shrink = 2
+stretch_shrink = 1
 
 [node name="SubViewport" type="SubViewport" parent="Screens/TeamAView" unique_id=98524503]
 handle_input_locally = false
@@ -42,7 +42,7 @@ current = true
 layout_mode = 2
 size_flags_horizontal = 3
 stretch = true
-stretch_shrink = 2
+stretch_shrink = 1
 
 [node name="SubViewport" type="SubViewport" parent="Screens/TeamBView" unique_id=823891378]
 handle_input_locally = false

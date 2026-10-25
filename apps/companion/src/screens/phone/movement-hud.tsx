@@ -3,8 +3,9 @@ import { StyleSheet, Text, View } from "react-native";
 import type { Counts, Direction, MovementState } from "@/lib/motion-summary";
 import type { GameControls } from "@/types/motion";
 import type { LobbyView } from "@/service/lobby-client";
-import { Eyebrow, Panel } from "./kit";
+import { Eyebrow, Panel, SlantButton } from "./kit";
 import { MatchBar } from "./match-bar";
+import { LiveVitals } from "./live-vitals";
 import { fonts, teamColor, teamTint, ui } from "./theme";
 
 const stateColor: Record<MovementState, string> = {
@@ -30,12 +31,14 @@ export function MovementHud({
 	state,
 	direction,
 	counts,
+	onRecalibrate,
 }: {
 	view: LobbyView;
 	controls: GameControls;
 	state: MovementState;
 	direction: Direction;
 	counts: Counts;
+	onRecalibrate?: () => void;
 }) {
 	const team = view.me?.teamId ?? 1;
 	return (
@@ -49,6 +52,7 @@ export function MovementHud({
 						<Text style={[styles.arrow, { color: teamColor(team) }]}>{direction.arrow}</Text>
 						<Text style={styles.dir}>{direction.label}</Text>
 					</View>
+					<LiveVitals feedback={view.feedback} color={teamColor(team)} />
 					<View style={styles.flags}>
 						<Text style={[styles.flag, controls.crouch && styles.flagOn]}>CROUCH</Text>
 						<Text style={[styles.flag, controls.sprint && styles.flagOn]}>SPRINT</Text>
@@ -63,7 +67,10 @@ export function MovementHud({
 					))}
 				</View>
 			</View>
-			<Text style={styles.hint}>Tilt to walk · tip to strafe · flick forward crouch · flick back jump · twist sprint</Text>
+			<View style={styles.footer}>
+				<Text style={[styles.hint, { flex: 1 }]}>Tilt to walk · tip to strafe · flick forward crouch · flick back jump · twist 32° to toggle sprint, then center</Text>
+				{onRecalibrate && <SlantButton label="RECENTER" small onPress={onRecalibrate} />}
+			</View>
 		</View>
 	);
 }
@@ -83,4 +90,5 @@ const styles = StyleSheet.create({
 	tile: { flexBasis: "45%", flexGrow: 1, justifyContent: "center" },
 	tileValue: { fontFamily: fonts.display, fontSize: 30, color: ui.ink },
 	hint: { fontFamily: fonts.body, fontSize: 12, color: ui.muted, textAlign: "center" },
+	footer: { flexDirection: "row", alignItems: "center", gap: 12 },
 });

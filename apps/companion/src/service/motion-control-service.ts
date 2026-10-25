@@ -31,7 +31,7 @@ export type { GameControls, MotionDebug, Role } from "@/types/motion";
  *           quick flick forward   crouch, flick again to stand up
  *           quick flick back      jump (while crouched: stand up)
  *   Yaw     slow tilt and hold    strafe right (right end down) / left
- *   Roll/Z  quick twist           sprint on, twist again for off
+ *   Roll/Z  comfortable 32° twist sprint on/off, return to neutral to re-arm
  *
  * WORKS IN ANY GRIP
  *
@@ -60,45 +60,47 @@ export type { GameControls, MotionDebug, Role } from "@/types/motion";
 // Adjustable settings
 const settings = {
 	// Neutral: phone held still this long at start
-	calibrationMs: 700,
+	calibrationMs: 450,
 	calibrationMaxRate: 15, // deg/s
 
 	// Walking: held tilt away from neutral
-	deadzoneDeg: 8,
-	fullSpeedDeg: 25,
+	deadzoneDeg: 5,
+	fullSpeedDeg: 20,
 
 	// Gravity smoothing when the phone doesn't report linear acceleration
-	gravitySmoothing: 0.15,
+	gravitySmoothing: 0.3,
 
 	// Bursts: a fast motion in progress
-	burstStartRate: 80, // deg/s
+	burstStartRate: 110, // deg/s
 	burstEndRate: 50, // deg/s
 	burstQuietMs: 80, // below burstEndRate this long ends the burst
-	burstMaxMs: 800,
+	burstMaxMs: 350,
 	dominance: 1.5, // winning axis must turn this many times more than the others
 
 	// Pitch flick: jump / crouch
-	flickRate: 150, // deg/s peak
-	flickMinDeg: 12,
+	flickRate: 135, // deg/s peak
+	flickMinDeg: 11,
 
-	// Twist (Z): sprint
-	twistRate: 150, // deg/s peak
-	twistMinDeg: 20,
+	// Wheel gestures use a held angle, so they work without a violent flick.
+	wheelTriggerDeg: 32,
+	wheelRearmDeg: 12,
+	wheelCooldownMs: 350,
 
 	// One gesture at a time
-	eventLockMs: 1000,
-	afterGestureMs: 500, // no walking this long after a gesture, unless back at neutral
+	eventLockMs: 350,
+	afterGestureMs: 180, // suppress the gesture's return swing
 
 	// Gunner
-	jabThreshold: 5.5,
+	jabThreshold: 3.4,
+	liftThreshold: 4.2,
 	gestureMaxRotation: 110,
-	gestureCooldownMs: 650,
-	rearmStillMs: 400,
-	rearmAcceleration: 1.2,
-	rearmRotation: 25,
-	aimFreezeAfterShotMs: 110,
+	gestureCooldownMs: 230,
+	rearmStillMs: 90,
+	rearmAcceleration: 1.8,
+	rearmRotation: 40,
+	aimFreezeAfterShotMs: 70,
 	aimMaxRate: 130,
-	aimDeadzone: 3,
+	aimDeadzone: 1.5,
 };
 
 // Flip a sign here if a direction comes out reversed on a real phone.
@@ -228,6 +230,8 @@ export class MotionController {
 	private lockedUntil = 0;
 	private quietUntil = 0;
 	private lastMove: Move = still;
+	private wheelArmed = true;
+	private wheelLockedUntil = 0;
 
 	// Gunner role
 	private armed = false;
@@ -261,6 +265,8 @@ export class MotionController {
 		this.lockedUntil = 0;
 		this.quietUntil = 0;
 		this.lastMove = still;
+		this.wheelArmed = true;
+		this.wheelLockedUntil = 0;
 
 		this.armed = false;
 		this.gunnerLockedUntil = 0;
@@ -287,10 +293,17 @@ export class MotionController {
 	}
 
 	process(reading: MotionReading, now = Date.now()): GameControls {
+		const total = reading.accelerationIncludingGravity;
+		const finiteVector = (v: MotionVector) => Number.isFinite(v.x) && Number.isFinite(v.y) && Number.isFinite(v.z);
+		if (!finiteVector(total) || magnitude(total) < 0.1 ||
+			(reading.acceleration && !finiteVector(reading.acceleration)) ||
+			(reading.rotationRate && ![reading.rotationRate.alpha, reading.rotationRate.beta, reading.rotationRate.gamma].every(Number.isFinite))) {
+			return { ...emptyControls, ready: this.frame !== null };
+		}
 		// Prefer the sensor's own clock: JS callbacks can arrive in bunches.
 		const stamp =
 			reading.rotationRate?.timestamp ?? reading.rotation.timestamp;
-		const t = typeof stamp === "number" ? stamp * 1000 : now;
+		const t = typeof stamp === "number" && Number.isFinite(stamp) ? stamp * 1000 : now;
 		const dt =
 			this.lastSampleAt === null
 				? 0
@@ -302,7 +315,7 @@ export class MotionController {
 		const gyro: MotionVector | null = reading.rotationRate
 			? deviceRotationRate(reading.rotationRate, this.platform)
 			: null;
-		const angularSpeed = gyro ? magnitude(gyro) : Infinity;
+		const angularSpeed = gyro ? magnitude(gyro) : 0;
 
 		// STEP 1: AUTOMATIC CALIBRATION
 		// Hold still: gravity then gives neutral and the grip.
@@ -349,7 +362,7 @@ export class MotionController {
 
 		return this.role === "movement"
 			? this.processMovement(gravity, this.frame, rates, t, dt)
-			: this.processGunner(reading, rates, angularSpeed, t);
+			: this.processGunner(reading, gravity, this.frame, rates, angularSpeed, t);
 	}
 
 	// Unit gravity direction in the phone's frame (points at the ground).
@@ -403,9 +416,16 @@ export class MotionController {
 			Math.abs(rightDeg) < settings.deadzoneDeg;
 
 		// STEP 2: GESTURES FROM GYROSCOPE BURSTS
-		let action: Action = null;
+		let action: Action = this.updateWheel(gravity, frame, t)
+			? this.toggleSprint()
+			: null;
+		if (action) {
+			this.burst = null;
+			this.lockedUntil = t + settings.eventLockMs;
+			this.quietUntil = t + settings.afterGestureMs;
+		}
 
-		if (rates) {
+		if (rates && !action) {
 			action = this.updateBurst(rates, t, dt);
 		}
 
@@ -525,17 +545,27 @@ export class MotionController {
 			return forward ? this.toggleCrouch() : this.jump();
 		}
 
-		// Twist about the screen normal (Z)
-		if (
-			twist >= settings.twistMinDeg &&
-			burst.peak.z >= settings.twistRate &&
-			twist >= settings.dominance * Math.max(pitch, side)
-		) {
-			return this.toggleSprint();
-		}
-
 		// Anything else (e.g. a quick left/right tilt) is not a gesture.
 		return null;
+	}
+
+	/** Angle around the screen normal, with hysteresis to ignore the return swing. */
+	private updateWheel(gravity: MotionVector, frame: Frame, t: number): boolean {
+		const neutralLength = Math.hypot(frame.down.x, frame.down.y);
+		const currentLength = Math.hypot(gravity.x, gravity.y);
+		// A face-up phone has no reliable wheel angle; ask for a normal tilted grip.
+		if (neutralLength < 0.25 || currentLength < 0.25) return false;
+		const angle = Math.abs(radToDeg(Math.atan2(
+			frame.down.x * gravity.y - frame.down.y * gravity.x,
+			frame.down.x * gravity.x + frame.down.y * gravity.y,
+		)));
+		if (angle <= settings.wheelRearmDeg && t >= this.wheelLockedUntil) {
+			this.wheelArmed = true;
+		}
+		if (!this.wheelArmed || t < this.wheelLockedUntil || angle < settings.wheelTriggerDeg) return false;
+		this.wheelArmed = false;
+		this.wheelLockedUntil = t + settings.wheelCooldownMs;
+		return true;
 	}
 
 	private toggleCrouch(): Action {
@@ -571,14 +601,22 @@ export class MotionController {
 
 	private processGunner(
 		reading: MotionReading,
+		gravity: MotionVector,
+		frame: Frame,
 		rates: PlayerRates | null,
 		angularSpeed: number,
 		t: number
 	): GameControls {
-		const linear = reading.acceleration;
-		const linearMagnitude = linear ? magnitude(linear) : Infinity;
+		// Browsers can omit linear acceleration; subtract smoothed gravity instead.
+		const total = reading.accelerationIncludingGravity;
+		const linear = reading.acceleration ?? {
+			x: total.x - gravity.x * 9.80665,
+			y: total.y - gravity.y * 9.80665,
+			z: total.z - gravity.z * 9.80665,
+		};
+		const linearMagnitude = magnitude(linear);
 
-		let action: Action = null;
+		let action: Action = this.updateWheel(gravity, frame, t) ? "weapon_next" : null;
 
 		// Re-arm: prevent returning the phone from firing another shot.
 		if (!this.armed) {
@@ -603,24 +641,24 @@ export class MotionController {
 		// Forward jab to shoot
 		if (
 			this.armed &&
-			linear &&
+			!action &&
 			angularSpeed < settings.gestureMaxRotation
 		) {
 			const forwardImpulse = axes.forwardJabZSign * linear.z;
 
-			if (
-				forwardImpulse >= settings.jabThreshold &&
-				forwardImpulse > 0.8 * linearMagnitude
-			) {
-				action = "shoot";
-
-				// Temporarily suppress camera jitter
-				this.aimFrozenUntil = t + settings.aimFreezeAfterShotMs;
-
-				this.armed = false;
-				this.gunnerLockedUntil = t + settings.gestureCooldownMs;
-				this.stillSince = null;
+			const liftImpulse = dot(linear, scale(frame.down, -1));
+			if (Math.abs(forwardImpulse) >= settings.jabThreshold && Math.abs(forwardImpulse) > 0.75 * linearMagnitude) {
+				action = forwardImpulse > 0 ? "shoot" : "scope";
+			} else if (liftImpulse >= settings.liftThreshold && liftImpulse > 0.75 * linearMagnitude) {
+				action = "reload";
 			}
+		}
+		if (action) {
+			// Temporarily suppress camera jitter and ignore the return movement.
+			this.aimFrozenUntil = t + settings.aimFreezeAfterShotMs;
+			this.armed = false;
+			this.gunnerLockedUntil = t + settings.gestureCooldownMs;
+			this.stillSince = null;
 		}
 
 		this.debug.gesture = this.armed ? "armed" : "locked";

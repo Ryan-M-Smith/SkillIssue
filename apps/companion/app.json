@@ -5,10 +5,13 @@
     "version": "1.0.0",
     "orientation": "landscape",
     "icon": "./assets/images/icon.png",
-    "scheme": "companion",
+    "scheme": ["companion", "skillissue"],
     "userInterfaceStyle": "automatic",
     "ios": {
-      "icon": "./assets/expo.icon"
+      "icon": "./assets/expo.icon",
+      "infoPlist": {
+        "NSLocalNetworkUsageDescription": "Connect to the SkillIssue game on your Wi-Fi network."
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -25,6 +28,12 @@
     },
     "plugins": [
       "expo-router",
+      [
+        "expo-sensors",
+        {
+          "motionPermission": "Allow SkillIssue to use motion for movement and aiming."
+        }
+      ],
       [
         "expo-splash-screen",
         {

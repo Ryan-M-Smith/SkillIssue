@@ -24,6 +24,10 @@ signal hit_confirmed(target: Node, damage: float, headshot: bool)
 var owned: Array[bool] = []
 var current := 0
 var scoped := false
+var reloading := false
+
+var _magazines: Array[int] = []
+var _reload_left := 0.0
 
 var _cooldown := 0.0
 var _fire_was := false
@@ -40,8 +44,13 @@ func _ready() -> void:
 
 func reset_loadout() -> void:
 	owned.clear()
+	_magazines.clear()
 	for i in loadout.size():
 		owned.append(i == 0)
+		_magazines.append(maxi(loadout[i].magazine_size, 1))
+	reloading = false
+	_reload_left = 0.0
+	_fire_was = false
 	_cooldown = 0.0
 	_bloom = 0.0
 	select(0, true)
@@ -52,7 +61,27 @@ func set_excluded(rids: Array[RID]) -> void:
 
 
 func current_data() -> WeaponData:
-	return loadout[current] if current < loadout.size() else null
+	return loadout[current] if current >= 0 and current < loadout.size() else null
+
+
+func ammo_in_mag() -> int:
+	return _magazines[current] if current >= 0 and current < _magazines.size() else 0
+
+
+func reload_progress() -> float:
+	var data := current_data()
+	if not reloading or data == null:
+		return 0.0
+	return clampf(1.0 - _reload_left / maxf(data.reload_seconds, 0.1), 0.0, 1.0)
+
+
+func reload() -> void:
+	var data := current_data()
+	if reloading or data == null or ammo_in_mag() >= data.magazine_size:
+		return
+	reloading = true
+	_reload_left = maxf(data.reload_seconds, 0.1)
+	_set_scoped(false)
 
 
 ## Pickups call this. Returns true if it was a new gun (pickup gets consumed).
@@ -71,6 +100,8 @@ func select(i: int, force := false) -> void:
 	if i == current and not force:
 		return
 	current = i
+	reloading = false
+	_reload_left = 0.0
 	_set_scoped(false)
 	_cooldown = maxf(_cooldown, 0.25)   # small swap delay
 	_update_view_model()
@@ -84,10 +115,21 @@ func tick(input: DuoInput, delta: float) -> void:
 	var data := current_data()
 	if data == null:
 		return
-	if input.scope_toggle and data.has_scope:
+	if input.scope_toggle and data.has_scope and not reloading:
 		_set_scoped(not scoped)
-	if input.fire and _cooldown <= 0.0 and (data.automatic or not _fire_was):
-		_shoot(data)
+	if input.reload:
+		reload()
+	if reloading:
+		_reload_left = maxf(_reload_left - delta, 0.0)
+		if _reload_left <= 0.0:
+			_magazines[current] = maxi(data.magazine_size, 1)
+			reloading = false
+	elif input.fire and _cooldown <= 0.0 and (data.automatic or not _fire_was):
+		if ammo_in_mag() > 0:
+			_magazines[current] -= 1
+			_shoot(data)
+		if ammo_in_mag() <= 0:
+			reload()
 	_fire_was = input.fire
 	_bloom = move_toward(_bloom, 0.0, data.bloom_recovery * delta)
 	# view-model recoil

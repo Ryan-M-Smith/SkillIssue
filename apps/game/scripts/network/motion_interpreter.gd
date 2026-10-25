@@ -12,8 +12,8 @@
 extends RefCounted
 
 # --- mover: tilt → move (x = right, y = forward, length 0..1)
-var tilt_deadzone_deg := 8.0
-var tilt_max_deg := 27.0
+var tilt_deadzone_deg := 5.0
+var tilt_max_deg := 20.0
 var forward_axis := Vector3(1, 0, 0)   ## phone axis whose rotation means "lean forward"
 var right_axis := Vector3(0, 1, 0)     ## phone axis whose rotation means "lean right"
 
@@ -21,7 +21,7 @@ var right_axis := Vector3(0, 1, 0)     ## phone axis whose rotation means "lean 
 var gyro_in_degrees := false           ## expo-sensors Gyroscope reports rad/s
 var yaw_axis := Vector3(0, -1, 0)      ## turning the phone right spins it about -y (portrait)
 var pitch_axis := Vector3(1, 0, 0)     ## tilting the top toward you spins it about +x
-var aim_deadzone_deg := 3.0            ## per second; filters hand tremor
+var aim_deadzone_deg := 1.5            ## per second; filters hand tremor
 var aim_max_rate_deg := 130.0          ## what lookX/lookY = 1.0 means (controls path)
 var aim_sensitivity := 1.0
 
@@ -38,6 +38,7 @@ var _last_msec := -1
 ## The next tilt reading becomes "standing still". Called on assignment and on "ready".
 func calibrate() -> void:
 	_neutral = Vector3.ZERO
+	clear()
 
 
 func clear() -> void:
@@ -75,6 +76,10 @@ func feed(payload: Dictionary, role: String, now_msec: int) -> bool:
 
 
 func _feed_controls(c: Dictionary, role: String, now_msec: int) -> bool:
+	for key in ["moveX", "moveY", "lookX", "lookY"]:
+		var value: Variant = c.get(key)
+		if not (typeof(value) in [TYPE_FLOAT, TYPE_INT]) or not is_finite(float(value)):
+			return false
 	if role == "mover":
 		move = Vector2(_num(c.get("moveX")), _num(c.get("moveY"))).limit_length(1.0)
 	else:
@@ -103,7 +108,7 @@ func _tilt_amount(deg: float) -> float:
 	var a := absf(deg)
 	if a < tilt_deadzone_deg:
 		return 0.0
-	return signf(deg) * clampf((a - tilt_deadzone_deg) / (tilt_max_deg - tilt_deadzone_deg), 0.0, 1.0)
+	return signf(deg) * clampf((a - tilt_deadzone_deg) / maxf(tilt_max_deg - tilt_deadzone_deg, 0.001), 0.0, 1.0)
 
 
 func _gyro_to_aim(gyro: Vector3) -> Vector2:
@@ -118,7 +123,7 @@ func _gyro_to_aim(gyro: Vector3) -> Vector2:
 
 
 static func _num(v: Variant) -> float:
-	return float(v) if typeof(v) == TYPE_FLOAT or typeof(v) == TYPE_INT else 0.0
+	return float(v) if (typeof(v) == TYPE_FLOAT or typeof(v) == TYPE_INT) and is_finite(float(v)) else 0.0
 
 
 ## {x, y, z} with numeric fields → Vector3, else null.
@@ -127,6 +132,6 @@ static func _vec3(v: Variant) -> Variant:
 		return null
 	var d: Dictionary = v
 	for k in ["x", "y", "z"]:
-		if typeof(d.get(k)) != TYPE_FLOAT and typeof(d.get(k)) != TYPE_INT:
+		if not (typeof(d.get(k)) in [TYPE_FLOAT, TYPE_INT]) or not is_finite(float(d[k])):
 			return null
 	return Vector3(d.x, d.y, d.z)

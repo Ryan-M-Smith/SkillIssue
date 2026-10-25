@@ -2,11 +2,13 @@ import { useEffect, useRef, useState, type ReactNode } from "react";
 import { Platform, StatusBar, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { DeviceMotion } from "expo-sensors";
+import * as Linking from "expo-linking";
 
 import { MotionController, emptyControls } from "@/service/motion-control-service";
 import { LobbyClient, idleLobby, type ControllerRole, type LobbyView, type TeamId } from "@/service/lobby-client";
 import { MotionTally, directionOf, zeroCounts, type Counts, type MovementState } from "@/lib/motion-summary";
 import { defaultDebugServerUrl } from "@/lib/net/server-url";
+import { parseJoinTicket } from "@/lib/net/join-ticket";
 import type { GameControls, Role } from "@/types/motion";
 
 import { AimHud } from "./phone/aim-hud";
@@ -17,6 +19,7 @@ import { MovementHud } from "./phone/movement-hud";
 import { Practice } from "./phone/practice";
 import { TeamSelect } from "./phone/team-select";
 import { ui } from "./phone/theme";
+import { Body } from "./phone/kit";
 
 type Screen = "menu" | "code" | "practice" | "match";
 
@@ -40,18 +43,46 @@ export default function PhoneApp() {
 	const [controls, setControls] = useState<GameControls>(emptyControls);
 	const [counts, setCounts] = useState<Counts>(zeroCounts);
 	const [state, setState] = useState<MovementState>("Calibrating");
-	const [weapon, setWeapon] = useState(0);
-	const [firing, setFiring] = useState(false);
 	const [notice, setNotice] = useState<string | null>(null);
+	const [joinError, setJoinError] = useState<string | null>(null);
+	const [sensorSession, setSensorSession] = useState(0);
+	const activeControls = screen === "match" && (view.stage === "lobby" || view.stage === "playing");
 
 	const clientRef = useRef<LobbyClient | null>(null);
 	const roleRef = useRef<Role>("movement");
 	const controllerRef = useRef(new MotionController("movement", Platform.OS));
 	const tallyRef = useRef(new MotionTally());
 	const lastDrawRef = useRef(0);
+	const stageRef = useRef(view.stage);
+	const gameStateRef = useRef(view.state);
 
-	// Motion sensors run the whole time; the model matches this phone's role.
 	useEffect(() => {
+		let cancelled = false;
+		function handleLink(link: string | null) {
+			if (cancelled || !link) return;
+			try {
+				const url = new URL(link);
+				if (!url.searchParams.has("code")) return;
+				const target = parseJoinTicket(`skillissue://join?${url.searchParams.toString()}`, defaultDebugServerUrl());
+				clientRef.current?.leave();
+				clientRef.current = null;
+				setCode(target.code);
+				setServerUrl(target.serverUrl);
+				setScreen("code");
+				setJoinError(null);
+			} catch (e) {
+				setJoinError(e instanceof Error ? e.message : "This lobby link is invalid.");
+				setScreen("code");
+			}
+		}
+		void Linking.getInitialURL().then(handleLink).catch(() => {});
+		const subscription = Linking.addEventListener("url", ({ url }) => handleLink(url));
+		return () => { cancelled = true; subscription.remove(); };
+	}, []);
+
+	// Practice owns its own sensors; the match model runs only while in a lobby/game.
+	useEffect(() => {
+		if (!activeControls) return;
 		let subscription: ReturnType<typeof DeviceMotion.addListener> | null = null;
 		let cancelled = false;
 		(async () => {
@@ -74,40 +105,63 @@ export default function PhoneApp() {
 					}
 				});
 			} catch (e) {
-				setNotice(e instanceof Error ? e.message : String(e));
+				if (!cancelled) setNotice(e instanceof Error ? e.message : String(e));
 			}
 		})();
 		return () => {
 			cancelled = true;
 			subscription?.remove();
-			clientRef.current?.leave();
 		};
-	}, []);
+	}, [activeControls, sensorSession]);
 
-	// Switch the motion model when the role changes; fresh counts at kick-off.
-	const myRole = view.me?.role ?? null;
-	useEffect(() => {
-		const next = modelRole(myRole);
-		if (next !== roleRef.current) {
-			roleRef.current = next;
-			controllerRef.current = new MotionController(next, Platform.OS);
+	useEffect(() => () => { clientRef.current?.leave(); }, []);
+
+	function recenter() {
+		controllerRef.current.reset();
+		// Browser motion permission must be requested directly from a user gesture.
+		void DeviceMotion.requestPermissionsAsync().then((permission) => {
+			if (permission.granted) { setNotice(null); setSensorSession((session) => session + 1); }
+			else setNotice("Motion permission denied. Allow motion access in your phone settings.");
+		}).catch(() => setNotice("Motion sensors are unavailable. Open the native phone app or use HTTPS."));
+	}
+
+	// Synchronize the sensor model before the next reading reaches the game.
+	function onLobbyChange(next: LobbyView) {
+		const role = modelRole(next.me?.role);
+		if (role !== roleRef.current) {
+			roleRef.current = role;
+			controllerRef.current = new MotionController(role, Platform.OS);
 		}
-	}, [myRole]);
-
-	useEffect(() => {
-		if (view.stage === "playing") {
+		if (next.stage === "playing" && (stageRef.current !== "playing" || (gameStateRef.current === "paused" && next.state === "playing"))) {
 			tallyRef.current.reset();
 			setCounts({ ...zeroCounts });
-			setWeapon(0);
+			controllerRef.current.reset();
+			setControls(emptyControls);
+			setState("Calibrating");
 		}
-		if (view.stage === "lobby") setWaitingAgain(false);
-	}, [view.stage]);
+		if (next.stage === "lobby") setWaitingAgain(false);
+		stageRef.current = next.stage;
+		gameStateRef.current = next.state;
+		setView(next);
+	}
 
 	function join() {
-		clientRef.current?.leave();
-		const client = new LobbyClient(serverUrl.trim(), Platform.OS, setView);
-		clientRef.current = client;
-		client.join(code, name || "Player");
+		try {
+			const target = parseJoinTicket(code, serverUrl);
+			if (Platform.OS === "web" && typeof window !== "undefined" && window.location.protocol === "https:" && target.serverUrl.startsWith("ws:")) {
+				throw new Error("This browser page uses HTTPS. Open the native phone app for a local lobby, or use a secure wss:// host.");
+			}
+			setJoinError(null);
+			recenter();
+			setServerUrl(target.serverUrl);
+			clientRef.current?.leave();
+			const client = new LobbyClient(target.serverUrl, Platform.OS, onLobbyChange);
+			clientRef.current = client;
+			setScreen("match");
+			client.join(target.code, name || "Player");
+		} catch (e) {
+			setJoinError(e instanceof Error ? e.message : "This lobby ticket is invalid.");
+		}
 	}
 
 	function leave() {
@@ -115,17 +169,8 @@ export default function PhoneApp() {
 		clientRef.current = null;
 		setView(idleLobby);
 		setWaitingAgain(false);
+		setJoinError(null);
 		setScreen("menu");
-	}
-
-	function fire(down: boolean) {
-		setFiring(down);
-		clientRef.current?.setFiring(down);
-	}
-
-	function pickWeapon(slot: number) {
-		setWeapon(slot);
-		clientRef.current?.selectWeapon(slot);
 	}
 
 	let body: ReactNode;
@@ -136,7 +181,7 @@ export default function PhoneApp() {
 				onName={setName}
 				serverUrl={serverUrl}
 				onServerUrl={setServerUrl}
-				onJoin={() => setScreen("code")}
+				onJoin={() => { setJoinError(null); setScreen("code"); }}
 				onPractice={() => setScreen("practice")}
 				notice={notice}
 			/>
@@ -147,14 +192,11 @@ export default function PhoneApp() {
 		body = (
 			<EnterCode
 				code={code}
-				onCode={setCode}
-				onJoin={() => {
-					setScreen("match");
-					join();
-				}}
+				onCode={(value) => { setCode(value); setJoinError(null); }}
+				onJoin={join}
 				onBack={leave}
 				busy={screen === "match" && view.stage === "connecting"}
-				error={screen === "match" ? view.error : null}
+				error={joinError ?? (screen === "match" ? view.error : null)}
 			/>
 		);
 	} else if (view.stage === "lobby") {
@@ -169,9 +211,9 @@ export default function PhoneApp() {
 	} else if (view.stage === "playing") {
 		body =
 			view.me?.role === "aim" ? (
-				<AimHud view={view} controls={controls} weapon={weapon} firing={firing} onFire={fire} onScope={() => clientRef.current?.toggleScope()} onWeapon={pickWeapon} />
+				<AimHud view={view} controls={controls} weapon={view.feedback?.weapon ?? 0} firing={controls.action === "shoot"} onRecalibrate={recenter} />
 			) : (
-				<MovementHud view={view} controls={controls} state={state} direction={directionOf(controls)} counts={counts} />
+				<MovementHud view={view} controls={controls} state={state} direction={directionOf(controls)} counts={counts} onRecalibrate={recenter} />
 			);
 	} else {
 		body = <GameOver view={view} waiting={waitingAgain} onPlayAgain={() => setWaitingAgain(true)} onMenu={leave} />;
@@ -181,10 +223,12 @@ export default function PhoneApp() {
 		<SafeAreaView style={styles.root} edges={["top", "bottom", "left", "right"]}>
 			<StatusBar hidden />
 			{body}
+			{notice && screen === "match" && view.stage === "playing" && <Body size={12} color={ui.gold} style={styles.notice}>{notice} Tap RECENTER to retry.</Body>}
 		</SafeAreaView>
 	);
 }
 
 const styles = StyleSheet.create({
 	root: { flex: 1, backgroundColor: ui.bg },
+	notice: { position: "absolute", bottom: 6, left: 20, right: 20, textAlign: "center", backgroundColor: ui.bg },
 });

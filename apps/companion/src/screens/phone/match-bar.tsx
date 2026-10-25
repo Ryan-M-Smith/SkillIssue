@@ -13,7 +13,7 @@ export function MatchBar({ view, role, calibrated }: { view: LobbyView; role: st
 		<View style={[styles.bar, { borderColor: teamColor(team), backgroundColor: teamTint(team, 0.18) }]}>
 			<View style={{ flex: 1 }}>
 				<Text style={[styles.team, { color: teamColor(team) }]}>TEAM {teamName(team)}</Text>
-				<Text style={styles.role}>{role} · {calibrated ? "calibrated" : "hold still to calibrate"}</Text>
+				<Text style={[styles.role, view.state === "paused" && { color: ui.gold }]}>{view.state === "paused" ? "PAUSED · waiting for controllers to reconnect" : `${role} · ${calibrated ? "calibrated" : "hold still to calibrate"}`}</Text>
 			</View>
 			<Score team={1} value={scores[0]} />
 			<View style={styles.clock}>

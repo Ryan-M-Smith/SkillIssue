@@ -12,6 +12,7 @@ var sprint := false             ## held (the phone toggles it; the game just rea
 # --- gunner (upper body)
 var aim_delta := Vector2.ZERO   ## radians this frame; x = turn right, y = look up
 var fire := false               ## held
+var reload := false             ## pressed this frame
 var scope_toggle := false       ## pressed this frame
 var weapon_slot := -1           ## requested slot this frame, -1 = none
 
@@ -23,6 +24,7 @@ func reset() -> void:
 	sprint = false
 	aim_delta = Vector2.ZERO
 	fire = false
+	reload = false
 	scope_toggle = false
 	weapon_slot = -1
 

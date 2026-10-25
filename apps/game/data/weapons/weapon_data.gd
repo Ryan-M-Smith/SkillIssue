@@ -14,6 +14,8 @@ enum SpreadPattern {
 @export var automatic := true              ## keep firing while FIRE is held
 @export var max_range := 100.0
 @export var headshot_multiplier := 2.0     ## used when a pellet hits the HEAD zone
+@export_range(1, 100) var magazine_size := 12
+@export_range(0.1, 10.0) var reload_seconds := 1.25
 
 @export_group("Spread")
 @export var spread_degrees := 0.5          ## base cone half-angle, standing still on the ground

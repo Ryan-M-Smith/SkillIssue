@@ -52,7 +52,7 @@ export function MainMenu({
 				<SlantButton label={settings ? "HIDE SETTINGS" : "SETTINGS"} small onPress={() => setSettings(!settings)} />
 				{settings && (
 					<View style={{ gap: 6 }}>
-						<Eyebrow>Server address</Eyebrow>
+						<Eyebrow>Host override (optional)</Eyebrow>
 						<TextInput
 							style={styles.input}
 							value={serverUrl}
@@ -62,7 +62,7 @@ export function MainMenu({
 							placeholder="ws://192.168.1.20:8080"
 							placeholderTextColor={ui.muted}
 						/>
-						<Body size={12} color={ui.muted}>Shown in the game's lobby, under the join code.</Body>
+						<Body size={12} color={ui.muted}>Your host is found automatically. A full lobby ticket also includes its address.</Body>
 					</View>
 				)}
 			</View>

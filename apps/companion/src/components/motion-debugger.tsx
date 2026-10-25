@@ -195,7 +195,7 @@ export default function MotionDebugger(motion: MotionDebuggerProps) {
 	) : (
         <ScrollView style={styles.screen} contentContainerStyle={styles.container}>
             <Text style={styles.title}> Motion Controller Debugger </Text>
-            <Text style={styles.subtitle}> Test your phone's motion-based game controls </Text>
+            <Text style={styles.subtitle}> Test your phone’s motion game controls </Text>
             <RoleCard motion={motion}/>
             <StatusCard motion={motion}/>
             <OutputCard motion={motion}/>

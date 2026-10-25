@@ -28,6 +28,13 @@ const SLOTS := [
 const HANDSHAKE_TIMEOUT_MS := 5000
 const MAX_DEBUG_READINGS := 50
 const MAX_PACKETS_PER_PEER := 64   ## per frame, so one chatty phone can't stall the game
+const MAX_CONNECTIONS := 32
+const MAX_MESSAGE_BYTES := 65536
+const MAX_MESSAGES_PER_SECOND := 240
+const IDENTIFY_TIMEOUT_MS := 10000
+const MOVEMENT_ACTIONS := ["jump", "crouch", "sprint"]
+const AIM_ACTIONS := ["shoot", "scope", "weapon", "reload"]
+const SHARED_ACTIONS := ["ready", "interact", "none"]
 
 @export var port := 8080
 ## Phones a match needs before it can start. 4 = a full match; lower it to test alone.
@@ -39,6 +46,7 @@ var message := ""
 
 var _tcp := TCPServer.new()
 var _pending: Array[Dictionary] = []   ## {"ws", "since"}: WebSocket handshakes in progress
+var _closing: Array[Dictionary] = []   ## keep polling until the closing handshake finishes
 var _peers := {}                       ## peer id -> {"ws", "kind", ...}; kind "" | "controller" | "debug"
 var _next_peer := 1
 var _rng := RandomNumberGenerator.new()
@@ -85,6 +93,16 @@ func lan_urls() -> PackedStringArray:
 	return PackedStringArray(sorted)
 
 
+## One value a phone can paste: the LAN address and lobby code travel together.
+func join_ticket(code: String = "") -> String:
+	var urls := lan_urls()
+	if urls.is_empty():
+		return ""
+	if code.is_empty() and _session != null:
+		code = str(_session.pairingCode)
+	return "%s/%s" % [urls[0].trim_prefix("ws://"), code]
+
+
 ## Starts listening if it isn't already. If something else holds the port (say, the Node
 ## server started by hand), the state becomes "external" and the game connects to that.
 func ensure_running() -> void:
@@ -110,6 +128,7 @@ func stop() -> void:
 	for p in _pending:
 		p.ws.close()
 	_pending.clear()
+	_closing.clear()
 	_tcp.stop()
 	if state == "running":
 		_set_status("idle", "")
@@ -146,7 +165,7 @@ func _close_lobby() -> void:
 func host_message(msg: Dictionary) -> void:
 	match str(msg.get("type", "")):
 		"hello":
-			if int(msg.get("protocolVersion", 0)) != PROTOCOL_VERSION or msg.get("clientType") != "game":
+			if not _valid_version(msg) or typeof(msg.get("clientType")) != TYPE_STRING or msg.clientType != "game":
 				_to_host(_rejection("invalid_message", "Only protocol version 1 game hello messages are supported."))
 				return
 			_register_game()
@@ -158,6 +177,8 @@ func host_message(msg: Dictionary) -> void:
 			_end_game(msg)
 		"reset_lobby":
 			_reset_lobby()
+		"to_controller":
+			_forward_feedback(msg)
 		_:
 			_to_host(_rejection("invalid_message", "Unknown message type."))
 
@@ -174,11 +195,18 @@ func _process(_delta: float) -> void:
 	if state != "running":
 		return
 	while _tcp.is_connection_available():
+		var stream := _tcp.take_connection()
+		if _pending.size() + _peers.size() + _closing.size() >= MAX_CONNECTIONS:
+			stream.disconnect_from_host()
+			continue
 		var ws := WebSocketPeer.new()
-		ws.inbound_buffer_size = 1 << 18
+		ws.inbound_buffer_size = MAX_MESSAGE_BYTES
+		ws.outbound_buffer_size = MAX_MESSAGE_BYTES
+		ws.max_queued_packets = 128
 		if "heartbeat_interval" in ws:
 			ws.set("heartbeat_interval", 10.0)
-		if ws.accept_stream(_tcp.take_connection()) == OK:
+		if ws.accept_stream(stream) == OK:
+			ws.set_no_delay(true)
 			_pending.append({"ws": ws, "since": Time.get_ticks_msec()})
 
 	for i in range(_pending.size() - 1, -1, -1):
@@ -190,7 +218,7 @@ func _process(_delta: float) -> void:
 				_pending.remove_at(i)
 				var id := _next_peer
 				_next_peer += 1
-				_peers[id] = {"ws": ws, "kind": ""}
+				_peers[id] = {"ws": ws, "kind": "", "since": Time.get_ticks_msec(), "window": Time.get_ticks_msec(), "messages": 0}
 			WebSocketPeer.STATE_CLOSED:
 				_pending.remove_at(i)
 			_:
@@ -198,18 +226,39 @@ func _process(_delta: float) -> void:
 					ws.close()
 					_pending.remove_at(i)
 
+	for i in range(_closing.size() - 1, -1, -1):
+		var closing: Dictionary = _closing[i]
+		(closing.ws as WebSocketPeer).poll()
+		if closing.ws.get_ready_state() == WebSocketPeer.STATE_CLOSED or Time.get_ticks_msec() - int(closing.since) > 2000:
+			_closing.remove_at(i)
+
 	for id in _peers.keys():
 		if not _peers.has(id):
 			continue
 		var ws: WebSocketPeer = _peers[id].ws
+		var peer: Dictionary = _peers[id]
 		ws.poll()
 		if ws.get_ready_state() == WebSocketPeer.STATE_CLOSED:
 			_disconnect(id)
 			continue
+		if peer.kind == "" and Time.get_ticks_msec() - int(peer.since) > IDENTIFY_TIMEOUT_MS:
+			_close_peer(id, 1008, "Join a lobby or debug room within 10 seconds.")
+			continue
 		var n := 0
 		while ws.get_available_packet_count() > 0 and n < MAX_PACKETS_PER_PEER and _peers.has(id):
 			n += 1
-			var data: Variant = JSON.parse_string(ws.get_packet().get_string_from_utf8())
+			var packet := ws.get_packet()
+			if Time.get_ticks_msec() - int(peer.window) >= 1000:
+				peer.window = Time.get_ticks_msec()
+				peer.messages = 0
+			peer.messages += 1
+			if int(peer.messages) > MAX_MESSAGES_PER_SECOND or packet.size() > MAX_MESSAGE_BYTES:
+				_close_peer(id, 1008, "Too much input; reconnect and try again.")
+				break
+			if not ws.was_string_packet():
+				_close_peer(id, 1003, "Use JSON text messages.")
+				break
+			var data: Variant = JSON.parse_string(packet.get_string_from_utf8())
 			if typeof(data) != TYPE_DICTIONARY or typeof(data.get("type")) != TYPE_STRING:
 				_send(id, _rejection("invalid_message", "Message must be valid JSON with a type."))
 				continue
@@ -226,9 +275,9 @@ func _close_peer(id: int, code: int, reason: String) -> void:
 	var peer: Variant = _peers.get(id)
 	if peer == null:
 		return
-	_peers.erase(id)
-	_leave_debug(id, peer)
+	_disconnect(id)
 	(peer.ws as WebSocketPeer).close(code, reason)
+	_closing.append({"ws": peer.ws, "since": Time.get_ticks_msec()})
 
 
 func _rejection(code: String, text: String) -> Dictionary:
@@ -252,7 +301,7 @@ func _handle(id: int, msg: Dictionary) -> void:
 			_send(id, _rejection("invalid_message", "This server is hosted by the game; it doesn't take another game."))
 		"join_game":
 			var role: Variant = msg.get("requestedRole")
-			if int(msg.get("protocolVersion", 0)) != PROTOCOL_VERSION or typeof(msg.get("pairingCode")) != TYPE_STRING \
+			if not _valid_version(msg) or typeof(msg.get("pairingCode")) != TYPE_STRING \
 					or (role != null and not (role in ["movement", "aim"])):
 				_send(id, _rejection("invalid_message", "Invalid join request."))
 				return
@@ -445,6 +494,9 @@ func _set_ready(id: int, ready: Variant) -> void:
 		return
 	if _session.state != "waiting" and _session.state != "ready":
 		return
+	if typeof(ready) != TYPE_BOOL:
+		_send(id, _rejection("invalid_message", "Ready must be true or false."))
+		return
 	if ready == true and (c.teamId == null or c.role == null):
 		_send(id, _rejection("invalid_message", "Pick a team and role before you ready up."))
 		return
@@ -460,13 +512,32 @@ func _forward_input(id: int, msg: Dictionary) -> void:
 	if _session.state != "playing":
 		_send(id, {"type": "broadcast", "error": "Input is ignored until the match is playing."})
 		return
+	if not _valid_input(msg, c.role):
+		_send(id, _rejection("invalid_message", "Invalid input for this controller role."))
+		return
 	var out := msg.duplicate()
 	out.sender = c.controllerId
 	_to_host(out)
 
 
+func _forward_feedback(msg: Dictionary) -> void:
+	var feedback: Variant = msg.get("message")
+	if _session == null or typeof(msg.get("controllerId")) != TYPE_STRING or typeof(feedback) != TYPE_DICTIONARY:
+		return
+	if not (feedback.get("t") in ["state", "buzz"]) or JSON.stringify(feedback).length() > 4096:
+		_to_host(_rejection("invalid_message", "Invalid controller feedback."))
+		return
+	for id in _session.controllers:
+		if _session.controllers[id].controllerId == msg.controllerId:
+			_send(id, {"type": "controller_feedback", "message": feedback})
+			return
+
+
 func _start_game() -> void:
 	if _session == null:
+		return
+	if not (_session.state in ["waiting", "ready"]):
+		_to_host(_rejection("game_unavailable", "This match has already started."))
 		return
 	if not _is_ready():
 		_to_host(_rejection("game_unavailable",
@@ -490,7 +561,66 @@ func _relay_match_status(msg: Dictionary) -> void:
 
 
 func _num(v: Variant) -> int:
-	return int(v) if typeof(v) in [TYPE_INT, TYPE_FLOAT] else 0
+	return int(v) if _finite(v) else 0
+
+
+func _finite(value: Variant) -> bool:
+	return typeof(value) in [TYPE_INT, TYPE_FLOAT] and is_finite(float(value))
+
+
+func _valid_version(msg: Dictionary) -> bool:
+	var version: Variant = msg.get("protocolVersion")
+	return _finite(version) and float(version) == float(PROTOCOL_VERSION)
+
+
+func _vector(value: Variant) -> bool:
+	if typeof(value) != TYPE_DICTIONARY:
+		return false
+	for axis in ["x", "y", "z"]:
+		if not _finite(value.get(axis)) or absf(float(value[axis])) > 1000000.0:
+			return false
+	return true
+
+
+func _rotation(value: Variant) -> bool:
+	if typeof(value) != TYPE_DICTIONARY:
+		return false
+	for axis in ["alpha", "beta", "gamma"]:
+		if not _finite(value.get(axis)) or absf(float(value[axis])) > 1000000.0:
+			return false
+	return true
+
+
+func _valid_debug_reading(value: Variant) -> bool:
+	if typeof(value) != TYPE_DICTIONARY or not _rotation(value.get("rotation")) or not _vector(value.get("accelerationIncludingGravity")):
+		return false
+	return (value.get("rotationRate") == null or _rotation(value.rotationRate)) \
+		and (value.get("acceleration") == null or _vector(value.acceleration))
+
+
+## Never pass untrusted nonfinite values, malformed payloads or another role's actions
+## into physics. The sender is still always taken from this socket's assignment.
+func _valid_input(msg: Dictionary, role: String) -> bool:
+	var payload: Variant = msg.get("payload")
+	if typeof(payload) != TYPE_DICTIONARY or not _finite(msg.get("timestamp")) or float(msg.timestamp) < 0.0:
+		return false
+	if msg.type == "environment":
+		var action: Variant = payload.get("action")
+		var allowed: Array = MOVEMENT_ACTIONS if role == "movement" else AIM_ACTIONS
+		if not (action in SHARED_ACTIONS or action in allowed) or typeof(payload.get("pressed")) != TYPE_BOOL:
+			return false
+		if action == "weapon":
+			return _finite(payload.get("slot")) and float(payload.slot) == floorf(float(payload.slot)) and int(payload.slot) in [0, 1, 2]
+		return true
+	if payload.has("controls"):
+		var controls: Variant = payload.controls
+		if typeof(controls) != TYPE_DICTIONARY:
+			return false
+		for key in ["moveX", "moveY", "lookX", "lookY"]:
+			if not _finite(controls.get(key)) or absf(float(controls[key])) > 1.0:
+				return false
+		return true
+	return _vector(payload.get("accelerometer")) and _vector(payload.get("gyroscope"))
 
 
 func _end_game(msg: Dictionary) -> void:
@@ -528,7 +658,7 @@ func _handle_debug(id: int, peer: Dictionary, msg: Dictionary) -> void:
 	if msg.type == "debug_join":
 		var room: Variant = msg.get("room")
 		var role: Variant = msg.get("role")
-		if int(msg.get("protocolVersion", 0)) != PROTOCOL_VERSION or typeof(room) != TYPE_STRING \
+		if not _valid_version(msg) or typeof(room) != TYPE_STRING \
 				or _debug_room_re.search(room) == null or not (role in ["phone", "viewer"]):
 			_send(id, _rejection("invalid_message", "Invalid debug_join: room must be 1-32 letters, digits, _ or -, role phone or viewer."))
 			return
@@ -553,6 +683,10 @@ func _handle_debug(id: int, peer: Dictionary, msg: Dictionary) -> void:
 				or typeof(readings) != TYPE_ARRAY or readings.size() > MAX_DEBUG_READINGS:
 			_send(id, _rejection("invalid_message", "Invalid debug_motion: only phones send it, with up to 50 readings."))
 			return
+		for reading in readings:
+			if not _valid_debug_reading(reading):
+				_send(id, _rejection("invalid_message", "Debug readings must contain finite sensor values."))
+				return
 		var relay := {"type": "debug_motion", "platform": msg.platform, "readings": readings}
 		for viewer in members.viewers:
 			_send(viewer, relay)

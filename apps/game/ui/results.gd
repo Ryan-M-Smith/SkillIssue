@@ -8,6 +8,7 @@ const GAME_SCENE := "res://modes/duo_sandbox.tscn"
 
 
 func _ready() -> void:
+	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 	theme = UiKit.make_theme()
 	set_anchors_preset(Control.PRESET_FULL_RECT)
 	var r: Dictionary = MatchStats.result
@@ -19,17 +20,17 @@ func _ready() -> void:
 	var margin := MarginContainer.new()
 	margin.set_anchors_preset(Control.PRESET_FULL_RECT)
 	for side in ["left", "right"]:
-		margin.add_theme_constant_override("margin_" + side, 96)
-	margin.add_theme_constant_override("margin_top", 48)
-	margin.add_theme_constant_override("margin_bottom", 40)
+		margin.add_theme_constant_override("margin_" + side, 64)
+	margin.add_theme_constant_override("margin_top", 24)
+	margin.add_theme_constant_override("margin_bottom", 24)
 	add_child(margin)
 
 	var col := VBoxContainer.new()
-	col.add_theme_constant_override("separation", 18)
+	col.add_theme_constant_override("separation", 12)
 	margin.add_child(col)
 
-	col.add_child(UiKit.eyebrow("Match over · %s" % _reason_text(r.get("reason", ""))))
-	var banner := UiKit.display("DRAW" if winner < 0 else "%s WINS" % UiKit.team_name(winner), 120,
+	col.add_child(UiKit.eyebrow("MATCH COMPLETE / %s" % _reason_text(r.get("reason", "")), UiKit.GOLD))
+	var banner := UiKit.display("DRAW" if winner < 0 else "%s WINS" % UiKit.team_name(winner), 86,
 		UiKit.INK if winner < 0 else UiKit.team_color(winner))
 	col.add_child(banner)
 	banner.pivot_offset = Vector2(0, 60)
@@ -50,9 +51,13 @@ func _ready() -> void:
 	table.add_theme_stylebox_override("panel", UiKit.panel_box(Color(1, 1, 1, 0.16)))
 	table.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	col.add_child(table)
+	var scroll := ScrollContainer.new()
+	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	table.add_child(scroll)
 	var rows := VBoxContainer.new()
-	rows.add_theme_constant_override("separation", 10)
-	table.add_child(rows)
+	rows.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	rows.add_theme_constant_override("separation", 6)
+	scroll.add_child(rows)
 	var head := HBoxContainer.new()
 	head.add_child(_cell(UiKit.display("BLUE", 28, UiKit.BLUE), 220, HORIZONTAL_ALIGNMENT_RIGHT))
 	head.add_child(_cell(UiKit.eyebrow("Team stats"), 0, HORIZONTAL_ALIGNMENT_CENTER, true))
@@ -62,8 +67,9 @@ func _ready() -> void:
 	var t: Array = MatchStats.teams
 	if t.size() == 2:
 		_stat_row(rows, "Kills", t[0].kills, t[1].kills)
-		_stat_row(rows, "Deaths", t[0].deaths, t[1].deaths)
-		_stat_row(rows, "Shots fired", t[0].shots, t[1].shots)
+		_stat_row(rows, "Deaths", t[0].deaths, t[1].deaths, "%d", true)
+		_stat_row(rows, "Best kill streak", t[0].get("best_streak", 0), t[1].get("best_streak", 0))
+		_stat_row(rows, "Projectiles fired", t[0].shots, t[1].shots)
 		_stat_row(rows, "Accuracy", MatchStats.accuracy(0) * 100.0, MatchStats.accuracy(1) * 100.0, "%d%%")
 		_stat_row(rows, "Headshots", t[0].headshots, t[1].headshots)
 		_stat_row(rows, "Distance", t[0].distance, t[1].distance, "%d m")
@@ -104,10 +110,10 @@ func _cell(node: Label, width: float, align: HorizontalAlignment, expand := fals
 
 
 ## One stat: blue value, a head-to-head bar, red value.
-func _stat_row(parent: Control, title: String, blue: float, red: float, fmt := "%d") -> void:
+func _stat_row(parent: Control, title: String, blue: float, red: float, fmt := "%d", lower_better := false) -> void:
 	var row := HBoxContainer.new()
 	row.add_theme_constant_override("separation", 16)
-	var b := _cell(UiKit.display(fmt % roundi(blue), 30, UiKit.INK if blue >= red else UiKit.MUTED), 220, HORIZONTAL_ALIGNMENT_RIGHT)
+	var b := _cell(UiKit.display(fmt % roundi(blue), 30, UiKit.INK if (blue <= red if lower_better else blue >= red) else UiKit.MUTED), 220, HORIZONTAL_ALIGNMENT_RIGHT)
 	row.add_child(b)
 	var mid := VBoxContainer.new()
 	mid.size_flags_horizontal = Control.SIZE_EXPAND_FILL
@@ -118,7 +124,7 @@ func _stat_row(parent: Control, title: String, blue: float, red: float, fmt := "
 	var bar := _versus_bar(blue, red)
 	mid.add_child(bar)
 	row.add_child(mid)
-	row.add_child(_cell(UiKit.display(fmt % roundi(red), 30, UiKit.INK if red >= blue else UiKit.MUTED), 220, HORIZONTAL_ALIGNMENT_LEFT))
+	row.add_child(_cell(UiKit.display(fmt % roundi(red), 30, UiKit.INK if (red <= blue if lower_better else red >= blue) else UiKit.MUTED), 220, HORIZONTAL_ALIGNMENT_LEFT))
 	parent.add_child(row)
 
 

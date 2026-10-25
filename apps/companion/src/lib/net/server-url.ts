@@ -12,16 +12,24 @@ export const defaultDebugRoom = "debug";
  * computer's LAN address instead (the server prints it on startup).
  */
 export function defaultDebugServerUrl(): string {
+	const configured = process.env.EXPO_PUBLIC_GAME_SERVER;
+	if (configured) return configured;
 	if (Platform.OS === "web" && typeof window !== "undefined" && window.location?.hostname) {
-		return `ws://${window.location.hostname}:${debugServerPort}`;
+		const secure = window.location.protocol === "https:";
+		return `${secure ? "wss" : "ws"}://${window.location.hostname}:${debugServerPort}`;
 	}
 
 	const hostUri = Constants.expoConfig?.hostUri ?? "";
-	const host = hostUri.split(":")[0];
+	let host = "";
+	try {
+		host = new URL(`http://${hostUri}`).hostname;
+	} catch {
+		// A release build or Expo tunnel may have no reachable LAN host.
+	}
 
 	if (host && !host.endsWith("exp.direct")) {
 		return `ws://${host}:${debugServerPort}`;
 	}
 
-	return `ws://192.168.1.2:${debugServerPort}`;
+	return "";
 }

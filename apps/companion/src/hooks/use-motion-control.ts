@@ -6,7 +6,6 @@ import { average } from "@/lib/math/sensors";
 import { deviceRotationRate } from "@/lib/math/motion";
 import { Vector3 } from "@/lib/math/vector3";
 import type {
-    Action,
     AveragedMotion,
     Counts,
     RawMotion,
@@ -29,6 +28,9 @@ const emptyCounts: Counts = {
     stand: 0,
     sprint: 0,
     shoot: 0,
+    reload: 0,
+    weapon_next: 0,
+    scope: 0,
 };
 
 const emptyRaw: RawMotion = {
@@ -58,6 +60,8 @@ export function useMotionControl(initialRole: Role = "movement") {
 
     const controllerRef = useRef(new MotionController(initialRole, Platform.OS));
     const subscriptionRef = useRef<ReturnType<typeof DeviceMotion.addListener> | null>(null);
+    const startGenerationRef = useRef(0);
+    const startPendingRef = useRef(false);
     const lastDisplayRef = useRef(0);
     const gyroSamplesRef = useRef<Vector3[]>([]);
     const accelSamplesRef = useRef<Vector3[]>([]);
@@ -69,8 +73,11 @@ export function useMotionControl(initialRole: Role = "movement") {
     }
 
     function stop() {
+        startGenerationRef.current++;
+        startPendingRef.current = false;
         subscriptionRef.current?.remove();
         subscriptionRef.current = null;
+        setStarting(false);
         resetSamples();
         setRunning(false);
         setStatus("Stopped");
@@ -78,19 +85,22 @@ export function useMotionControl(initialRole: Role = "movement") {
     }
 
     async function start() {
-        if (running || starting) return;
+        if (subscriptionRef.current || startPendingRef.current) return;
 
+        const generation = ++startGenerationRef.current;
+        startPendingRef.current = true;
         setStarting(true);
 
         try {
-            if (!(await DeviceMotion.isAvailableAsync())) {
-                throw new Error("DeviceMotion is unavailable on this device.");
-            }
-
+            // Safari requires the permission request directly after the user's tap.
             const permission = await DeviceMotion.requestPermissionsAsync();
             if (!permission.granted) {
                 throw new Error("Motion sensor permission is required.");
             }
+            if (!(await DeviceMotion.isAvailableAsync())) {
+                throw new Error("DeviceMotion is unavailable on this device.");
+            }
+            if (generation !== startGenerationRef.current) return;
 
             controllerRef.current = new MotionController(role, Platform.OS);
             resetSamples();
@@ -137,7 +147,7 @@ export function useMotionControl(initialRole: Role = "movement") {
                 }
 
                 const now = Date.now();
-                if (now - lastDisplayRef.current < 100 && output.action === null) {
+                if (now - lastDisplayRef.current < 50 && output.action === null) {
                     return;
                 }
 
@@ -167,10 +177,15 @@ export function useMotionControl(initialRole: Role = "movement") {
             setRunning(true);
             setStatus("Receiving motion data");
         } catch (error) {
-            Alert.alert("Sensor Error", String(error));
-            setStatus("Failed to start");
+            if (generation === startGenerationRef.current) {
+                Alert.alert("Sensor Error", String(error));
+                setStatus("Failed to start");
+            }
         } finally {
-            setStarting(false);
+            if (generation === startGenerationRef.current) {
+                startPendingRef.current = false;
+                setStarting(false);
+            }
         }
     }
 
@@ -188,6 +203,9 @@ export function useMotionControl(initialRole: Role = "movement") {
 
     useEffect(() => {
         return () => {
+            // Every active start has a positive generation; invalidate it at unmount.
+            startGenerationRef.current = -1;
+            startPendingRef.current = false;
             subscriptionRef.current?.remove();
             subscriptionRef.current = null;
         };

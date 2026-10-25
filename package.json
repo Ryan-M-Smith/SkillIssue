@@ -9,7 +9,13 @@
 		"packages/*"
 	],
 	"scripts": {
-		"test": "echo \"Error: no test specified\" && exit 1",
+		"test": "npm run test:companion && npm run test:network",
+		"test:companion": "tsx --tsconfig apps/companion/tsconfig.json --test apps/companion/tests/*.test.mts",
+		"test:network": "node --test apps/server/network.integration.test.ts",
+		"test:game": "node scripts/test-game.mjs",
+		"typecheck": "tsc --noEmit -p apps/companion/tsconfig.json && tsc --noEmit -p apps/server/tsconfig.json",
+		"lint": "npm --prefix apps/companion run lint -- --max-warnings 0",
+		"companion:lan": "npm --prefix apps/companion run start -- --lan",
 		"companion:start": "npm --prefix apps/companion run start -- --tunnel",
 		"companion:web": "npm --prefix apps/companion run web",
 		"server:start": "npm --prefix apps/server run start"

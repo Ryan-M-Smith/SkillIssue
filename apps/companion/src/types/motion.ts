@@ -29,10 +29,13 @@ export type MotionReading = {
  * - jump:   quick flick back (top of the phone toward you)
  * - crouch: quick flick forward; toggles crouch on/off
  * - stand:  jump flick while crouched; stands up instead of jumping
- * - sprint: quick twist about the screen axis (Z); toggles sprint on/off
+ * - sprint: comfortable wheel twist, then return to neutral to re-arm
  * - shoot:  gunner forward jab
+ * - reload: gunner upward lift
+ * - weapon_next: gunner wheel twist
+ * - scope: gunner pull back
  */
-export type Action = "jump" | "crouch" | "stand" | "sprint" | "shoot" | null;
+export type Action = "jump" | "crouch" | "stand" | "sprint" | "shoot" | "reload" | "weapon_next" | "scope" | null;
 
 export type GameControls = {
 	ready: boolean;

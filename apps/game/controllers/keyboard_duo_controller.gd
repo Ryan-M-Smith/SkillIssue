@@ -51,6 +51,7 @@ func poll(input: DuoInput, delta: float) -> void:
 		input.aim_delta += _mouse_accum
 		_mouse_accum = Vector2.ZERO
 		if _pressed_once("jump", _key(KEY_SPACE)): input.jump = true
+		if _pressed_once("reload", _key(KEY_R)): input.reload = true
 		if _pressed_once("scope", captured and Input.is_mouse_button_pressed(MOUSE_BUTTON_RIGHT)): input.scope_toggle = true
 		for i in 3:
 			if _pressed_once("w%d" % i, _key(KEY_1 + i)): input.weapon_slot = i
@@ -62,6 +63,7 @@ func poll(input: DuoInput, delta: float) -> void:
 		input.sprint = input.sprint or _key(KEY_U)
 		input.fire = input.fire or _key(KEY_ENTER)
 		if _pressed_once("jump", _key(KEY_SHIFT)): input.jump = true
+		if _pressed_once("reload", _key(KEY_O)): input.reload = true
 		if _pressed_once("scope", _key(KEY_M)): input.scope_toggle = true
 		var keys := [KEY_8, KEY_9, KEY_0]
 		for i in 3:

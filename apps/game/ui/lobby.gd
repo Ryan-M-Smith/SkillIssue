@@ -14,6 +14,8 @@ var _slots := {}          # "team:role" -> {"panel", "name", "badge"}
 var _waiting: Label
 var _footer: Label
 var _retry: Button
+var _copy_ticket: Button
+var _rendered_code := ""
 var _countdown := -1.0
 var _loading := false
 
@@ -34,6 +36,7 @@ func _ready() -> void:
 
 	if NetworkClient.is_connected_to_server() and not GameSession.pairing_code.is_empty():
 		_refresh()   # back from Play Again: same lobby
+		_on_state(GameSession.state)
 	else:
 		_open_lobby()
 
@@ -83,7 +86,12 @@ func _build() -> void:
 	code_text.add_child(UiKit.eyebrow("Join code"))
 	code_text.add_child(UiKit.label("Open the SkillIssue app → Join a Lobby → enter this code.", 22))
 	_address = UiKit.label("", 20, UiKit.BODY, UiKit.MUTED)
+	_address.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	code_text.add_child(_address)
+	_copy_ticket = UiKit.button("COPY LOBBY TICKET")
+	_copy_ticket.pressed.connect(func():
+		DisplayServer.clipboard_set(_join_ticket())
+		_status.text = "Ticket copied. Paste it into Join a Lobby on your phone.")
 	_status = UiKit.label("", 20, UiKit.BODY_SEMI, UiKit.GOLD)
 	_status.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	code_text.add_child(_status)
@@ -91,6 +99,7 @@ func _build() -> void:
 	_retry.visible = false
 	_retry.pressed.connect(_open_lobby)
 	var retry_row := HBoxContainer.new()
+	retry_row.add_child(_copy_ticket)
 	retry_row.add_child(_retry)
 	code_text.add_child(retry_row)
 	code_box.add_child(code_text)
@@ -161,7 +170,8 @@ func _refresh() -> void:
 	else:
 		_status.text = ""
 		_retry.visible = false
-	_address.text = "Server: %s" % _phone_address() if server_ok else ""
+	_address.text = "Lobby ticket: %s\nSame Wi-Fi. Paste the ticket to connect without a server address." % _join_ticket() if server_ok else ""
+	_copy_ticket.disabled = not server_ok or GameSession.pairing_code.is_empty()
 
 	var waiting := PackedStringArray()
 	var slotted := 0
@@ -185,6 +195,9 @@ func _refresh() -> void:
 
 
 func _render_code(code: String) -> void:
+	if code == _rendered_code and _code_row.get_child_count() > 0:
+		return
+	_rendered_code = code
 	for c in _code_row.get_children():
 		c.queue_free()
 	var text := code if not code.is_empty() else "······"
@@ -223,6 +236,13 @@ func _render_slot(team: int, role: String, player: Dictionary) -> void:
 func _phone_address() -> String:
 	var urls := LobbyServer.lan_urls()
 	return urls[0] if not urls.is_empty() else LobbyServer.server_url()
+
+
+func _join_ticket() -> String:
+	var url := NetworkClient.url.trim_suffix("/")
+	if NetworkClient.is_local() or url.begins_with("ws://127.") or url.begins_with("ws://localhost:") or url.begins_with("ws://[::1]:"):
+		return LobbyServer.join_ticket(GameSession.pairing_code)
+	return "%s%scode=%s" % [url, "&" if url.contains("?") else "?", GameSession.pairing_code]
 
 
 func _on_server_status() -> void:

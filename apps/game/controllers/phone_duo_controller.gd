@@ -15,6 +15,7 @@ var _fire := false
 var _aim_accum := Vector2.ZERO
 var _jump_queued := false
 var _scope_queued := false
+var _reload_queued := false
 var _weapon_queued := -1
 var _send_timer := 0.0
 var _bridge: Node
@@ -76,6 +77,9 @@ func _on_phone_message(msg_team: int, role: String, msg: Dictionary) -> void:
 					"scope":
 						if held:
 							_scope_queued = true
+					"reload":
+						if held:
+							_reload_queued = true
 			"weapon":
 				_weapon_queued = int(msg.get("i", -1))
 
@@ -87,9 +91,13 @@ func _on_phone_left(msg_team: int, role: String) -> void:
 		_move = Vector2.ZERO
 		_crouch = false
 		_sprint = false
+		_jump_queued = false
 	else:
 		_fire = false
 		_aim_accum = Vector2.ZERO
+		_scope_queued = false
+		_reload_queued = false
+		_weapon_queued = -1
 
 
 func poll(input: DuoInput, _delta: float) -> void:
@@ -105,6 +113,9 @@ func poll(input: DuoInput, _delta: float) -> void:
 	if _scope_queued:
 		input.scope_toggle = true
 		_scope_queued = false
+	if _reload_queued:
+		input.reload = true
+		_reload_queued = false
 	if _weapon_queued >= 0:
 		input.weapon_slot = _weapon_queued
 		_weapon_queued = -1
@@ -125,4 +136,8 @@ func _process(delta: float) -> void:
 	g["owned"] = w.owned
 	g["scoped"] = w.scoped
 	g["can_scope"] = w.current_data() != null and w.current_data().has_scope
+	g["ammo"] = w.ammo_in_mag()
+	g["magazine_size"] = w.current_data().magazine_size if w.current_data() else 0
+	g["reloading"] = w.reloading
+	g["reload_progress"] = w.reload_progress()
 	_send("gunner", g)

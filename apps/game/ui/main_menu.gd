@@ -5,9 +5,11 @@ const LOBBY_SCENE := "res://ui/lobby.tscn"
 
 var _how: Control
 var _how_close: Button
+var _graphics: CanvasLayer
 
 
 func _ready() -> void:
+	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 	theme = UiKit.make_theme()
 	set_anchors_preset(Control.PRESET_FULL_RECT)
 	add_child(UiKit.background(0.62, 1.0))
@@ -49,10 +51,18 @@ func _ready() -> void:
 	var how := UiKit.button("HOW TO PLAY")
 	how.custom_minimum_size = Vector2(420, 60)
 	how.pressed.connect(_show_how)
+	var graphics := UiKit.button("GRAPHICS")
+	graphics.custom_minimum_size = Vector2(420, 60)
+	graphics.pressed.connect(func(): _graphics.open_menu())
+	var practice := UiKit.button("PRACTICE / KEYBOARD")
+	practice.custom_minimum_size = Vector2(420, 60)
+	practice.pressed.connect(func():
+		GameSession.leave_lobby()
+		get_tree().change_scene_to_file("res://modes/duo_sandbox.tscn"))
 	var quit := UiKit.button("QUIT")
 	quit.custom_minimum_size = Vector2(420, 60)
 	quit.pressed.connect(func(): get_tree().quit())
-	for b in [create, how, quit]:
+	for b in [create, practice, how, graphics, quit]:
 		var holder := HBoxContainer.new()
 		holder.add_child(b)
 		left.add_child(holder)
@@ -75,6 +85,9 @@ func _ready() -> void:
 	_how = _build_how_to_play()
 	_how.visible = false
 	add_child(_how)
+	_graphics = preload("res://ui/graphics_menu.gd").new()
+	add_child(_graphics)
+	_graphics.closed.connect(func(): graphics.grab_focus())
 
 	UiKit.fade_in(self)
 	create.grab_focus.call_deferred()
@@ -131,13 +144,14 @@ func _build_how_to_play() -> Control:
 		["Tip an end down", "Strafe left / right"],
 		["Flick forward", "Crouch (again to stand)"],
 		["Flick back", "Jump"],
-		["Twist like a wheel", "Sprint on / off"],
+		["Twist 32 degrees, return to center", "Sprint on / off"],
 	]))
 	cols.add_child(_how_column("AIM PHONE", UiKit.RED, [
 		["Turn the phone", "Look around"],
-		["Jab forward or hold FIRE", "Shoot"],
-		["SCOPE button", "Zoom (sniper)"],
-		["Weapon buttons", "Pistol, shotgun, sniper"],
+		["Jab forward", "Shoot"],
+		["Pull back", "Scope (sniper)"],
+		["Lift upward", "Reload"],
+		["Twist 32 degrees, then center", "Next owned weapon"],
 		["Pick up guns on the map", "Unlock them"],
 	]))
 	for l in [UiKit.label("Phones join with the 6-character code shown in the lobby, pick a team and role, then tap Ready. The match starts when all four are ready.", 20, UiKit.BODY, UiKit.MUTED)]:

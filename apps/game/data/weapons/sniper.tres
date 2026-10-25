@@ -5,6 +5,8 @@
 [resource]
 script = ExtResource("1")
 display_name = "Sniper"
+magazine_size = 5
+reload_seconds = 2.2
 damage = 90.0
 spread_degrees = 3.0
 fire_interval = 1.4

@@ -17,6 +17,7 @@ import {
     type MatchStatusMessage,
     type ServerMessage,
     type TeamId,
+    type ToControllerMessage,
 } from "../../packages/protocol/events.ts";
 
 const port = Number(process.env.PORT ?? 8080);
@@ -26,6 +27,13 @@ const pairingCodeLength = 6;
 const pairingAlphabet = "ABCDEFGHJKMNPQRSTUVWXYZ23456789";
 const maxPlayersPerLobby = 4;
 const maxNameLength = 16;
+const maxConnections = 32;
+const maxMessageBytes = 65_536;
+const maxMessagesPerSecond = 240;
+const identifyTimeoutMs = 10_000;
+const movementActions = new Set(["jump", "crouch", "sprint"]);
+const aimActions = new Set(["shoot", "scope", "weapon", "reload"]);
+const sharedActions = new Set(["ready", "interact", "none"]);
 // How many slotted, ready phones a match needs before it can start. Default:
 // all four slots. Set MIN_CONTROLLERS=1 to test with a single phone.
 const minControllers = Math.min(4, Math.max(1, Math.floor(Number(process.env.MIN_CONTROLLERS ?? 4)) || 4));
@@ -79,6 +87,10 @@ function lanAddresses() {
 
 function send(socket: WebSocket, message: ServerMessage) {
     if (socket.readyState === WebSocket.OPEN) {
+        if (socket.bufferedAmount > maxMessageBytes * 4) {
+            socket.close(1013, "Connection is too slow; please reconnect.");
+            return;
+        }
         socket.send(JSON.stringify(message));
     }
 }
@@ -165,6 +177,10 @@ function sendLobbyState(session: Session) {
 }
 
 function registerGame(socket: WebSocket) {
+    if (contexts.has(socket)) {
+        sendError(socket, "invalid_message", "This connection is already in a lobby.");
+        return;
+    }
     const session: Session = {
         gameId: `game_${randomUUID()}`,
         pairingCode: createPairingCode(),
@@ -296,6 +312,10 @@ function setReady(socket: WebSocket, ready: unknown) {
     if (session.state !== "waiting" && session.state !== "ready") {
         return;
     }
+    if (typeof ready !== "boolean") {
+        sendError(socket, "invalid_message", "Ready must be true or false.");
+        return;
+    }
     if (ready === true && (controller.teamId === null || controller.role === null)) {
         sendError(socket, "invalid_message", "Pick a team and role before you ready up.");
         return;
@@ -308,6 +328,11 @@ function startGame(socket: WebSocket) {
     const context = hostContext(socket);
     if (!context) {
         sendError(socket, "invalid_message", "Only the game host can start a match.");
+        return;
+    }
+
+    if (context.session.state !== "waiting" && context.session.state !== "ready") {
+        sendError(socket, "game_unavailable", "This match has already started.");
         return;
     }
 
@@ -410,6 +435,10 @@ function forwardInput(socket: WebSocket, message: AuthorizedInputMessage) {
         });
         return;
     }
+    if (!validInput(message, context.controller.role)) {
+        sendError(socket, "invalid_message", "Invalid input for this controller role.");
+        return;
+    }
 
     send(context.session.gameSocket, {
         ...message,
@@ -417,8 +446,61 @@ function forwardInput(socket: WebSocket, message: AuthorizedInputMessage) {
     });
 }
 
+function forwardFeedback(socket: WebSocket, message: ToControllerMessage) {
+    const context = hostContext(socket);
+    if (!context || typeof message.controllerId !== "string" || !record(message.message) ||
+        !["state", "buzz"].includes(String(message.message.t)) || JSON.stringify(message.message).length > 4096) {
+        sendError(socket, "invalid_message", "Only a game host may send bounded controller feedback.");
+        return;
+    }
+    const controller = context.session.controllers.get(message.controllerId);
+    if (controller) send(controller.socket, { type: "controller_feedback", message: message.message });
+}
+
+function record(value: unknown): value is Record<string, unknown> {
+    return value !== null && typeof value === "object" && !Array.isArray(value);
+}
+
+function finite(value: unknown): value is number {
+    return typeof value === "number" && Number.isFinite(value);
+}
+
+function vector(value: unknown) {
+    return record(value) && ["x", "y", "z"].every((key) => finite(value[key]) && Math.abs(value[key]) <= 1_000_000);
+}
+
+function rotation(value: unknown) {
+    return record(value) && ["alpha", "beta", "gamma"].every((key) => finite(value[key]) && Math.abs(value[key]) <= 1_000_000);
+}
+
+function validDebugReading(value: unknown) {
+    return record(value) && rotation(value.rotation) && vector(value.accelerationIncludingGravity) &&
+        (value.rotationRate == null || rotation(value.rotationRate)) && (value.acceleration == null || vector(value.acceleration));
+}
+
+/** Validate data at the network boundary before it reaches the game's physics. */
+function validInput(message: AuthorizedInputMessage, role: ControllerRole | null) {
+    if (!record(message.payload) || !finite(message.timestamp) || message.timestamp < 0) return false;
+    const payload: Record<string, unknown> = message.payload;
+    if (message.type === "environment") {
+        const action = payload.action;
+        const allowed = role === "movement" ? movementActions : aimActions;
+        if (typeof action !== "string" || (!allowed.has(action) && !sharedActions.has(action)) || typeof payload.pressed !== "boolean") return false;
+        return action !== "weapon" || (Number.isInteger(payload.slot) && [0, 1, 2].includes(payload.slot as number));
+    }
+    if ("controls" in payload) {
+        const controls = payload.controls;
+        return record(controls) && ["moveX", "moveY", "lookX", "lookY"].every((key) => finite(controls[key]) && Math.abs(controls[key]) <= 1);
+    }
+    return vector(payload.accelerometer) && vector(payload.gyroscope);
+}
+
 function sendDebug(socket: WebSocket, message: DebugServerMessage) {
     if (socket.readyState === WebSocket.OPEN) {
+        if (socket.bufferedAmount > maxMessageBytes * 4) {
+            socket.close(1013, "Connection is too slow; please reconnect.");
+            return;
+        }
         socket.send(JSON.stringify(message));
     }
 }
@@ -493,7 +575,8 @@ function handleDebugMessage(socket: WebSocket, message: DebugClientMessage) {
             member.role !== "phone" ||
             typeof message.platform !== "string" ||
             !Array.isArray(message.readings) ||
-            message.readings.length > maxReadingsPerMessage
+            message.readings.length > maxReadingsPerMessage ||
+            !message.readings.every(validDebugReading)
         ) {
             sendError(socket, "invalid_message", "Invalid debug_motion: only phones send it, with up to 50 readings.");
             return;
@@ -523,7 +606,7 @@ function handleDebugMessage(socket: WebSocket, message: DebugClientMessage) {
 function parseMessage(data: WebSocket.RawData): ClientMessage | DebugClientMessage | null {
     try {
         const message = JSON.parse(data.toString()) as ClientMessage | DebugClientMessage;
-        return message && typeof message.type === "string" ? message : null;
+        return record(message) && typeof message.type === "string" ? message : null;
     } catch {
         return null;
     }
@@ -580,6 +663,9 @@ function handleMessage(socket: WebSocket, message: ClientMessage | DebugClientMe
         case "reset_lobby":
             resetLobby(socket);
             return;
+        case "to_controller":
+            forwardFeedback(socket, message);
+            return;
         case "motion":
         case "environment":
             if (debugMembers.has(socket)) {
@@ -622,15 +708,37 @@ function disconnect(socket: WebSocket) {
     sendLobbyState(session);
 }
 
-const wss = new WebSocketServer({ port });
+const wss = new WebSocketServer({ port, maxPayload: maxMessageBytes, perMessageDeflate: false });
 
 wss.on("connection", (socket) => {
+    if (wss.clients.size > maxConnections) {
+        socket.close(1013, "Server is busy; please try again.");
+        return;
+    }
+    let windowStart = Date.now();
+    let messages = 0;
+    const identifyTimer = setTimeout(() => {
+        if (!contexts.has(socket) && !debugMembers.has(socket)) socket.close(1008, "Join a lobby or debug room within 10 seconds.");
+    }, identifyTimeoutMs);
+    identifyTimer.unref();
     const heartbeatSocket = socket as HeartbeatSocket;
     heartbeatSocket.isAlive = true;
     socket.on("pong", () => {
         heartbeatSocket.isAlive = true;
     });
-    socket.on("message", (data) => {
+    socket.on("message", (data, isBinary) => {
+        if (Date.now() - windowStart >= 1_000) {
+            windowStart = Date.now();
+            messages = 0;
+        }
+        if (++messages > maxMessagesPerSecond) {
+            socket.close(1008, "Too much input; reconnect and try again.");
+            return;
+        }
+        if (isBinary) {
+            socket.close(1003, "Use JSON text messages.");
+            return;
+        }
         const message = parseMessage(data);
         if (!message) {
             sendError(socket, "invalid_message", "Message must be valid JSON with a type.");
@@ -638,7 +746,10 @@ wss.on("connection", (socket) => {
         }
         handleMessage(socket, message);
     });
-    socket.on("close", () => disconnect(socket));
+    socket.on("close", () => {
+        clearTimeout(identifyTimer);
+        disconnect(socket);
+    });
     socket.on("error", () => disconnect(socket));
 });
 

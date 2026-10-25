@@ -10,6 +10,7 @@ const rows: [keyof TeamStats, string, (v: number) => string][] = [
 	["deaths", "Deaths", String],
 	["hits", "Hits", String],
 	["headshots", "Headshots", String],
+	["bestStreak", "Best streak", String],
 	["distance", "Distance", (v) => `${v} m`],
 	["jumps", "Jumps", String],
 	["sprintTime", "Sprint", (v) => `${v} s`],

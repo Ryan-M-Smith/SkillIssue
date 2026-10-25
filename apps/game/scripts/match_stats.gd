@@ -28,6 +28,7 @@ func reset() -> void:
 		teams.append({
 			"kills": 0, "deaths": 0, "shots": 0, "hits": 0, "headshots": 0,
 			"distance": 0.0, "jumps": 0, "crouches": 0, "sprint_time": 0.0,
+			"streak": 0, "best_streak": 0,
 		})
 
 
@@ -41,7 +42,7 @@ func begin(duos: Array) -> void:
 		_last_pos.append(duo.global_position)
 		_was_crouching.append(false)
 		var team: int = duo.team_id
-		duo.weapons.fired.connect(func(_data): _add(team, "shots", 1))
+		duo.weapons.fired.connect(func(data: WeaponData): _add(team, "shots", maxi(data.pellets, 1)))
 		duo.weapons.hit_confirmed.connect(func(_target, _damage, headshot: bool):
 			_add(team, "hits", 1)
 			if headshot:
@@ -54,6 +55,16 @@ func finish(winner: int, scores: Array, reason: String) -> void:
 	result = {"winner": winner, "scores": [scores[0], scores[1]], "reason": reason}
 
 
+## A lost lobby is an abandoned match, so discard its partial results and references.
+func abort() -> void:
+	_running = false
+	_duos = []
+	_last_pos.clear()
+	_was_crouching.clear()
+	result = {}
+	reset()
+
+
 ## TeamStats for the protocol (teams numbered 1 and 2).
 func to_protocol() -> Array:
 	var out := []
@@ -63,13 +74,15 @@ func to_protocol() -> Array:
 			"teamId": i + 1, "kills": t.kills, "deaths": t.deaths, "shots": t.shots,
 			"hits": t.hits, "headshots": t.headshots, "distance": roundi(t.distance),
 			"jumps": t.jumps, "crouches": t.crouches, "sprintTime": roundi(t.sprint_time),
+			"bestStreak": t.best_streak,
 		})
 	return out
 
 
 func accuracy(team: int) -> float:
 	var t: Dictionary = teams[team]
-	return float(t.hits) / t.shots if t.shots > 0 else 0.0
+	# A shotgun can hit with multiple pellets from one shell.
+	return minf(float(t.hits) / t.shots, 1.0) if t.shots > 0 else 0.0
 
 
 func _physics_process(delta: float) -> void:
@@ -101,8 +114,11 @@ func _on_duo_killed(victim_team: int, killer_team: int) -> void:
 		return
 	if victim_team >= 0 and victim_team < TEAM_COUNT:
 		_add(victim_team, "deaths", 1)
+		teams[victim_team].streak = 0
 	if killer_team >= 0 and killer_team < TEAM_COUNT and killer_team != victim_team:
 		_add(killer_team, "kills", 1)
+		teams[killer_team].streak += 1
+		teams[killer_team].best_streak = maxi(teams[killer_team].best_streak, teams[killer_team].streak)
 
 
 func _add(team: int, key: String, amount: int) -> void:
