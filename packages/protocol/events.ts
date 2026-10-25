@@ -35,6 +35,8 @@ export type EnvironmentAction =
     | "crouch"
     | "sprint"
     | "shoot"
+    | "scope"
+    | "weapon"
     | "reload"
     | "interact"
     | "none";
@@ -45,11 +47,74 @@ export type HelloMessage = {
     clientType: ClientType;
 };
 
+/**
+ * A phone joins a lobby with its 6-character code (letters and digits,
+ * case-insensitive). Without `requestedRole` it joins unassigned and picks a
+ * team and role with `select_slot`; with it, the server picks the first free
+ * slot for that role (older clients).
+ */
 export type JoinGameMessage = {
     type: "join_game";
     protocolVersion: typeof protocolVersion;
     pairingCode: string;
-    requestedRole: ControllerRole;
+    requestedRole?: ControllerRole;
+    /** Shown in the lobby. Up to 16 characters. */
+    name?: string;
+};
+
+/** Phone: take a team + role slot in the lobby. Clears this phone's ready flag. */
+export type SelectSlotMessage = {
+    type: "select_slot";
+    teamId: TeamId;
+    role: ControllerRole;
+};
+
+/** Phone: ready (or not) to start. Needs a slot. */
+export type SetReadyMessage = {
+    type: "set_ready";
+    ready: boolean;
+};
+
+/** Per-team numbers for the results screen. */
+export type TeamStats = {
+    teamId: TeamId;
+    kills: number;
+    deaths: number;
+    shots: number;
+    hits: number;
+    headshots: number;
+    /** Metres moved. */
+    distance: number;
+    jumps: number;
+    crouches: number;
+    /** Seconds spent sprinting. */
+    sprintTime: number;
+};
+
+/** Game host -> server -> phones while playing: the live score and clock. */
+export type MatchStatusMessage = {
+    type: "match_status";
+    /** Kills for team 1 and team 2. */
+    scores: [number, number];
+    /** Seconds left on the clock. */
+    timeLeft: number;
+    killTarget: number;
+};
+
+/** Game host: the match is over. The server moves to "ended" and tells the phones. */
+export type EndGameMessage = {
+    type: "end_game";
+    protocolVersion: typeof protocolVersion;
+    /** null = draw. */
+    winningTeam: TeamId | null;
+    scores: [number, number];
+    stats: TeamStats[];
+};
+
+/** Game host: back to the lobby with the same code and players (Play Again). */
+export type ResetLobbyMessage = {
+    type: "reset_lobby";
+    protocolVersion: typeof protocolVersion;
 };
 
 export type StartGameMessage = {
@@ -69,13 +134,20 @@ export type EnvironmentInputMessage = {
     payload: {
         action: EnvironmentAction;
         pressed: boolean;
+        /** For "weapon": 0 pistol, 1 shotgun, 2 sniper. */
+        slot?: number;
     };
 };
 
 export type ClientMessage =
     | HelloMessage
     | JoinGameMessage
+    | SelectSlotMessage
+    | SetReadyMessage
     | StartGameMessage
+    | MatchStatusMessage
+    | EndGameMessage
+    | ResetLobbyMessage
     | MotionInputMessage
     | EnvironmentInputMessage;
 
@@ -92,6 +164,31 @@ export type ControllerAssignment = {
     teamId: TeamId;
     role: ControllerRole;
     connected: boolean;
+};
+
+/** One phone in the lobby, with or without a slot yet. */
+export type LobbyPlayer = {
+    controllerId: string;
+    name: string;
+    teamId: TeamId | null;
+    role: ControllerRole | null;
+    ready: boolean;
+    connected: boolean;
+};
+
+/** Sent to a phone when it enters a lobby. */
+export type LobbyJoinedMessage = {
+    type: "lobby_joined";
+    controllerId: string;
+    pairingCode: string;
+};
+
+/** Sent to the phones when the host ends the match. */
+export type MatchEndedMessage = {
+    type: "match_ended";
+    winningTeam: TeamId | null;
+    scores: [number, number];
+    stats: TeamStats[];
 };
 
 export type ControllerAssignedMessage = {
@@ -115,7 +212,12 @@ export type ControllerDisconnectedMessage = {
 export type LobbyStateMessage = {
     type: "lobby_state";
     state: GameState;
+    /** Phones that hold a slot (what the game uses to route input). */
     assignments: ControllerAssignment[];
+    /** Every phone in the lobby, slotted or not, with names and ready flags. */
+    players: LobbyPlayer[];
+    /** How many slotted, ready phones it takes to start (4 unless MIN_CONTROLLERS). */
+    minPlayers: number;
 };
 
 export type BroadcastMessage = {
@@ -131,6 +233,9 @@ export type AuthorizedInputMessage =
 
 export type ServerMessage =
     | GameRegisteredMessage
+    | LobbyJoinedMessage
+    | MatchStatusMessage
+    | MatchEndedMessage
     | ControllerAssignedMessage
     | JoinRejectedMessage
     | ControllerDisconnectedMessage

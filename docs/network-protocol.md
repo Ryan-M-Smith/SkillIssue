@@ -1,6 +1,6 @@
 # SkillIssue Network Protocol
 
-The Node.js server is authoritative for game sessions, pairing codes, controller IDs, team assignments, roles, and connection state. Godot is the game host. Mobile clients request a role and send input only after receiving a server-issued assignment.
+The server is authoritative for game sessions, pairing codes, controller IDs, team assignments, roles, and connection state. It runs inside the Godot game (`apps/game/scripts/network/lobby_server.gd`); `apps/server/index.ts` is the same server in Node.js. Godot is the game host. Mobile clients request a role and send input only after receiving a server-issued assignment.
 
 ## Controller slots
 
@@ -13,7 +13,7 @@ The server exposes four exclusive slots:
 | 2 | `movement` | Move, jump, crouch, sprint |
 | 2 | `aim` | Aim and shoot |
 
-## Handshake
+## Handshake and lobby
 
 Godot registers a game host:
 
@@ -21,29 +21,33 @@ Godot registers a game host:
 {"type":"hello","protocolVersion":1,"clientType":"game"}
 ```
 
-The server replies with `game_registered`, including `gameId`, `pairingCode`, and `state`.
+The server replies with `game_registered`, including `gameId`, `pairingCode` (6 characters from `ABCDEFGHJKMNPQRSTUVWXYZ23456789`, entered case-insensitively) and `state`.
 
-A mobile client joins with a requested role:
+A phone joins with the code and a display name, then picks a spot and readies up:
 
 ```json
-{"type":"join_game","protocolVersion":1,"pairingCode":"482917","requestedRole":"movement"}
+{"type":"join_game","protocolVersion":1,"pairingCode":"T6YYH9","name":"Ryan"}
+{"type":"select_slot","teamId":1,"role":"movement"}
+{"type":"set_ready","ready":true}
 ```
 
-The server replies to the phone and game with `controller_assigned`. The server, not the phone, supplies `controllerId` and `teamId`.
+The server answers `lobby_joined` (`controllerId`) and `controller_assigned` when a spot is taken; a taken spot is rejected with the holder's name. A lobby holds 4 phones. Older clients may still send `requestedRole` in `join_game`: they get the first free spot for that role, already ready.
+
+Every change sends `lobby_state` to everyone: `state`, `assignments` (phones holding a spot, what the game routes input by), `players` (every phone: name, team, role, ready) and `minPlayers`.
 
 ## Lifecycle
 
-The server reports `waiting` until all four slots are assigned, then `ready`. Godot requests the transition to `playing` with:
+`waiting` → `ready` when all four spots are taken and every phone holding one is ready (or the game's `--min-players` / the Node server's `MIN_CONTROLLERS` phones, for testing). The game counts down 3 s and sends `start_game`; the server checks readiness again and broadcasts `playing`. Teams are locked while playing.
 
-```json
-{"type":"start_game","protocolVersion":1}
-```
+While playing, the game sends `match_status` (`scores` for teams 1 and 2, `timeLeft`, `killTarget`) every second; the server passes it to the phones. A match ends at 10 kills or after 5 minutes: the game sends `end_game` (`winningTeam` or null for a draw, `scores`, per-team `stats`), the server moves to `ended` and sends the phones `match_ended`. Input after that is ignored. **Play Again** on the game sends `reset_lobby`: back to `waiting` with the same code and spots, everyone un-readied.
 
-The server accepts that request only from the registered game host and only when all four slots are occupied. It then broadcasts the authoritative state.
+When a phone disconnects, the server removes it and tells the game (`controller_disconnected`). If the game host disconnects, the lobby is closed and the phones are disconnected.
 
-Godot sends `start_game` on its own as soon as the lobby reports `ready` (`GameSession.auto_start`, on by default). Until the match starts, the `LobbyOverlay` autoload shows the join code, the server address phones should use (when the server runs on the same computer), and how many phones have joined.
+## Who starts the server
 
-To test with fewer than four phones, start the server with `MIN_CONTROLLERS` set, for example `MIN_CONTROLLERS=1 npm run server:start`. The lobby is then `ready`, and the match starts, as soon as that many controllers have joined. The default is 4.
+The game hosts it. **Create a Lobby** (`GameSession.create_lobby`) asks the `LobbyServer` autoload to listen on port 8080 (all network interfaces), then the game hosts the lobby on it in-process: `NetworkClient.connect_local()` passes the host's messages straight to `LobbyServer` and gets back exactly what a remote server would send. Phones connect over WebSocket as usual. No Node.js or separate process; the server stops with the game.
+
+If another server already holds port 8080 (for example `npm run server:start`), the game connects to it over WebSocket instead. `-- --server=ws://host:port` connects to a specific server. To test with fewer than four phones, run the game with `-- --min-players=1` (or set `LobbyServer.min_players`).
 
 ## Input authority
 
@@ -53,17 +57,19 @@ When a controller disconnects, the server sends `controller_disconnected` to the
 
 ## Companion movement phone
 
-The companion app runs in landscape, held like a controller. Its **Game** panel takes the server address and the 6-digit join code from the game, and joins with `requestedRole: "movement"`. Once the match is `playing` it sends:
+The companion app runs in landscape, held like a controller: Main Menu → Join a Lobby → Enter Code → Team + Role Select → Ready → in-match screen for its role → Game Over. A **movement** phone sends, once the match is `playing`:
 
 - `motion` at 30 Hz with `payload.controls` (`moveX`, `moveY` from the phone's own motion model, `lookX`/`lookY` 0) plus the raw `accelerometer` (with gravity, m/s²) and `gyroscope` (phone axes, rad/s). Godot uses `controls` when present.
 - `environment` `jump` with `pressed: true` for each jump.
 - `environment` `crouch` and `sprint` with `pressed` set to the new state each time it changes, and once more when the match starts, so the game's held states match the phone.
 
+An **aim** phone sends `motion` with `controls.lookX`/`lookY` (its gyro, −1..1 = ±130°/s) and `environment` `shoot` (`pressed` true/false: a forward jab is a 120 ms tap, the FIRE button is held), `scope` and `weapon` (`slot` 0 pistol, 1 shotgun, 2 sniper).
+
 ## Debug relay (phone to web debugger)
 
 A separate, game-free channel for debugging the movement phone. It needs no Godot host, pairing code or slots, and debug connections can't send game input or join a game.
 
-1. Start the server: `npm run server:start`. It prints the `ws://` addresses it can be reached on from your network.
+1. Start the server: `npm run server:start` (or open a lobby in the game, whose server relays debug rooms too). It prints the `ws://` addresses it can be reached on from your network.
 2. Open the companion's web version on the computer: `npm run companion:web` (or press `w` in a running Expo dev server). The web version is the **Motion Debugger**; it connects to `ws://<this page's host>:8080`, room `debug`.
 3. On the phone, open the companion (it shows the simplified **Controller** screen), enter one of the printed addresses and the same room, and tap **Connect**. The phone and computer must be on the same network.
 

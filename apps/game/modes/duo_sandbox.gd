@@ -12,6 +12,11 @@
 ##   - builds a temporary test floor + cover only if the map has no geometry at all
 ##   Nothing is ever saved into the map or main.tscn.
 ##
+## Match rules: first team to `kill_target` kills wins, or whoever leads when the
+## `match_seconds` clock runs out (equal = draw). The live score and clock go to the phones
+## every second; at the final whistle the action freezes, the result goes to the server and
+## the phones, and the results screen (ui/results.tscn) loads.
+##
 ## Controls work from phones (via the relay) and from the keyboard at the same time:
 ##   Team A: WASD, Space jump, Ctrl crouch, hold Q sprint, mouse aim (click to capture), LMB fire, RMB scope, 1/2/3 guns
 ##   Team B: IJKL, Shift jump, N crouch, hold U sprint, arrow keys aim, Enter fire, M scope, 8/9/0 guns
@@ -26,6 +31,12 @@ extends Node
 	preload("res://data/teams/team_red.tres"),
 ]
 @export var keyboard_controls := true
+@export_group("Match rules")
+@export var kill_target := 10
+@export var match_seconds := 300.0
+@export var results_scene := "res://ui/results.tscn"
+@export var end_banner_seconds := 2.5
+@export_group("")
 @export var respawn_delay := 3.0
 @export var fov := 80.0
 @export var fall_kill_height := -30.0
@@ -57,8 +68,15 @@ var scores: Array[int] = [0, 0]
 
 var _cameras: Array[Camera3D] = []
 var _hud_halves: Array[Dictionary] = []
-var _score_label: Label
 var _hint_label: Label
+var _score_blue: Label
+var _score_red: Label
+var _clock: Label
+var _banner: Control
+
+var _time_left := 0.0
+var _running := false
+var _status_timer := 0.0
 
 
 func _ready() -> void:
@@ -94,6 +112,7 @@ func _setup() -> void:
 	GameEvents.duo_killed.connect(_on_duo_killed)
 	_update_score()
 	set_debug_view(debug_view)
+	_start_match()
 
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -126,6 +145,7 @@ func _bind_camera(duo: Duo, cam: Camera3D) -> void:
 
 
 func _process(delta: float) -> void:
+	_tick_match(delta)
 	for i in duos.size():
 		var duo := duos[i]
 		var w := duo.weapons
@@ -184,9 +204,12 @@ func _on_duo_killed(victim_team: int, killer_team: int) -> void:
 			v = d
 	if v == null:
 		return
-	if killer_team >= 0 and killer_team != victim_team:
+	if killer_team >= 0 and killer_team != victim_team and _running:
 		scores[killer_team] += 1
 		GameEvents.score_changed.emit(killer_team, scores[killer_team])
+		_send_status()
+		if scores[killer_team] >= kill_target:
+			_end_match("kills")
 	_update_score()
 	await get_tree().create_timer(respawn_delay).timeout
 	if is_instance_valid(v) and not v.alive:
@@ -221,29 +244,35 @@ func _build_hud() -> void:
 		half.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		halves.add_child(half)
 
-		var crosshair := _label("+", 30)
+		var crosshair := _label("+", 48)
 		crosshair.set_anchors_preset(Control.PRESET_CENTER)
 		crosshair.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		crosshair.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-		crosshair.custom_minimum_size = Vector2(40, 40)
+		crosshair.custom_minimum_size = Vector2(64, 64)
 		crosshair.position = -crosshair.custom_minimum_size * 0.5
 		half.add_child(crosshair)
 
-		var title := _label("%s TEAM" % teams[i].display_name.to_upper(), 24)
+		var title := _label("%s TEAM" % teams[i].display_name.to_upper(), 38)
 		title.add_theme_color_override("font_color", teams[i].color)
-		title.position = Vector2(16, 52)
+		if i == 0:
+			title.position = Vector2(28, 28)
+		else:   # top right, clear of the scoreboard in the middle
+			title.set_anchors_preset(Control.PRESET_TOP_RIGHT)
+			title.grow_horizontal = Control.GROW_DIRECTION_BEGIN
+			title.position = Vector2(-28, 28)
+			title.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 		half.add_child(title)
 
-		var info := _label("", 18)
+		var info := _label("", 30)
 		info.set_anchors_preset(Control.PRESET_BOTTOM_LEFT)
 		info.position = Vector2(16, -118)   # sits above the team HUD's health bar / kill counter
 		half.add_child(info)
 
-		var dead := _label("RESPAWNING…", 40)
+		var dead := _label("RESPAWNING…", 64)
 		dead.set_anchors_preset(Control.PRESET_CENTER)
 		dead.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		dead.custom_minimum_size = Vector2(400, 60)
-		dead.position = Vector2(-200, -90)
+		dead.custom_minimum_size = Vector2(640, 96)
+		dead.position = Vector2(-320, -150)
 		dead.visible = false
 		half.add_child(dead)
 
@@ -271,12 +300,7 @@ func _build_hud() -> void:
 
 		_hud_halves.append({"crosshair": crosshair, "info": info, "dead": dead, "half": half, "ring": ring, "spread": spread_label})
 
-	_score_label = _label("", 26)
-	_score_label.set_anchors_preset(Control.PRESET_CENTER_TOP)
-	_score_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	_score_label.custom_minimum_size = Vector2(320, 40)
-	_score_label.position = Vector2(-160, 8)
-	root.add_child(_score_label)
+	root.add_child(_build_scoreboard())
 
 	_hint_label = _label("F3: debug view", 14)
 	_hint_label.set_anchors_preset(Control.PRESET_CENTER_TOP)
@@ -290,9 +314,10 @@ func _label(text: String, size: int) -> Label:
 	var l := Label.new()
 	l.text = text
 	l.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	l.add_theme_font_override("font", UiKit.font(UiKit.BODY_BOLD))
 	l.add_theme_font_size_override("font_size", size)
 	l.add_theme_color_override("font_outline_color", Color.BLACK)
-	l.add_theme_constant_override("outline_size", 6)
+	l.add_theme_constant_override("outline_size", 8)
 	return l
 
 
@@ -329,9 +354,124 @@ func _update_half_hud(i: int, duo: Duo) -> void:
 
 
 func _update_score() -> void:
-	if _score_label:
-		_score_label.text = "%s %d  —  %d %s" % [
-			teams[0].display_name.to_upper(), scores[0], scores[1], teams[1].display_name.to_upper()]
+	if _score_blue:
+		_score_blue.text = str(scores[0])
+		_score_red.text = str(scores[1])
+
+
+# ---------------------------------------------------------------- match rules
+
+func _start_match() -> void:
+	scores = [0, 0]
+	_time_left = match_seconds
+	_running = true
+	MatchStats.begin(duos)
+	_update_score()
+	_send_status()
+
+
+func _tick_match(delta: float) -> void:
+	if not _running:
+		return
+	_time_left = maxf(_time_left - delta, 0.0)
+	if _clock:
+		_clock.text = "%d:%02d" % [int(_time_left) / 60, int(_time_left) % 60]
+		_clock.add_theme_color_override("font_color", UiKit.GOLD if _time_left <= 30.0 else UiKit.INK)
+	_status_timer -= delta
+	if _status_timer <= 0.0:
+		_send_status()
+	if _time_left <= 0.0:
+		_end_match("time")
+
+
+func _send_status() -> void:
+	_status_timer = 1.0
+	if NetworkClient.is_connected_to_server() and GameSession.is_playing():
+		GameSession.send_match_status(scores, _time_left, kill_target)
+
+
+func _end_match(reason: String) -> void:
+	if not _running:
+		return
+	_running = false
+	var winner := -1
+	if scores[0] != scores[1]:
+		winner = 0 if scores[0] > scores[1] else 1
+	MatchStats.finish(winner, scores, reason)
+	if NetworkClient.is_connected_to_server() and GameSession.is_playing():
+		GameSession.end_match(winner, scores, MatchStats.to_protocol())
+	_show_banner(winner)
+	get_tree().paused = true
+	await get_tree().create_timer(end_banner_seconds, true).timeout
+	get_tree().paused = false
+	get_tree().change_scene_to_file(results_scene)
+
+
+func _build_scoreboard() -> Control:
+	var board := HBoxContainer.new()
+	board.set_anchors_preset(Control.PRESET_CENTER_TOP)
+	board.grow_horizontal = Control.GROW_DIRECTION_BOTH
+	board.position.y = 10
+	board.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	board.add_theme_constant_override("separation", 0)
+	_score_blue = _board_cell(board, "0", UiKit.BLUE, 0.2)
+	var mid := PanelContainer.new()
+	mid.add_theme_stylebox_override("panel", UiKit.panel_box(Color(1, 1, 1, 0.25), Color(0.03, 0.04, 0.08, 0.92)))
+	var mid_box := VBoxContainer.new()
+	mid_box.add_theme_constant_override("separation", -4)
+	_clock = UiKit.display("5:00", 34)
+	_clock.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	mid_box.add_child(_clock)
+	var target := UiKit.label("FIRST TO %d" % kill_target, 15, UiKit.BODY_BOLD, UiKit.MUTED)
+	target.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	mid_box.add_child(target)
+	mid.add_child(mid_box)
+	board.add_child(mid)
+	_score_red = _board_cell(board, "0", UiKit.RED, -0.2)
+	return board
+
+
+func _board_cell(board: HBoxContainer, text: String, color: Color, skew: float) -> Label:
+	var cell := PanelContainer.new()
+	var box := UiKit.panel_box(color, Color(color.r * 0.35, color.g * 0.35, color.b * 0.35, 0.92), skew)
+	box.content_margin_left = 30
+	box.content_margin_right = 30
+	box.content_margin_top = 6
+	box.content_margin_bottom = 6
+	cell.add_theme_stylebox_override("panel", box)
+	cell.custom_minimum_size.x = 110
+	var l := UiKit.display(text, 52)
+	l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	cell.add_child(l)
+	board.add_child(cell)
+	return l
+
+
+func _show_banner(winner: int) -> void:
+	var hud := get_node_or_null(hud_path)
+	if hud == null:
+		return
+	_banner = ColorRect.new()
+	(_banner as ColorRect).color = Color(0, 0, 0, 0.55)
+	_banner.set_anchors_preset(Control.PRESET_FULL_RECT)
+	_banner.process_mode = Node.PROCESS_MODE_ALWAYS
+	var center := CenterContainer.new()
+	center.set_anchors_preset(Control.PRESET_FULL_RECT)
+	_banner.add_child(center)
+	var box := VBoxContainer.new()
+	box.alignment = BoxContainer.ALIGNMENT_CENTER
+	center.add_child(box)
+	var top := UiKit.eyebrow("Match over", UiKit.INK)
+	top.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	box.add_child(top)
+	var text := "DRAW" if winner < 0 else "%s WINS" % UiKit.team_name(winner)
+	var big := UiKit.display(text, 140, UiKit.INK if winner < 0 else UiKit.team_color(winner))
+	big.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	box.add_child(big)
+	var line := UiKit.display("%d — %d" % [scores[0], scores[1]], 48)
+	line.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	box.add_child(line)
+	hud.add_child(_banner)
 
 
 # ---------------------------------------------------------------- helpers

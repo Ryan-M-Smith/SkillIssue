@@ -14,9 +14,8 @@ import { DeviceMotion } from "expo-sensors";
 
 import { MotionController, emptyControls } from "@/service/motion-control-service";
 import { DebugLink, idleLinkStatus, type DebugLinkStatus } from "@/service/debug-link";
-import { GameLink, idleGameStatus, type GameLinkStatus } from "@/service/game-link";
 import { MotionTally, directionOf, zeroCounts, type Counts, type MovementState } from "@/lib/motion-summary";
-import { defaultDebugRoom, defaultDebugServerUrl } from "@/lib/net/server-url";
+import { defaultDebugRoom } from "@/lib/net/server-url";
 import type { GameControls, Grip } from "@/types/motion";
 
 const colors = {
@@ -54,32 +53,21 @@ const countLabels: [keyof Counts, string][] = [
 
 const redrawMs = 80;
 
-function gameLine(status: GameLinkStatus): { text: string; tone: "muted" | "good" | "warn" | "bad" } {
-	if (status.state === "idle") return { text: "Enter the code shown in the game.", tone: "muted" };
-	if (status.state === "connecting") return { text: "Joining…", tone: "warn" };
-	if (status.state === "closed") return { text: status.error ?? "Disconnected.", tone: "bad" };
-	if (status.game === "playing") return { text: "Playing. Your moves go to the game.", tone: "good" };
-	return { text: `In the lobby · ${status.players} phone${status.players === 1 ? "" : "s"} · waiting for the match to start`, tone: "warn" };
-}
-
-/** The movement phone, in landscape: what the model sees, plus links to the game and the debugger. */
-export default function PhoneController() {
+/** Practice: try the movement gestures and see what the model makes of them, and
+ * optionally stream the sensors to the web debugger. Reached from the main menu. */
+export function Practice({ serverUrl, onBack }: { serverUrl: string; onBack: () => void }) {
 	const [controls, setControls] = useState<GameControls>(emptyControls);
 	const [counts, setCounts] = useState<Counts>(zeroCounts);
 	const [state, setState] = useState<MovementState>("Calibrating");
 	const [grip, setGrip] = useState<Grip | null>(null);
 	const [sensorError, setSensorError] = useState("");
 
-	const [serverUrl, setServerUrl] = useState(defaultDebugServerUrl);
-	const [code, setCode] = useState("");
-	const [game, setGame] = useState<GameLinkStatus>(idleGameStatus);
 	const [room, setRoom] = useState(defaultDebugRoom);
 	const [debug, setDebug] = useState<DebugLinkStatus>(idleLinkStatus);
 	const [debugOn, setDebugOn] = useState(false);
 
 	const controllerRef = useRef(new MotionController("movement", Platform.OS));
 	const tallyRef = useRef(new MotionTally());
-	const gameRef = useRef<GameLink | null>(null);
 	const debugRef = useRef<DebugLink | null>(null);
 	const lastDrawRef = useRef(0);
 
@@ -99,7 +87,6 @@ export default function PhoneController() {
 					const now = Date.now();
 					const output = controllerRef.current.process(reading, now);
 					tallyRef.current.add(output, now);
-					gameRef.current?.update(output, reading);
 					debugRef.current?.sendReading(reading);
 
 					if (now - lastDrawRef.current >= redrawMs || output.action) {
@@ -118,7 +105,6 @@ export default function PhoneController() {
 		return () => {
 			cancelled = true;
 			subscription?.remove();
-			gameRef.current?.leave();
 			debugRef.current?.close();
 		};
 	}, []);
@@ -132,19 +118,6 @@ export default function PhoneController() {
 		tallyRef.current.reset();
 		setCounts({ ...zeroCounts });
 		debugRef.current?.sendEvent("reset_counts");
-	}
-
-	function toggleGame() {
-		if (gameRef.current && game.state !== "closed") {
-			gameRef.current.leave();
-			gameRef.current = null;
-			setGame(idleGameStatus);
-			return;
-		}
-		gameRef.current?.leave();
-		const link = new GameLink(serverUrl.trim(), Platform.OS, setGame);
-		gameRef.current = link;
-		link.join(code.trim());
 	}
 
 	function toggleDebug() {
@@ -171,10 +144,6 @@ export default function PhoneController() {
 	}
 
 	const direction = directionOf(controls);
-	const inGame = game.state === "connecting" || game.state === "joined";
-	const line = gameLine(game);
-	const lineColor = { muted: colors.muted, good: colors.green, warn: colors.yellow, bad: colors.red }[line.tone];
-	const teamColor = game.team === 2 ? colors.teamRed : colors.teamBlue;
 	const debugText =
 		debug.state === "connected"
 			? `Streaming to ${debug.viewers} viewer${debug.viewers === 1 ? "" : "s"}`
@@ -233,45 +202,12 @@ export default function PhoneController() {
 
 				{/* RIGHT: connections */}
 				<ScrollView style={[styles.card, styles.linkCol]} contentContainerStyle={{ gap: 8 }} keyboardShouldPersistTaps="handled">
-					<Text style={styles.label}>SERVER</Text>
-					<TextInput
-						style={styles.input}
-						value={serverUrl}
-						onChangeText={setServerUrl}
-						editable={!inGame && !debugOn}
-						autoCapitalize="none"
-						autoCorrect={false}
-						placeholder="ws://192.168.1.20:8080"
-						placeholderTextColor={colors.muted}
-					/>
-
-					<View style={styles.rowBetween}>
-						<Text style={styles.label}>GAME</Text>
-						{game.team != null && (
-							<Text style={[styles.team, { color: teamColor, borderColor: teamColor }]}>TEAM {game.team}</Text>
-						)}
-					</View>
-					<View style={styles.row}>
-						<TextInput
-							style={[styles.input, styles.grow]}
-							value={code}
-							onChangeText={(t) => setCode(t.replace(/[^0-9]/g, "").slice(0, 6))}
-							editable={!inGame}
-							keyboardType="number-pad"
-							placeholder="Join code"
-							placeholderTextColor={colors.muted}
-						/>
-						<Pressable
-							style={[styles.button, styles.fit, inGame ? styles.stop : styles.go, !inGame && code.length !== 6 && styles.disabled]}
-							onPress={toggleGame}
-							disabled={!inGame && code.length !== 6}
-						>
-							<Text style={styles.buttonText}>{inGame ? "LEAVE" : "JOIN"}</Text>
-						</Pressable>
-					</View>
-					<Text style={[styles.hint, { color: lineColor }]}>{line.text}</Text>
-
-					<Text style={styles.label}>WEB DEBUGGER</Text>
+					<Pressable style={[styles.button, styles.fit]} onPress={onBack}>
+						<Text style={styles.buttonText}>BACK TO MENU</Text>
+					</Pressable>
+					<Text style={styles.label}>PRACTICE</Text>
+					<Text style={styles.hint}>Hold the phone sideways at about 45° and keep it still to calibrate. Tilt to walk, tip to strafe, flick forward to crouch, flick back to jump, twist to sprint.</Text>
+					<Text style={styles.label}>WEB DEBUGGER · {serverUrl}</Text>
 					<View style={styles.row}>
 						<TextInput
 							style={[styles.input, styles.grow]}
