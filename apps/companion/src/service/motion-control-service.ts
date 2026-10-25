@@ -103,7 +103,7 @@ const settings = {
 
 	// Gunner.
 	aimMaxRate: 130,
-	aimDeadzone: 1.5, // deg/s: hand tremor
+	aimDeadzone: 1, // deg/s: reject resting noise, retain slow deliberate turns
 };
 
 // Flip a sign here if a direction comes out reversed on a real phone.
@@ -183,7 +183,9 @@ function tiltToMovement(degrees: number, wasActive: boolean, strafe = false): { 
 }
 
 function aimRate(degreesPerSecond: number) {
-	return Math.abs(degreesPerSecond) >= settings.aimDeadzone ? degreesPerSecond : 0;
+	// Continuous transition avoids the old abrupt 1.5 deg/s camera stop/start.
+	const amount = clamp((Math.abs(degreesPerSecond) - settings.aimDeadzone) / 2.5, 0, 1);
+	return amount === 0 ? 0 : degreesPerSecond * amount * amount * (3 - 2 * amount);
 }
 
 export const emptyControls: GameControls = {

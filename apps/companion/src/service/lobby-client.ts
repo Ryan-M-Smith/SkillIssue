@@ -280,10 +280,16 @@ export class LobbyClient {
 				lookX: !movement && fresh ? c.lookX : 0, lookY: !movement && fresh ? c.lookY : 0,
 				...(movement ? {} : { lookDX: fresh ? this.lookDX : 0, lookDY: fresh ? this.lookDY : 0 }) },
 		};
-		this.lookDX = 0;
-		this.lookDY = 0;
-		this.lastMotionAt = Date.now();
-		this.send({ type: "motion", timestamp: this.lastMotionAt, payload });
+		const sentAt = Date.now();
+		if (this.send({ type: "motion", timestamp: sentAt, payload })) {
+			this.lookDX = 0;
+			this.lookDY = 0;
+			this.lastMotionAt = sentAt;
+		} else if (!fresh) {
+			// Never replay an old turn after sensors stop or the connection stalls.
+			this.lookDX = 0;
+			this.lookDY = 0;
+		}
 	}
 
 	private receive(text: string) {
@@ -403,7 +409,9 @@ export class LobbyClient {
 	private send(message: object) {
 		// React Native's WebSocket never sets bufferedAmount (it stays undefined), so treat
 		// "unknown" as empty; comparing undefined would drop every message on phones.
-		if (this.socket?.readyState === WebSocket.OPEN && (this.socket.bufferedAmount ?? 0) < 65536) this.socket.send(JSON.stringify(message));
+		if (this.socket?.readyState !== WebSocket.OPEN || (this.socket.bufferedAmount ?? 0) >= 65536) return false;
+		this.socket.send(JSON.stringify(message));
+		return true;
 	}
 	private set(view: LobbyView) { this.view = view; this.onChange(view); }
 }

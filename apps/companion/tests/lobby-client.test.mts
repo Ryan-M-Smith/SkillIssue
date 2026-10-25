@@ -287,3 +287,25 @@ test("the gunner sends every degree it turned, summed between messages", (t) => 
 	assert.deepEqual(sent, [[1.5, -0.5], [9, 1.25]], "nothing is dropped or counted twice");
 	assert.equal(motions()[0].payload.controls.moveY, 0, "the gunner never moves");
 });
+
+
+test("gunner backpressure retains fresh turns and discards stale turns", (t) => {
+ t.mock.timers.enable({ apis: ["setTimeout", "setInterval", "Date"], now: 1000 });
+ const { client, socket } = connect("aim");
+ socket.bufferedAmount = 65536;
+ client.update({ ...controls, lookDX: 2, lookDY: -1 }, reading);
+ t.mock.timers.tick(16);
+ client.update({ ...controls, lookDX: 3, lookDY: -2 }, reading);
+ assert.equal(socket.sent.filter(m => m.type === "motion").length, 0);
+ socket.bufferedAmount = 0;
+ t.mock.timers.tick(34);
+ const motion = socket.sent.filter(m => m.type === "motion").at(-1)!;
+ assert.equal(motion.payload.controls.lookDX, 5);
+ assert.equal(motion.payload.controls.lookDY, -3);
+ socket.bufferedAmount = 65536;
+ client.update({ ...controls, lookDX: 20, lookDY: 0 }, reading);
+ t.mock.timers.tick(350);
+ socket.bufferedAmount = 0;
+ t.mock.timers.tick(50);
+ assert.equal(socket.sent.filter(m => m.type === "motion").at(-1)!.payload.controls.lookDX, 0);
+});

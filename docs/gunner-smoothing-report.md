@@ -1,0 +1,27 @@
+# Gunner smoothing and gesture audit
+
+## Changes
+
+- Added a 25 ms exponential filter to phone camera input in Godot. Packet bursts are spread over physics frames without extrapolating or losing the accumulated angle. Disconnect, stale input and match transitions clear pending turns through the existing router reset path.
+- Replaced the abrupt aiming deadzone with a continuous transition: resting noise below 1 degree/second is ignored; larger turns retain full sensitivity. Degree/radian conversion remains unchanged.
+- Fixed the phone transport clearing unsent camera deltas when WebSocket backpressure prevents sending. Brief congestion retains the turn; frozen sensor input discards stale turns.
+- Fixed the movement component looking for its health sibling at an invalid child path, which caused runtime errors when loading characters.
+- Kept runner jump/crouch gestures and UI unchanged, as requested. No jump/crouch buttons were added.
+
+## Expo Go limitation
+
+Jump/crouch flicks can trigger Expo Go's native shake-to-open developer menu. Android Expo Go does not expose a supported JavaScript switch to disable this shortcut. Calling React Native's iOS-only shake setting on Android does nothing; hiding the menu after it opens would interrupt gameplay anyway. This native Expo Go behavior is not fixed by this commit.
+
+For motion-only play without the developer menu, use an installed release preview APK. The repository already has an internal APK profile in `apps/companion/eas.json`. From `apps/companion`, run `npx eas-cli@latest build --platform android --profile preview`, then install the resulting APK. This requires an Expo account/build service; no APK was built or installed during this change.
+
+References: [Expo developer menu](https://docs.expo.dev/versions/v58.0.0/sdk/dev-menu/), [Android native menu exports](https://github.com/expo/expo/blob/main/packages/expo-dev-menu/android/src/debug/java/expo/modules/devmenu/modules/DevMenuModule.kt).
+
+## Validation
+
+- Companion regression suite: 47 tests pass, including fresh-turn retention under backpressure and stale-turn discard.
+- TypeScript and Expo lint pass.
+- Godot gameplay smoke: 67 checks pass, including actual yaw/pitch, camera transform propagation, conserved turn angle and disconnect clearing.
+- Godot lifecycle smoke: 25 checks pass.
+- Network integration: all 4 tests pass, including real WebSocket clients against the embedded Godot server.
+
+Physical Android/iOS feel and real relay latency still need a device check. Automated tests verify the camera path, but do not establish why a particular handset previously had no aiming or guarantee flawless play. Pull main, restart the game, clear Metro's cache, then test both landscape grips after holding still briefly for calibration.

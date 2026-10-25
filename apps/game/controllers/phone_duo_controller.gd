@@ -7,6 +7,8 @@ extends DuoController
 
 @export var team := 0
 @export var state_send_interval := 0.15
+## Short packet-jitter filter; remaining angle is conserved, never extrapolated.
+@export_range(0.0, 0.1) var aim_smoothing_seconds := 0.025
 
 var _move := Vector2.ZERO
 var _crouch := false
@@ -100,13 +102,17 @@ func _on_phone_left(msg_team: int, role: String) -> void:
 		_weapon_queued = -1
 
 
-func poll(input: DuoInput, _delta: float) -> void:
+func poll(input: DuoInput, delta: float) -> void:
 	input.move += _move
 	input.crouch = input.crouch or _crouch
 	input.sprint = input.sprint or _sprint
 	input.fire = input.fire or _fire
-	input.aim_delta += _aim_accum
-	_aim_accum = Vector2.ZERO
+	var weight := 1.0 if aim_smoothing_seconds <= 0.0 else 1.0 - exp(-maxf(delta, 0.0) / aim_smoothing_seconds)
+	var turn := _aim_accum * weight
+	if _aim_accum.length_squared() < 0.0000000001:
+		turn = _aim_accum
+	input.aim_delta += turn
+	_aim_accum -= turn
 	if _jump_queued:
 		input.jump = true
 		_jump_queued = false

@@ -306,6 +306,38 @@ func _run() -> void:
 	interp.feed({"controls": {"moveX": 0.0, "moveY": 0.0, "lookX": 1.0, "lookY": 0.0}}, "gunner", 1020)
 	if not _check(is_equal_approx(interp.take_aim(0.5).x, deg_to_rad(65.0)), "phones that only send a rate still aim"):
 		return
+	# Exercise the actual phone controller, aim component and remote camera mount.
+	var duo = load("res://entities/duo/duo.tscn").instantiate()
+	root.add_child(duo)
+	duo.set_physics_process(false)
+	var camera := Camera3D.new()
+	root.add_child(camera)
+	duo.camera_mount.remote_path = duo.camera_mount.get_path_to(camera)
+	var phone := PhoneDuoController.new(0)
+	duo.add_controller(phone)
+	phone._on_phone_message(0, "gunner", {"t": "aim", "dx": deg_to_rad(24.0), "dy": deg_to_rad(6.0)})
+	var phone_input := DuoInput.new()
+	phone.poll(phone_input, 1.0 / 60.0)
+	if not _check(phone_input.aim_delta.x > 0.0 and phone_input.aim_delta.x < deg_to_rad(24.0), "network turn starts immediately without a single-frame snap"):
+		return
+	duo.aim.tick(phone_input, 1.0 / 60.0)
+	for frame_index in range(30):
+		phone_input.reset()
+		phone.poll(phone_input, 1.0 / 60.0)
+		duo.aim.tick(phone_input, 1.0 / 60.0)
+	await process_frame
+	if not _check(is_equal_approx(duo.torso.rotation.y, deg_to_rad(-24.0)) and is_equal_approx(duo.head.rotation.x, deg_to_rad(6.0)), "smoothed gunner input preserves full yaw and pitch"):
+		return
+	if not _check(camera.global_basis.is_equal_approx(duo.camera_mount.global_basis), "gunner turns reach the rendered camera"):
+		return
+	phone._on_phone_message(0, "gunner", {"t": "aim", "dx": 1.0})
+	phone._on_phone_left(0, "gunner")
+	phone_input.reset()
+	phone.poll(phone_input, 1.0 / 60.0)
+	if not _check(phone_input.aim_delta == Vector2.ZERO, "disconnect discards buffered camera turns"):
+		return
+	duo.free()
+	camera.free()
 	print("GAMEPLAY_SMOKE_PASS ", _checks, " checks")
 	DirAccess.remove_absolute(ProjectSettings.globalize_path(GRAPHICS_TEST_CONFIG))
 	_finished = true
