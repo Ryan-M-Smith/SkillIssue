@@ -7,13 +7,15 @@ const TEAM_COUNT := 2
 
 ## Per game team (0 blue, 1 red).
 var teams: Array[Dictionary] = []
-## Last finished match: {"winner": int (-1 draw), "scores": [int, int], "reason": String}
+## Last finished match: {"winner": int (-1 draw), "scores": [int, int], "reason": String,
+## "seconds": float, "names": {"0:gunner": "Ryan", ...}}
 var result := {}
 
 var _duos: Array = []
 var _last_pos: Array[Vector3] = []
 var _was_crouching: Array[bool] = []
 var _running := false
+var _started_msec := 0
 
 
 func _ready() -> void:
@@ -26,7 +28,7 @@ func reset() -> void:
 	teams.clear()
 	for i in TEAM_COUNT:
 		teams.append({
-			"kills": 0, "deaths": 0, "shots": 0, "hits": 0, "headshots": 0,
+			"kills": 0, "deaths": 0, "shots": 0, "hits": 0, "headshots": 0, "damage": 0.0,
 			"distance": 0.0, "jumps": 0, "crouches": 0, "sprint_time": 0.0,
 			"streak": 0, "best_streak": 0,
 		})
@@ -43,16 +45,28 @@ func begin(duos: Array) -> void:
 		_was_crouching.append(false)
 		var team: int = duo.team_id
 		duo.weapons.fired.connect(func(data: WeaponData): _add(team, "shots", maxi(data.pellets, 1)))
-		duo.weapons.hit_confirmed.connect(func(_target, _damage, headshot: bool):
+		duo.weapons.hit_confirmed.connect(func(_target, damage: float, headshot: bool):
 			_add(team, "hits", 1)
+			if _running:
+				teams[team].damage += damage
 			if headshot:
 				_add(team, "headshots", 1))
+	_started_msec = Time.get_ticks_msec()
 	_running = true
 
 
 func finish(winner: int, scores: Array, reason: String) -> void:
 	_running = false
-	result = {"winner": winner, "scores": [scores[0], scores[1]], "reason": reason}
+	var names := {}
+	for team in TEAM_COUNT:
+		for role in ["gunner", "mover"]:
+			var player: Dictionary = GameSession.player_at(team, role)
+			if not player.is_empty():
+				names["%d:%s" % [team, role]] = str(player.name)
+	result = {
+		"winner": winner, "scores": [scores[0], scores[1]], "reason": reason,
+		"seconds": (Time.get_ticks_msec() - _started_msec) / 1000.0, "names": names,
+	}
 
 
 ## A lost lobby is an abandoned match, so discard its partial results and references.
@@ -77,6 +91,12 @@ func to_protocol() -> Array:
 			"bestStreak": t.best_streak,
 		})
 	return out
+
+
+## Kills per death; with no deaths, the kill count itself.
+func kdr(team: int) -> float:
+	var t: Dictionary = teams[team]
+	return float(t.kills) / t.deaths if t.deaths > 0 else float(t.kills)
 
 
 func accuracy(team: int) -> float:

@@ -54,6 +54,12 @@ In phone matches, the desktop host cannot move, aim, or fire. The mouse stays vi
 
 Weapons have real magazines: pistol **12 / 1.25 s reload**, shotgun **6 / 1.8 s**, sniper **5 / 2.2 s**. Empty magazines reload automatically. HUDs show live health, ammo and reload progress; kills build a streak that resets on death, with the best streak retained in results.
 
+## End screen and MVP
+
+The results screen opens with "and the winner is…" and the winning team (**Red Team** / **Blue Team**, or **Nobody** on a draw), then shows five final stats per team (kills, KDR, accuracy, damage dealt, distance traveled in meters) beside the **Match MVP**. Any of the four players can be MVP: Gunners usually for KDR, kills or damage; Runners for distance or for being so hard to hit that the other team scored little or shot poorly. In a draw the bar is higher, and the screen can say **No MVP**.
+
+The game sends the finished match to the control plane (`POST /api/mvp`), which asks Gemini to judge it. Set `GEMINI_API_KEY` (and optionally `GEMINI_MODEL`, default `gemini-flash-latest`) in the Vercel environment for `apps/landing`; the key never ships in the game. If the endpoint is unconfigured, slow (12 s) or offline, the game picks with its own rule and labels the card "Judged offline".
+
 ## Graphics
 
 The default window is **1920 × 1080**. Open **Graphics** from the main menu or **Menu / Esc** during a match to set output resolution, 3D render scale, window mode and V-sync. Presets include 720p, 900p, 1080p, 2160 × 1440, 1440p (2560 × 1440), and 4K (3840 × 2160).
