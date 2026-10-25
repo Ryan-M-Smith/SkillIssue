@@ -1,4 +1,4 @@
-import { randomUUID } from "node:crypto";
+import { randomInt, randomUUID } from "node:crypto";
 import { networkInterfaces } from "node:os";
 import { WebSocket, WebSocketServer } from "ws";
 
@@ -11,7 +11,10 @@ import {
     type DebugClientMessage,
     type DebugRole,
     type DebugServerMessage,
+    type EndGameMessage,
     type GameState,
+    type LobbyPlayer,
+    type MatchStatusMessage,
     type ServerMessage,
     type TeamId,
 } from "../../packages/protocol/events.ts";
@@ -19,8 +22,12 @@ import {
 const port = Number(process.env.PORT ?? 8080);
 const heartbeatIntervalMs = 30_000;
 const pairingCodeLength = 6;
-// How many phones a match needs before it can start. Default: all four slots.
-// Set MIN_CONTROLLERS=1 to test with a single phone.
+// Letters and digits that can't be mistaken for each other (no 0/O, 1/I/L).
+const pairingAlphabet = "ABCDEFGHJKMNPQRSTUVWXYZ23456789";
+const maxPlayersPerLobby = 4;
+const maxNameLength = 16;
+// How many slotted, ready phones a match needs before it can start. Default:
+// all four slots. Set MIN_CONTROLLERS=1 to test with a single phone.
 const minControllers = Math.min(4, Math.max(1, Math.floor(Number(process.env.MIN_CONTROLLERS ?? 4)) || 4));
 const controllerSlots: ReadonlyArray<{ teamId: TeamId; role: ControllerRole }> = [
     { teamId: 1, role: "movement" },
@@ -34,13 +41,16 @@ type Session = {
     pairingCode: string;
     state: GameState;
     gameSocket: WebSocket;
+    /** Every phone in the lobby, in join order. */
     controllers: Map<string, ControllerConnection>;
 };
 
 type ControllerConnection = {
     controllerId: string;
-    teamId: TeamId;
-    role: ControllerRole;
+    name: string;
+    teamId: TeamId | null;
+    role: ControllerRole | null;
+    ready: boolean;
     socket: WebSocket;
 };
 
@@ -84,54 +94,74 @@ function sendError(
 function createPairingCode() {
     let code = "";
     do {
-        code = Math.floor(Math.random() * 10 ** pairingCodeLength)
-            .toString()
-            .padStart(pairingCodeLength, "0");
+        code = Array.from({ length: pairingCodeLength }, () => pairingAlphabet[randomInt(pairingAlphabet.length)]).join("");
     } while (sessionsByCode.has(code));
     return code;
 }
 
+function normalizeCode(code: unknown) {
+    return typeof code === "string" ? code.trim().toUpperCase() : "";
+}
+
+function cleanName(name: unknown, fallback: string) {
+    const text = typeof name === "string" ? name.replace(/[\u0000-\u001f]/g, "").trim().slice(0, maxNameLength) : "";
+    return text || fallback;
+}
+
+function slotted(session: Session) {
+    return [...session.controllers.values()].filter((c) => c.teamId !== null && c.role !== null);
+}
+
+function slotHolder(session: Session, teamId: TeamId, role: ControllerRole) {
+    return [...session.controllers.values()].find((c) => c.teamId === teamId && c.role === role);
+}
+
 function assignmentsFor(session: Session): ControllerAssignment[] {
-    return [...session.controllers.values()].map((controller) => ({
+    return slotted(session).map((controller) => ({
         controllerId: controller.controllerId,
-        teamId: controller.teamId,
-        role: controller.role,
+        teamId: controller.teamId as TeamId,
+        role: controller.role as ControllerRole,
         connected: controller.socket.readyState === WebSocket.OPEN,
     }));
 }
 
+function playersFor(session: Session): LobbyPlayer[] {
+    return [...session.controllers.values()].map((controller) => ({
+        controllerId: controller.controllerId,
+        name: controller.name,
+        teamId: controller.teamId,
+        role: controller.role,
+        ready: controller.ready,
+        connected: controller.socket.readyState === WebSocket.OPEN,
+    }));
+}
+
+/** Enough slotted phones (all four, or MIN_CONTROLLERS) and every slotted phone ready. */
 function isReady(session: Session) {
-    if (minControllers < controllerSlots.length) {
-        return session.controllers.size >= minControllers;
+    const inSlots = slotted(session);
+    if (inSlots.length === 0 || !inSlots.every((c) => c.ready)) {
+        return false;
     }
-    return controllerSlots.every(({ teamId, role }) =>
-        [...session.controllers.values()].some(
-            (controller) => controller.teamId === teamId && controller.role === role
-        )
-    );
+    if (minControllers < controllerSlots.length) {
+        return inSlots.length >= minControllers;
+    }
+    return controllerSlots.every(({ teamId, role }) => slotHolder(session, teamId, role));
 }
 
 function sendLobbyState(session: Session) {
-    const state: GameState = session.state === "playing"
-        ? "playing"
-        : isReady(session)
-            ? "ready"
-            : "waiting";
-
-    if (session.state !== "playing") {
-        session.state = state;
+    if (session.state === "waiting" || session.state === "ready") {
+        session.state = isReady(session) ? "ready" : "waiting";
     }
 
     const message: ServerMessage = {
         type: "lobby_state",
         state: session.state,
         assignments: assignmentsFor(session),
+        players: playersFor(session),
+        minPlayers: minControllers,
     };
 
-    send(session.gameSocket, message);
-    for (const controller of session.controllers.values()) {
-        send(controller.socket, message);
-    }
+    broadcast(session, message);
 }
 
 function registerGame(socket: WebSocket) {
@@ -156,54 +186,127 @@ function registerGame(socket: WebSocket) {
     sendLobbyState(session);
 }
 
-function joinGame(socket: WebSocket, pairingCode: string, requestedRole: ControllerRole) {
-    const session = sessionsByCode.get(pairingCode);
+function joinGame(socket: WebSocket, pairingCode: string, requestedRole: ControllerRole | undefined, name: unknown) {
+    if (contexts.has(socket)) {
+        sendError(socket, "invalid_message", "This connection is already in a lobby.");
+        return;
+    }
+
+    const session = sessionsByCode.get(normalizeCode(pairingCode));
     if (!session || session.gameSocket.readyState !== WebSocket.OPEN) {
-        sendError(socket, "invalid_pairing_code", "The pairing code is invalid or expired.");
+        sendError(socket, "invalid_pairing_code", "That code doesn't match an open lobby. Check the code on the game screen.");
         return;
     }
 
     if (session.state === "playing" || session.state === "ended") {
-        sendError(socket, "game_unavailable", "This game is no longer accepting controllers.");
+        sendError(socket, "game_unavailable", "This match has already started.");
         return;
     }
 
-    const slot = controllerSlots.find(({ teamId, role }) =>
-        role === requestedRole && ![...session.controllers.values()].some(
-            (controller) => controller.teamId === teamId && controller.role === role
-        )
-    );
-
-    if (!slot) {
-        sendError(socket, "slot_occupied", `The ${requestedRole} controller slots are occupied.`);
+    if (session.controllers.size >= maxPlayersPerLobby) {
+        sendError(socket, "slot_occupied", "This lobby is full.");
         return;
+    }
+
+    let slot: { teamId: TeamId; role: ControllerRole } | undefined;
+    if (requestedRole) {
+        // Older clients: take the first free slot for that role, ready straight away.
+        slot = controllerSlots.find(({ teamId, role }) => role === requestedRole && !slotHolder(session, teamId, role));
+        if (!slot) {
+            sendError(socket, "slot_occupied", `The ${requestedRole} controller slots are occupied.`);
+            return;
+        }
     }
 
     const controller: ControllerConnection = {
         controllerId: `controller_${randomUUID()}`,
-        teamId: slot.teamId,
-        role: slot.role,
+        name: cleanName(name, `Player ${session.controllers.size + 1}`),
+        teamId: slot?.teamId ?? null,
+        role: slot?.role ?? null,
+        ready: !!slot,
         socket,
     };
 
     session.controllers.set(controller.controllerId, controller);
     contexts.set(socket, { kind: "controller", session, controller });
 
-    send(socket, {
+    send(socket, { type: "lobby_joined", controllerId: controller.controllerId, pairingCode: session.pairingCode });
+    if (slot) {
+        sendAssigned(controller);
+    }
+    sendLobbyState(session);
+}
+
+function sendAssigned(controller: ControllerConnection) {
+    send(controller.socket, {
         type: "controller_assigned",
         assignment: {
             controllerId: controller.controllerId,
-            teamId: controller.teamId,
-            role: controller.role,
+            teamId: controller.teamId as TeamId,
+            role: controller.role as ControllerRole,
             connected: true,
         },
     });
+}
+
+function controllerContext(socket: WebSocket) {
+    const context = contexts.get(socket);
+    return context && context.kind === "controller" ? context : null;
+}
+
+function hostContext(socket: WebSocket) {
+    const context = contexts.get(socket);
+    return context && context.kind === "game" ? context : null;
+}
+
+function selectSlot(socket: WebSocket, teamId: unknown, role: unknown) {
+    const context = controllerContext(socket);
+    if (!context) {
+        sendError(socket, "invalid_message", "Join a lobby before picking a team.");
+        return;
+    }
+    const { session, controller } = context;
+    if (session.state !== "waiting" && session.state !== "ready") {
+        sendError(socket, "game_unavailable", "Teams are locked while a match is on.");
+        return;
+    }
+    if ((teamId !== 1 && teamId !== 2) || (role !== "movement" && role !== "aim")) {
+        sendError(socket, "invalid_message", "Pick team 1 or 2 and role movement or aim.");
+        return;
+    }
+    const holder = slotHolder(session, teamId, role);
+    if (holder && holder !== controller) {
+        sendError(socket, "slot_occupied", `${holder.name} already has that spot.`);
+        return;
+    }
+    controller.teamId = teamId;
+    controller.role = role;
+    controller.ready = false;
+    sendAssigned(controller);
+    sendLobbyState(session);
+}
+
+function setReady(socket: WebSocket, ready: unknown) {
+    const context = controllerContext(socket);
+    if (!context) {
+        sendError(socket, "invalid_message", "Join a lobby first.");
+        return;
+    }
+    const { session, controller } = context;
+    if (session.state !== "waiting" && session.state !== "ready") {
+        return;
+    }
+    if (ready === true && (controller.teamId === null || controller.role === null)) {
+        sendError(socket, "invalid_message", "Pick a team and role before you ready up.");
+        return;
+    }
+    controller.ready = ready === true;
     sendLobbyState(session);
 }
 
 function startGame(socket: WebSocket) {
-    const context = contexts.get(socket);
-    if (!context || context.kind !== "game") {
+    const context = hostContext(socket);
+    if (!context) {
         sendError(socket, "invalid_message", "Only the game host can start a match.");
         return;
     }
@@ -213,8 +316,8 @@ function startGame(socket: WebSocket) {
             socket,
             "game_unavailable",
             minControllers < controllerSlots.length
-                ? `At least ${minControllers} controller(s) must be connected first.`
-                : "All four controller slots must be connected first."
+                ? `At least ${minControllers} controller(s) must pick a spot and ready up first.`
+                : "All four spots must be taken and ready first."
         );
         return;
     }
@@ -222,6 +325,68 @@ function startGame(socket: WebSocket) {
     context.session.state = "playing";
     broadcast(context.session, { type: "broadcast", state: "playing" });
     sendLobbyState(context.session);
+}
+
+function relayMatchStatus(socket: WebSocket, message: MatchStatusMessage) {
+    const context = hostContext(socket);
+    if (!context || context.session.state !== "playing") return;
+    if (!Array.isArray(message.scores) || message.scores.length !== 2 || typeof message.timeLeft !== "number") {
+        sendError(socket, "invalid_message", "Invalid match_status.");
+        return;
+    }
+    const status: ServerMessage = {
+        type: "match_status",
+        scores: [Number(message.scores[0]) || 0, Number(message.scores[1]) || 0],
+        timeLeft: Math.max(0, message.timeLeft),
+        killTarget: Number(message.killTarget) || 0,
+    };
+    for (const controller of context.session.controllers.values()) {
+        send(controller.socket, status);
+    }
+}
+
+function endGame(socket: WebSocket, message: EndGameMessage) {
+    const context = hostContext(socket);
+    if (!context) {
+        sendError(socket, "invalid_message", "Only the game host can end a match.");
+        return;
+    }
+    const { session } = context;
+    if (session.state !== "playing") {
+        sendError(socket, "game_unavailable", "There's no match to end.");
+        return;
+    }
+    session.state = "ended";
+    const result: ServerMessage = {
+        type: "match_ended",
+        winningTeam: message.winningTeam === 1 || message.winningTeam === 2 ? message.winningTeam : null,
+        scores: Array.isArray(message.scores) && message.scores.length === 2
+            ? [Number(message.scores[0]) || 0, Number(message.scores[1]) || 0]
+            : [0, 0],
+        stats: Array.isArray(message.stats) ? message.stats.slice(0, 2) : [],
+    };
+    for (const controller of session.controllers.values()) {
+        send(controller.socket, result);
+    }
+    sendLobbyState(session);
+}
+
+function resetLobby(socket: WebSocket) {
+    const context = hostContext(socket);
+    if (!context) {
+        sendError(socket, "invalid_message", "Only the game host can reopen the lobby.");
+        return;
+    }
+    const { session } = context;
+    if (session.state === "playing") {
+        sendError(socket, "game_unavailable", "End the match before reopening the lobby.");
+        return;
+    }
+    session.state = "waiting";
+    for (const controller of session.controllers.values()) {
+        controller.ready = false;
+    }
+    sendLobbyState(session);
 }
 
 function broadcast(session: Session, message: ServerMessage) {
@@ -232,9 +397,9 @@ function broadcast(session: Session, message: ServerMessage) {
 }
 
 function forwardInput(socket: WebSocket, message: AuthorizedInputMessage) {
-    const context = contexts.get(socket);
-    if (!context || context.kind !== "controller") {
-        sendError(socket, "invalid_message", "Only an assigned controller can send input.");
+    const context = controllerContext(socket);
+    if (!context || context.controller.teamId === null) {
+        sendError(socket, "invalid_message", "Only a controller with a team and role can send input.");
         return;
     }
 
@@ -387,14 +552,33 @@ function handleMessage(socket: WebSocket, message: ClientMessage | DebugClientMe
                 sendError(socket, "invalid_message", "Debug connections can't join a game.");
                 return;
             }
-            if (message.protocolVersion !== protocolVersion || !["movement", "aim"].includes(message.requestedRole)) {
+            if (
+                message.protocolVersion !== protocolVersion ||
+                typeof message.pairingCode !== "string" ||
+                (message.requestedRole !== undefined && !["movement", "aim"].includes(message.requestedRole))
+            ) {
                 sendError(socket, "invalid_message", "Invalid join request.");
                 return;
             }
-            joinGame(socket, message.pairingCode, message.requestedRole);
+            joinGame(socket, message.pairingCode, message.requestedRole, message.name);
+            return;
+        case "select_slot":
+            selectSlot(socket, message.teamId, message.role);
+            return;
+        case "set_ready":
+            setReady(socket, message.ready);
             return;
         case "start_game":
             startGame(socket);
+            return;
+        case "match_status":
+            relayMatchStatus(socket, message);
+            return;
+        case "end_game":
+            endGame(socket, message);
+            return;
+        case "reset_lobby":
+            resetLobby(socket);
             return;
         case "motion":
         case "environment":
@@ -427,12 +611,14 @@ function disconnect(socket: WebSocket) {
 
     const { session, controller } = context;
     session.controllers.delete(controller.controllerId);
-    broadcast(session, {
-        type: "controller_disconnected",
-        controllerId: controller.controllerId,
-        teamId: controller.teamId,
-        role: controller.role,
-    });
+    if (controller.teamId !== null && controller.role !== null) {
+        broadcast(session, {
+            type: "controller_disconnected",
+            controllerId: controller.controllerId,
+            teamId: controller.teamId,
+            role: controller.role,
+        });
+    }
     sendLobbyState(session);
 }
 
@@ -469,6 +655,21 @@ const heartbeat = setInterval(() => {
 }, heartbeatIntervalMs);
 
 wss.on("close", () => clearInterval(heartbeat));
+
+// When the game launches this server, it passes its process id. Exit when
+// that process is gone, so a crashed or force-quit game never leaves an
+// orphaned server holding the port.
+const parentPid = Number(process.env.SKILLISSUE_PARENT_PID);
+if (Number.isInteger(parentPid) && parentPid > 0) {
+    setInterval(() => {
+        try {
+            process.kill(parentPid, 0);
+        } catch {
+            console.log("The game that launched this server has exited. Shutting down.");
+            process.exit(0);
+        }
+    }, 2000).unref();
+}
 console.log(`SkillIssue WebSocket server listening on ws://localhost:${port}`);
 if (minControllers < controllerSlots.length) {
     console.log(`  matches can start with ${minControllers} controller(s) (MIN_CONTROLLERS)`);

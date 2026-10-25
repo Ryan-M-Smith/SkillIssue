@@ -11,6 +11,8 @@ signal controller_removed(controller_id: String, team: int, role: String)
 signal controller_ready_changed(controller_id: String, is_ready: bool)
 signal server_message(message: String)
 signal server_error(error: String)
+## The lobby roster or its state changed (names, spots, ready flags). Read `players`.
+signal lobby_changed()
 
 const STATES: PackedStringArray = ["waiting", "ready", "playing", "paused", "ended"]
 const ROLES: PackedStringArray = ["mover", "gunner"]   ## game-side role names (PhoneDuoController)
@@ -25,12 +27,19 @@ const ROLE_ALIASES := {
 ## The protocol numbers teams 1 and 2; the game's TeamData ids are 0 (blue) and 1 (red).
 @export var server_team_offset := 1
 ## Ask the server to start the match as soon as the lobby is ready (all four
-## slots, or fewer when the server runs with MIN_CONTROLLERS).
-@export var auto_start := true
+## slots, or fewer when the server runs with MIN_CONTROLLERS). Off by default: the
+## lobby screen counts down and starts the match itself.
+@export var auto_start := false
 
 var game_id := ""
 var pairing_code := ""
 var state := "waiting"
+
+## Every phone in the lobby, slotted or not, in join order:
+## {"id", "name", "team" (game team, -1 = none), "role" ("mover"/"gunner"/""), "ready", "connected"}
+var players: Array[Dictionary] = []
+## Slotted, ready phones it takes to start (from the server).
+var min_players := 4
 
 ## controller_id -> {"team": int, "role": String, "ready": bool}
 var _controllers := {}
@@ -73,6 +82,44 @@ func request_start() -> bool:
 	return NetworkClient.send_message("start_game")
 
 
+## Starts the server if needed and connects to it as the game host. The server
+## replies with the join code (`registered`). Await it; check `pairing_code`.
+func create_lobby() -> void:
+	await ServerProcess.ensure_running()
+	if not ServerProcess.is_up():
+		server_error.emit(ServerProcess.message)
+		return
+	NetworkClient.connect_to_server(ServerProcess.server_url())
+
+
+## Disconnects from the server, which closes the lobby for every phone.
+func leave_lobby() -> void:
+	NetworkClient.disconnect_from_server()
+
+
+## While playing: the live score and clock, which the server passes to the phones.
+## `scores` is indexed by game team (0 blue, 1 red).
+func send_match_status(scores: Array, time_left: float, kill_target: int) -> void:
+	NetworkClient.send_message("match_status", {
+		"scores": [scores[0], scores[1]], "timeLeft": snappedf(time_left, 0.1), "killTarget": kill_target,
+	})
+
+
+## The match is over: the server moves to "ended" and shows the phones the result.
+## `winning_team` is a game team (0/1), or -1 for a draw. `stats` are protocol TeamStats.
+func end_match(winning_team: int, scores: Array, stats: Array) -> void:
+	NetworkClient.send_message("end_game", {
+		"winningTeam": null if winning_team < 0 else winning_team + server_team_offset,
+		"scores": [scores[0], scores[1]],
+		"stats": stats,
+	})
+
+
+## Play Again: back to the lobby with the same code and players, ready flags cleared.
+func reset_lobby() -> void:
+	NetworkClient.send_message("reset_lobby")
+
+
 ## Marks a controller ready (from its "ready" action). Purely lobby display state.
 func set_controller_ready(controller_id: String, is_ready: bool) -> void:
 	if _controllers.has(controller_id) and _controllers[controller_id].ready != is_ready:
@@ -95,8 +142,12 @@ func _on_game_event(event: Dictionary) -> void:
 		"lobby_state":
 			# The server's full assignment list; the game learns assignments from this.
 			_sync_assignments(p.get("assignments"))
+			_sync_players(p.get("players"))
+			if typeof(p.get("minPlayers")) in [TYPE_INT, TYPE_FLOAT]:
+				min_players = int(p.minPlayers)
 			if p.has("state"):
 				_set_state(str(p.state))
+			lobby_changed.emit()
 		"controller_assigned":
 			# The server sends this to the phone; accepted here too, nested or flat.
 			var a: Variant = p.get("assignment", p)
@@ -167,6 +218,32 @@ func _sync_assignments(list: Variant) -> void:
 			_remove(id)
 
 
+func _sync_players(list: Variant) -> void:
+	players.clear()
+	if typeof(list) != TYPE_ARRAY:
+		return
+	for a in list:
+		if typeof(a) != TYPE_DICTIONARY:
+			continue
+		var team_v: Variant = a.get("teamId")
+		players.append({
+			"id": str(a.get("controllerId", "")),
+			"name": str(a.get("name", "Player")),
+			"team": int(team_v) - server_team_offset if typeof(team_v) in [TYPE_INT, TYPE_FLOAT] else -1,
+			"role": normalize_role(str(a.get("role", ""))) if a.get("role") != null else "",
+			"ready": a.get("ready", false) == true,
+			"connected": a.get("connected", true) != false,
+		})
+
+
+## The player holding a game team's role, or {} if the spot is open.
+func player_at(team: int, role: String) -> Dictionary:
+	for p in players:
+		if p.team == team and p.role == role:
+			return p
+	return {}
+
+
 func _remove(id: String) -> void:
 	if not _controllers.has(id):
 		return
@@ -193,6 +270,8 @@ func _on_connection_changed(connected: bool) -> void:
 		return
 	for id in _controllers.keys():
 		_remove(id)
+	players.clear()
 	game_id = ""
 	pairing_code = ""
 	_set_state("waiting")
+	lobby_changed.emit()

@@ -19,7 +19,8 @@ const KNOWN_TYPES: PackedStringArray = [
 	"join_rejected", "broadcast", "role", "motion", "environment",
 ]
 
-@export var auto_connect := true
+## Off: the game connects when a lobby is created (GameSession.create_lobby).
+@export var auto_connect := false
 @export var reconnect_delay := 2.0         ## seconds between reconnect attempts
 @export var max_reconnect_delay := 15.0    ## backoff cap
 @export var log_stats_every := 0.0         ## seconds; 0 = never print stats
