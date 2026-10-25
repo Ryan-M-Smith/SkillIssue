@@ -12,7 +12,7 @@
 ##   - builds a temporary test floor + cover only if the map has no geometry at all
 ##   Nothing is ever saved into the map or main.tscn.
 ##
-## Match rules: first team to `kill_target` kills wins, or whoever leads when the
+## Match rules: first team to `kill_target` POINTS wins, or whoever leads when the
 ## `match_seconds` clock runs out (equal = draw). The live score and clock go to the phones
 ## every second; at the final whistle the action freezes, the result goes to the server and
 ## the phones, and the results screen (ui/results.tscn) loads.
@@ -26,6 +26,14 @@
 ## comes back after `pickup_respawn_time`. On death you drop back to the pistol.
 ##   F3: debug view: hitbox zones on both duos (red head / yellow body / blue legs)
 ##       plus each team's live spread circle and spread value
+##
+## Extra rules:
+##   Bounty: a kill is 1 point. Get killed and your team has `bounty_seconds` to take revenge:
+##     that kill is worth `bounty_points`. It's still one kill in the stats; only points go up.
+##   Swap on death: `swap_on_death_chance` that a dead team's Runner and Gunner phones trade
+##     roles (phone matches only; the server swaps them and both phones switch screens).
+##   Mystery boxes (random buff / debuff, see PowerupComponent) float on the map: on
+##     "MysterySpot*" nodes if the map has them, otherwise on `mystery_spots` (tuned for The Pit).
 class_name DuoSandbox
 extends Node
 
@@ -44,6 +52,12 @@ extends Node
 @export var match_seconds := 300.0
 @export var results_scene := "res://ui/results.tscn"
 @export var end_banner_seconds := 2.5
+## After you're killed, your team has this long to take revenge...
+@export var bounty_seconds := 30.0
+## ...and the revenge kill is worth this many points (instead of 1).
+@export var bounty_points := 2
+## Chance (0-1) that a team's two phones swap roles when it dies. Phone matches only.
+@export_range(0.0, 1.0) var swap_on_death_chance := 0.2
 @export_group("")
 @export var respawn_delay := 3.0
 @export var fov := 80.0
@@ -69,6 +83,13 @@ extends Node
 @export var pickup_respawn_time := 10.0
 @export_group("")
 
+@export_group("Mystery boxes")
+@export var place_arena_pickups := true
+## Used when the map has no "MysterySpot*" nodes. Defaults fit The Pit: down in the pit
+## walkway, the same distance from each team's spawn.
+@export var mystery_spots: Array[Vector3] = [Vector3(8, 0.12, -8), Vector3(-8, 0.12, 8)]
+@export_group("")
+
 @export_group("Scene paths (relative to this node; it sits directly under Main)")
 @export var world_path: NodePath = ^"../World"
 @export var entities_path: NodePath = ^"../World/Entities"
@@ -80,7 +101,13 @@ extends Node
 ]
 
 var duos: Array[Duo] = []
+## Points per team (a kill is 1, a bounty kill is `bounty_points`). Kills are in MatchStats.
 var scores: Array[int] = [0, 0]
+## Seconds each team has left to take revenge (0 = no bounty).
+var bounty_left: Array[float] = [0.0, 0.0]
+## Rolls swap-on-death. Seed it for a predictable test.
+var rng := RandomNumberGenerator.new()
+var arena_pickups: Array[ArenaPickup] = []
 
 var _cameras: Array[Camera3D] = []
 var _hud_halves: Array[Dictionary] = []
@@ -137,7 +164,16 @@ func _setup() -> void:
 
 	if place_weapon_pickups and not duos.is_empty():
 		_place_weapon_pickups(world, duos[0].weapons.loadout)
+	if place_arena_pickups:
+		_place_arena_pickups(world)
 	_add_scope_overlays()
+	rng.randomize()
+	for duo in duos:
+		var team := duo.team_id
+		duo.powerups.effect_started.connect(func(effect: PowerupComponent.Effect, _seconds: float):
+			var good := PowerupComponent.is_buff(effect)
+			toast(team, "%s  /  %s" % [PowerupComponent.display_name(effect), PowerupComponent.INFO[effect].blurb], UiKit.GOLD if good else UiKit.RED))
+	GameSession.roles_swapped.connect(_on_roles_swapped)
 	GameEvents.duo_killed.connect(_on_duo_killed)
 	_update_score()
 	set_debug_view(debug_view)
@@ -234,6 +270,23 @@ func _place_weapon_pickups(world: Node3D, loadout: Array[WeaponData]) -> void:
 		print("[DuoSandbox] Placed %d floating weapon pickup(s) on the map's gun spots (runtime only)." % placed)
 
 
+## Map pickups built on ArenaPickup (mystery boxes): on the map's "MysterySpot*" nodes if it
+## has any, otherwise on `mystery_spots`. Runtime only. Add a kind: one more row here.
+func _place_arena_pickups(world: Node3D) -> void:
+	for kind in [["MysterySpot*", mystery_spots, MysteryPickup]]:
+		var points: Array[Vector3] = []
+		for n in world.find_children(kind[0], "Node3D", true, false):
+			points.append((n as Node3D).global_position)
+		if points.is_empty():
+			points.assign(kind[1])
+		for at in points:
+			var p: ArenaPickup = kind[2].new()
+			p.name = "%s%d" % [kind[0].trim_suffix("Spot*") + "Pickup", arena_pickups.size() + 1]
+			world.add_child(p)
+			p.global_position = at
+			arena_pickups.append(p)
+
+
 ## Sniper scope picture on each team's half of the screen (shows itself while scoped).
 func _add_scope_overlays() -> void:
 	for i in mini(duos.size(), _hud_halves.size()):
@@ -303,12 +356,21 @@ func _on_duo_killed(victim_team: int, killer_team: int) -> void:
 	if v == null:
 		return
 	if killer_team >= 0 and killer_team < scores.size() and killer_team != victim_team:
-		scores[killer_team] += 1
+		var points := 1
+		if bounty_left[killer_team] > 0.0:
+			points = bounty_points       # revenge: more points, still one kill
+			bounty_left[killer_team] = 0.0
+			toast(killer_team, "REVENGE  /  +%d POINTS" % points, UiKit.GOLD)
+		bounty_left[victim_team] = bounty_seconds
+		scores[killer_team] += points
 		GameEvents.score_changed.emit(killer_team, scores[killer_team])
 		_send_status()
 		if scores[killer_team] >= kill_target:
 			_end_match.call_deferred("kills")
 	_update_score()
+	var match_over: bool = scores.max() >= kill_target
+	if _network_match and not match_over and rng.randf() < swap_on_death_chance:
+		GameSession.request_role_swap(victim_team)
 	await get_tree().create_timer(respawn_delay).timeout
 	if _running and is_instance_valid(v) and not v.alive:
 		# spawn protection after a death; skipped when respawns are near-instant (test setups)
@@ -355,7 +417,20 @@ func _build_hud() -> void:
 		spread.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		spread.visible = false
 		half.add_child(spread)
-		_hud_halves.append({"half": half, "ring": ring, "spread": spread})
+		# Bounty timer (top), pop-up messages (above the crosshair), active effects (bottom).
+		var bounty := UiKit.label("", 20, UiKit.BODY_BOLD, UiKit.GOLD)
+		_center_label(bounty, Control.PRESET_CENTER_TOP, 110)
+		half.add_child(bounty)
+		var toast_label := UiKit.label("", 26, UiKit.BODY_BOLD, UiKit.GOLD)
+		_center_label(toast_label, Control.PRESET_CENTER, -150)
+		toast_label.modulate.a = 0.0
+		half.add_child(toast_label)
+		var effects := UiKit.label("", 18, UiKit.BODY_BOLD, UiKit.INK)
+		_center_label(effects, Control.PRESET_CENTER_BOTTOM, -150)
+		effects.vertical_alignment = VERTICAL_ALIGNMENT_BOTTOM
+		half.add_child(effects)
+		_hud_halves.append({"half": half, "ring": ring, "spread": spread,
+			"bounty": bounty, "toast": toast_label, "effects": effects})
 	root.add_child(_build_scoreboard())
 	_hint_label = UiKit.label("TAB  /  SCOREBOARD     F3  /  HITBOXES", 12, UiKit.BODY_BOLD, UiKit.MUTED)
 	_hint_label.set_anchors_preset(Control.PRESET_CENTER_TOP)
@@ -373,6 +448,7 @@ func _update_half_hud(i: int, duo: Duo) -> void:
 	if i >= _hud_halves.size():
 		return
 	var half: Dictionary = _hud_halves[i]
+	_update_rules_hud(half, duo)
 	var show: bool = debug_view and duo.alive
 	half.ring.visible = show
 	half.spread.visible = show
@@ -387,6 +463,53 @@ func _update_half_hud(i: int, duo: Duo) -> void:
 		half.spread.text = "SPREAD %.1f deg" % degrees
 
 
+func _update_rules_hud(half: Dictionary, duo: Duo) -> void:
+	var team := duo.team_id
+	var left: float = bounty_left[team] if team < bounty_left.size() else 0.0
+	(half.bounty as Label).text = "BOUNTY  %ds  /  REVENGE KILL = %d PTS" % [ceili(left), bounty_points] if left > 0.0 and _running else ""
+	var lines := PackedStringArray()
+	for entry in duo.powerups.active():
+		var effect: PowerupComponent.Effect = entry[0]
+		var secs: float = entry[1]
+		var title := PowerupComponent.display_name(effect)
+		lines.append(title if is_inf(secs) else "%s  %ds" % [title, ceili(secs)])
+	var effects := half.effects as Label
+	effects.text = "\n".join(lines)
+	var any_debuff := duo.powerups.has(PowerupComponent.Effect.INVERTED) or duo.powerups.has(PowerupComponent.Effect.SLOWED)
+	effects.add_theme_color_override("font_color", UiKit.RED if any_debuff else UiKit.GOLD)
+
+
+## A short message on one team's half of the screen that fades out.
+func toast(team: int, text: String, color := UiKit.GOLD) -> void:
+	if team < 0 or team >= _hud_halves.size():
+		return
+	var label := _hud_halves[team].toast as Label
+	label.text = text
+	label.add_theme_color_override("font_color", color)
+	label.modulate.a = 1.0
+	if label.has_meta("fade"):
+		(label.get_meta("fade") as Tween).kill()   # a newer message restarts the fade
+	var tween := label.create_tween()
+	label.set_meta("fade", tween)
+	tween.tween_interval(2.2)
+	tween.tween_property(label, "modulate:a", 0.0, 0.6)
+
+
+func _center_label(label: Label, preset: Control.LayoutPreset, y: float) -> void:
+	label.set_anchors_preset(preset)
+	label.offset_left = -400
+	label.offset_right = 400
+	label.offset_top = y
+	label.offset_bottom = y + 30
+	label.grow_vertical = Control.GROW_DIRECTION_BEGIN if preset == Control.PRESET_CENTER_BOTTOM else Control.GROW_DIRECTION_END
+	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+
+
+func _on_roles_swapped(team: int) -> void:
+	toast(team, "ROLE SWAP!  RUNNER <-> GUNNER  /  CHECK YOUR PHONES", UiKit.GOLD)
+
+
 func _update_score() -> void:
 	if _score_blue:
 		_score_blue.text = str(scores[0])
@@ -397,6 +520,7 @@ func _update_score() -> void:
 
 func _start_match() -> void:
 	scores = [0, 0]
+	bounty_left = [0.0, 0.0]
 	_time_left = match_seconds
 	_running = true
 	_network_match = NetworkClient.is_connected_to_server() and GameSession.is_playing()
@@ -404,6 +528,7 @@ func _start_match() -> void:
 	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 	GameSession.state_changed.connect(_on_session_state_changed)
 	MatchStats.begin(duos)
+	Music.play("match")
 	_update_score()
 	_send_status()
 
@@ -428,6 +553,8 @@ func _tick_match(delta: float) -> void:
 	if not _running:
 		return
 	_time_left = maxf(_time_left - delta, 0.0)
+	for t in bounty_left.size():
+		bounty_left[t] = maxf(bounty_left[t] - delta, 0.0)
 	if _clock:
 		_clock.text = "%d:%02d" % [int(_time_left) / 60, int(_time_left) % 60]
 		_clock.add_theme_color_override("font_color", UiKit.GOLD if _time_left <= 30.0 else UiKit.INK)
@@ -489,7 +616,7 @@ func _build_scoreboard() -> Control:
 	_clock = UiKit.display("5:00", 32)
 	_clock.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	col.add_child(_clock)
-	var target := UiKit.label("FIRST TO %d" % kill_target, 13, UiKit.BODY_BOLD, UiKit.MUTED)
+	var target := UiKit.label("FIRST TO %d PTS" % kill_target, 13, UiKit.BODY_BOLD, UiKit.MUTED)
 	target.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	col.add_child(target)
 	center.add_child(col)
