@@ -2,13 +2,14 @@
 import React, { useEffect, useRef, useState } from "react";
 import {
   SafeAreaView, ScrollView, View, Text, Pressable,
-  StyleSheet, StatusBar,
+  StyleSheet, StatusBar, Platform, Share,
 } from "react-native";
 import { DeviceMotion } from "expo-sensors";
 
 import { Axis, Panel, Value } from "@/components/motion-ui";
 
-import type { Action } from "@/types/motion";
+import type { Action, MotionReading } from "@/types/motion";
+import { deviceRotationRate } from "@/lib/math/motion";
 import {
   MotionController,
   emptyControls,
@@ -46,11 +47,14 @@ const zeroDebug: MotionDebug = {
   sidePressDeg: 0,
   pitchRate: 0,
   sidePressRate: 0,
+  twistRate: 0,
+  burst: "none",
   sprintPhase: "off",
   gesture: "armed",
-  strafeMeters: 0,
-  positionTracking: "missing",
 };
+
+// How long the tuning recorder captures raw sensor data.
+const recordMs = 5000;
 
 const fmt = (n: number, places = 1) =>
   Number.isFinite(n) ? n.toFixed(places) : "0";
@@ -77,11 +81,18 @@ export default function Index() {
 
   const [rateHz, setRateHz] = useState(0);
 
+  // Gyroscope about the phone's own X / Y / Z axes.
   const [rawGyro, setRawGyro] = useState({
-    alpha: 0,
-    beta: 0,
-    gamma: 0,
+    x: 0,
+    y: 0,
+    z: 0,
   });
+
+  const [recording, setRecording] = useState(false);
+  const recordRef = useRef<{
+    until: number;
+    samples: MotionReading[];
+  } | null>(null);
 
   const [rawAccel, setRawAccel] = useState({
     x: 0,
@@ -92,7 +103,7 @@ export default function Index() {
   // -------------------- REFS --------------------
 
   const controllerRef = useRef(
-    new MotionController("movement")
+    new MotionController("movement", Platform.OS)
   );
 
   const subRef = useRef<
@@ -132,9 +143,9 @@ export default function Index() {
     setRateHz(0);
 
     setRawGyro({
-      alpha: 0,
-      beta: 0,
-      gamma: 0,
+      x: 0,
+      y: 0,
+      z: 0,
     });
 
     setRawAccel({
@@ -161,7 +172,7 @@ export default function Index() {
     setRole(next);
 
     controllerRef.current =
-      new MotionController(next);
+      new MotionController(next, Platform.OS);
 
     clearReadings();
   }
@@ -192,6 +203,37 @@ export default function Index() {
 
     controllerRef.current.reset();
     clearReadings();
+  }
+
+  // -------------------- TUNING RECORDER --------------------
+
+  function startRecording() {
+    if (!subRef.current || recordRef.current) return;
+
+    recordRef.current = {
+      until: Date.now() + recordMs,
+      samples: [],
+    };
+    setRecording(true);
+  }
+
+  async function shareRecording(samples: MotionReading[]) {
+    setRecording(false);
+
+    const data = JSON.stringify({
+      platform: Platform.OS,
+      samples,
+    });
+
+    console.log("[Motion recording]", data);
+
+    try {
+      await Share.share({ message: data });
+    } catch (e) {
+      setError(
+        e instanceof Error ? e.message : String(e)
+      );
+    }
   }
 
   async function start() {
@@ -233,6 +275,18 @@ export default function Index() {
       subRef.current = DeviceMotion.addListener(
         (reading) => {
           const now = Date.now();
+
+          // Tuning recorder: keep raw readings for a few seconds.
+          const rec = recordRef.current;
+
+          if (rec) {
+            rec.samples.push(reading);
+
+            if (now >= rec.until) {
+              recordRef.current = null;
+              shareRecording(rec.samples);
+            }
+          }
 
           // Main motion-control processing.
           const output =
@@ -285,11 +339,14 @@ export default function Index() {
             setControls(output);
             setDebug(d);
 
-            setRawGyro({
-              alpha: reading.rotationRate?.alpha ?? 0,
-              beta: reading.rotationRate?.beta ?? 0,
-              gamma: reading.rotationRate?.gamma ?? 0,
-            });
+            setRawGyro(
+              reading.rotationRate
+                ? deviceRotationRate(
+                    reading.rotationRate,
+                    Platform.OS
+                  )
+                : { x: 0, y: 0, z: 0 }
+            );
 
             setRawAccel({
               x: reading.acceleration?.x ?? 0,
@@ -527,26 +584,41 @@ export default function Index() {
         <Panel title="GESTURE DIAGNOSTICS">
           <View style={styles.stats}>
             <Value
-              name="PITCH ANGLE"
+              name="PITCH TILT (X)"
               value={`${fmt(debug.pitchDeg)}°`}
             />
 
             <Value
-              name="SIDE-PRESS ANGLE"
+              name="SIDE TILT (Y)"
               value={`${fmt(debug.sidePressDeg)}°`}
             />
           </View>
 
           <View style={styles.stats}>
             <Value
-              name="PITCH RATE"
+              name="X RATE"
               value={`${fmt(debug.pitchRate, 0)} °/s`}
             />
 
             <Value
-              name="SIDE-PRESS RATE"
+              name="Y RATE"
               value={`${fmt(debug.sidePressRate, 0)} °/s`}
             />
+
+            <Value
+              name="Z RATE"
+              value={`${fmt(debug.twistRate, 0)} °/s`}
+            />
+          </View>
+
+          <View style={styles.line}>
+            <Text style={styles.label}>
+              Fast motion in progress
+            </Text>
+
+            <Text style={styles.highlight}>
+              {debug.burst.toUpperCase()}
+            </Text>
           </View>
 
           <View style={styles.line}>
@@ -561,33 +633,36 @@ export default function Index() {
 
           <View style={styles.line}>
             <Text style={styles.label}>
-              Sprint recognition phase
+              Sprint
             </Text>
 
             <Text style={styles.highlight}>
               {debug.sprintPhase.toUpperCase()}
             </Text>
           </View>
+        </Panel>
 
-          <View style={styles.line}>
-            <Text style={styles.label}>
-              AR position tracking
-            </Text>
+        {/* TUNING RECORDER */}
 
-            <Text style={styles.value}>
-              {debug.positionTracking.toUpperCase()}
-            </Text>
-          </View>
+        <Panel title="RECORD FOR TUNING">
+          <Text style={styles.hint}>
+            Records {recordMs / 1000} s of raw sensor data,
+            then opens the share sheet so you can send it.
+            Do one gesture a few times while recording.
+          </Text>
 
-          <View style={styles.line}>
-            <Text style={styles.label}>
-              Sideways displacement
+          <Pressable
+            onPress={startRecording}
+            disabled={!connected || recording}
+            style={[
+              styles.resetButton,
+              (!connected || recording) && { opacity: 0.5 },
+            ]}
+          >
+            <Text style={styles.buttonText}>
+              {recording ? "RECORDING..." : "RECORD 5 S"}
             </Text>
-
-            <Text style={styles.value}>
-              {fmt(debug.strafeMeters, 3)} m
-            </Text>
-          </View>
+          </Pressable>
         </Panel>
 
         {/* RAW SENSOR VALUES */}
@@ -595,9 +670,9 @@ export default function Index() {
         <Panel title="RAW SENSOR VALUES">
           <Text style={styles.raw}>
             GYRO °/s:
-            {"  "}α {fmt(rawGyro.alpha)}
-            {"  "}β {fmt(rawGyro.beta)}
-            {"  "}γ {fmt(rawGyro.gamma)}
+            {"  "}X {fmt(rawGyro.x)}
+            {"  "}Y {fmt(rawGyro.y)}
+            {"  "}Z {fmt(rawGyro.z)}
           </Text>
 
           <Text style={styles.raw}>
@@ -615,34 +690,30 @@ export default function Index() {
 
           {"\n\n"}
           1. Start sensors and hold the phone still at
-          about 45° for roughly one second. That pose
-          is neutral.
+          about 45°, screen toward you, for about a
+          second. That pose is neutral.
 
           {"\n"}
-          2. Slowly tilt the top away and hold to walk
-          forward. Tilt it toward you to walk back.
-          Return to neutral to stop.
+          2. Pitch (X): slowly tilt the top away and
+          hold to walk forward. Tilt it toward you to
+          walk back. Return to neutral to stop.
 
           {"\n"}
-          3. Slowly press the right or left side down
-          and hold to strafe.
+          3. Pitch (X): quickly flick forward to crouch,
+          again to stand up. Quickly flick back to jump.
 
           {"\n"}
-          4. Quickly flick forward to crouch. Flick
-          forward again to stand up.
+          4. Yaw (Y): slowly press the right or left
+          side down and hold to strafe.
 
           {"\n"}
-          5. Quickly flick back to jump. While crouched
-          this stands you up instead.
-
-          {"\n"}
-          6. Quickly shake side to side to sprint.
-          Shake again to stop.
+          5. Roll (Z): quickly twist the phone like a
+          steering wheel to sprint, again to stop.
 
           {"\n\n"}
-          One gesture at a time: after a gesture, bring
-          the phone back to neutral (or hold it still)
-          before the next one.
+          The X / Y / Z rates above show which axis a
+          motion uses. If a direction is reversed, flip
+          its sign in motion-control-service.ts.
         </Text>
 
       </ScrollView>
