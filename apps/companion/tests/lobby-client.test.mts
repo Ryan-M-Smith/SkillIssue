@@ -101,6 +101,16 @@ test("a server that accepts the socket but never answers the join is named", (t)
 	t.mock.timers.tick(10001);
 	assert.match(client.snapshot.error!, /Connected to relay\.example\.com, but it didn't answer the join/);
 });
+test("a server that answers with something else says what it sent", (t) => {
+	t.mock.timers.enable({ apis: ["setTimeout", "setInterval", "Date"], now: 1000 });
+	const client = new LobbyClient("wss://relay.example.com", "ios"); clients.push(client);
+	client.join("ABC123", "Tester");
+	Socket.instances[0].onopen?.();
+	Socket.instances[0].receive({ type: "hello_from_old_relay" });
+	Socket.instances[0].onmessage?.({ data: "Bad Gateway" });
+	t.mock.timers.tick(10001);
+	assert.match(client.snapshot.error!, /relay\.example\.com answered with "hello_from_old_relay, not JSON" instead of joining/);
+});
 test("obsolete socket messages and errors cannot replace a retried connection", () => {
 	const { client, socket: old } = connect();
 	client.join("DEF456", "Tester");
