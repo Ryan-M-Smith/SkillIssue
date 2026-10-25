@@ -136,6 +136,26 @@ test("held tilts walk and strafe promptly, and stop promptly", () => {
 	}
 });
 
+test("small side tilts are responsive in both directions without changing forward sensitivity", () => {
+	for (const [grip, platform] of grips) {
+		const run = runner(grip, platform);
+		move(run, { right: 7 }, 180);
+		hold(run, 80);
+		assert.ok(run.out.moveX > 0.45, `${grip} ${platform}: 7° strafe should be responsive (${run.out.moveX})`);
+		move(run, { right: 12 }, 150);
+		hold(run, 80);
+		assert.ok(run.out.moveX > 0.93, `${grip} ${platform}: 12° strafe should reach full speed (${run.out.moveX})`);
+		move(run, { right: -12 }, 300);
+		hold(run, 80);
+		assert.ok(run.out.moveX < -0.93, `${grip} ${platform}: left should match right`);
+		move(run, { right: 0, fwd: 7 }, 200);
+		hold(run, 80);
+		assert.equal(run.out.moveX, 0, `${grip} ${platform}: centering stops lateral motion`);
+		assert.ok(run.out.moveY > 0.1 && run.out.moveY < 0.4, `${grip} ${platform}: forward keeps its previous curve`);
+		assert.deepEqual(run.actions, [], `${grip} ${platform}: lateral movement must not trigger sprint`);
+	}
+});
+
 test("a deep strafe never toggles sprint, a 30° twist does without strafing", () => {
 	for (const [grip, platform] of grips) {
 		const run = runner(grip, platform);

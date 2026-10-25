@@ -14,7 +14,7 @@ import { fonts, ui } from "./theme";
 
 const movementGuide = [
 	["↕", "TILT TO MOVE", "Tilt 5–20° forward or back. Return to center to stop."],
-	["↔", "TIP TO STRAFE", "Tip one end down slightly to move sideways."],
+	["↔", "TIP TO STRAFE", "Tip one end down about 4–12° to move sideways. Center to stop."],
 	["↻", "30° WHEEL TWIST", "Toggle sprint with a gentle twist. Center before twisting again."],
 	["↑", "FLICK BACK", "A short, quick flick toward you jumps or stands up."],
 	["↓", "FLICK FORWARD", "A short flick away toggles crouch."],

@@ -96,8 +96,16 @@ test("raw Android sensors move and aim correctly in both landscape grips", () =>
 			if (role === "movement") {
 				for (let i = 0; i < 20; i++) { pose.fwd += 0.7; forward = step().moveY; }
 				assert.ok(forward > 0.5, `${grip}: forward tilt must move forward`);
-				for (let i = 0; i < 20; i++) { pose.right += 0.7; right = step().moveX; }
-				assert.ok(right > 0.4, `${grip}: right tilt must strafe right`);
+				for (let i = 0; i < 20; i++) { pose.fwd -= 0.7; step(); }
+				for (let i = 0; i < 10; i++) { pose.right += 0.7; step(); }
+				for (let i = 0; i < 5; i++) right = step().moveX;
+				assert.ok(right > 0.45, `${grip}: raw Android 7° strafe must respond promptly (${right})`);
+				for (let i = 0; i < 10; i++) { pose.right += 0.5; step(); }
+				for (let i = 0; i < 5; i++) right = step().moveX;
+				assert.ok(right > 0.93, `${grip}: raw Android 12° strafe must reach full speed (${right})`);
+				for (let i = 0; i < 24; i++) { pose.right -= 1; step(); }
+				for (let i = 0; i < 5; i++) right = step().moveX;
+				assert.ok(right < -0.93, `${grip}: raw Android left strafe matches right (${right})`);
 			} else {
 				for (let i = 0; i < 25; i++) { pose.yaw -= 1.2; right += step().lookDX!; }
 				assert.ok(Math.abs(right - 30) < 1, `${grip}: raw radians must turn camera 30 degrees, got ${right}`);

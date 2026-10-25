@@ -10,4 +10,6 @@ All controller screens and the legacy sensor hook use the same sensor adapter an
 
 Validation: 45 companion regression tests, TypeScript checks, lint, and web/Android/iOS exports. New tests cover Android permission independence, missing sensors, unit conversion, timestamp mismatch/restart, queued browser callbacks, backgrounding, gyro bias, and both landscape grips using raw Android measurements. Physical Samsung testing is still required; an export is not a device test.
 
+The lateral-sensitivity follow-up gives strafing independent thresholds: 3.5° to start, below 3° to stop, and full speed at 12°, with a stronger small-tilt response. Forward/backward retains its 5°–20° response. The updated 46-test suite checks both directions, stopping at center, unchanged forward response, drift resistance, and sprint separation; raw Android checks cover both landscape grips.
+
 Restart Expo with a cleared cache, reopen the project in Expo Go, and test Practice: hold still briefly, tilt to walk/strafe, twist to toggle sprint, and turn the gunner phone to aim. Returning after backgrounding should briefly recalibrate. Android should not ask for activity-recognition permission. Check that neither Android's Sensors Off control nor device-level sensor restrictions are enabled.

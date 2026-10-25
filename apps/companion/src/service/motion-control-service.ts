@@ -19,7 +19,7 @@ export type { GameControls, MotionDebug, Role } from "@/types/motion";
  * whatever angle is comfortable. The pose it is held in at the start is neutral.
  *
  *   tilt top away / toward you      walk forward / back     (held, 5°–20°)
- *   tip one end down                strafe                  (held, 5°–20°)
+ *   tip one end down                strafe                  (held, 3.5°–12°)
  *   quick flick forward and back    crouch on / off
  *   quick flick back and forward    jump (while crouched: stand up)
  *   twist ~30° like a wheel         sprint on / off, return to center to re-arm
@@ -66,6 +66,11 @@ const settings = {
 	enterDeg: 5,
 	exitDeg: 3.5,
 	fullSpeedDeg: 20,
+	// Strafing needs a smaller wrist movement than forward/backward tilt.
+	strafeEnterDeg: 3.5,
+	strafeExitDeg: 3,
+	strafeFullSpeedDeg: 12,
+	strafeCurve: 0.7,
 	curve: 0.85, // < 1 eases small tilts in faster
 	jitterTau: 0.025, // s, light filter on the output
 
@@ -167,11 +172,14 @@ function finite(v: MotionVector | null | undefined) {
 	return !v || (Number.isFinite(v.x) && Number.isFinite(v.y) && Number.isFinite(v.z));
 }
 
-function tiltToMovement(degrees: number, wasActive: boolean): { value: number; active: boolean } {
+function tiltToMovement(degrees: number, wasActive: boolean, strafe = false): { value: number; active: boolean } {
+	const enter = strafe ? settings.strafeEnterDeg : settings.enterDeg;
+	const exit = strafe ? settings.strafeExitDeg : settings.exitDeg;
+	const full = strafe ? settings.strafeFullSpeedDeg : settings.fullSpeedDeg;
 	const abs = Math.abs(degrees);
-	if (abs < (wasActive ? settings.exitDeg : settings.enterDeg)) return { value: 0, active: false };
-	const portion = clamp((abs - settings.exitDeg) / (settings.fullSpeedDeg - settings.exitDeg), 0, 1);
-	return { value: Math.sign(degrees) * Math.pow(portion, settings.curve), active: true };
+	if (abs < (wasActive ? exit : enter)) return { value: 0, active: false };
+	const portion = clamp((abs - exit) / (full - exit), 0, 1);
+	return { value: Math.sign(degrees) * Math.pow(portion, strafe ? settings.strafeCurve : settings.curve), active: true };
 }
 
 function aimRate(degreesPerSecond: number) {
@@ -471,8 +479,8 @@ export class MotionController {
 			action = this.updateFlick(rates, t, dt);
 		}
 
-		const atNeutral = Math.abs(forwardDeg) < settings.enterDeg && Math.abs(rightDeg) < settings.enterDeg;
-		const x = tiltToMovement(rightDeg, this.walkX);
+		const atNeutral = Math.abs(forwardDeg) < settings.enterDeg && Math.abs(rightDeg) < settings.strafeEnterDeg;
+		const x = tiltToMovement(rightDeg, this.walkX, true);
 		const y = tiltToMovement(forwardDeg, this.walkY);
 		this.walkX = x.active;
 		this.walkY = y.active;
