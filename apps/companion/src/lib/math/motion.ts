@@ -47,3 +47,25 @@ export function deviceRotationRate(
 			return { x: rate.gamma, y: rate.beta, z: rate.alpha };
 	}
 }
+
+
+export function dot(a: MotionVector, b: MotionVector) {
+	return a.x * b.x + a.y * b.y + a.z * b.z;
+}
+
+export function cross(a: MotionVector, b: MotionVector): MotionVector {
+	return {
+		x: a.y * b.z - a.z * b.y,
+		y: a.z * b.x - a.x * b.z,
+		z: a.x * b.y - a.y * b.x,
+	};
+}
+
+export function scale(v: MotionVector, k: number): MotionVector {
+	return { x: v.x * k, y: v.y * k, z: v.z * k };
+}
+
+export function normalize(v: MotionVector): MotionVector {
+	const length = magnitude(v);
+	return length > 1e-9 ? scale(v, 1 / length) : { x: 0, y: 0, z: 0 };
+}

@@ -47,6 +47,26 @@ Controllers send `motion` or `environment` messages without a trusted sender fie
 
 When a controller disconnects, the server sends `controller_disconnected` to the game, removes the slot, and returns the lobby to `waiting`. If the game host disconnects, the session is invalidated and controller connections are closed.
 
+## Debug relay (phone to web debugger)
+
+A separate, game-free channel for debugging the movement phone. It needs no Godot host, pairing code or slots, and debug connections can't send game input or join a game.
+
+1. Start the server: `npm run server:start`. It prints the `ws://` addresses it can be reached on from your network.
+2. Open the companion's web version on the computer: `npm run companion:web` (or press `w` in a running Expo dev server). The web version is the **Motion Debugger**; it connects to `ws://<this page's host>:8080`, room `debug`.
+3. On the phone, open the companion (it shows the simplified **Controller** screen), enter one of the printed addresses and the same room, and tap **Connect**. The phone and computer must be on the same network.
+
+The phone runs the motion model itself and streams its raw DeviceMotion readings. The web version runs the same model on that stream, so it shows exactly what the phone computes, plus a 3D view of the phone in the player's frame (pitch, side and twist axes, and gravity).
+
+| Message | From | To | Payload |
+| --- | --- | --- | --- |
+| `debug_join` | phone or viewer | server | `protocolVersion`, `room` (1-32 letters, digits, `_`, `-`), `role`: `phone` or `viewer` |
+| `debug_joined` | server | that client | `room`, `role`, `addresses` (`ws://` LAN addresses) |
+| `debug_status` | server | everyone in the room | `phones`, `viewers` (sent on every join and leave) |
+| `debug_motion` | phone | viewers | `platform` (the phone's `Platform.OS`), `readings` (up to 50 DeviceMotion readings with sensor timestamps) |
+| `debug_event` | anyone | everyone else in the room | `event`: `recalibrate` or `reset_counts` |
+
+Types are in `packages/protocol/events.ts` (`Debug*`).
+
 ## Godot client
 
 Implemented in `apps/game` against this server (`apps/server/index.ts`) and `packages/protocol/events.ts`.
@@ -70,15 +90,15 @@ How Godot reads the server's messages:
 
 ## Movement phone gestures
 
-The companion (`apps/companion/src/service/motion-control-service.ts`) turns phone motion into these controls. The phone is held at about 45°, screen toward the player; the pose it is held still in at start is neutral. Each control uses one of the phone's own axes. Slow, held tilts move; fast motions are gestures, recognised from the gyroscope by whichever axis dominates.
+The companion (`apps/companion/src/service/motion-control-service.ts`) turns phone motion into these controls. The phone is held in landscape with both hands, like a controller, tilted about 45° with the screen toward the player (portrait also works). The pose it is held still in at start is neutral, and gravity at that moment tells the companion which grip is in use, so the axes below are relative to the player, not fixed phone axes. Slow, held tilts move; fast motions are gestures, recognised from the gyroscope by whichever axis dominates.
 
 | Axis | Phone motion | Game control | Message |
 | --- | --- | --- | --- |
-| Pitch / X | Slowly tilt the top away / toward you and hold | Walk forward / backward | `motion` (`moveY`) |
-| Pitch / X | Quick flick forward | Crouch on, flick again for off | `environment` `crouch`, `pressed` = new state |
-| Pitch / X | Quick flick back | Jump. While crouched it only stands up | `environment` `jump`, `pressed: true` (or `crouch`, `pressed: false`) |
-| Yaw / Y | Slowly press the right / left side down and hold | Strafe right / left | `motion` (`moveX`) |
-| Roll / Z | Quick twist, like a steering wheel | Sprint on, twist again for off | `environment` `sprint`, `pressed` = new state |
+| Pitch | Slowly tilt the top edge away / toward you and hold | Walk forward / backward | `motion` (`moveY`) |
+| Pitch | Quick flick forward | Crouch on, flick again for off | `environment` `crouch`, `pressed` = new state |
+| Pitch | Quick flick back | Jump. While crouched it only stands up | `environment` `jump`, `pressed: true` (or `crouch`, `pressed: false`) |
+| Yaw | Slowly tip the right / left end down and hold | Strafe right / left | `motion` (`moveX`) |
+| Roll / Z | Quick twist in the plane of the screen | Sprint on, twist again for off | `environment` `sprint`, `pressed` = new state |
 | | Back to neutral | Stop | `motion` (zero) |
 
 Only one gesture registers per motion, then gestures are locked for 1 s, and a gesture's own motion never becomes walking. Crouch and sprint are exclusive: starting one ends the other.

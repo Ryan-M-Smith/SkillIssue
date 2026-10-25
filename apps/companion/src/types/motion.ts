@@ -45,17 +45,21 @@ export type GameControls = {
 	action: Action;
 };
 
+/** How the phone was held at calibration, worked out from gravity. */
+export type Grip = "portrait" | "landscape" | "upside down" | "flat";
+
 export type MotionDebug = {
 	calibration: "calibrating" | "ready";
+	grip: Grip;
 	/** Held tilt from neutral, degrees. + = top away (forward). */
 	pitchDeg: number;
 	/** Held tilt from neutral, degrees. + = right side down. */
 	sidePressDeg: number;
-	/** Gyroscope about the phone's X axis (pitch), deg/s. */
+	/** Gyroscope about the player's left-right axis (pitch), deg/s. */
 	pitchRate: number;
-	/** Gyroscope about the phone's Y axis (left/right), deg/s. */
+	/** Gyroscope about the screen's up axis (left/right), deg/s. */
 	sidePressRate: number;
-	/** Gyroscope about the phone's Z axis (twist), deg/s. */
+	/** Gyroscope about the screen normal, Z (twist), deg/s. */
 	twistRate: number;
 	/** Axis of the fast motion in progress, if any. */
 	burst: "none" | "pitch" | "side" | "twist";

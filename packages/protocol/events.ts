@@ -127,3 +127,61 @@ export type ServerMessage =
     | LobbyStateMessage
     | BroadcastMessage
     | AuthorizedInputMessage;
+
+// ---------------------------------------------------------------------------
+// Debug relay. Separate from game sessions: no game host, pairing code or
+// slots. A companion phone joins a named room and streams its raw
+// DeviceMotion readings; browsers in the same room receive them to visualise
+// what the phone's motion model sees.
+
+export type DebugRole = "phone" | "viewer";
+
+/** One DeviceMotion reading, as expo-sensors reports it (timestamps in seconds). */
+export type DebugMotionReading = {
+    rotation: { alpha: number; beta: number; gamma: number; timestamp?: number };
+    rotationRate: { alpha: number; beta: number; gamma: number; timestamp?: number } | null;
+    acceleration: MotionVector & { timestamp?: number } | null;
+    accelerationIncludingGravity: MotionVector & { timestamp?: number };
+};
+
+export type DebugJoinMessage = {
+    type: "debug_join";
+    protocolVersion: typeof protocolVersion;
+    room: string;
+    role: DebugRole;
+};
+
+/** Phone -> server -> viewers. `platform` is the phone's Platform.OS. */
+export type DebugMotionMessage = {
+    type: "debug_motion";
+    platform: string;
+    readings: DebugMotionReading[];
+};
+
+/** Either side -> everyone else in the room. */
+export type DebugEventMessage = {
+    type: "debug_event";
+    event: "recalibrate" | "reset_counts";
+};
+
+export type DebugJoinedMessage = {
+    type: "debug_joined";
+    room: string;
+    role: DebugRole;
+    /** ws:// addresses this server can be reached on from the local network. */
+    addresses: string[];
+};
+
+export type DebugStatusMessage = {
+    type: "debug_status";
+    room: string;
+    phones: number;
+    viewers: number;
+};
+
+export type DebugClientMessage = DebugJoinMessage | DebugMotionMessage | DebugEventMessage;
+export type DebugServerMessage =
+    | DebugJoinedMessage
+    | DebugStatusMessage
+    | DebugMotionMessage
+    | DebugEventMessage;
