@@ -51,6 +51,8 @@ type ControllerConnection = {
     teamId: TeamId | null;
     role: ControllerRole | null;
     ready: boolean;
+    /** Auth0 access token from join_game; only ever sent to the game host. */
+    authToken: string | null;
     socket: WebSocket;
 };
 
@@ -132,6 +134,7 @@ function playersFor(session: Session): LobbyPlayer[] {
         teamId: controller.teamId,
         role: controller.role,
         ready: controller.ready,
+        signedIn: controller.authToken !== null,
         connected: controller.socket.readyState === WebSocket.OPEN,
     }));
 }
@@ -186,7 +189,7 @@ function registerGame(socket: WebSocket) {
     sendLobbyState(session);
 }
 
-function joinGame(socket: WebSocket, pairingCode: string, requestedRole: ControllerRole | undefined, name: unknown) {
+function joinGame(socket: WebSocket, pairingCode: string, requestedRole: ControllerRole | undefined, name: unknown, authToken: unknown) {
     if (contexts.has(socket)) {
         sendError(socket, "invalid_message", "This connection is already in a lobby.");
         return;
@@ -224,6 +227,7 @@ function joinGame(socket: WebSocket, pairingCode: string, requestedRole: Control
         teamId: slot?.teamId ?? null,
         role: slot?.role ?? null,
         ready: !!slot,
+        authToken: typeof authToken === "string" && authToken.length > 0 && authToken.length <= 8192 ? authToken : null,
         socket,
     };
 
@@ -231,6 +235,9 @@ function joinGame(socket: WebSocket, pairingCode: string, requestedRole: Control
     contexts.set(socket, { kind: "controller", session, controller });
 
     send(socket, { type: "lobby_joined", controllerId: controller.controllerId, pairingCode: session.pairingCode });
+    if (controller.authToken) {
+        send(session.gameSocket, { type: "player_auth", controllerId: controller.controllerId, authToken: controller.authToken });
+    }
     if (slot) {
         sendAssigned(controller);
     }
@@ -560,7 +567,7 @@ function handleMessage(socket: WebSocket, message: ClientMessage | DebugClientMe
                 sendError(socket, "invalid_message", "Invalid join request.");
                 return;
             }
-            joinGame(socket, message.pairingCode, message.requestedRole, message.name);
+            joinGame(socket, message.pairingCode, message.requestedRole, message.name, message.authToken);
             return;
         case "select_slot":
             selectSlot(socket, message.teamId, message.role);

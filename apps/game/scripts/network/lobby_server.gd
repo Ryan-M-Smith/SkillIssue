@@ -256,7 +256,7 @@ func _handle(id: int, msg: Dictionary) -> void:
 					or (role != null and not (role in ["movement", "aim"])):
 				_send(id, _rejection("invalid_message", "Invalid join request."))
 				return
-			_join_game(id, str(msg.pairingCode), role, msg.get("name"))
+			_join_game(id, str(msg.pairingCode), role, msg.get("name"), msg.get("authToken"))
 		"select_slot":
 			_select_slot(id, msg.get("teamId"), msg.get("role"))
 		"set_ready":
@@ -335,7 +335,7 @@ func _send_lobby_state() -> void:
 		if c.teamId != null and c.role != null:
 			assignments.append({"controllerId": c.controllerId, "teamId": c.teamId, "role": c.role, "connected": true})
 		players.append({"controllerId": c.controllerId, "name": c.name, "teamId": c.teamId,
-			"role": c.role, "ready": c.ready, "connected": true})
+			"role": c.role, "ready": c.ready, "signedIn": c.authToken != null, "connected": true})
 	_broadcast({"type": "lobby_state", "state": _session.state, "assignments": assignments,
 		"players": players, "minPlayers": min_players})
 
@@ -363,7 +363,7 @@ func _clean_name(raw: Variant, fallback: String) -> String:
 	return text if not text.is_empty() else fallback
 
 
-func _join_game(id: int, code: String, requested_role: Variant, raw_name: Variant) -> void:
+func _join_game(id: int, code: String, requested_role: Variant, raw_name: Variant, auth_token: Variant = null) -> void:
 	var peer: Dictionary = _peers[id]
 	if peer.kind == "controller":
 		_send(id, _rejection("invalid_message", "This connection is already in a lobby."))
@@ -395,10 +395,14 @@ func _join_game(id: int, code: String, requested_role: Variant, raw_name: Varian
 		"teamId": slot.teamId if slot != null else null,
 		"role": slot.role if slot != null else null,
 		"ready": slot != null,
+		# Auth0 access token when the phone is signed in. Only ever passed to the game.
+		"authToken": auth_token if typeof(auth_token) == TYPE_STRING and not (auth_token as String).is_empty() and (auth_token as String).length() <= 8192 else null,
 	}
 	_session.controllers[id] = c
 	peer.kind = "controller"
 	_send(id, {"type": "lobby_joined", "controllerId": c.controllerId, "pairingCode": _session.pairingCode})
+	if c.authToken != null:
+		_to_host({"type": "player_auth", "controllerId": c.controllerId, "authToken": c.authToken})
 	if slot != null:
 		_send_assigned(id, c)
 	_send_lobby_state()

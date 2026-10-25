@@ -6,6 +6,8 @@ const MENU_SCENE := "res://ui/main_menu.tscn"
 const LOBBY_SCENE := "res://ui/lobby.tscn"
 const GAME_SCENE := "res://modes/duo_sandbox.tscn"
 
+var _upload: Label
+
 
 func _ready() -> void:
 	theme = UiKit.make_theme()
@@ -75,6 +77,12 @@ func _ready() -> void:
 	buttons.add_theme_constant_override("separation", 20)
 	buttons.alignment = BoxContainer.ALIGNMENT_END
 	col.add_child(buttons)
+	# Saved to the leaderboard? (Account.upload_match, started at the final whistle.)
+	_upload = UiKit.label("", 22, UiKit.BODY_SEMI, UiKit.MUTED)
+	_upload.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	buttons.add_child(_upload)
+	Account.upload_changed.connect(_on_upload)
+	_on_upload(Account.upload_state, Account.upload_message)
 	var menu := UiKit.button("MAIN MENU")
 	menu.pressed.connect(_on_menu)
 	var again := UiKit.button("PLAY AGAIN", true)
@@ -84,6 +92,14 @@ func _ready() -> void:
 	buttons.add_child(again)
 	again.grab_focus.call_deferred()
 	UiKit.fade_in(self)
+
+
+func _on_upload(state: String, message: String) -> void:
+	if not is_instance_valid(_upload):
+		return
+	_upload.text = message
+	var colors := {"saved": UiKit.READY, "failed": UiKit.GOLD, "uploading": UiKit.INK}
+	_upload.add_theme_color_override("font_color", colors.get(state, UiKit.MUTED))
 
 
 func _reason_text(reason: String) -> String:

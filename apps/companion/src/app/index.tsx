@@ -1,13 +1,13 @@
 import { Platform } from "react-native";
 
-import DebugDashboard from "@/screens/debug-dashboard";
 import PhoneApp from "@/screens/phone-app";
+import Landing from "@/screens/web/landing";
 
 /**
- * Phones run the game controller app (menu, lobby, movement or aim phone).
- * The web version (open it on your computer with `expo start --web`) is the
- * debugger: it shows what the phone's motion model sees, with a live 3D view.
+ * Phones run the game controller app (sign in, menu, lobby, movement or aim phone).
+ * The web version is the game's website: an intro, the live leaderboard and your
+ * stats. The motion debugger moved to /debug.
  */
 export default function Index() {
-	return Platform.OS === "web" ? <DebugDashboard /> : <PhoneApp />;
+	return Platform.OS === "web" ? <Landing /> : <PhoneApp />;
 }

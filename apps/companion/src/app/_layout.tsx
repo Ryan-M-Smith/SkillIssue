@@ -2,6 +2,7 @@ import { DarkTheme, DefaultTheme, Slot, ThemeProvider } from "expo-router";
 import { useFonts } from "expo-font";
 import { useColorScheme } from "react-native";
 
+import { AccountProvider } from "@/lib/account/account";
 import { fontAssets } from "@/screens/phone/theme";
 
 export default function RootLayout() {
@@ -15,7 +16,9 @@ export default function RootLayout() {
 
 	return (
 		<ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
-			<Slot/>
+			<AccountProvider>
+				<Slot/>
+			</AccountProvider>
 		</ThemeProvider>
 	);
 }

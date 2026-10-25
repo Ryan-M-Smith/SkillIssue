@@ -60,6 +60,12 @@ export type JoinGameMessage = {
     requestedRole?: ControllerRole;
     /** Shown in the lobby. Up to 16 characters. */
     name?: string;
+    /**
+     * The player's Auth0 access token, when signed in. Never shown to other phones:
+     * the server passes it only to the game (`player_auth`), which sends it with the
+     * match results so the web API can credit the right account.
+     */
+    authToken?: string;
 };
 
 /** Phone: take a team + role slot in the lobby. Clears this phone's ready flag. */
@@ -170,10 +176,19 @@ export type ControllerAssignment = {
 export type LobbyPlayer = {
     controllerId: string;
     name: string;
+    /** Joined with an Auth0 token: this phone's matches count toward its account. */
+    signedIn?: boolean;
     teamId: TeamId | null;
     role: ControllerRole | null;
     ready: boolean;
     connected: boolean;
+};
+
+/** Server → game only: a phone's Auth0 token, so the game can upload results for it. */
+export type PlayerAuthMessage = {
+    type: "player_auth";
+    controllerId: string;
+    authToken: string;
 };
 
 /** Sent to a phone when it enters a lobby. */
@@ -241,7 +256,8 @@ export type ServerMessage =
     | ControllerDisconnectedMessage
     | LobbyStateMessage
     | BroadcastMessage
-    | AuthorizedInputMessage;
+    | AuthorizedInputMessage
+    | PlayerAuthMessage;
 
 // ---------------------------------------------------------------------------
 // Debug relay. Separate from game sessions: no game host, pairing code or

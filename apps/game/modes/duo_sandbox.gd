@@ -399,7 +399,7 @@ func _end_match(reason: String) -> void:
 		winner = 0 if scores[0] > scores[1] else 1
 	MatchStats.finish(winner, scores, reason)
 	if NetworkClient.is_connected_to_server() and GameSession.is_playing():
-		GameSession.end_match(winner, scores, MatchStats.to_protocol())
+		GameSession.end_match(winner, scores, MatchStats.to_protocol(), reason, MatchStats.result.duration)
 	_show_banner(winner)
 	get_tree().paused = true
 	await get_tree().create_timer(end_banner_seconds, true).timeout

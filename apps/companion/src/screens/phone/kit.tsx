@@ -42,6 +42,8 @@ export function SlantButton({
 	style,
 	onPressIn,
 	onPressOut,
+	textColor,
+	icon,
 }: {
 	label: string;
 	onPress?: () => void;
@@ -52,9 +54,12 @@ export function SlantButton({
 	style?: StyleProp<ViewStyle>;
 	onPressIn?: () => void;
 	onPressOut?: () => void;
+	textColor?: string;
+	/** Drawn left of the label (e.g. a sign-in provider's mark). */
+	icon?: ReactNode;
 }) {
 	const fill = color ?? (primary ? ui.ink : ui.panel2);
-	const text = primary ? ui.bg : ui.ink;
+	const text = textColor ?? (primary ? ui.bg : ui.ink);
 	return (
 		<Pressable
 			onPress={onPress}
@@ -68,9 +73,12 @@ export function SlantButton({
 				style,
 			]}
 		>
-			<Text style={[styles.buttonText, small && { fontSize: 13 }, { color: text, transform: [{ skewX: "12deg" }] }]} numberOfLines={1}>
-				{label}
-			</Text>
+			<View style={styles.buttonRow}>
+				{icon}
+				<Text style={[styles.buttonText, small && { fontSize: 13 }, { color: text, transform: [{ skewX: "12deg" }] }]} numberOfLines={1}>
+					{label}
+				</Text>
+			</View>
 		</Pressable>
 	);
 }
@@ -93,6 +101,7 @@ const styles = StyleSheet.create({
 		justifyContent: "center",
 		transform: [{ skewX: "-12deg" }],
 	},
+	buttonRow: { flexDirection: "row", alignItems: "center", gap: 10 },
 	buttonSmall: { paddingVertical: 8, paddingHorizontal: 14 },
 	buttonText: { fontFamily: fonts.displaySemi, fontSize: 16, letterSpacing: 0.6 },
 	panel: { borderWidth: 1.5, borderRadius: 8, padding: 12 },

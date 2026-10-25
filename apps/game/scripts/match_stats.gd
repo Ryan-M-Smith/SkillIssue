@@ -7,13 +7,14 @@ const TEAM_COUNT := 2
 
 ## Per game team (0 blue, 1 red).
 var teams: Array[Dictionary] = []
-## Last finished match: {"winner": int (-1 draw), "scores": [int, int], "reason": String}
+## Last finished match: {"winner": int (-1 draw), "scores": [int, int], "reason": String, "duration": int (s)}
 var result := {}
 
 var _duos: Array = []
 var _last_pos: Array[Vector3] = []
 var _was_crouching: Array[bool] = []
 var _running := false
+var _started_msec := 0
 
 
 func _ready() -> void:
@@ -46,12 +47,14 @@ func begin(duos: Array) -> void:
 			_add(team, "hits", 1)
 			if headshot:
 				_add(team, "headshots", 1))
+	_started_msec = Time.get_ticks_msec()
 	_running = true
 
 
 func finish(winner: int, scores: Array, reason: String) -> void:
 	_running = false
-	result = {"winner": winner, "scores": [scores[0], scores[1]], "reason": reason}
+	result = {"winner": winner, "scores": [scores[0], scores[1]], "reason": reason,
+		"duration": roundi((Time.get_ticks_msec() - _started_msec) / 1000.0)}
 
 
 ## TeamStats for the protocol (teams numbered 1 and 2).

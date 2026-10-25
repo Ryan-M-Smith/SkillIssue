@@ -1,5 +1,7 @@
 import { useState } from "react";
-import { StyleSheet, TextInput, View } from "react-native";
+import { Image, Pressable, StyleSheet, TextInput, View } from "react-native";
+
+import type { Profile } from "@/lib/account/account";
 
 import { Body, Eyebrow, SlantButton, SplitBackground, Title } from "./kit";
 import { fonts, ui } from "./theme";
@@ -11,6 +13,8 @@ export function MainMenu({
 	onServerUrl,
 	onJoin,
 	onPractice,
+	onAccount,
+	profile,
 	notice,
 }: {
 	name: string;
@@ -19,6 +23,8 @@ export function MainMenu({
 	onServerUrl: (url: string) => void;
 	onJoin: () => void;
 	onPractice: () => void;
+	onAccount: () => void;
+	profile: Profile | null;
 	notice?: string | null;
 }) {
 	const [settings, setSettings] = useState(false);
@@ -39,16 +45,30 @@ export function MainMenu({
 				</View>
 			</View>
 			<View style={styles.right}>
-				<Eyebrow>Your name</Eyebrow>
-				<TextInput
-					style={styles.input}
-					value={name}
-					onChangeText={(t) => onName(t.slice(0, 16))}
-					placeholder="Player"
-					placeholderTextColor={ui.muted}
-					autoCorrect={false}
-					maxLength={16}
-				/>
+				{profile ? (
+					<Pressable onPress={onAccount} style={styles.account}>
+						{profile.picture ? <Image source={{ uri: profile.picture }} style={styles.avatar} /> : <View style={[styles.avatar, { backgroundColor: ui.panel2 }]} />}
+						<View style={{ flex: 1 }}>
+							<Eyebrow color={ui.ready}>Signed in · stats saved</Eyebrow>
+							<Title size={22}>{profile.name}</Title>
+						</View>
+						<Eyebrow>Account ›</Eyebrow>
+					</Pressable>
+				) : (
+					<>
+						<Eyebrow>Your name</Eyebrow>
+						<TextInput
+							style={styles.input}
+							value={name}
+							onChangeText={(t) => onName(t.slice(0, 16))}
+							placeholder="Player"
+							placeholderTextColor={ui.muted}
+							autoCorrect={false}
+							maxLength={16}
+						/>
+						<SlantButton label="SIGN IN TO SAVE STATS" small onPress={onAccount} />
+					</>
+				)}
 				<SlantButton label={settings ? "HIDE SETTINGS" : "SETTINGS"} small onPress={() => setSettings(!settings)} />
 				{settings && (
 					<View style={{ gap: 6 }}>
@@ -76,6 +96,8 @@ const styles = StyleSheet.create({
 	wordmark: { flexDirection: "row", gap: 14 },
 	buttons: { flexDirection: "row", flexWrap: "wrap", gap: 14, marginTop: 14 },
 	right: { flex: 1, justifyContent: "center", gap: 8, maxWidth: 320 },
+	account: { flexDirection: "row", alignItems: "center", gap: 12, padding: 10, borderRadius: 8, borderWidth: 1.5, borderColor: ui.line, backgroundColor: ui.panel },
+	avatar: { width: 44, height: 44, borderRadius: 22 },
 	input: {
 		fontFamily: fonts.bodySemi,
 		fontSize: 18,

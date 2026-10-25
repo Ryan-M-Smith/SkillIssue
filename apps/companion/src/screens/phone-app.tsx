@@ -3,6 +3,8 @@ import { Platform, StatusBar, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { DeviceMotion } from "expo-sensors";
 
+import { useAccount } from "@/lib/account/account";
+import { storage } from "@/lib/account/storage";
 import { MotionController, emptyControls } from "@/service/motion-control-service";
 import { LobbyClient, idleLobby, type ControllerRole, type LobbyView, type TeamId } from "@/service/lobby-client";
 import { MotionTally, directionOf, zeroCounts, type Counts, type MovementState } from "@/lib/motion-summary";
@@ -15,10 +17,11 @@ import { GameOver } from "./phone/game-over";
 import { MainMenu } from "./phone/main-menu";
 import { MovementHud } from "./phone/movement-hud";
 import { Practice } from "./phone/practice";
+import { SignIn } from "./phone/sign-in";
 import { TeamSelect } from "./phone/team-select";
 import { ui } from "./phone/theme";
 
-type Screen = "menu" | "code" | "practice" | "match";
+type Screen = "welcome" | "signin" | "menu" | "code" | "practice" | "match";
 
 const redrawMs = 80;
 
@@ -30,6 +33,7 @@ const modelRole = (role: ControllerRole | null | undefined): Role => (role === "
  * → Game Over → Main Menu / Play Again.
  */
 export default function PhoneApp() {
+	const account = useAccount();
 	const [screen, setScreen] = useState<Screen>("menu");
 	const [name, setName] = useState("");
 	const [serverUrl, setServerUrl] = useState(defaultDebugServerUrl);
@@ -49,6 +53,13 @@ export default function PhoneApp() {
 	const controllerRef = useRef(new MotionController("movement", Platform.OS));
 	const tallyRef = useRef(new MotionTally());
 	const lastDrawRef = useRef(0);
+
+	// First launch: offer sign-in before the menu (once; Account on the menu brings it back).
+	useEffect(() => {
+		storage.get("skillissue.welcomed").then((seen) => {
+			if (!seen) setScreen((s) => (s === "menu" ? "welcome" : s));
+		});
+	}, []);
 
 	// Motion sensors run the whole time; the model matches this phone's role.
 	useEffect(() => {
@@ -103,11 +114,13 @@ export default function PhoneApp() {
 		if (view.stage === "lobby") setWaitingAgain(false);
 	}, [view.stage]);
 
-	function join() {
+	async function join() {
 		clientRef.current?.leave();
 		const client = new LobbyClient(serverUrl.trim(), Platform.OS, setView);
 		clientRef.current = client;
-		client.join(code, name || "Player");
+		// Signed in: the game passes this token on with the results, so the match counts for this account.
+		const token = await account.accessToken();
+		client.join(code, account.profile?.name || name || "Player", token);
 	}
 
 	function leave() {
@@ -129,7 +142,17 @@ export default function PhoneApp() {
 	}
 
 	let body: ReactNode;
-	if (screen === "menu") {
+	if (screen === "welcome" || screen === "signin") {
+		body = (
+			<SignIn
+				first={screen === "welcome"}
+				onDone={() => {
+					void storage.set("skillissue.welcomed", "1");
+					setScreen("menu");
+				}}
+			/>
+		);
+	} else if (screen === "menu") {
 		body = (
 			<MainMenu
 				name={name}
@@ -138,6 +161,8 @@ export default function PhoneApp() {
 				onServerUrl={setServerUrl}
 				onJoin={() => setScreen("code")}
 				onPractice={() => setScreen("practice")}
+				onAccount={() => setScreen("signin")}
+				profile={account.profile}
 				notice={notice}
 			/>
 		);
@@ -150,7 +175,7 @@ export default function PhoneApp() {
 				onCode={setCode}
 				onJoin={() => {
 					setScreen("match");
-					join();
+					void join();
 				}}
 				onBack={leave}
 				busy={screen === "match" && view.stage === "connecting"}

@@ -33,7 +33,9 @@ A phone joins with the code and a display name, then picks a spot and readies up
 
 The server answers `lobby_joined` (`controllerId`) and `controller_assigned` when a spot is taken; a taken spot is rejected with the holder's name. A lobby holds 4 phones. Older clients may still send `requestedRole` in `join_game`: they get the first free spot for that role, already ready.
 
-Every change sends `lobby_state` to everyone: `state`, `assignments` (phones holding a spot, what the game routes input by), `players` (every phone: name, team, role, ready) and `minPlayers`.
+Every change sends `lobby_state` to everyone: `state`, `assignments` (phones holding a spot, what the game routes input by), `players` (every phone: name, team, role, ready, `signedIn`) and `minPlayers`.
+
+A signed-in phone adds its Auth0 access token: `"authToken":"eyJ..."` in `join_game`. The server never shows it to other phones; it passes it to the game alone (`{"type":"player_auth","controllerId":"…","authToken":"…"}`) and marks the player `signedIn`. When the match ends, the game sends the tokens with the results to the web API, which credits each account (see [mlh-setup.md](mlh-setup.md)).
 
 ## Lifecycle
 

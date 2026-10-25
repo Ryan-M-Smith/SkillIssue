@@ -33,6 +33,8 @@ const routes: Record<string, Handler> = {
 		auth: authEnabled()
 			? {
 				domain: config.auth0.domain,
+				/** Base URL of the Auth0 endpoints (https://<domain>/). */
+				issuer: config.auth0.issuer,
 				audience: config.auth0.audience,
 				webClientId: config.auth0.webClientId || null,
 				nativeClientId: config.auth0.nativeClientId || null,

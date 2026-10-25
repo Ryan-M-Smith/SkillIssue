@@ -18,7 +18,7 @@ const URL_ARG := "--server="                ## optional command-line override: -
 ## Every type the server may send. Anything else is counted and dropped.
 const KNOWN_TYPES: PackedStringArray = [
 	"game_registered", "lobby_state", "controller_assigned", "controller_disconnected",
-	"join_rejected", "broadcast", "role", "motion", "environment",
+	"join_rejected", "broadcast", "role", "motion", "environment", "player_auth",
 ]
 
 ## Off: the game connects when a lobby is created (GameSession.create_lobby).

@@ -43,6 +43,8 @@ var min_players := 4
 
 ## controller_id -> {"team": int, "role": String, "ready": bool}
 var _controllers := {}
+## controller_id -> the phone's Auth0 access token (player_auth). Sent with the results.
+var _tokens := {}
 
 
 func _ready() -> void:
@@ -113,14 +115,20 @@ func send_match_status(scores: Array, time_left: float, kill_target: int) -> voi
 	})
 
 
-## The match is over: the server moves to "ended" and shows the phones the result.
+## The match is over: the server moves to "ended" and shows the phones the result, and
+## the match is saved to the leaderboard (Account.upload_match) when the game is signed in.
 ## `winning_team` is a game team (0/1), or -1 for a draw. `stats` are protocol TeamStats.
-func end_match(winning_team: int, scores: Array, stats: Array) -> void:
+func end_match(winning_team: int, scores: Array, stats: Array, reason := "", duration_s := 0) -> void:
+	var winner: Variant = null if winning_team < 0 else winning_team + server_team_offset
 	NetworkClient.send_message("end_game", {
-		"winningTeam": null if winning_team < 0 else winning_team + server_team_offset,
+		"winningTeam": winner,
 		"scores": [scores[0], scores[1]],
 		"stats": stats,
 	})
+	Account.upload_match({
+		"lobbyCode": pairing_code, "reason": reason, "winningTeam": winner,
+		"scores": [scores[0], scores[1]], "teams": stats, "durationS": duration_s,
+	}, players.duplicate(true), _tokens.duplicate())
 
 
 ## Play Again: back to the lobby with the same code and players, ready flags cleared.
@@ -174,6 +182,10 @@ func _on_game_event(event: Dictionary) -> void:
 				_assign(id, _controllers[id].team + server_team_offset, str(p.get("role", "")))
 		"controller_disconnected":
 			_remove(str(p.get("controllerId", "")))
+		"player_auth":
+			var token_id := str(p.get("controllerId", ""))
+			if not token_id.is_empty() and typeof(p.get("authToken")) == TYPE_STRING:
+				_tokens[token_id] = p.authToken
 		"broadcast":
 			if p.has("state"):
 				_set_state(str(p.state))
@@ -240,8 +252,13 @@ func _sync_players(list: Variant) -> void:
 			"team": int(team_v) - server_team_offset if typeof(team_v) in [TYPE_INT, TYPE_FLOAT] else -1,
 			"role": normalize_role(str(a.get("role", ""))) if a.get("role") != null else "",
 			"ready": a.get("ready", false) == true,
+			"signed_in": a.get("signedIn", false) == true,
 			"connected": a.get("connected", true) != false,
 		})
+	# Forget tokens of phones that left.
+	for id in _tokens.keys():
+		if not players.any(func(pl): return pl.id == id):
+			_tokens.erase(id)
 
 
 ## The player holding a game team's role, or {} if the spot is open.
@@ -279,6 +296,7 @@ func _on_connection_changed(connected: bool) -> void:
 	for id in _controllers.keys():
 		_remove(id)
 	players.clear()
+	_tokens.clear()
 	game_id = ""
 	pairing_code = ""
 	_set_state("waiting")

@@ -23,6 +23,7 @@ GameSession="*res://scripts/game_session.gd"
 InputRouter="*res://scripts/input_router.gd"
 LobbyServer="*res://scripts/network/lobby_server.gd"
 MatchStats="*res://scripts/match_stats.gd"
+Account="*res://scripts/account/account.gd"
 
 [display]
 
@@ -86,3 +87,7 @@ fire={
 rendering_device/driver.windows="d3d12"
 renderer/rendering_method="gl_compatibility"
 renderer/rendering_method.mobile="gl_compatibility"
+
+[skillissue]
+
+api_url="http://127.0.0.1:3000"

@@ -208,8 +208,9 @@ func _render_slot(team: int, role: String, player: Dictionary) -> void:
 		s.badge.text = ""
 		s.panel.add_theme_stylebox_override("panel", UiKit.panel_box(Color(1, 1, 1, 0.08), Color(0, 0, 0, 0.25)))
 		return
-	s.name.text = player.name
+	s.name.text = player.name + ("  ✓" if player.get("signed_in", false) else "")
 	s.name.add_theme_color_override("font_color", UiKit.INK)
+	s.name.tooltip_text = "Signed in: this player's stats are saved" if player.get("signed_in", false) else "Guest"
 	if player.ready:
 		s.badge.text = "READY"
 		s.badge.add_theme_color_override("font_color", UiKit.READY)

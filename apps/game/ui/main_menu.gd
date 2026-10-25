@@ -1,10 +1,13 @@
-## Main menu: Create a Lobby, How to Play, Quit.
+## Main menu: Create a Lobby, How to Play, Sign In / Account, Quit.
 extends Control
 
 const LOBBY_SCENE := "res://ui/lobby.tscn"
+const SIGN_IN_SCENE := "res://ui/sign_in.tscn"
 
 var _how: Control
 var _how_close: Button
+var _account: Button
+var _who: Label
 
 
 func _ready() -> void:
@@ -49,16 +52,23 @@ func _ready() -> void:
 	var how := UiKit.button("HOW TO PLAY")
 	how.custom_minimum_size = Vector2(420, 60)
 	how.pressed.connect(_show_how)
+	_account = UiKit.button("SIGN IN")
+	_account.custom_minimum_size = Vector2(420, 60)
+	_account.pressed.connect(func(): get_tree().change_scene_to_file(SIGN_IN_SCENE))
 	var quit := UiKit.button("QUIT")
 	quit.custom_minimum_size = Vector2(420, 60)
 	quit.pressed.connect(func(): get_tree().quit())
-	for b in [create, how, quit]:
+	for b in [create, how, _account, quit]:
 		var holder := HBoxContainer.new()
 		holder.add_child(b)
 		left.add_child(holder)
 
 	var foot := UiKit.label("Phones: open the SkillIssue app and tap Join a Lobby.", 20, UiKit.BODY, UiKit.MUTED)
 	left.add_child(foot)
+	_who = UiKit.label("", 20, UiKit.BODY_SEMI, UiKit.MUTED)
+	left.add_child(_who)
+	Account.changed.connect(_render_account)
+	_render_account()
 
 	# Right: the two teams, face to face
 	var right := VBoxContainer.new()
@@ -95,6 +105,19 @@ func _team_card(team: int) -> PanelContainer:
 static func _panel_for(team: int) -> Color:
 	var c := UiKit.team_color(team)
 	return Color(c.r * 0.16, c.g * 0.16, c.b * 0.16, 0.9)
+
+
+func _render_account() -> void:
+	if not is_inside_tree():
+		return
+	if Account.is_signed_in():
+		_account.text = "ACCOUNT · %s" % str(Account.profile.name).to_upper()
+		_who.text = "Signed in: matches you host go on the all-time leaderboard."
+		_who.add_theme_color_override("font_color", UiKit.READY)
+	else:
+		_account.text = "SIGN IN"
+		_who.text = "Not signed in: matches aren't saved to the leaderboard."
+		_who.add_theme_color_override("font_color", UiKit.MUTED)
 
 
 func _on_create() -> void:

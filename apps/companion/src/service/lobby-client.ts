@@ -80,7 +80,8 @@ export class LobbyClient {
 		return this.view;
 	}
 
-	join(code: string, name: string) {
+	/** `authToken`: the player's Auth0 access token when signed in (the game forwards it with the results). */
+	join(code: string, name: string, authToken?: string | null) {
 		this.leave();
 		this.set({ ...idleLobby, stage: "connecting", code: code.toUpperCase() });
 
@@ -94,7 +95,13 @@ export class LobbyClient {
 		this.socket = socket;
 
 		socket.onopen = () => {
-			this.send({ type: "join_game", protocolVersion: 1, pairingCode: code.trim().toUpperCase(), name: name.trim() });
+			this.send({
+				type: "join_game",
+				protocolVersion: 1,
+				pairingCode: code.trim().toUpperCase(),
+				name: name.trim(),
+				...(authToken ? { authToken } : {}),
+			});
 		};
 		socket.onmessage = (event) => this.receive(String(event.data));
 		socket.onerror = () => {
