@@ -156,7 +156,7 @@ test("small side tilts are responsive in both directions without changing forwar
 	}
 });
 
-test("a deep strafe never toggles sprint, a 30° twist does without strafing", () => {
+test("a deep strafe never toggles sprint, a 40° twist does without strafing", () => {
 	for (const [grip, platform] of grips) {
 		const run = runner(grip, platform);
 		move(run, { right: 28 }, 300);
@@ -164,14 +164,17 @@ test("a deep strafe never toggles sprint, a 30° twist does without strafing", (
 		move(run, { right: 0 }, 300);
 		assert.deepEqual(run.actions, [], `${grip} ${platform}: a 28° strafe is not a twist`);
 		let strafe = 0;
-		move(run, { twist: 34 }, 700, (out) => { strafe = Math.max(strafe, Math.abs(out.moveX)); });
-		assert.deepEqual(run.actions, ["sprint"], `${grip} ${platform}: a gentle twist toggles sprint`);
+		move(run, { twist: 46 }, 700, (out) => { strafe = Math.max(strafe, Math.abs(out.moveX)); });
+		hold(run, 180);
+		assert.deepEqual(run.actions, ["sprint"], `${grip} ${platform}: a held deliberate twist toggles sprint`);
 		assert.equal(run.out.sprint, true);
 		assert.ok(strafe < 0.35, `${grip} ${platform}: twisting barely strafes (${strafe})`);
 		hold(run, 1000);
 		move(run, { twist: 0 }, 400);
+		hold(run, 180);
 		assert.deepEqual(run.actions, ["sprint"], `${grip} ${platform}: holding and returning don't toggle again`);
-		move(run, { twist: -34 }, 500);
+		move(run, { twist: -46 }, 500);
+		hold(run, 180);
 		assert.equal(run.out.sprint, false, `${grip} ${platform}: the next twist turns sprint off`);
 	}
 });
@@ -181,7 +184,8 @@ test("twisting to sprint while walking keeps walking", () => {
 	move(run, { fwd: 15 }, 200);
 	hold(run, 100);
 	let slowest = 1;
-	move(run, { twist: 34 }, 500, (out) => { slowest = Math.min(slowest, out.moveY); });
+	move(run, { twist: 46 }, 500, (out) => { slowest = Math.min(slowest, out.moveY); });
+	hold(run, 180);
 	assert.equal(run.out.sprint, true);
 	assert.ok(slowest > 0.4, `forward walking continues through the twist (${slowest})`);
 });
@@ -242,10 +246,13 @@ test("never needs a manual recalibration: grip creep, gyro drift, long play", ()
 	hold(run, 50);
 	assert.ok(run.out.moveY > 0.5, "walking still works");
 	move(run, { fwd: run.pose.fwd - 14 }, 200);
-	move(run, { twist: 34 }, 500);
+	move(run, { twist: 46 }, 500);
+	hold(run, 180);
 	assert.deepEqual(run.actions, ["sprint"], "sprint twist still works");
 	move(run, { twist: 0 }, 400);
-	move(run, { twist: 34 }, 500);
+	hold(run, 180);
+	move(run, { twist: 46 }, 500);
+	hold(run, 180);
 	assert.deepEqual(run.actions, ["sprint", "sprint"], "and re-arms");
 });
 
@@ -301,5 +308,40 @@ test("gunner wrist turns sweep the view with mouse-style sensitivity", () => {
 			dx += model.process(rig.step(pose, 16).reading as never, (now += 16)).lookDX ?? 0;
 		}
 		assert.ok(Math.abs(dx - 180) < 8, `${grip} ${platform}: a fast flick turned ${dx.toFixed(1)}° for 60°`);
+	}
+});
+
+
+test("incidental twists and mixed movement do not toggle sprint", () => {
+	for (const [grip, platform] of grips) {
+		const run = runner(grip, platform);
+		move(run, { fwd: 15, right: 12, twist: 30 }, 350);
+		hold(run, 500);
+		move(run, { fwd: 0, right: 0, twist: 0 }, 350);
+		hold(run, 200);
+		assert.ok(!run.actions.includes("sprint"), `${grip} ${platform}: incidental 30-degree twist`);
+		move(run, { twist: 46 }, 80);
+		move(run, { twist: 0 }, 80);
+		hold(run, 300);
+		assert.ok(!run.actions.includes("sprint"), `${grip} ${platform}: brief threshold crossing`);
+	}
+});
+
+test("sprint requires a centered pause before another deliberate toggle", () => {
+	for (const [grip, platform] of grips) {
+		const run = runner(grip, platform);
+		move(run, { twist: 46 }, 500);
+		hold(run, 800);
+		assert.equal(run.out.sprint, true);
+		move(run, { twist: 0 }, 80);
+		move(run, { twist: -46 }, 80);
+		hold(run, 800);
+		assert.deepEqual(run.actions, ["sprint"], "passing center cannot re-arm sprint");
+		move(run, { twist: 0 }, 300);
+		hold(run, 200);
+		move(run, { twist: -46 }, 500);
+		hold(run, 200);
+		assert.equal(run.out.sprint, false);
+		assert.deepEqual(run.actions, ["sprint", "sprint"]);
 	}
 });
