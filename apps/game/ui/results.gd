@@ -162,11 +162,20 @@ func _judge() -> void:
 		show_badge(await MvpService.badge_ready)
 
 
-## The generated picture, or (null) the drawn stand-in.
+## The generated picture. With no MVP it's Gemini's scene or nothing at all; an MVP's
+## medal draws its own raccoon if no picture comes.
 func show_badge(texture: Texture2D) -> void:
 	if _badge == null or not is_instance_valid(_badge):
 		return
-	if texture:
+	if _badge.mode == "none":
+		if texture == null:
+			_badge.queue_free()
+			return
+		_badge.visible = true
+		_badge.custom_minimum_size.y = 0.0
+		_badge.create_tween().tween_property(_badge, "custom_minimum_size:y", 190.0, 0.35).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+		_badge.show_texture(texture)
+	elif texture:
 		_badge.show_texture(texture)
 	else:
 		_badge.show_fallback()
@@ -185,7 +194,7 @@ func show_mvp(pick: Dictionary) -> void:
 	var shown := VBoxContainer.new()
 	shown.add_theme_constant_override("separation", 6)
 	_shown = shown
-	# The picture: a raccoon medallion beside the name, or the empty, tumbleweed-blown alley.
+	# The picture: a raccoon medallion beside the name, or Gemini's no-MVP noir scene.
 	var badge := preload("res://ui/mvp_badge.gd").new()
 	badge.mode = "mvp" if has_mvp else "none"
 	badge.color = color
@@ -204,7 +213,7 @@ func show_mvp(pick: Dictionary) -> void:
 		row.add_child(text)
 		shown.add_child(row)
 	else:
-		badge.custom_minimum_size = Vector2(0, 190)
+		badge.visible = false   # until Gemini's scene arrives; never shown without it
 		shown.add_child(badge)
 	if has_mvp:
 		var name_label := UiKit.display(str(pick.name).to_upper(), 56, UiKit.INK)

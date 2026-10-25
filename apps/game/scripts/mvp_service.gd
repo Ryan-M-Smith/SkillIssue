@@ -3,8 +3,8 @@
 ## so both are usually ready by the time the results screen opens.
 ##   1. POST /api/mvp        Gemini judges the match (MvpJudge builds the report; local rule if offline)
 ##   2. POST /api/mvp/badge  Gemini draws a raccoon badge for that accolade, or, with no MVP,
-##                           tumbleweeds and a sly noir raccoon lurking. Without it the results
-##                           screen draws its own (ui/mvp_badge.gd).
+##                           tumbleweeds and a sly noir raccoon lurking. Without it, an MVP
+##                           medal draws its own raccoon (ui/mvp_badge.gd); no MVP shows no picture.
 ## The results screen reads `pick` / `badge` and listens for the signals if they aren't in yet.
 extends Node
 
@@ -53,7 +53,7 @@ func clear() -> void:
 func _draw_badge(job: int, result: Dictionary) -> void:
 	var control_plane := NetworkClient.configured_control_plane_url()
 	if control_plane.is_empty():
-		_badge_done(job, null)   # offline: the results screen draws its own
+		_badge_done(job, null)   # offline: an MVP medal draws its own; no MVP shows no picture
 		return
 	var body := {"kind": "none"}
 	if not str(result.get("id", "")).is_empty():
