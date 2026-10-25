@@ -1,0 +1,23 @@
+{
+	"name": "api",
+	"version": "1.0.0",
+	"private": true,
+	"type": "module",
+	"description": "SkillIssue web API: Auth0 sign-in, Tiger Data (TimescaleDB) accounts, matches, stats and leaderboards. Also serves the website.",
+	"scripts": {
+		"start": "tsx src/index.ts",
+		"db:migrate": "tsx src/migrate.ts",
+		"auth0:setup": "tsx scripts/auth0-setup.ts",
+		"typecheck": "tsc --noEmit"
+	},
+	"dependencies": {
+		"jose": "^6.2.13",
+		"pg": "^8.23.1",
+		"tsx": "^4.23.15"
+	},
+	"devDependencies": {
+		"@types/node": "^26.6.5",
+		"@types/pg": "^8.15.6",
+		"typescript": "^7.0.2"
+	}
+}

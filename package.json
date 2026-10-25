@@ -6,13 +6,18 @@
 	"workspaces": [
 		"apps/companion",
 		"apps/server",
+		"apps/api",
 		"packages/*"
 	],
 	"scripts": {
 		"test": "echo \"Error: no test specified\" && exit 1",
 		"companion:start": "npm --prefix apps/companion run start -- --tunnel",
 		"companion:web": "npm --prefix apps/companion run web",
-		"server:start": "npm --prefix apps/server run start"
+		"server:start": "npm --prefix apps/server run start",
+		"api:start": "npm --prefix apps/api run start",
+		"db:migrate": "npm --prefix apps/api run db:migrate",
+		"auth0:setup": "npm --prefix apps/api run auth0:setup",
+		"web:build": "cd apps/companion && npx expo export -p web"
 	},
 	"keywords": [],
 	"author": "",
