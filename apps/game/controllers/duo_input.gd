@@ -15,6 +15,7 @@ var fire := false               ## held
 var reload := false             ## pressed this frame
 var scope_toggle := false       ## pressed this frame
 var weapon_slot := -1           ## requested slot this frame, -1 = none
+var weapon_cycle := 0           ## +1 next gun / -1 previous gun this frame (skips guns you don't own)
 
 
 func reset() -> void:
@@ -27,6 +28,7 @@ func reset() -> void:
 	reload = false
 	scope_toggle = false
 	weapon_slot = -1
+	weapon_cycle = 0
 
 
 func clamp_values() -> void:

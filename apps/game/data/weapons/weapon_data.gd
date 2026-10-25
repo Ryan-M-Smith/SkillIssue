@@ -43,3 +43,6 @@ enum SpreadPattern {
 @export_group("Look")
 @export var color := Color(0.8, 0.8, 0.85)
 @export var model_size := Vector3(0.08, 0.12, 0.35)   ## view model / pickup box size
+## The gun's model (entities/weapons/models/*.tscn): used in first person, on the Duo the
+## enemy sees, and on the floating pickup. Leave empty to use a box of `model_size`.
+@export var model_scene: PackedScene

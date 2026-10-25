@@ -4,3 +4,5 @@
 
 [resource]
 script = ExtResource("1")
+head_size = Vector3(0.6, 0.56, 0.56)
+head_offset = Vector3(0, 0.17, 0)

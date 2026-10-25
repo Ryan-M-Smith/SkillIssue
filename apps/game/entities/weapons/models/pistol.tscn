@@ -1,0 +1,88 @@
+[gd_scene format=3]
+
+[sub_resource type="StandardMaterial3D" id="metal"]
+albedo_color = Color(0.16, 0.17, 0.19, 1)
+metallic = 0.7
+roughness = 0.35
+
+[sub_resource type="StandardMaterial3D" id="dark"]
+albedo_color = Color(0.09, 0.09, 0.1, 1)
+metallic = 0.2
+roughness = 0.7
+
+[sub_resource type="StandardMaterial3D" id="accent"]
+albedo_color = Color(0.75, 0.75, 0.8, 1)
+metallic = 0.5
+roughness = 0.35
+
+[sub_resource type="BoxMesh" id="mesh_0"]
+size = Vector3(0.05, 0.055, 0.24)
+
+[sub_resource type="BoxMesh" id="mesh_1"]
+size = Vector3(0.044, 0.035, 0.19)
+
+[sub_resource type="BoxMesh" id="mesh_2"]
+size = Vector3(0.042, 0.13, 0.065)
+
+[sub_resource type="BoxMesh" id="mesh_3"]
+size = Vector3(0.012, 0.035, 0.06)
+
+[sub_resource type="CylinderMesh" id="mesh_4"]
+top_radius = 0.011
+bottom_radius = 0.011
+height = 0.03
+radial_segments = 12
+rings = 1
+
+[sub_resource type="BoxMesh" id="mesh_5"]
+size = Vector3(0.03, 0.012, 0.012)
+
+[sub_resource type="BoxMesh" id="mesh_6"]
+size = Vector3(0.008, 0.012, 0.012)
+
+[node name="PistolModel" type="Node3D"]
+
+[node name="Slide" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.065, -0.09)
+cast_shadow = 0
+mesh = SubResource("mesh_0")
+surface_material_override/0 = SubResource("accent")
+
+[node name="Frame" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.025, -0.075)
+cast_shadow = 0
+mesh = SubResource("mesh_1")
+surface_material_override/0 = SubResource("dark")
+
+[node name="Grip" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.965926, -0.258819, 0, 0.258819, 0.965926, 0, -0.035, 0.0)
+cast_shadow = 0
+mesh = SubResource("mesh_2")
+surface_material_override/0 = SubResource("dark")
+
+[node name="TriggerGuard" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.005, -0.055)
+cast_shadow = 0
+mesh = SubResource("mesh_3")
+surface_material_override/0 = SubResource("metal")
+
+[node name="Barrel" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 6.12323e-17, 1, 0, -1, 6.12323e-17, 0, 0.065, -0.215)
+cast_shadow = 0
+mesh = SubResource("mesh_4")
+surface_material_override/0 = SubResource("metal")
+
+[node name="RearSight" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.098, 0.02)
+cast_shadow = 0
+mesh = SubResource("mesh_5")
+surface_material_override/0 = SubResource("metal")
+
+[node name="FrontSight" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.098, -0.2)
+cast_shadow = 0
+mesh = SubResource("mesh_6")
+surface_material_override/0 = SubResource("metal")
+
+[node name="Muzzle" type="Marker3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.065, -0.23)

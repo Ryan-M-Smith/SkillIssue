@@ -1,0 +1,168 @@
+[gd_scene format=3]
+
+[sub_resource type="StandardMaterial3D" id="metal"]
+albedo_color = Color(0.16, 0.17, 0.19, 1)
+metallic = 0.7
+roughness = 0.35
+
+[sub_resource type="StandardMaterial3D" id="dark"]
+albedo_color = Color(0.09, 0.09, 0.1, 1)
+metallic = 0.2
+roughness = 0.7
+
+[sub_resource type="StandardMaterial3D" id="accent"]
+albedo_color = Color(0.3, 0.85, 0.45, 1)
+roughness = 0.55
+
+[sub_resource type="StandardMaterial3D" id="lens"]
+albedo_color = Color(0.25, 0.55, 1.0, 1)
+metallic = 0.3
+roughness = 0.1
+emission_enabled = true
+emission = Color(0.3, 0.6, 1.0, 1)
+emission_energy_multiplier = 0.6
+
+[sub_resource type="StandardMaterial3D" id="glint"]
+shading_mode = 0
+albedo_color = Color(1, 1, 1, 1)
+roughness = 1
+emission_enabled = true
+emission = Color(0.8, 0.9, 1.0, 1)
+emission_energy_multiplier = 6.0
+
+[sub_resource type="BoxMesh" id="mesh_0"]
+size = Vector3(0.05, 0.12, 0.32)
+
+[sub_resource type="BoxMesh" id="mesh_1"]
+size = Vector3(0.042, 0.1, 0.05)
+
+[sub_resource type="BoxMesh" id="mesh_2"]
+size = Vector3(0.062, 0.075, 0.36)
+
+[sub_resource type="CylinderMesh" id="mesh_3"]
+top_radius = 0.016
+bottom_radius = 0.016
+height = 0.62
+radial_segments = 12
+rings = 1
+
+[sub_resource type="BoxMesh" id="mesh_4"]
+size = Vector3(0.042, 0.042, 0.07)
+
+[sub_resource type="CylinderMesh" id="mesh_5"]
+top_radius = 0.024
+bottom_radius = 0.024
+height = 0.3
+radial_segments = 12
+rings = 1
+
+[sub_resource type="CylinderMesh" id="mesh_6"]
+top_radius = 0.033
+bottom_radius = 0.033
+height = 0.05
+radial_segments = 12
+rings = 1
+
+[sub_resource type="CylinderMesh" id="mesh_7"]
+top_radius = 0.03
+bottom_radius = 0.03
+height = 0.04
+radial_segments = 12
+rings = 1
+
+[sub_resource type="CylinderMesh" id="mesh_8"]
+top_radius = 0.029
+bottom_radius = 0.029
+height = 0.006
+radial_segments = 12
+rings = 1
+
+[sub_resource type="BoxMesh" id="mesh_9"]
+size = Vector3(0.02, 0.04, 0.025)
+
+[sub_resource type="BoxMesh" id="mesh_10"]
+size = Vector3(0.02, 0.04, 0.025)
+
+[sub_resource type="SphereMesh" id="mesh_11"]
+radius = 0.06
+height = 0.12
+radial_segments = 12
+rings = 6
+
+[node name="SniperModel" type="Node3D"]
+
+[node name="Stock" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.996195, 0.0871557, 0, -0.0871557, 0.996195, 0, -0.025, 0.2)
+cast_shadow = 0
+mesh = SubResource("mesh_0")
+surface_material_override/0 = SubResource("accent")
+
+[node name="Grip" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.978148, -0.207912, 0, 0.207912, 0.978148, 0, -0.065, 0.02)
+cast_shadow = 0
+mesh = SubResource("mesh_1")
+surface_material_override/0 = SubResource("dark")
+
+[node name="Body" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.02, -0.12)
+cast_shadow = 0
+mesh = SubResource("mesh_2")
+surface_material_override/0 = SubResource("accent")
+
+[node name="Barrel" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 6.12323e-17, 1, 0, -1, 6.12323e-17, 0, 0.035, -0.6)
+cast_shadow = 0
+mesh = SubResource("mesh_3")
+surface_material_override/0 = SubResource("metal")
+
+[node name="MuzzleBrake" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.035, -0.93)
+cast_shadow = 0
+mesh = SubResource("mesh_4")
+surface_material_override/0 = SubResource("dark")
+
+[node name="ScopeTube" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 6.12323e-17, 1, 0, -1, 6.12323e-17, 0, 0.105, -0.1)
+cast_shadow = 0
+mesh = SubResource("mesh_5")
+surface_material_override/0 = SubResource("dark")
+
+[node name="ScopeFront" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 6.12323e-17, 1, 0, -1, 6.12323e-17, 0, 0.105, -0.26)
+cast_shadow = 0
+mesh = SubResource("mesh_6")
+surface_material_override/0 = SubResource("dark")
+
+[node name="ScopeBack" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 6.12323e-17, 1, 0, -1, 6.12323e-17, 0, 0.105, 0.06)
+cast_shadow = 0
+mesh = SubResource("mesh_7")
+surface_material_override/0 = SubResource("dark")
+
+[node name="Lens" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 6.12323e-17, 1, 0, -1, 6.12323e-17, 0, 0.105, -0.288)
+cast_shadow = 0
+mesh = SubResource("mesh_8")
+surface_material_override/0 = SubResource("lens")
+
+[node name="MountFront" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.065, -0.18)
+cast_shadow = 0
+mesh = SubResource("mesh_9")
+surface_material_override/0 = SubResource("metal")
+
+[node name="MountBack" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.065, -0.02)
+cast_shadow = 0
+mesh = SubResource("mesh_10")
+surface_material_override/0 = SubResource("metal")
+
+[node name="Glint" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.105, -0.3)
+visible = false
+cast_shadow = 0
+mesh = SubResource("mesh_11")
+surface_material_override/0 = SubResource("glint")
+
+[node name="Muzzle" type="Marker3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.035, -0.97)

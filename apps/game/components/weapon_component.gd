@@ -17,7 +17,7 @@ signal hit_confirmed(target: Node, damage: float, headshot: bool)
 @export var third_person_gun: MeshInstance3D
 @export var third_person_scale := 1.3
 @export_flags_3d_physics var hit_mask := 1 | 4   ## world + hurtbox
-@export var view_model_scale := 0.8             ## first-person gun is drawn smaller than the pickup
+@export var view_model_scale := 0.6             ## first-person gun is drawn smaller than the pickup
 ## Optional: lets spread react to walking / jumping / crouching.
 @export var movement: MovementComponent
 
@@ -35,10 +35,13 @@ var _excluded: Array[RID] = []
 var _vm_base := Vector3.ZERO
 var _kick := 0.0
 var _bloom := 0.0
+var _tp_base := Vector3.ZERO
 
 
 func _ready() -> void:
 	_vm_base = view_model.position
+	if third_person_gun:
+		_tp_base = third_person_gun.position
 	reset_loadout()
 
 
@@ -108,10 +111,26 @@ func select(i: int, force := false) -> void:
 	weapon_changed.emit(i, loadout[i])
 
 
+## Next (+1) or previous (-1) gun you own. Wraps around; skips guns you haven't picked up.
+func cycle(direction: int) -> void:
+	var n := loadout.size()
+	if n == 0:
+		return
+	var step := 1 if direction > 0 else -1
+	var i := current
+	for _k in n:
+		i = posmod(i + step, n)
+		if owned[i]:
+			select(i)
+			return
+
+
 func tick(input: DuoInput, delta: float) -> void:
 	_cooldown -= delta
 	if input.weapon_slot >= 0:
 		select(input.weapon_slot)
+	elif input.weapon_cycle != 0:
+		cycle(input.weapon_cycle)
 	var data := current_data()
 	if data == null:
 		return
@@ -142,6 +161,7 @@ func _set_scoped(on: bool) -> void:
 		return
 	scoped = on
 	view_model.visible = not on
+	GunSkin.set_glint(third_person_gun, on)   # the enemy sees a scope glint
 	scope_changed.emit(on)
 
 
@@ -213,20 +233,19 @@ func _update_view_model() -> void:
 	var data := current_data()
 	if data == null:
 		return
-	var m := BoxMesh.new()
-	m.size = data.model_size * view_model_scale
-	view_model.mesh = m
-	var mat := StandardMaterial3D.new()
-	mat.albedo_color = data.color
-	mat.metallic = 0.3
-	mat.roughness = 0.4
-	view_model.material_override = mat
-	_vm_base.z = -data.model_size.z * view_model_scale * 0.5
+	# First-person gun (your own screen only)
+	var skin := GunSkin.attach(view_model, data, view_model_scale)
+	if skin:
+		_vm_base.z = 0.0
+		muzzle.position = _vm_base + GunSkin.muzzle_offset(skin)
+	else:
+		_vm_base.z = -data.model_size.z * view_model_scale * 0.5
+		muzzle.position = Vector3(0, 0, -data.model_size.z * view_model_scale)
 	view_model.position = _vm_base
-	muzzle.position = Vector3(0, 0, -data.model_size.z * view_model_scale)
+	# The gun in the Duo's hands that the enemy sees
 	if third_person_gun:
-		var tm := BoxMesh.new()
-		tm.size = data.model_size * third_person_scale
-		third_person_gun.mesh = tm
-		third_person_gun.material_override = mat
-		third_person_gun.position.z = -data.model_size.z * third_person_scale * 0.5
+		var tp := GunSkin.attach(third_person_gun, data, third_person_scale)
+		third_person_gun.position = _tp_base
+		if tp == null:
+			third_person_gun.position.z = -data.model_size.z * third_person_scale * 0.5
+		GunSkin.set_glint(third_person_gun, scoped)

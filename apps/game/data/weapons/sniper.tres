@@ -1,6 +1,7 @@
 [gd_resource type="Resource" script_class="WeaponData" format=3]
 
 [ext_resource type="Script" path="res://data/weapons/weapon_data.gd" id="1"]
+[ext_resource type="PackedScene" path="res://entities/weapons/models/sniper.tscn" id="2_model"]
 
 [resource]
 script = ExtResource("1")
@@ -26,3 +27,4 @@ tracer_width = 0.05
 tracer_lifetime = 0.3
 impact_size = 0.12
 impact_lifetime = 0.3
+model_scene = ExtResource("2_model")

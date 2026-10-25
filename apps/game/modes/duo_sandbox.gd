@@ -18,8 +18,12 @@
 ## the phones, and the results screen (ui/results.tscn) loads.
 ##
 ## Controls work from phones (via the relay) and from the keyboard at the same time:
-##   Team A: WASD, Space jump, Ctrl crouch, hold Q sprint, mouse aim (click to capture), LMB fire, RMB scope, 1/2/3 guns
-##   Team B: IJKL, Shift jump, N crouch, hold U sprint, arrow keys aim, Enter fire, M scope, 8/9/0 guns
+##   Team A: WASD, Space jump, Ctrl crouch, hold Q sprint, mouse aim (click to capture), LMB fire, RMB scope, 1/2/3 guns, E / wheel next gun
+##   Team B: IJKL, Shift jump, N crouch, hold U sprint, arrow keys aim, Enter fire, M scope, 8/9/0 guns, O next gun
+##
+## Weapon pickups: the map's "Sniper..." / "Shotgun..." spots become floating, spinning guns
+## (entities/weapons/weapon_pickup.tscn) at runtime. Walk through one to own that gun; it
+## comes back after `pickup_respawn_time`. On death you drop back to the pistol.
 ##   F3: debug view: hitbox zones on both duos (red head / yellow body / blue legs)
 ##       plus each team's live spread circle and spread value
 class_name DuoSandbox
@@ -52,6 +56,14 @@ extends Node
 @export var add_light_if_missing := true
 ## Start with the F3 debug view on.
 @export var debug_view := false
+
+@export_group("Weapon pickups")
+## Turn the map's gun spots (Area3D nodes named after a gun, e.g. "SniperSpawnObject") into
+## floating gun pickups at runtime. The map file itself is not changed.
+@export var place_weapon_pickups := true
+@export var pickup_scene: PackedScene = preload("res://entities/weapons/weapon_pickup.tscn")
+@export var pickup_respawn_time := 10.0
+@export_group("")
 
 @export_group("Scene paths (relative to this node; it sits directly under Main)")
 @export var world_path: NodePath = ^"../World"
@@ -116,6 +128,9 @@ func _setup() -> void:
 		if team_huds and i < team_huds.get_child_count():
 			(team_huds.get_child(i) as TeamHud).bind_duo(duo, respawn_delay)
 
+	if place_weapon_pickups and not duos.is_empty():
+		_place_weapon_pickups(world, duos[0].weapons.loadout)
+	_add_scope_overlays()
 	GameEvents.duo_killed.connect(_on_duo_killed)
 	_update_score()
 	set_debug_view(debug_view)
@@ -178,6 +193,56 @@ func _physics_process(_delta: float) -> void:
 	for duo in duos:
 		if duo.alive and duo.global_position.y < fall_kill_height:
 			duo.health.kill(null)
+
+
+# ---------------------------------------------------------------- weapon pickups
+
+## Finds the map's gun spots by name ("SniperSpawnObject", "ShotgunSpawnObject2", ...), hides
+## their placeholder spheres and puts a floating WeaponPickup in the same place. Runtime only.
+func _place_weapon_pickups(world: Node3D, loadout: Array[WeaponData]) -> void:
+	var placed := 0
+	for spot in world.find_children("*", "Area3D", true, false):
+		if spot is WeaponPickup or spot is Hurtbox:
+			continue
+		var data := _weapon_for_spot(spot.name, loadout)
+		if data == null:
+			continue
+		# Use the placeholder's visible center if it has one (some are offset from the Area3D).
+		var at: Vector3 = spot.global_position
+		var visuals := spot.find_children("*", "GeometryInstance3D", true, false)
+		if not visuals.is_empty():
+			at = (visuals[0] as Node3D).global_position
+		for v in visuals:
+			(v as GeometryInstance3D).visible = false
+		spot.set_deferred("monitoring", false)
+		var p := pickup_scene.instantiate() as WeaponPickup
+		p.name = "%sPickup%d" % [data.display_name, placed + 1]
+		p.weapon = data
+		p.respawn_time = pickup_respawn_time
+		p.hover_height = 0.0          # the spot already marks where the gun floats
+		world.add_child(p)
+		p.global_position = at
+		placed += 1
+	if placed > 0:
+		print("[DuoSandbox] Placed %d floating weapon pickup(s) on the map's gun spots (runtime only)." % placed)
+
+
+## Sniper scope picture on each team's half of the screen (shows itself while scoped).
+func _add_scope_overlays() -> void:
+	for i in mini(duos.size(), _hud_halves.size()):
+		var half := _hud_halves[i].get("half") as Control
+		if half:
+			var overlay := ScopeOverlay.new(duos[i].weapons)
+			half.add_child(overlay)
+			half.move_child(overlay, 0)   # under the text
+
+
+func _weapon_for_spot(spot_name: String, loadout: Array[WeaponData]) -> WeaponData:
+	var n := spot_name.to_lower()
+	for i in range(1, loadout.size()):      # slot 0 is the starting pistol; no pickup needed
+		if loadout[i] and n.contains(loadout[i].display_name.to_lower()):
+			return loadout[i]
+	return null
 
 
 # ---------------------------------------------------------------- spawning / death

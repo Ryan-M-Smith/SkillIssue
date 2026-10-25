@@ -1,8 +1,8 @@
 ## Desk-testing controller: lets one or two people play a full match on one laptop.
 ##   Scheme 0 (Blue): WASD move, Space jump, Ctrl crouch, Q sprint, mouse aim (click to capture),
-##                    LMB fire, RMB scope, 1/2/3 guns, Esc releases mouse.
+##                    LMB fire, RMB scope, 1/2/3 guns, E or mouse wheel next gun, Esc releases mouse.
 ##   Scheme 1 (Red):  IJKL move, Shift jump, N crouch, U sprint, arrow keys aim,
-##                    Enter fire, M scope, 8/9/0 guns.
+##                    Enter fire, M scope, 8/9/0 guns, O next gun.
 class_name KeyboardDuoController
 extends DuoController
 
@@ -12,6 +12,7 @@ extends DuoController
 
 var _mouse_accum := Vector2.ZERO
 var _prev := {}
+var _wheel := 0
 
 
 func _init(scheme_id: int = 0) -> void:
@@ -35,6 +36,8 @@ func _unhandled_input(event: InputEvent) -> void:
 		Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 	elif event is InputEventKey and event.pressed and event.physical_keycode == KEY_ESCAPE:
 		Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
+	elif event is InputEventMouseButton and event.pressed and event.button_index in [MOUSE_BUTTON_WHEEL_UP, MOUSE_BUTTON_WHEEL_DOWN]:
+		_wheel = 1 if event.button_index == MOUSE_BUTTON_WHEEL_DOWN else -1
 	elif event is InputEventMouseMotion and Input.mouse_mode == Input.MOUSE_MODE_CAPTURED:
 		_mouse_accum += Vector2(event.relative.x, -event.relative.y) * mouse_sensitivity
 
@@ -68,6 +71,10 @@ func poll(input: DuoInput, delta: float) -> void:
 		if _pressed_once("scope", captured and Input.is_mouse_button_pressed(MOUSE_BUTTON_RIGHT)): input.scope_toggle = true
 		for i in 3:
 			if _pressed_once("w%d" % i, _key(KEY_1 + i)): input.weapon_slot = i
+		if _pressed_once("cycle", _key(KEY_E)): input.weapon_cycle = 1
+		if _wheel != 0:
+			input.weapon_cycle = _wheel
+			_wheel = 0
 	else:
 		mv = Vector2(float(_key(KEY_L)) - float(_key(KEY_J)), float(_key(KEY_I)) - float(_key(KEY_K)))
 		var turn := Vector2(float(_key(KEY_RIGHT)) - float(_key(KEY_LEFT)), float(_key(KEY_UP)) - float(_key(KEY_DOWN)))
@@ -81,4 +88,5 @@ func poll(input: DuoInput, delta: float) -> void:
 		var keys := [KEY_8, KEY_9, KEY_0]
 		for i in 3:
 			if _pressed_once("w%d" % i, _key(keys[i])): input.weapon_slot = i
+		if _pressed_once("cycle", _key(KEY_O)): input.weapon_cycle = 1
 	input.move += mv.normalized() if mv.length() > 1.0 else mv
