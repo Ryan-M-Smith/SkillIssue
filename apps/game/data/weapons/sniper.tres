@@ -28,3 +28,4 @@ tracer_lifetime = 0.3
 impact_size = 0.12
 impact_lifetime = 0.3
 model_scene = ExtResource("2_model")
+drop_when_empty = true

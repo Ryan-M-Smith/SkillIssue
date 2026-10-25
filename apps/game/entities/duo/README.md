@@ -20,8 +20,10 @@ Duo (CharacterBody3D)            duo.gd: wires components, nothing else
 ```
 
 **Try it:** open `res://modes/duo_sandbox.tscn` and press F6.
-Team A (left screen): WASD, Space jump, Ctrl crouch, hold Q sprint, mouse aim (click to capture), LMB fire, RMB scope, 1/2/3 guns.
-Team B (right screen): IJKL, Shift jump, N crouch, hold U sprint, arrow keys aim, Enter fire, M scope, 8/9/0 guns.
+Team A (Blue, left screen): WASD move, Space jump, C crouch, hold Shift sprint, mouse aim (click to capture), left click fire, right click scope, Q / mouse wheel swap gun.
+Team B (Red, right screen): IJKL move, U jump, O crouch, hold P sprint, arrow keys aim, Enter fire, / scope, . (period) swap gun.
+
+Reloading is automatic. Shotgun and sniper ammo is limited: when it runs out the gun is gone until you pick up another.
 
 **Tune it:** numbers live in `data/` (`.tres` files, edit in the Inspector, re-run).
 - `data/hitboxes/default_hitboxes.tres`: head / body / legs box sizes, positions, damage multipliers

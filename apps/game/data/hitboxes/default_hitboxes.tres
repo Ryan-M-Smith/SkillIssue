@@ -4,5 +4,9 @@
 
 [resource]
 script = ExtResource("1")
-head_size = Vector3(0.6, 0.56, 0.56)
+head_size = Vector3(0.5, 0.6, 0.5)
 head_offset = Vector3(0, 0.17, 0)
+body_size = Vector3(0.66, 0.56, 0.48)
+body_offset = Vector3(0, 1.25, 0)
+legs_size = Vector3(0.78, 0.92, 0.6)
+legs_offset = Vector3(0, 0.46, 0)

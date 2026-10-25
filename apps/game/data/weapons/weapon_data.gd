@@ -16,6 +16,9 @@ enum SpreadPattern {
 @export var headshot_multiplier := 2.0     ## used when a pellet hits the HEAD zone
 @export_range(1, 100) var magazine_size := 12
 @export_range(0.1, 10.0) var reload_seconds := 1.25
+## Pickup guns: no reloading. When the last round is fired the gun is gone, and the Duo has
+## to grab another one from a pickup (the starting pistol keeps reloading forever).
+@export var drop_when_empty := false
 
 @export_group("Spread")
 @export var spread_degrees := 0.5          ## base cone half-angle, standing still on the ground
