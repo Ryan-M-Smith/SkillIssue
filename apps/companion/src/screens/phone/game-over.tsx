@@ -2,7 +2,7 @@ import { StyleSheet, Text, View } from "react-native";
 
 import type { LobbyView } from "@/service/lobby-client";
 import type { TeamStats } from "../../../../../packages/protocol/events";
-import { Body, Eyebrow, SlantButton, SplitBackground, Title } from "./kit";
+import { Body, Eyebrow, Script, SlantButton, SplitBackground, Title } from "./kit";
 import { fonts, teamColor, ui } from "./theme";
 
 const rows: [keyof TeamStats, string, (v: number) => string][] = [
@@ -40,7 +40,9 @@ export function GameOver({
 			<SplitBackground split={winner === 1 ? 0.8 : winner === 2 ? 0.2 : 0.5} />
 			<View style={styles.left}>
 				<Eyebrow>Game over</Eyebrow>
-				<Title size={52} color={color}>{headline}</Title>
+				<Script size={18}>{winner === null ? "and nobody walks away clean…" : "and the winner is…"}</Script>
+				<Title size={52} depth={0.1}>{headline}</Title>
+				<View style={[styles.bar, { backgroundColor: color }]} />
 				<View style={styles.score}>
 					<Title size={34} color={ui.blue}>{scores[0]}</Title>
 					<Title size={34} color={ui.muted}>—</Title>
@@ -54,9 +56,9 @@ export function GameOver({
 			</View>
 			<View style={styles.table}>
 				<View style={styles.tr}>
-					<Text style={[styles.th, { color: ui.blue }]}>BLUE</Text>
+					<Text style={[styles.th, { color: ui.ink, borderBottomColor: ui.blue }]}>BLUE</Text>
 					<Text style={[styles.label, { color: ui.muted }]}> </Text>
-					<Text style={[styles.th, { color: ui.red }]}>RED</Text>
+					<Text style={[styles.th, { color: ui.ink, borderBottomColor: ui.red }]}>RED</Text>
 				</View>
 				{blue && red ? (
 					rows.map(([key, label, fmt]) => {
@@ -82,10 +84,11 @@ const styles = StyleSheet.create({
 	screen: { flex: 1, flexDirection: "row", padding: 22, gap: 22 },
 	left: { flex: 1, justifyContent: "center", gap: 6 },
 	score: { flexDirection: "row", gap: 14, alignItems: "center" },
+	bar: { width: 120, height: 4, marginBottom: 4 },
 	buttons: { flexDirection: "row", flexWrap: "wrap", gap: 12, marginTop: 12 },
-	table: { flex: 1, justifyContent: "center", gap: 4, backgroundColor: "rgba(7, 10, 18, 0.75)", borderRadius: 10, borderWidth: 1.5, borderColor: ui.line, padding: 12 },
+	table: { flex: 1, justifyContent: "center", gap: 4, backgroundColor: "rgba(8, 8, 8, 0.85)", borderRadius: 0, borderWidth: 1, borderColor: ui.line, padding: 12 },
 	tr: { flexDirection: "row", alignItems: "center" },
-	th: { flex: 1, textAlign: "center", fontFamily: fonts.display, fontSize: 16 },
+	th: { flex: 1, textAlign: "center", fontFamily: fonts.display, fontSize: 16, borderBottomWidth: 2, paddingBottom: 2 },
 	td: { flex: 1, textAlign: "center", fontFamily: fonts.displaySemi, fontSize: 18, color: ui.muted },
 	lead: { color: ui.ink },
 	label: { flex: 1.2, textAlign: "center", fontFamily: fonts.bodySemi, fontSize: 13, color: ui.muted },

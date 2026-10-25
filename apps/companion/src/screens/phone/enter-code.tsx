@@ -1,6 +1,6 @@
 import { StyleSheet, TextInput, View } from "react-native";
 
-import { Body, Eyebrow, SlantButton, SplitBackground, Title } from "./kit";
+import { Body, Eyebrow, Script, SlantButton, SplitBackground, Title } from "./kit";
 import { fonts, ui } from "./theme";
 
 export const codeLength = 6;
@@ -19,8 +19,8 @@ export function EnterCode({ code, onCode, onJoin, onBack, busy, error }: {
 			<SplitBackground />
 			<View style={styles.head}>
 				<View>
-					<Eyebrow>Join your squad</Eyebrow>
-					<Title size={30}>ENTER YOUR LOBBY</Title>
+					<Script size={18}>join your squad…</Script>
+					<Title size={30} depth={0.1}>ENTER YOUR LOBBY</Title>
 				</View>
 				<SlantButton label={busy ? "CANCEL" : "BACK"} small onPress={onBack} />
 			</View>
@@ -57,6 +57,6 @@ const styles = StyleSheet.create({
 	screen: { flex: 1, padding: 24, justifyContent: "space-between", gap: 12 },
 	head: { flexDirection: "row", justifyContent: "space-between", alignItems: "flex-start" },
 	entry: { gap: 10, alignSelf: "center", width: "100%", maxWidth: 700 },
-	input: { fontFamily: fonts.displaySemi, fontSize: 24, color: ui.ink, borderWidth: 2, borderColor: ui.blue, borderRadius: 8, backgroundColor: ui.panel, paddingHorizontal: 18, paddingVertical: 12 },
+	input: { fontFamily: fonts.displaySemi, fontSize: 28, letterSpacing: 6, color: ui.ink, borderWidth: 1, borderColor: ui.line, borderBottomWidth: 3, borderBottomColor: ui.ink, borderRadius: 0, backgroundColor: ui.panel, paddingHorizontal: 18, paddingVertical: 12 },
 	foot: { flexDirection: "row", alignItems: "center", gap: 16 },
 });

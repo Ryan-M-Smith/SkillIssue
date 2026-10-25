@@ -1,37 +1,38 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { AccessibilityInfo, Animated, Easing, StyleSheet, useWindowDimensions, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { ui } from "./theme";
 
-const blue = (a: number) => `rgba(59, 140, 255, ${a})`;
-const red = (a: number) => `rgba(255, 74, 74, ${a})`;
-const base = (a: number) => `rgba(7, 10, 18, ${a})`;
+const brickW = 64;
+const brickH = 24;
+const mortar = 3;
+/** Concentric soft rings that fake a spotlight on the wall: [radius as a share of the screen, alpha]. */
+const spot: [number, number][] = [[0.95, 0.018], [0.78, 0.02], [0.62, 0.024], [0.48, 0.028], [0.36, 0.032], [0.26, 0.036], [0.18, 0.04]];
+/** Darkening bands toward every edge (vignette): [thickness px, alpha]. */
+const edge: [number, number][] = [[140, 0.18], [90, 0.2], [50, 0.24], [22, 0.3]];
 
-const stripeGap = 46;       // px between stripes
-const stripeWidth = 3;
-const stripeLoopMs = 4200;  // one stripe gap per loop: they flow away from the seam
-const breatheMs = 5200;     // the seam sways and its glow pulses
-
-/** Glow bands on each side of the seam, nearest first: [width px, team alpha]. */
-const glow: [number, number][] = [[6, 0.3], [16, 0.16], [32, 0.1], [60, 0.07], [110, 0.05], [190, 0.035], [300, 0.025]];
-/** How far from the seam the backdrop fades back to the base color: [from px, alpha]. */
-const fade: [number, number][] = [[110, 0.1], [170, 0.2], [240, 0.3], [320, 0.4], [410, 0.5], [520, 0.6], [650, 0.68]];
+/** Deterministic 0..1 per brick, so the wall doesn't change between renders. */
+const hash = (x: number, y: number) => {
+	const s = Math.sin(x * 127.1 + y * 311.7) * 43758.5453;
+	return s - Math.floor(s);
+};
 
 /**
- * The game's menu background (apps/game/ui/ui_kit.gd BACKGROUND_SHADER) for the phone:
- * blue | red halves meeting at a tilted, glowing seam that sways, diagonal stripes that
- * flow away from it on each side, and tints that fade with distance.
- * Built from animated views (native driver), so it runs in Expo Go without a shader.
- * It reaches past the safe-area padding to the screen's edges; controls stay inside.
- * Still when the phone's Reduce Motion setting is on.
+ * The game's menu backdrop (apps/game/ui/ui_kit.gd BACKGROUND_SHADER) for the phone, in the
+ * film-noir style: a dark brick wall under one spotlight, a heavy vignette, a slight film
+ * flicker, and a faint blue | red glow along the bottom edge (`split` moves where blue turns
+ * to red). Plain views (native driver), so it runs in Expo Go without a shader. It reaches
+ * past the safe-area padding to the screen's edges; controls stay inside. Still when the
+ * phone's Reduce Motion setting is on. (Name kept so every screen keeps working.)
  */
 export function SplitBackground({ split = 0.5 }: { split?: number }) {
 	const insets = useSafeAreaInsets();
 	const { width, height } = useWindowDimensions();
-	const [flow] = useState(() => new Animated.Value(0));
-	const [breathe] = useState(() => new Animated.Value(0));
+	const [flicker] = useState(() => new Animated.Value(1));
 	const [still, setStill] = useState(false);
+	const w = width + insets.left + insets.right;
+	const h = height + insets.top + insets.bottom;
 
 	useEffect(() => {
 		let cancelled = false;
@@ -45,84 +46,60 @@ export function SplitBackground({ split = 0.5 }: { split?: number }) {
 
 	useEffect(() => {
 		if (still) return;
-		const loops = Animated.parallel([
-			Animated.loop(Animated.timing(flow, { toValue: 1, duration: stripeLoopMs, easing: Easing.linear, useNativeDriver: true })),
-			Animated.loop(Animated.sequence([
-				Animated.timing(breathe, { toValue: 1, duration: breatheMs / 2, easing: Easing.inOut(Easing.sin), useNativeDriver: true }),
-				Animated.timing(breathe, { toValue: 0, duration: breatheMs / 2, easing: Easing.inOut(Easing.sin), useNativeDriver: true }),
-			])),
-		]);
-		loops.start();
-		return () => loops.stop();
-	}, [still, flow, breathe]);
+		// an old projector: the light dips a little now and then
+		const step = (to: number, ms: number) => Animated.timing(flicker, { toValue: to, duration: ms, easing: Easing.linear, useNativeDriver: true });
+		const loop = Animated.loop(Animated.sequence([
+			step(0.93, 80), step(1, 120), Animated.delay(1900), step(0.96, 60), step(1, 90), Animated.delay(2600), step(0.9, 70), step(0.98, 60), step(1, 140), Animated.delay(1400),
+		]));
+		loop.start();
+		return () => loop.stop();
+	}, [still, flicker]);
 
-	// Same slant as the game: the seam moves 0.28 of the width from top to bottom ("\").
-	const angle = -(Math.atan((0.28 * width) / Math.max(1, height)) * 180) / Math.PI;
-	const sway = breathe.interpolate({ inputRange: [0, 1], outputRange: [`${angle - 1.2}deg`, `${angle + 1.2}deg`] });
-	const glowOpacity = breathe.interpolate({ inputRange: [0, 1], outputRange: [0.8, 1] });
-	const span = Math.hypot(width, height) * 1.6; // covers the screen at any slant
-	const stripes = Math.ceil(span / stripeGap) + 2;
-	const outLeft = flow.interpolate({ inputRange: [0, 1], outputRange: [0, -stripeGap] });
-	const outRight = flow.interpolate({ inputRange: [0, 1], outputRange: [0, stripeGap] });
+	const bricks = useMemo(() => {
+		const out: { x: number; y: number; a: number }[] = [];
+		const rows = Math.ceil(h / brickH) + 1;
+		const cols = Math.ceil(w / brickW) + 2;
+		for (let r = 0; r < rows; r++) {
+			const off = r % 2 ? brickW / 2 : 0;
+			for (let c = -1; c < cols; c++) {
+				out.push({ x: c * brickW - off, y: r * brickH, a: 0.035 + hash(c, r) * 0.05 });
+			}
+		}
+		return out;
+	}, [w, h]);
 
-	const side = (dir: -1 | 1) => {
-		const tint = dir < 0 ? blue : red;
-		const at = (offset: number, w: number) => (dir < 0 ? { left: -offset - w, width: w } : { left: offset, width: w });
-		return (
-			<>
-				<View style={[styles.band, at(0, span), { backgroundColor: tint(0.1) }]} />
-				{/* Stripes, slanted against the seam, flowing outward. */}
-				<View style={[styles.band, at(0, span), { overflow: "hidden" }]}>
-					<Animated.View
-						style={[
-							styles.stripes,
-							{ left: -stripeGap, width: span + stripeGap * 2, transform: [{ translateX: dir < 0 ? outLeft : outRight }, { skewX: `${dir * 22}deg` }] },
-						]}
-					>
-						{Array.from({ length: stripes }, (_, i) => (
-							<View key={i} style={{ width: stripeWidth, marginRight: stripeGap - stripeWidth, backgroundColor: tint(0.09) }} />
-						))}
-					</Animated.View>
-				</View>
-				{/* Glow hugging the seam. */}
-				<Animated.View style={[StyleSheet.absoluteFill, { opacity: glowOpacity }]}>
-					{glow.map(([w, a]) => (
-						<View key={w} style={[styles.band, at(0, w), { backgroundColor: tint(a) }]} />
-					))}
-				</Animated.View>
-				{/* Fade back to the base color farther out. */}
-				{fade.map(([from, a], i) => {
-					const to = fade[i + 1]?.[0] ?? span;
-					return <View key={from} style={[styles.band, at(from, to - from), { backgroundColor: base(a) }]} />;
-				})}
-			</>
-		);
-	};
-
+	const cx = w * 0.38;
+	const cy = h * 0.3;
+	const size = Math.max(w, h);
 	return (
-		<View
-			style={[StyleSheet.absoluteFill, { top: -insets.top, bottom: -insets.bottom, left: -insets.left, right: -insets.right, overflow: "hidden", backgroundColor: ui.bg }]}
-			pointerEvents="none"
-		>
-			<Animated.View
-				style={[
-					styles.seam,
-					{ left: split * (width + insets.left + insets.right), top: -span / 2 + height / 2, height: span, transform: [{ rotate: sway }] },
-				]}
-			>
-				{side(-1)}
-				{side(1)}
-				<Animated.View style={[styles.core, { opacity: glowOpacity }]} />
-				<View style={styles.coreSoft} />
+		<View style={[StyleSheet.absoluteFill, { top: -insets.top, bottom: -insets.bottom, left: -insets.left, right: -insets.right, overflow: "hidden", backgroundColor: ui.bg }]} pointerEvents="none">
+			{/* the wall */}
+			{bricks.map((b, i) => (
+				<View key={i} style={{ position: "absolute", left: b.x, top: b.y, width: brickW - mortar, height: brickH - mortar, backgroundColor: `rgba(255, 255, 255, ${b.a.toFixed(3)})` }} />
+			))}
+			{/* one hard spotlight, flickering slightly */}
+			<Animated.View style={[StyleSheet.absoluteFill, { opacity: flicker }]}>
+				{spot.map(([r, a]) => {
+					const d = size * r * 2;
+					return <View key={r} style={{ position: "absolute", left: cx - d / 2, top: cy - d / 2, width: d, height: d, borderRadius: d / 2, backgroundColor: `rgba(255, 252, 244, ${a})` }} />;
+				})}
 			</Animated.View>
+			{/* faint team glow along the bottom: blue on the left, red on the right */}
+			{[[34, 0.05], [18, 0.07], [8, 0.1]].map(([t, a]) => (
+				<View key={t} style={{ position: "absolute", left: 0, right: 0, bottom: 0, height: t, flexDirection: "row" }}>
+					<View style={{ flex: split, backgroundColor: `rgba(59, 140, 255, ${a})` }} />
+					<View style={{ flex: 1 - split, backgroundColor: `rgba(255, 74, 74, ${a})` }} />
+				</View>
+			))}
+			{/* heavy vignette */}
+			{edge.map(([t, a]) => (
+				<View key={`e${t}`} style={StyleSheet.absoluteFill}>
+					<View style={{ position: "absolute", left: 0, right: 0, top: 0, height: t, backgroundColor: `rgba(0, 0, 0, ${a})` }} />
+					<View style={{ position: "absolute", left: 0, right: 0, bottom: 0, height: t, backgroundColor: `rgba(0, 0, 0, ${a})` }} />
+					<View style={{ position: "absolute", top: 0, bottom: 0, left: 0, width: t * 1.4, backgroundColor: `rgba(0, 0, 0, ${a})` }} />
+					<View style={{ position: "absolute", top: 0, bottom: 0, right: 0, width: t * 1.4, backgroundColor: `rgba(0, 0, 0, ${a})` }} />
+				</View>
+			))}
 		</View>
 	);
 }
-
-const styles = StyleSheet.create({
-	seam: { position: "absolute", width: 0 },
-	band: { position: "absolute", top: 0, bottom: 0 },
-	stripes: { position: "absolute", top: 0, bottom: 0, flexDirection: "row" },
-	core: { position: "absolute", top: 0, bottom: 0, left: -1, width: 2, backgroundColor: "rgba(255, 255, 255, 0.9)" },
-	coreSoft: { position: "absolute", top: 0, bottom: 0, left: -4, width: 8, backgroundColor: "rgba(255, 255, 255, 0.12)" },
-});

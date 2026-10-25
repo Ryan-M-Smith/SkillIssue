@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { StyleSheet, TextInput, View } from "react-native";
 
-import { Body, Eyebrow, SlantButton, SplitBackground, Title } from "./kit";
+import { Body, Eyebrow, Script, SlantButton, SplitBackground, Title } from "./kit";
 import { fonts, ui } from "./theme";
 
 export function MainMenu({
@@ -26,11 +26,15 @@ export function MainMenu({
 		<View style={styles.screen}>
 			<SplitBackground split={0.62} />
 			<View style={styles.left}>
-				<Eyebrow>2 v 2 · hold your phone sideways</Eyebrow>
+				<Script size={20}>HackPSU Fall 2026 presents</Script>
 				<View style={styles.wordmark}>
-					<Title size={58} color={ui.blue}>Skill</Title>
-					<Title size={58} color={ui.red}>Issue</Title>
+					<Title size={58} depth={0.1}>SKILL ISSUE</Title>
 				</View>
+				<View style={styles.teamMarks}>
+					<View style={[styles.mark, { backgroundColor: ui.blue }]} />
+					<View style={[styles.mark, { backgroundColor: ui.red }]} />
+				</View>
+				<Eyebrow>2 v 2 · hold your phone sideways</Eyebrow>
 				<Body size={16} color={ui.ink}>One of you moves. One of you shoots.</Body>
 				{!!notice && <Body size={14} color={ui.gold}>{notice}</Body>}
 				<View style={styles.buttons}>
@@ -73,17 +77,19 @@ export function MainMenu({
 const styles = StyleSheet.create({
 	screen: { flex: 1, flexDirection: "row", padding: 24, gap: 24 },
 	left: { flex: 1.3, justifyContent: "center", gap: 8 },
-	wordmark: { flexDirection: "row", gap: 14 },
+	wordmark: { flexDirection: "row" },
+	teamMarks: { flexDirection: "row", gap: 6, marginBottom: 4 },
+	mark: { width: 44, height: 3 },
 	buttons: { flexDirection: "row", flexWrap: "wrap", gap: 14, marginTop: 14 },
 	right: { flex: 1, justifyContent: "center", gap: 8, maxWidth: 320 },
 	input: {
 		fontFamily: fonts.bodySemi,
 		fontSize: 18,
 		color: ui.ink,
-		backgroundColor: "rgba(7, 10, 18, 0.85)",
+		backgroundColor: "rgba(8, 8, 8, 0.85)",
 		borderColor: ui.line,
-		borderWidth: 1.5,
-		borderRadius: 6,
+		borderWidth: 1,
+		borderRadius: 0,
 		paddingVertical: 9,
 		paddingHorizontal: 12,
 	},
