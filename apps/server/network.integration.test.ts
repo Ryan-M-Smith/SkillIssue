@@ -196,6 +196,47 @@ test("relay uses the host's player count per lobby", async () => {
     }
 });
 
+test("relay swaps a team's roles mid-match for the host only", async () => {
+    const { child, url } = await startRelay();
+    const peers: Peer[] = [];
+    const connect = async () => { const peer = new Peer(url); peers.push(peer); return peer.open(); };
+    try {
+        const host = await connect();
+        host.send({ type: "hello", protocolVersion: 1, clientType: "game", minPlayers: 2 });
+        const { pairingCode } = await host.next("game_registered");
+        const ids: string[] = [];
+        for (const role of ["movement", "aim"] as const) {
+            const phone = await connect();
+            phone.send(join(pairingCode, role));
+            ids.push((await phone.next("lobby_joined")).controllerId);
+            phone.send({ type: "select_slot", teamId: 1, role });
+            await phone.next("controller_assigned");
+            phone.send({ type: "set_ready", ready: true });
+        }
+        const [runner, gunner] = [peers[1]!, peers[2]!];
+        // Not while waiting: nothing changes, no reply.
+        host.send({ type: "swap_roles", teamId: 1 });
+        await host.next("lobby_state", (message) => message.state === "ready");
+        host.send({ type: "start_game", protocolVersion: 1 });
+        await host.next("lobby_state", (message) => message.state === "playing");
+        runner.send({ type: "swap_roles", teamId: 1 });
+        assert.equal((await runner.next("join_rejected")).code, "invalid_message");
+        host.send({ type: "swap_roles", teamId: 2 });   // team 2 has no phones: ignored
+        host.send({ type: "swap_roles", teamId: 1 });
+        assert.equal((await host.next("roles_swapped")).teamId, 1);
+        assert.equal((await runner.next("controller_assigned")).assignment.role, "aim");
+        assert.equal((await gunner.next("controller_assigned")).assignment.role, "movement");
+        const state = await host.next("lobby_state", (message) => message.assignments.some((a: Message) => a.controllerId === ids[0] && a.role === "aim"));
+        assert.equal(state.assignments.find((a: Message) => a.controllerId === ids[1]).role, "movement");
+        // Input is checked against the new role.
+        runner.send({ type: "environment", timestamp: Date.now(), payload: { action: "shoot", pressed: true } });
+        assert.equal((await host.next("environment")).sender, ids[0]);
+    } finally {
+        peers.forEach((peer) => peer.close());
+        child.kill();
+    }
+});
+
 test("relay rejects binary and oversized packets", async () => {
     const { child, url } = await startRelay();
     const peers: Peer[] = [];

@@ -4,6 +4,8 @@ class_name Duo
 extends CharacterBody3D
 
 signal respawned()
+## A health pack was picked up (the HUD flashes a green vignette).
+signal health_picked_up(amount: float)
 ## Emitted on death with the killer Duo (or null) and the weapon name, for kill feeds.
 signal killed(killer: Node, weapon_name: String)
 
@@ -22,6 +24,8 @@ signal killed(killer: Node, weapon_name: String)
 ## Seconds of spawn protection after respawning (not at kick-off). Firing ends it early.
 @export var spawn_protection := 2.0
 
+## Buffs / debuffs (mystery boxes, Scrambler hits). Created in _ready, under Components.
+var powerups: PowerupComponent
 var input := DuoInput.new()
 var alive := true
 var team_id: int:
@@ -33,6 +37,11 @@ var _hurtboxes: Array[Hurtbox] = []
 
 func _ready() -> void:
 	_layer = collision_layer
+	powerups = PowerupComponent.new()
+	powerups.name = "Powerups"
+	powerups.duo = self
+	$Components.add_child(powerups)
+	weapons.powerups = powerups
 	for h in find_children("*", "Area3D", true, false):
 		if h is Hurtbox:
 			_hurtboxes.append(h)
@@ -63,6 +72,7 @@ func modify_health(add: int) -> void:
 	if health.has_method("heal"):
 		print('give health')
 		health.heal(20)
+		health_picked_up.emit(20.0)
 
 func test_damage() -> void:
 	print('ok')
@@ -78,6 +88,8 @@ func _physics_process(delta: float) -> void:
 	input.clamp_values()
 	if not alive:
 		return
+	powerups.modify_input(input)
+	movement.speed_scale = powerups.speed_multiplier()
 	movement.tick(input, delta)
 	aim.tick(input, delta)
 	weapons.tick(input, delta)
@@ -85,6 +97,7 @@ func _physics_process(delta: float) -> void:
 
 func _on_died(killer: Node) -> void:
 	alive = false
+	powerups.clear()
 	weapons._set_scoped(false)
 	_set_present(false)
 	var killer_team := -1    # -1 = no killer (fell off the map, etc.)
