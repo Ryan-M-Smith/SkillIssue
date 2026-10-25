@@ -38,7 +38,8 @@ const modelRole = (role: ControllerRole | null | undefined): Role => (role === "
 export default function PhoneApp() {
 	const [screen, setScreen] = useState<Screen>("menu");
 	const [name, setName] = useState("");
-	const [serverUrl, setServerUrl] = useState(defaultDebugServerUrl);
+	// Practice's optional web-debugger stream; not a player setting (lobbies are found by code).
+	const [serverUrl] = useState(defaultDebugServerUrl);
 	const [code, setCode] = useState("");
 	const [view, setView] = useState<LobbyView>(idleLobby);
 	const [waitingAgain, setWaitingAgain] = useState(false);
@@ -196,8 +197,6 @@ export default function PhoneApp() {
 			<MainMenu
 				name={name}
 				onName={setName}
-				serverUrl={serverUrl}
-				onServerUrl={setServerUrl}
 				onJoin={() => { setJoinError(null); setScreen("code"); }}
 				onPractice={() => setScreen("practice")}
 				notice={notice}

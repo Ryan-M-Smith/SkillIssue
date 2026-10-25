@@ -53,7 +53,7 @@ For the optional web debugger:
 
 1. Keep a Godot lobby open or run `npm run server:start`.
 2. Use the native companion for motion controls. The browser-facing connection information is in `apps/landing`.
-3. Enable the debug stream in phone Practice; use the same server and room (`debug` by default).
+3. Enable the debug stream in phone Practice with the same room (`debug` by default). The phone streams to the computer running the Expo dev server, or to `EXPO_PUBLIC_GAME_SERVER` when set; there is no server field in the app.
 
 ## Check changes
 
