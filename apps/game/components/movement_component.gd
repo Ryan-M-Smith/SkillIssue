@@ -15,6 +15,8 @@ enum ForwardMode {
 @export var collision: CollisionShape3D
 @export var jump_buffer_time := 0.15     ## a JUMP tap just before landing still counts
 
+@onready var health: HealthComponent = $Components/Health
+
 var crouching := false
 var _crouch_amount := 0.0                ## 0 = standing, 1 = fully crouched
 var _jump_buffer := 0.0
@@ -81,6 +83,10 @@ func tick(input: DuoInput, delta: float) -> void:
 func current_height() -> float:
 	return lerpf(stats.stand_height, stats.crouch_height, _crouch_amount)
 
+func test_damage() -> void:
+	print('ok')
+	if health.has_method("test_damage"):
+		health.test_damage()
 
 func _apply_crouch() -> void:
 	var height := current_height()

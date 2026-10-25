@@ -60,8 +60,14 @@ func add_controller(c: DuoController) -> void:
 	c._on_attached()
 	
 func modify_health(add: int) -> void:
-	if health.has_method("addHealth"):
+	if health.has_method("heal"):
+		print('give health')
 		health.heal(20)
+
+func test_damage() -> void:
+	print('ok')
+	if health.has_method("test_damage"):
+		health.test_damage()
 
 
 func _physics_process(delta: float) -> void:
