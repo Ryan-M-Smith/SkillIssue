@@ -9,7 +9,7 @@ import { fonts, teamColor, ui } from "./theme";
 
 const weapons = ["PISTOL", "SHOTGUN", "SNIPER"];
 /**
- * The gunner aims by tilting the phone; actions are buttons: hold FIRE, toggle AIM (scope), RELOAD, SWITCH gun.
+ * The gunner aims by pointing the phone (1:1 gyro: the view turns exactly as the phone does); actions are buttons: hold FIRE, toggle AIM (scope), RELOAD, SWITCH gun.
  */
 export function AimHud({ view, controls, weapon, firing = false, onFire, onAim, onReload, onSwitch, onRecalibrate }: {
 	view: LobbyView;
@@ -34,7 +34,7 @@ export function AimHud({ view, controls, weapon, firing = false, onFire, onAim, 
 			<View style={styles.row}>
 				<Panel style={[styles.scope, { borderLeftWidth: 4, borderLeftColor: color }]}>
 					<View style={styles.scopeTop}>
-						<Eyebrow color={ui.soft}>TILT AIM</Eyebrow>
+						<Eyebrow color={ui.soft}>GYRO AIM</Eyebrow>
 						<Eyebrow color={controls.ready ? ui.ready : ui.gold}>{controls.ready ? "LIVE" : "HOLD STILL"}</Eyebrow>
 					</View>
 					<View style={styles.reticle}>
@@ -43,8 +43,8 @@ export function AimHud({ view, controls, weapon, firing = false, onFire, onAim, 
 						<View style={styles.crossV} />
 						<View style={[styles.dot, { backgroundColor: firing ? ui.gold : ui.ink, transform: [{ translateX: controls.lookX * 50 }, { translateY: -controls.lookY * 50 }] }]} />
 					</View>
-					<Text style={[styles.action, { color: firing ? ui.gold : ui.ink }]}>{firing ? "FIRING" : controls.ready ? "TILT PHONE TO AIM" : "HOLD STILL"}</Text>
-					<Body color={ui.muted} size={12} style={styles.center}>Tip the top toward you to look up, away to look down; dip an end to look that way. Level out to stop.</Body>
+					<Text style={[styles.action, { color: firing ? ui.gold : ui.ink }]}>{firing ? "FIRING" : controls.ready ? "POINT THE PHONE TO AIM" : "HOLD STILL"}</Text>
+					<Body color={ui.muted} size={12} style={styles.center}>Turn with the phone to look around; tip the top toward you to look up. Hold still and the view holds.</Body>
 				</Panel>
 				<Panel style={styles.side}>
 					<View style={styles.weaponHeader}>

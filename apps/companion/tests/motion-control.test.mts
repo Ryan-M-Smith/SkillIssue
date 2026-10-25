@@ -38,7 +38,7 @@ test("gunner gestures no longer trigger anything: jab, lift, pull and twist only
 	}
 });
 
-test("tilting left, right, up and down directly steers gunner aim and neutral stops", () => {
+test("gunner aim follows the phone: turn right looks right, tip the top toward you looks up", () => {
 	for (const platform of ["ios", "android"]) {
 		for (const grip of ["landscape-left", "landscape-right"] as const) {
 			const rig = new PhoneRig(grip, platform);
@@ -48,19 +48,43 @@ test("tilting left, right, up and down directly steers gunner aim and neutral st
 			const pose = { fwd: 0, right: 0, twist: 0, yaw: 0 };
 			const step = () => { now += 20; return model.process(rig.step(pose, 20).reading as never, now); };
 			for (let i = 0; i < 60; i++) step(); // calibrate
-			pose.right = -4;
-			assert.ok(step().lookX < 0, `${platform} ${grip}: left tilt looks left`);
-			pose.right = 0;
-			assert.equal(step().lookX, 0, `${platform} ${grip}: neutral stops horizontal aim`);
-			pose.right = 8;
-			assert.ok(step().lookX > 0, `${platform} ${grip}: right tilt looks right`);
-			pose.right = 0;
-			step();
-			pose.fwd = -8; // top edge tipped back toward you
-			assert.ok(step().lookY > 0, `${platform} ${grip}: tilt up looks up`);
-			pose.fwd = 8; // top edge tipped away
-			assert.ok(step().lookY < 0, `${platform} ${grip}: tilt down looks down`);
+			let dx = 0, dy = 0;
+			for (let i = 0; i < 20; i++) { pose.yaw -= 1; const o = step(); dx += o.lookDX!; dy += o.lookDY!; } // yaw < 0: turn right
+			assert.ok(Math.abs(dx - 20) < 0.5 && Math.abs(dy) < 0.5, `${platform} ${grip}: turning 20° right turned the view ${dx.toFixed(2)}° (${dy.toFixed(2)}° up)`);
+			dx = 0;
+			for (let i = 0; i < 20; i++) { pose.yaw += 1; dx += step().lookDX!; }
+			assert.ok(Math.abs(dx + 20) < 0.5, `${platform} ${grip}: turning back returns the view (${dx.toFixed(2)})`);
+			assert.equal(step().lookDX, 0, `${platform} ${grip}: holding still holds the view`);
+			dy = 0;
+			for (let i = 0; i < 10; i++) { pose.fwd -= 1; dy += step().lookDY!; } // top edge toward you
+			assert.ok(Math.abs(dy - 10) < 0.5, `${platform} ${grip}: tipping the top 10° toward you looked up ${dy.toFixed(2)}°`);
+			dy = 0;
+			for (let i = 0; i < 20; i++) { pose.fwd += 1; dy += step().lookDY!; } // top edge away
+			assert.ok(Math.abs(dy + 20) < 0.5, `${platform} ${grip}: tipping it 20° away looked down ${dy.toFixed(2)}°`);
+			pose.fwd = -25; // tilted well back, then turn: still a pure turn
+			for (let i = 0; i < 5; i++) step();
+			dx = 0; dy = 0;
+			for (let i = 0; i < 30; i++) { pose.yaw -= 1; const o = step(); dx += o.lookDX!; dy += o.lookDY!; }
+			assert.ok(Math.abs(dx - 30) < 1 && Math.abs(dy) < 1, `${platform} ${grip}: tilted-back turn gave ${dx.toFixed(2)}°, ${dy.toFixed(2)}° up`);
 		}
+	}
+});
+
+test("gunner view doesn't creep while the phone is held still, even with gyro bias", () => {
+	for (const [grip, platform] of grips) {
+		const rig = new PhoneRig(grip, platform);
+		rig.random = seeded(7);
+		rig.shake = { gyro: 0.05, gravity: 0.01 };
+		rig.bias = [0.6, -0.4, 0.3];
+		const model = new MotionController("gunner", platform);
+		let now = 0, dx = 0, dy = 0;
+		const pose = neutral();
+		for (let i = 0; i < 60; i++) model.process(rig.step(pose, 16).reading as never, (now += 16));
+		for (let i = 0; i < 600; i++) {
+			const o = model.process(rig.step(pose, 16).reading as never, (now += 16));
+			dx += o.lookDX!; dy += o.lookDY!;
+		}
+		assert.ok(Math.hypot(dx, dy) < 1, `${grip} ${platform}: drifted ${dx.toFixed(2)}°, ${dy.toFixed(2)}° in 10 s`);
 	}
 });
 
@@ -320,7 +344,7 @@ test("sprint requires a centered pause before another deliberate toggle", () => 
 });
 
 
-test("holding a small screen tilt continuously turns through a full camera sweep", () => {
+test("a full physical turn is exactly a full camera turn", () => {
 	for (const [grip, platform] of grips) {
 		const rig = new PhoneRig(grip, platform);
 		rig.tremor = false;
@@ -329,10 +353,31 @@ test("holding a small screen tilt continuously turns through a full camera sweep
 		const pose = neutral();
 		for (let i = 0; i < 40; i++) model.process(rig.step(pose, 16).reading as never, (now += 16));
 		let cameraTurn = 0;
-		pose.right = 8;
-		for (let i = 1; i <= 375; i++) {
+		for (let i = 1; i <= 180; i++) {
+			pose.yaw = -i * 2;
 			cameraTurn += model.process(rig.step(pose, 16).reading as never, (now += 16)).lookDX ?? 0;
 		}
-		assert.ok(cameraTurn >= 240 && cameraTurn <= 360, `${platform}/${grip}: held tilt turned ${cameraTurn.toFixed(1)} degrees`);
+		assert.ok(Math.abs(cameraTurn - 360) < 3, `${platform}/${grip}: a 360° turn mapped to ${cameraTurn.toFixed(1)}°`);
+		// A fast flick turns all the way too.
+		cameraTurn = 0;
+		for (let i = 1; i <= 6; i++) {
+			pose.yaw -= 10; // 600°/s
+			cameraTurn += model.process(rig.step(pose, 16).reading as never, (now += 16)).lookDX ?? 0;
+		}
+		assert.ok(Math.abs(cameraTurn - 60) < 2, `${platform}/${grip}: a 60° flick turned ${cameraTurn.toFixed(1)}°`);
+	}
+});
+
+test("walking goes the way the phone tips, diagonals included", () => {
+	for (const [grip, platform] of grips) {
+		for (const [fwd, right] of [[10, 6], [-10, 6], [10, -6], [-10, -6], [6, 3]]) {
+			const run = runner(grip, platform);
+			move(run, { fwd, right }, 200);
+			hold(run, 80);
+			const want = Math.atan2(right / 12, fwd / 20);
+			const got = Math.atan2(run.out.moveX, run.out.moveY);
+			assert.ok(Math.abs(got - want) < 0.2, `${grip} ${platform}: tipped ${fwd}° fwd, ${right}° right walked at ${(got * 180 / Math.PI).toFixed(0)}° (want ${(want * 180 / Math.PI).toFixed(0)}°)`);
+			assert.ok(Math.hypot(run.out.moveX, run.out.moveY) > 0.2);
+		}
 	}
 });

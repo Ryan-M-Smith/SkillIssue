@@ -33,11 +33,10 @@ The phone confirms what it did with haptics (`expo-haptics`, works in Expo Go): 
 
 | Role | Motion | Result |
 | --- | --- | --- |
-| Runner | Gentle forward/back tilt | Walk; 5-degree deadzone, full speed at 20 degrees |
-| Runner | Tip an end down | Strafe |
+| Runner | Tip the phone the way you want to go (top away = forward, an end down = that side, a corner = diagonal) | Walk that way; further = faster (full speed at 20° forward, 12° sideways) |
 | Runner | Twist 30 degrees, then center | Toggle sprint |
 | Runner | Quick flick away / toward you | Toggle crouch / jump or stand |
-| Gunner | Tilt: top toward you / away, or dip an end | Look up / down / left / right; level out to stop |
+| Gunner | Point the phone: turn left / right, tip the top toward you / away | The view turns exactly as the phone does (1:1); hold still to hold the view |
 | Gunner | Hold **FIRE** | Shoot |
 | Gunner | Tap **AIM** | Aim down sights / sniper scope |
 | Gunner | Tap **RELOAD** | Reload |
