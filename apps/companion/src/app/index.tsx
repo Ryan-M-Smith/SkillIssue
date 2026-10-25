@@ -8,6 +8,7 @@ import { DeviceMotion } from "expo-sensors";
 
 import { Axis, Panel, Value } from "@/components/motion-ui";
 
+import type { Action } from "@/types/motion";
 import {
   MotionController,
   emptyControls,
@@ -28,14 +29,15 @@ const colors = {
   red: "#FF7891",
 };
 
-type EventType = "jump" | "crouch" | "shoot" | "sprint";
+type EventType = Exclude<Action, null>;
 type Counts = Record<EventType, number>;
 
 const zeroCounts: Counts = {
   jump: 0,
   crouch: 0,
-  shoot: 0,
+  stand: 0,
   sprint: 0,
+  shoot: 0,
 };
 
 const zeroDebug: MotionDebug = {
@@ -44,7 +46,8 @@ const zeroDebug: MotionDebug = {
   sidePressDeg: 0,
   pitchRate: 0,
   sidePressRate: 0,
-  sprintPhase: "idle",
+  sprintPhase: "off",
+  gesture: "armed",
   strafeMeters: 0,
   positionTracking: "missing",
 };
@@ -104,9 +107,6 @@ export default function Index() {
   const sampleWindowRef = useRef(0);
   const sampleCountRef = useRef(0);
 
-  const priorSprintPhaseRef =
-    useRef<MotionDebug["sprintPhase"]>("idle");
-
   const priorCrouchRef = useRef(false);
 
   // -------------------- CLEANUP --------------------
@@ -147,7 +147,6 @@ export default function Index() {
     sampleWindowRef.current = 0;
     sampleCountRef.current = 0;
 
-    priorSprintPhaseRef.current = "idle";
     priorCrouchRef.current = false;
   }
 
@@ -242,20 +241,7 @@ export default function Index() {
           const d =
             controllerRef.current.getDebug();
 
-          // Sprint is stored internally in MotionController.
-          // Entering cooldown means a complete sprint gesture
-          // was recognized.
-          if (
-            d.sprintPhase === "cooldown" &&
-            priorSprintPhaseRef.current !== "cooldown"
-          ) {
-            detected("sprint", now);
-          }
-
-          priorSprintPhaseRef.current =
-            d.sprintPhase;
-
-          // Jump, crouch, or shoot events.
+          // Jump, crouch, stand, sprint, or shoot events.
           if (output.action) {
             detected(output.action, now);
           }
@@ -509,7 +495,7 @@ export default function Index() {
           <View style={styles.stats}>
             {(
               role === "movement"
-                ? ["jump", "crouch", "sprint"]
+                ? ["jump", "crouch", "stand", "sprint"]
                 : ["shoot"]
             ).map((name) => (
               <Value
@@ -561,6 +547,16 @@ export default function Index() {
               name="SIDE-PRESS RATE"
               value={`${fmt(debug.sidePressRate, 0)} °/s`}
             />
+          </View>
+
+          <View style={styles.line}>
+            <Text style={styles.label}>
+              Gesture recognition
+            </Text>
+
+            <Text style={styles.highlight}>
+              {debug.gesture.toUpperCase()}
+            </Text>
           </View>
 
           <View style={styles.line}>
@@ -618,29 +614,35 @@ export default function Index() {
           TESTING INSTRUCTIONS
 
           {"\n\n"}
-          1. Start sensors and hold the phone still
-          for roughly one second.
+          1. Start sensors and hold the phone still at
+          about 45° for roughly one second. That pose
+          is neutral.
 
           {"\n"}
-          2. Slowly tilt forward/backward to test walking.
+          2. Slowly tilt the top away and hold to walk
+          forward. Tilt it toward you to walk back.
+          Return to neutral to stop.
 
           {"\n"}
-          3. Quickly flick backward for jump.
+          3. Slowly press the right or left side down
+          and hold to strafe.
 
           {"\n"}
-          4. Quickly flick forward for crouch.
+          4. Quickly flick forward to crouch. Flick
+          forward again to stand up.
 
           {"\n"}
-          5. Quickly press alternating sides of the
-          phone down for sprint.
+          5. Quickly flick back to jump. While crouched
+          this stands you up instead.
+
+          {"\n"}
+          6. Quickly shake side to side to sprint.
+          Shake again to stop.
 
           {"\n\n"}
-          Sprint gestures are counted even when the
-          player is not moving forward.
-
-          {"\n\n"}
-          Physical sideways strafing requires an
-          AR position feed. Without it, moveX remains zero.
+          One gesture at a time: after a gesture, bring
+          the phone back to neutral (or hold it still)
+          before the next one.
         </Text>
 
       </ScrollView>

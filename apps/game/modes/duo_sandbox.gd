@@ -13,8 +13,8 @@
 ##   Nothing is ever saved into the map or main.tscn.
 ##
 ## Controls work from phones (via the relay) and from the keyboard at the same time:
-##   Team A: WASD, Space jump, Ctrl crouch, mouse aim (click to capture), LMB fire, RMB scope, 1/2/3 guns
-##   Team B: IJKL, Shift jump, N crouch, arrow keys aim, Enter fire, M scope, 8/9/0 guns
+##   Team A: WASD, Space jump, Ctrl crouch, hold Q sprint, mouse aim (click to capture), LMB fire, RMB scope, 1/2/3 guns
+##   Team B: IJKL, Shift jump, N crouch, hold U sprint, arrow keys aim, Enter fire, M scope, 8/9/0 guns
 class_name DuoSandbox
 extends Node
 

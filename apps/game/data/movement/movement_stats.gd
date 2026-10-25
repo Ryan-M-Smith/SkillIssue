@@ -2,6 +2,7 @@ class_name MovementStats
 extends Resource
 
 @export var walk_speed := 6.0
+@export var sprint_speed := 9.5          ## moving forward with sprint on; ignored while crouched
 @export var crouch_speed := 3.0
 @export var ground_accel := 40.0
 @export var air_accel := 12.0

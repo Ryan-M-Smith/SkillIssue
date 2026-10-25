@@ -8,6 +8,7 @@ extends RefCounted
 var move := Vector2.ZERO        ## x = right, y = forward, length 0..1
 var jump := false               ## pressed this frame
 var crouch := false             ## held
+var sprint := false             ## held (the phone toggles it; the game just reads the state)
 # --- gunner (upper body)
 var aim_delta := Vector2.ZERO   ## radians this frame; x = turn right, y = look up
 var fire := false               ## held
@@ -19,6 +20,7 @@ func reset() -> void:
 	move = Vector2.ZERO
 	jump = false
 	crouch = false
+	sprint = false
 	aim_delta = Vector2.ZERO
 	fire = false
 	scope_toggle = false

@@ -50,8 +50,10 @@ func tick(input: DuoInput, delta: float) -> void:
 	_crouch_amount = move_toward(_crouch_amount, 1.0 if crouching else 0.0, stats.crouch_speed_lerp * delta)
 	_apply_crouch()
 
-	# --- horizontal velocity
-	var speed := lerpf(stats.walk_speed, stats.crouch_speed, _crouch_amount)
+	# --- horizontal velocity (sprint only speeds up forward movement, never a crouch)
+	var sprinting := input.sprint and not crouching and input.move.y > 0.1
+	var base_speed: float = stats.sprint_speed if sprinting else stats.walk_speed
+	var speed := lerpf(base_speed, stats.crouch_speed, _crouch_amount)
 	var target := dir * speed
 	var accel := stats.ground_accel if body.is_on_floor() else stats.air_accel
 	var h := Vector3(body.velocity.x, 0.0, body.velocity.z).move_toward(target, accel * delta)
