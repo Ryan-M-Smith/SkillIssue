@@ -12,6 +12,7 @@ var _mvp_box: VBoxContainer
 var _mvp_card: PanelContainer
 var _thinking: Label
 var _shown: Control
+var _badge: Control
 
 
 func _ready() -> void:
@@ -145,12 +146,39 @@ func _process(_delta: float) -> void:
 		_thinking.text = "Reviewing the tape" + ".".repeat(int(Time.get_ticks_msec() / 400.0) % 4)
 
 
-## Ask for the MVP (Gemini via the control plane, or the local rule) and show it.
+## Show the MVP that MvpService started judging at the final whistle (usually ready by now),
+## then their badge when it's drawn.
 func _judge() -> void:
-	var pick: Dictionary = await MvpJudge.decide(self)
+	if MvpService.pick.is_empty() and not MvpService.judging:
+		MvpService.begin()   # opened without a whistle (tests, previews); offline it answers at once
+	if MvpService.pick.is_empty():
+		await MvpService.pick_ready
 	if not is_inside_tree():
 		return
-	show_mvp(pick)
+	show_mvp(MvpService.pick)
+	if MvpService.badge or MvpService.badge_failed:
+		show_badge(MvpService.badge)
+	else:
+		show_badge(await MvpService.badge_ready)
+
+
+## The generated picture. With no MVP it's Gemini's scene or nothing at all; an MVP's
+## medal draws its own raccoon if no picture comes.
+func show_badge(texture: Texture2D) -> void:
+	if _badge == null or not is_instance_valid(_badge):
+		return
+	if _badge.mode == "none":
+		if texture == null:
+			_badge.queue_free()
+			return
+		_badge.visible = true
+		_badge.custom_minimum_size.y = 0.0
+		_badge.create_tween().tween_property(_badge, "custom_minimum_size:y", 190.0, 0.35).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+		_badge.show_texture(texture)
+	elif texture:
+		_badge.show_texture(texture)
+	else:
+		_badge.show_fallback()
 
 
 func show_mvp(pick: Dictionary) -> void:
@@ -166,27 +194,48 @@ func show_mvp(pick: Dictionary) -> void:
 	var shown := VBoxContainer.new()
 	shown.add_theme_constant_override("separation", 6)
 	_shown = shown
+	# The picture: a raccoon medallion beside the name, or Gemini's no-MVP noir scene.
+	var badge := preload("res://ui/mvp_badge.gd").new()
+	badge.mode = "mvp" if has_mvp else "none"
+	badge.color = color
+	_badge = badge
+	var text := shown
+	if has_mvp:
+		badge.custom_minimum_size = Vector2(210, 210)
+		badge.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+		var row := HBoxContainer.new()
+		row.add_theme_constant_override("separation", 22)
+		row.add_child(badge)
+		text = VBoxContainer.new()
+		text.add_theme_constant_override("separation", 6)
+		text.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		text.alignment = BoxContainer.ALIGNMENT_CENTER
+		row.add_child(text)
+		shown.add_child(row)
+	else:
+		badge.visible = false   # until Gemini's scene arrives; never shown without it
+		shown.add_child(badge)
 	if has_mvp:
 		var name_label := UiKit.display(str(pick.name).to_upper(), 56, UiKit.INK)
 		name_label.clip_text = true
 		name_label.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
-		shown.add_child(name_label)
-		shown.add_child(UiKit.label("%s TEAM  ·  %s" % [UiKit.team_name(team), str(pick.role).to_upper()], 22, UiKit.BODY_BOLD, color))
+		text.add_child(name_label)
+		text.add_child(UiKit.label("%s TEAM  ·  %s" % [UiKit.team_name(team), str(pick.role).to_upper()], 22, UiKit.BODY_BOLD, color))
 	else:
-		shown.add_child(UiKit.display("NO MVP", 56, UiKit.INK))
+		text.add_child(UiKit.display("NO MVP", 56, UiKit.INK))
 	var bar := ColorRect.new()
 	bar.color = color
 	bar.custom_minimum_size = Vector2(120, 3)
 	bar.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
-	shown.add_child(bar)
+	text.add_child(bar)
 	if not str(pick.get("headline", "")).is_empty() and has_mvp:
-		shown.add_child(UiKit.display(str(pick.headline).to_upper(), 30, UiKit.GOLD))
+		text.add_child(UiKit.display(str(pick.headline).to_upper(), 30, UiKit.GOLD))
 	var reason := UiKit.label(str(pick.get("reason", "")), 22, UiKit.BODY, UiKit.INK)
 	reason.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	reason.custom_minimum_size.x = 420
-	shown.add_child(reason)
+	reason.custom_minimum_size.x = 380 if has_mvp else 560
+	text.add_child(reason)
 	var source := "Judged by Gemini" if pick.get("source") == "gemini" else "Judged offline"
-	shown.add_child(UiKit.eyebrow(source, UiKit.MUTED))
+	text.add_child(UiKit.eyebrow(source, UiKit.MUTED))
 	_mvp_box.add_child(shown)
 	shown.modulate.a = 0.0
 	create_tween().tween_property(shown, "modulate:a", 1.0, 0.4)

@@ -1,35 +1,38 @@
 import type { TeamId } from "@/service/lobby-client";
 
-/** Same palette as the game's menus (apps/game/ui/ui_kit.gd). */
+/**
+ * Same palette as the game's menus (apps/game/ui/ui_kit.gd): film noir. Black, grays and
+ * off-white like an old movie title card; red and blue only as small team marks.
+ */
 export const ui = {
-	bg: "#070A12",
-	panel: "rgba(15, 20, 36, 0.92)",
-	panel2: "#161D33",
-	line: "rgba(255, 255, 255, 0.14)",
-	ink: "#F2F5FF",
-	muted: "#8E97B2",
-	soft: "#B6BED4",  // secondary text on dark panels (easier to read than muted)
+	bg: "#080808",
+	panel: "rgba(12, 12, 12, 0.92)",
+	panel2: "#1A1A1A",
+	line: "rgba(255, 255, 255, 0.16)",
+	ink: "#E6E3DB",
+	muted: "#8C8B88",
+	soft: "#B5B3AE",  // secondary text on dark panels (easier to read than muted)
 	blue: "#3B8CFF",
 	red: "#FF4A4A",
-	gold: "#FFCB52",
-	ready: "#54EDA6",
+	gold: "#FFF8E6",   // highlight: a hot white
+	ready: "#EBEBE6",
 };
 
 export const fonts = {
-	display: "ChakraPetch-Bold",
-	displaySemi: "ChakraPetch-SemiBold",
+	display: "BarlowSemiCondensed-Bold",
+	displaySemi: "BarlowSemiCondensed-SemiBold",
 	body: "BarlowSemiCondensed-Medium",
 	bodySemi: "BarlowSemiCondensed-SemiBold",
 	bodyBold: "BarlowSemiCondensed-Bold",
+	script: "TeXGyreChorus-MediumItalic",   // title-card script ("presents", "vs.")
 };
 
 /** For expo-font's useFonts (see app/_layout.tsx). */
 export const fontAssets = {
-	[fonts.display]: require("../../../assets/fonts/ChakraPetch-Bold.ttf"),
-	[fonts.displaySemi]: require("../../../assets/fonts/ChakraPetch-SemiBold.ttf"),
 	[fonts.body]: require("../../../assets/fonts/BarlowSemiCondensed-Medium.ttf"),
 	[fonts.bodySemi]: require("../../../assets/fonts/BarlowSemiCondensed-SemiBold.ttf"),
 	[fonts.bodyBold]: require("../../../assets/fonts/BarlowSemiCondensed-Bold.ttf"),
+	[fonts.script]: require("../../../assets/fonts/TeXGyreChorus-MediumItalic.otf"),
 };
 
 export const teamColor = (team: TeamId | null | undefined) => (team === 2 ? ui.red : ui.blue);
@@ -45,7 +48,7 @@ export const teamTint = (team: TeamId | null | undefined, alpha = 0.16) =>
  */
 export const teamSolid = (team: TeamId | null | undefined, strength = 0.16) => {
 	const color = team === 2 ? [255, 74, 74] : [59, 140, 255];
-	const base = [7, 10, 18]; // ui.bg
+	const base = [8, 8, 8]; // ui.bg
 	const mix = color.map((c, i) => Math.round(base[i] + (c - base[i]) * strength));
 	return `rgb(${mix.join(", ")})`;
 };

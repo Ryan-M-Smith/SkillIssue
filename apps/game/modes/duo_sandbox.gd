@@ -404,6 +404,7 @@ func _start_match() -> void:
 	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 	GameSession.state_changed.connect(_on_session_state_changed)
 	MatchStats.begin(duos)
+	MvpService.clear()
 	_update_score()
 	_send_status()
 
@@ -460,6 +461,7 @@ func _end_match(reason: String) -> void:
 	if scores[0] != scores[1]:
 		winner = 0 if scores[0] > scores[1] else 1
 	MatchStats.finish(winner, scores, reason)
+	MvpService.begin()   # judge + badge start now, so they're ready when the results open
 	if NetworkClient.is_connected_to_server() and GameSession.is_playing():
 		GameSession.end_match(winner, scores, MatchStats.to_protocol(), reason)
 	_show_banner(winner)

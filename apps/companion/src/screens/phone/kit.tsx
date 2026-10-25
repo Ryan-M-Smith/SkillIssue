@@ -5,8 +5,33 @@ import { fonts, ui } from "./theme";
 
 export { SplitBackground } from "./split-background";
 
-export function Title({ children, size = 34, color = ui.ink, style }: { children: ReactNode; size?: number; color?: string; style?: StyleProp<TextStyle> }) {
-	return <Text style={[{ fontFamily: fonts.display, fontSize: size, color, letterSpacing: 0.5 }, style]}>{children}</Text>;
+/**
+ * Display type. `depth` > 0 gives old-movie title lettering: a gray extrusion going
+ * down-right behind the face (depth is a fraction of the font size, ~0.1 looks right).
+ */
+export function Title({ children, size = 34, color = ui.ink, style, depth = 0 }: { children: ReactNode; size?: number; color?: string; style?: StyleProp<TextStyle>; depth?: number }) {
+	const base: TextStyle = { fontFamily: fonts.display, fontSize: size, color, letterSpacing: 0.5 };
+	if (depth <= 0) return <Text style={[base, style]}>{children}</Text>;
+	const layers = Math.max(2, Math.round(size * depth));
+	return (
+		<View style={{ paddingRight: layers, paddingBottom: layers }}>
+			{Array.from({ length: layers }, (_, i) => {
+				const k = layers - i;
+				const g = Math.round(18 + (1 - k / layers) * 66);
+				return (
+					<Text key={k} accessible={false} importantForAccessibility="no" style={[base, style, styles.layer, { left: k * 0.75, top: k, color: `rgb(${g}, ${g}, ${g})` }]}>
+						{children}
+					</Text>
+				);
+			})}
+			<Text style={[base, style]}>{children}</Text>
+		</View>
+	);
+}
+
+/** Title-card script, for small lines like "presents" or "vs.". */
+export function Script({ children, size = 20, color = ui.muted }: { children: ReactNode; size?: number; color?: string }) {
+	return <Text style={{ fontFamily: fonts.script, fontSize: size, color }}>{children}</Text>;
 }
 
 export function Eyebrow({ children, color = ui.muted }: { children: ReactNode; color?: string }) {
@@ -17,7 +42,7 @@ export function Body({ children, color = ui.ink, size = 15, style }: { children:
 	return <Text style={[{ fontFamily: fonts.body, fontSize: size, color, lineHeight: size * 1.3 }, style]}>{children}</Text>;
 }
 
-/** The game's slanted button. `primary` = white slab. `color` = team-colored fill. */
+/** The game's flat noir button (name kept for callers). `primary` = off-white slab. `color` = custom fill. */
 export function SlantButton({
 	label,
 	onPress,
@@ -40,7 +65,8 @@ export function SlantButton({
 	onPressOut?: () => void;
 }) {
 	const fill = color ?? (primary ? ui.ink : ui.panel2);
-	const text = primary ? ui.bg : ui.ink;
+	const lightFill = color === ui.ready || color === ui.gold || color === ui.ink;
+	const text = primary || lightFill ? ui.bg : ui.ink;
 	return (
 		<Pressable
 			onPress={onPress}
@@ -54,7 +80,7 @@ export function SlantButton({
 				style,
 			]}
 		>
-			<Text style={[styles.buttonText, small && { fontSize: 13 }, { color: text, transform: [{ skewX: "12deg" }] }]} numberOfLines={1}>
+			<Text style={[styles.buttonText, small && { fontSize: 13 }, { color: text }]} numberOfLines={1}>
 				{label}
 			</Text>
 		</Pressable>
@@ -70,13 +96,13 @@ const styles = StyleSheet.create({
 	button: {
 		paddingVertical: 12,
 		paddingHorizontal: 22,
-		borderRadius: 4,
-		borderWidth: 1.5,
+		borderRadius: 0,
+		borderWidth: 1,
 		alignItems: "center",
 		justifyContent: "center",
-		transform: [{ skewX: "-12deg" }],
 	},
 	buttonSmall: { paddingVertical: 8, paddingHorizontal: 14 },
-	buttonText: { fontFamily: fonts.displaySemi, fontSize: 16, letterSpacing: 0.6 },
-	panel: { borderWidth: 1.5, borderRadius: 8, padding: 12 },
+	buttonText: { fontFamily: fonts.displaySemi, fontSize: 16, letterSpacing: 1 },
+	panel: { borderWidth: 1, borderRadius: 0, padding: 12 },
+	layer: { position: "absolute" },
 });

@@ -2,7 +2,7 @@ import { Pressable, StyleSheet, Text, View } from "react-native";
 
 import type { ControllerRole, LobbyPlayer, LobbyView, TeamId } from "@/service/lobby-client";
 import { Body, Eyebrow, SlantButton, SplitBackground, Title } from "./kit";
-import { fonts, teamColor, teamName, teamSolid, ui } from "./theme";
+import { fonts, teamColor, teamName, ui } from "./theme";
 
 const roles: { role: ControllerRole; label: string; hint: string }[] = [
 	{ role: "aim", label: "GUNNER", hint: "Turn to aim · fire, aim, reload buttons" },
@@ -33,15 +33,15 @@ export function TeamSelect({
 			<View style={styles.head}>
 				<View>
 					<Eyebrow>Lobby {view.code}</Eyebrow>
-					<Title size={26}>PICK YOUR TEAM AND ROLE</Title>
+					<Title size={26} depth={0.1}>PICK YOUR TEAM AND ROLE</Title>
 				</View>
 				<SlantButton label="LEAVE" small onPress={onLeave} />
 			</View>
 
 			<View style={styles.teams}>
 				{([1, 2] as TeamId[]).map((team) => (
-					<View key={team} style={[styles.team, { borderColor: teamColor(team), backgroundColor: teamSolid(team, 0.1) }]}>
-						<Title size={20} color={teamColor(team)}>TEAM {teamName(team)}</Title>
+					<View key={team} style={[styles.team, { borderTopColor: teamColor(team) }]}>
+						<Title size={20}>TEAM {teamName(team)}</Title>
 						{roles.map(({ role, label, hint }) => (
 							<Slot
 								key={role}
@@ -82,8 +82,8 @@ function Slot({ team, label, hint, holder, mine, onPress }: { team: TeamId; labe
 			disabled={taken}
 			style={({ pressed }) => [
 				styles.slot,
-				{ backgroundColor: teamSolid(team, pressed ? 0.12 : 0.03) },
-				mine && { borderColor: teamColor(team), backgroundColor: teamSolid(team, 0.32) },
+				{ backgroundColor: pressed ? ui.panel2 : "rgba(0, 0, 0, 0.35)" },
+				mine && { borderLeftWidth: 4, borderLeftColor: teamColor(team), backgroundColor: ui.panel2 },
 			]}
 		>
 			<View style={{ flex: 1 }}>
@@ -102,8 +102,8 @@ const styles = StyleSheet.create({
 	screen: { flex: 1, padding: 18, gap: 10 },
 	head: { flexDirection: "row", justifyContent: "space-between", alignItems: "flex-start" },
 	teams: { flex: 1, flexDirection: "row", gap: 14 },
-	team: { flex: 1, borderWidth: 1.5, borderRadius: 10, padding: 10, gap: 8 },
-	slot: { flex: 1, flexDirection: "row", alignItems: "center", gap: 8, borderWidth: 1.5, borderColor: ui.line, borderRadius: 8, padding: 10 },
+	team: { flex: 1, borderWidth: 1, borderColor: ui.line, borderTopWidth: 3, borderRadius: 0, backgroundColor: ui.panel, padding: 10, gap: 8 },
+	slot: { flex: 1, flexDirection: "row", alignItems: "center", gap: 8, borderWidth: 1, borderColor: ui.line, borderRadius: 0, padding: 10 },
 	slotName: { fontFamily: fonts.displaySemi, fontSize: 18, color: ui.ink },
 	badge: { fontFamily: fonts.bodyBold, fontSize: 12, letterSpacing: 1 },
 	foot: { flexDirection: "row", alignItems: "center", gap: 16 },
