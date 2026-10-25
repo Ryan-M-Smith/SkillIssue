@@ -33,6 +33,16 @@ export const idleLobby: LobbyView = {
 const motionHz = 30;
 const tapMs = 120;
 const reconnectDelaysMs = [500, 1000, 2000, 4000, 8000];
+/** Tries before a first join gives up (a lobby we were in keeps retrying). */
+const firstJoinAttempts = 3;
+
+function hostOf(url: string): string {
+	try {
+		return new URL(url).host || url;
+	} catch {
+		return url;
+	}
+}
 const zero = { x: 0, y: 0, z: 0 };
 const degToRad = Math.PI / 180;
 const gameStates = new Set<GameState>(["waiting", "ready", "playing", "paused", "ended"]);
@@ -58,6 +68,8 @@ export class LobbyClient {
 	private shotTimer: ReturnType<typeof setTimeout> | null = null;
 	private reconnectTimer: ReturnType<typeof setTimeout> | null = null;
 	private reconnectAttempt = 0;
+	/** Got lobby_joined at least once since join() was called (reconnects keep it). */
+	private joinedOnce = false;
 	private reconnecting = false;
 	private wanted = false;
 	private joinCode = "";
@@ -81,27 +93,38 @@ export class LobbyClient {
 
 	join(code: string, name: string) {
 		const wasReconnect = this.reconnecting;
+		const lastError = this.view.error;
 		this.reconnecting = false;
 		this.leave();
 		this.wanted = true;
 		if (!wasReconnect) {
 			this.reconnectAttempt = 0;
+			this.joinedOnce = false;
 			this.desiredSlot = null;
 			this.desiredReady = false;
 		}
 		this.joinCode = code.trim().toUpperCase();
 		this.joinName = name.trim().slice(0, 16) || "Player";
-		this.set({ ...idleLobby, stage: "connecting", code: this.joinCode });
+		// Keep the last failure on screen while retrying, so it doesn't look like plain "joining".
+		this.set({ ...idleLobby, stage: "connecting", code: this.joinCode, error: wasReconnect ? lastError : null });
 		let socket: WebSocket;
 		try { socket = new WebSocket(this.url); }
 		catch { this.fail("Invalid host address. Paste the full lobby ticket from the game screen."); return; }
 		this.socket = socket;
 		// The connection is gone (closed, failed, or timed out): retry, unless the host ended it.
 		// Called from every path, since not every runtime fires close after an error.
+		let opened = false;
 		const dropped = () => {
 			if (this.socket !== socket) return;
 			if (this.view.stage === "ended" && this.view.result?.reason === "host") { this.leave(); return; }
 			this.socket = null;
+			if (!this.joinedOnce) {
+				const host = hostOf(this.url);
+				this.scheduleReconnect(opened
+					? `Connected to ${host}, but it didn't answer the join. Retrying…`
+					: `Can't reach the game server (${host}). Retrying…`);
+				return;
+			}
 			this.scheduleReconnect(this.view.error ?? "Connection lost. Retrying...");
 		};
 		this.joinTimer = setTimeout(() => {
@@ -111,6 +134,7 @@ export class LobbyClient {
 			}
 		}, 10000);
 		socket.onopen = () => {
+			opened = true;
 			if (this.socket === socket) this.send({ type: "join_game", protocolVersion: 1, pairingCode: code.trim().toUpperCase(), name: name.trim().slice(0, 16) || "Player" });
 		};
 		socket.onmessage = (event) => { if (this.socket === socket) this.receive(String(event.data)); };
@@ -218,6 +242,7 @@ export class LobbyClient {
 		if (!message || typeof message !== "object") return;
 		switch (message.type) {
 			case "lobby_joined":
+				this.joinedOnce = true;
 				this.clearJoinTimer();
 				this.reconnectAttempt = 0;
 				this.set({ ...this.view, stage: "lobby", myId: message.controllerId, code: message.pairingCode, error: null });
@@ -288,6 +313,11 @@ export class LobbyClient {
 	private clearJoinTimer() { if (this.joinTimer) clearTimeout(this.joinTimer); this.joinTimer = null; }
 	private scheduleReconnect(error: string) {
 		if (!this.wanted || this.reconnectTimer) return;
+		// Never got in: after a few tries, stop and say why instead of retrying forever.
+		if (!this.joinedOnce && this.reconnectAttempt + 1 >= firstJoinAttempts) {
+			this.fail(`${error.replace(/\s*Retrying…$/, "")} Check your internet connection, then try again.`);
+			return;
+		}
 		this.clearJoinTimer();
 		this.stop();
 		const delay = reconnectDelaysMs[Math.min(this.reconnectAttempt, reconnectDelaysMs.length - 1)];
