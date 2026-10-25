@@ -366,7 +366,9 @@ export class LobbyClient {
 		this.set({ ...this.view, stage: "closed", error });
 	}
 	private send(message: object) {
-		if (this.socket?.readyState === WebSocket.OPEN && this.socket.bufferedAmount < 65536) this.socket.send(JSON.stringify(message));
+		// React Native's WebSocket never sets bufferedAmount (it stays undefined), so treat
+		// "unknown" as empty; comparing undefined would drop every message on phones.
+		if (this.socket?.readyState === WebSocket.OPEN && (this.socket.bufferedAmount ?? 0) < 65536) this.socket.send(JSON.stringify(message));
 	}
 	private set(view: LobbyView) { this.view = view; this.onChange(view); }
 }
