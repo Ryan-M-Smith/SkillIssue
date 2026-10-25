@@ -46,12 +46,12 @@ function sample(ms: number, gyro = { x: 0, y: 0, z: 0 }): MotionReading {
 		rotationRate: { alpha: gyro.z, beta: gyro.y, gamma: gyro.x }, acceleration: { x: 0, y: 0, z: 0 },
 		accelerationIncludingGravity: { x: -9.80665 * Math.SQRT1_2, y: 0, z: -9.80665 * Math.SQRT1_2 } };
 }
-test("browser top-level seconds calibrate even when JS callbacks arrive in a batch", () => {
+test("browser top-level seconds calibrate; gyro spin alone does not steer tilt aim", () => {
 	const model = new MotionController("gunner", "ios");
 	for (let ms = 0; ms <= 500; ms += 20) model.process(sample(ms), 2000);
 	assert.equal(model.getDebug().calibration, "ready");
 	const turn = model.process(sample(520, { x: 40, y: 0, z: 40 }), 2000);
-	assert.ok(Math.abs(turn.lookDX!) > 0.5 && Math.abs(turn.lookDX!) < 5);
+	assert.equal(turn.lookDX, 0);
 });
 test("sensor timestamp restart recovers instead of rejecting samples forever", () => {
 	const model = new MotionController("movement", "android");
@@ -68,12 +68,15 @@ test("background sensor gap cannot create a camera jump", () => {
 	assert.equal(resumed.lookDX, 0);
 	assert.equal(resumed.sprint, false);
 });
-test("initial resting gyro bias is learned without removing intentional aiming", () => {
+test("neutral screen tilt stays still while deliberate tilt moves gunner aim", () => {
 	const model = new MotionController("gunner", "ios");
-	const bias = { x: 1.9, y: 0, z: 1.9 };
-	for (let ms = 0; ms <= 600; ms += 20) model.process(sample(ms, bias), ms);
-	assert.equal(model.process(sample(620, bias), 620).lookDX, 0);
-	assert.ok(Math.abs(model.process(sample(640, { x: 40, y: 0, z: 40 }), 640).lookDX!) > 0.5);
+	const rig = new PhoneRig("landscape-left", "ios");
+	const pose = neutralPose();
+	const step = () => model.process(rig.step(pose, 20).reading as never);
+	for (let i = 0; i < 35; i++) step();
+	assert.equal(step().lookDX, 0);
+	pose.right = 8;
+	assert.ok(step().lookDX! > 0);
 });
 
 test("raw Android sensors move and aim correctly in both landscape grips", () => {
@@ -107,8 +110,8 @@ test("raw Android sensors move and aim correctly in both landscape grips", () =>
 				for (let i = 0; i < 5; i++) right = step().moveX;
 				assert.ok(right < -0.93, `${grip}: raw Android left strafe matches right (${right})`);
 			} else {
-				for (let i = 0; i < 25; i++) { pose.yaw -= 1.2; right += step().lookDX!; }
-				assert.ok(right > 28 && right < 34, `${grip}: raw radians must use the full-turn gyro response, got ${right}`);
+				for (let i = 0; i < 20; i++) { pose.right += 0.4; right = step().lookX; }
+				assert.ok(right > 0.2, `${grip}: raw Android screen tilt must turn the camera (${right})`);
 			}
 		}
 	}

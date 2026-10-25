@@ -38,15 +38,7 @@ test("gunner gestures no longer trigger anything: jab, lift, pull and twist only
 	}
 });
 
-test("small gyro turns aim and tremor does not", () => {
-	const model = calibrated("gunner");
-	const slow = model.process(sample(600, gravity, zero, { x: 0.4, y: 0, z: 0 }), 600);
-	assert.ok(Math.abs(slow.lookX) > 0, `slow deliberate gyro turns move the aim (${JSON.stringify(slow)})`);
-	assert.equal(model.process(sample(620, gravity, zero, { x: 0.1, y: 0, z: 0 }), 620).lookX, 0, "sensor tremor stays below the deadzone");
-	assert.notEqual(model.process(sample(640, gravity, zero, { x: 10, y: 0, z: 0 }), 640).lookX, 0);
-});
-
-test("turning the phone right looks right and tipping its back up looks up (not inverted)", () => {
+test("tilting left, right, up and down directly steers gunner aim and neutral stops", () => {
 	for (const platform of ["ios", "android"]) {
 		for (const grip of ["landscape-left", "landscape-right"] as const) {
 			const rig = new PhoneRig(grip, platform);
@@ -56,12 +48,18 @@ test("turning the phone right looks right and tipping its back up looks up (not 
 			const pose = { fwd: 0, right: 0, twist: 0, yaw: 0 };
 			const step = () => { now += 20; return model.process(rig.step(pose, 20).reading as never, now); };
 			for (let i = 0; i < 60; i++) step(); // calibrate
-			let right = 0, up = 0;
-			for (let i = 0; i < 20; i++) { pose.yaw -= 1.2; right += step().lookX; }  // yaw < 0: turning right
-			for (let i = 0; i < 20; i++) step();
-			for (let i = 0; i < 20; i++) { pose.fwd -= 1.2; up += step().lookY; }    // fwd < 0: back of the phone tips up
-			assert.ok(right > 1, `${platform} ${grip}: turning right gave lookX ${right}`);
-			assert.ok(up > 1, `${platform} ${grip}: tipping up gave lookY ${up}`);
+			pose.right = -4;
+			assert.ok(step().lookX < 0, `${platform} ${grip}: left tilt looks left`);
+			pose.right = 0;
+			assert.equal(step().lookX, 0, `${platform} ${grip}: neutral stops horizontal aim`);
+			pose.right = 8;
+			assert.ok(step().lookX > 0, `${platform} ${grip}: right tilt looks right`);
+			pose.right = 0;
+			step();
+			pose.fwd = 8;
+			assert.ok(step().lookY > 0, `${platform} ${grip}: tilt up looks up`);
+			pose.fwd = -8;
+			assert.ok(step().lookY < 0, `${platform} ${grip}: tilt down looks down`);
 		}
 	}
 });
@@ -287,33 +285,6 @@ function neutral(): Pose {
 	return { fwd: 0, right: 0, twist: 0, yaw: 0 };
 }
 
-test("gunner wrist turns sweep the view with mouse-style sensitivity", () => {
-	for (const [grip, platform] of grips) {
-		const rig = new PhoneRig(grip, platform);
-		rig.tremor = false;
-		const model = new MotionController("gunner", platform);
-		let now = 0;
-		const pose = neutral();
-		for (let i = 0; i < 40; i++) model.process(rig.step(pose, 16).reading as never, (now += 16));
-		let dx = 0, dy = 0;
-		for (let i = 1; i <= 30; i++) {
-			pose.yaw = -i; // 30° to the right in under half a second (60°/s+)
-			const out = model.process(rig.step(pose, 16).reading as never, (now += 16));
-			dx += out.lookDX ?? 0; dy += out.lookDY ?? 0;
-		}
-		assert.ok(dx > 28 && dx < 34, `${grip} ${platform}: turned ${dx.toFixed(1)}° for 30°`);
-		assert.ok(Math.abs(dy) < 2);
-		// A flick faster than the old 130°/s cap still turns all the way.
-		dx = 0;
-		for (let i = 1; i <= 6; i++) {
-			pose.yaw = -30 - i * 10; // 600°/s
-			dx += model.process(rig.step(pose, 16).reading as never, (now += 16)).lookDX ?? 0;
-		}
-		assert.ok(Math.abs(dx - 90) < 8, `${grip} ${platform}: a fast flick turned ${dx.toFixed(1)}° for 60°`);
-	}
-});
-
-
 test("incidental twists and mixed movement do not toggle sprint", () => {
 	for (const [grip, platform] of grips) {
 		const run = runner(grip, platform);
@@ -349,7 +320,7 @@ test("sprint requires a centered pause before another deliberate toggle", () => 
 });
 
 
-test("a full physical phone rotation remains a continuous full camera turn", () => {
+test("holding a small screen tilt continuously turns through a full camera sweep", () => {
 	for (const [grip, platform] of grips) {
 		const rig = new PhoneRig(grip, platform);
 		rig.tremor = false;
@@ -358,10 +329,10 @@ test("a full physical phone rotation remains a continuous full camera turn", () 
 		const pose = neutral();
 		for (let i = 0; i < 40; i++) model.process(rig.step(pose, 16).reading as never, (now += 16));
 		let cameraTurn = 0;
-		for (let i = 1; i <= 180; i++) {
-			pose.yaw = -i * 2;
+		pose.right = 8;
+		for (let i = 1; i <= 375; i++) {
 			cameraTurn += model.process(rig.step(pose, 16).reading as never, (now += 16)).lookDX ?? 0;
 		}
-		assert.ok(cameraTurn >= 400 && cameraTurn <= 470, `${platform}/${grip}: full turn mapped to ${cameraTurn.toFixed(1)} degrees`);
+		assert.ok(cameraTurn >= 240 && cameraTurn <= 360, `${platform}/${grip}: held tilt turned ${cameraTurn.toFixed(1)} degrees`);
 	}
 });

@@ -9,8 +9,7 @@ import { fonts, teamColor, ui } from "./theme";
 
 const weapons = ["PISTOL", "SHOTGUN", "SNIPER"];
 /**
- * The gunner's phone. Turning the phone moves the camera (gyro only); everything
- * else is a button: hold FIRE, toggle AIM (scope), RELOAD, SWITCH gun.
+ * The gunner aims by tilting the phone; actions are buttons: hold FIRE, toggle AIM (scope), RELOAD, SWITCH gun.
  */
 export function AimHud({ view, controls, weapon, firing = false, onFire, onAim, onReload, onSwitch, onRecalibrate }: {
 	view: LobbyView;
@@ -35,7 +34,7 @@ export function AimHud({ view, controls, weapon, firing = false, onFire, onAim, 
 			<View style={styles.row}>
 				<Panel style={[styles.scope, { borderLeftWidth: 4, borderLeftColor: color }]}>
 					<View style={styles.scopeTop}>
-						<Eyebrow color={ui.soft}>GYRO LINK</Eyebrow>
+						<Eyebrow color={ui.soft}>TILT AIM</Eyebrow>
 						<Eyebrow color={controls.ready ? ui.ready : ui.gold}>{controls.ready ? "LIVE" : "HOLD STILL"}</Eyebrow>
 					</View>
 					<View style={styles.reticle}>
@@ -44,8 +43,8 @@ export function AimHud({ view, controls, weapon, firing = false, onFire, onAim, 
 						<View style={styles.crossV} />
 						<View style={[styles.dot, { backgroundColor: firing ? ui.gold : ui.ink, transform: [{ translateX: controls.lookX * 50 }, { translateY: -controls.lookY * 50 }] }]} />
 					</View>
-					<Text style={[styles.action, { color: firing ? ui.gold : ui.ink }]}>{firing ? "FIRING" : controls.ready ? "TURN THE PHONE TO AIM" : "HOLD STILL"}</Text>
-					<Body color={ui.muted} size={12} style={styles.center}>Small turns aim precisely. Faster wrist turns sweep the view.</Body>
+					<Text style={[styles.action, { color: firing ? ui.gold : ui.ink }]}>{firing ? "FIRING" : controls.ready ? "TILT PHONE TO AIM" : "HOLD STILL"}</Text>
+					<Body color={ui.muted} size={12} style={styles.center}>Tilt left/right or up/down to steer. Return toward neutral to stop.</Body>
 				</Panel>
 				<Panel style={styles.side}>
 					<View style={styles.weaponHeader}>

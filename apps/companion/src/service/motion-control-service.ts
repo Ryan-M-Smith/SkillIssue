@@ -1,4 +1,4 @@
-import { gyroAim } from "@/lib/math/gyro-aim";
+import { aimFromTilt } from "@/lib/math/tilt-aim";
 import type {
 	Action,
 	GameControls,
@@ -350,7 +350,7 @@ export class MotionController {
 
 		return this.role === "movement"
 			? this.processMovement(gravity, frame, gyro, rates, speed, t, dt)
-			: this.processGunner(gyro, gravity, frame, dt);
+			: this.processGunner(gravity, frame, dt);
 	}
 
 	/** Output while a sample is unusable: keep stances, stop moving. */
@@ -612,30 +612,16 @@ export class MotionController {
 
 	// -------------------- GUNNER PHONE --------------------
 
-	/**
-	 * The gunner's phone only aims; firing, scope, reload and weapons are buttons.
-	 * Yaw is the turn about true vertical (current gravity), so turning your body turns the
-	 * camera fully however far the phone is tilted back; pitch is about the level left-right axis.
-	 */
-	private processGunner(gyro: MotionVector | null, gravity: MotionVector, frame: Frame, dt: number): GameControls {
+	/** Screen tilt steers the view continuously; return the phone to neutral to stop. */
+	private processGunner(gravity: MotionVector, frame: Frame, dt: number): GameControls {
 		const output: GameControls = { ...emptyControls, ready: true };
-		if (gyro) {
-			// Turning right / tipping the back of the phone up = looking right / up.
-			const level = normalize(cross(frame.up, scale(gravity, -1)));
-			const right = magnitude(level) > 0.5 ? level : frame.right;
-			// Integrate each real gyro sample directly so full phone turns aren't lost
-			// to a phone-side low-pass tail. Godot smooths the accumulated deltas.
-			const aim = gyroAim(
-				axes.gunnerYawSign * dot(gyro, scale(gravity, -1)),
-				axes.gunnerPitchSign * dot(gyro, right),
-			);
-			const yaw = aim.x;
-			const pitch = aim.y;
-			output.lookX = clamp(yaw / settings.aimMaxRate);
-			output.lookY = clamp(pitch / settings.aimMaxRate);
-			output.lookDX = yaw * dt;
-			output.lookDY = pitch * dt;
-		}
+		const vertical = -axes.forwardSign * rotationAbout(frame.down, gravity, frame.right);
+		const horizontal = axes.rightSign * rotationAbout(frame.down, gravity, frame.away);
+		const aim = aimFromTilt(horizontal, vertical);
+		output.lookX = clamp(aim.x / settings.aimMaxRate);
+		output.lookY = clamp(aim.y / settings.aimMaxRate);
+		output.lookDX = aim.x * dt;
+		output.lookDY = aim.y * dt;
 		return output;
 	}
 }
