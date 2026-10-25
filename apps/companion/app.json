@@ -5,15 +5,20 @@
     "version": "1.0.0",
     "orientation": "landscape",
     "icon": "./assets/images/icon.png",
-    "scheme": ["companion", "skillissue"],
+    "scheme": [
+      "companion",
+      "skillissue"
+    ],
     "userInterfaceStyle": "automatic",
     "ios": {
+      "bundleIdentifier": "com.skillissue.companion",
       "icon": "./assets/expo.icon",
       "infoPlist": {
         "NSLocalNetworkUsageDescription": "Connect to the Skill Issue game on your Wi-Fi network."
       }
     },
     "android": {
+      "package": "com.skillissue.companion",
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",
         "foregroundImage": "./assets/images/android-icon-foreground.png",
@@ -42,6 +47,17 @@
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
-    }
+    },
+    "extra": {
+      "router": {
+        "asyncRoutes": {
+          "web": true
+        }
+      },
+      "eas": {
+        "projectId": "9468f2c1-6750-4b79-a971-e9dec2186957"
+      }
+    },
+    "owner": "rmsmith144"
   }
 }
