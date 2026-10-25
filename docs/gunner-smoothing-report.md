@@ -12,3 +12,13 @@ Every valid gyro sample contributes its turn directly. A phone-side low-pass fil
 - Godot gameplay, lifecycle, and rules smoke checks pass (69, 25, and 32 checks).
 
 These simulations verify axis math and turn accumulation. They cannot confirm physical feel, sensor noise, or relay latency on a handset; that still needs a phone test.
+
+
+## Slow aim response
+
+The gyro deadzone is now 0.2 degrees per second (was 1.2), with a smooth sensitivity ramp immediately above it. After calibration, bias tracking only follows readings below 0.2 degrees per second so a sustained slow turn is not learned away. Resting sensor noise below the threshold remains ignored.
+
+
+## Slow turn follow-up
+
+The deadzone is now 0.2 degrees per second, and the response curve starts smoothly above it. Post calibration gyro bias tracking is limited to rates below the same threshold, so it does not cancel a deliberate slow turn. Companion coverage confirms 0.4 degrees/second produces aim movement while 0.1 degrees/second tremor remains suppressed.

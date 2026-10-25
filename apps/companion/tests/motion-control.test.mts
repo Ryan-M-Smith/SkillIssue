@@ -40,8 +40,10 @@ test("gunner gestures no longer trigger anything: jab, lift, pull and twist only
 
 test("small gyro turns aim and tremor does not", () => {
 	const model = calibrated("gunner");
-	assert.equal(model.process(sample(600, gravity, zero, { x: 1, y: 0, z: 0 }), 600).lookX, 0);
-	assert.notEqual(model.process(sample(620, gravity, zero, { x: 10, y: 0, z: 0 }), 620).lookX, 0);
+	const slow = model.process(sample(600, gravity, zero, { x: 0.4, y: 0, z: 0 }), 600);
+	assert.ok(Math.abs(slow.lookX) > 0, `slow deliberate gyro turns move the aim (${JSON.stringify(slow)})`);
+	assert.equal(model.process(sample(620, gravity, zero, { x: 0.1, y: 0, z: 0 }), 620).lookX, 0, "sensor tremor stays below the deadzone");
+	assert.notEqual(model.process(sample(640, gravity, zero, { x: 10, y: 0, z: 0 }), 640).lookX, 0);
 });
 
 test("turning the phone right looks right and tipping its back up looks up (not inverted)", () => {

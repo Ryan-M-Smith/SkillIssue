@@ -5,8 +5,9 @@ import { gyroAim } from "../src/lib/math/gyro-aim.ts";
 test("mouse aiming keeps slow corrections precise and makes wrist sweeps useful", () => {
 	assert.equal(gyroAim(10, 0).x, 10);
 	assert.ok(gyroAim(90, 0).x > 90 && gyroAim(90, 0).x < 140);
-	assert.deepEqual(gyroAim(0.5, -0.5), { x: 0, y: 0 });
-	assert.ok(gyroAim(1.01, 0).x < 0.001, "no sudden jump at the noise threshold");
+	assert.ok(gyroAim(0.5, -0.5).x > 0 && gyroAim(0.5, -0.5).y < 0);
+	assert.ok(gyroAim(0.4, 0).x > 0, "slow intentional movement is not suppressed");
+	assert.equal(gyroAim(0.1, 0).x, 0, "resting noise remains suppressed");
 });
 
 test("horizontal, vertical and diagonal aiming share one sensitivity curve", () => {

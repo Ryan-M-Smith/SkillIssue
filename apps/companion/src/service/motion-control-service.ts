@@ -106,6 +106,7 @@ const settings = {
 
 	// Gunner.
 	aimMaxRate: 130,
+	gyroBiasQuietRate: 0.2,
 };
 
 // Flip a sign here if a direction comes out reversed on a real phone.
@@ -318,9 +319,9 @@ export class MotionController {
 		this.lastSampleAt = t;
 
 		const rawGyro = rate ? deviceRotationRate(rate, this.platform) : null;
-		if (rawGyro && magnitude(rawGyro) < 3 && (!this.frame || magnitude(rawGyro) < 0.8)) {
+		if (rawGyro && magnitude(rawGyro) < 3 && (!this.frame || magnitude(rawGyro) < settings.gyroBiasQuietRate)) {
 			// Learn small zero-rate offsets at rest, without absorbing deliberate turns.
-			const k = 1 - Math.exp(-dt / (this.frame ? 5 : 0.15));
+			const k = 1 - Math.exp(-dt / (this.frame ? 5 : 0.06));
 			this.gyroBias = {
 				x: this.gyroBias.x + k * (rawGyro.x - this.gyroBias.x),
 				y: this.gyroBias.y + k * (rawGyro.y - this.gyroBias.y),
