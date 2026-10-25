@@ -56,9 +56,9 @@ test("tilting left, right, up and down directly steers gunner aim and neutral st
 			assert.ok(step().lookX > 0, `${platform} ${grip}: right tilt looks right`);
 			pose.right = 0;
 			step();
-			pose.fwd = 8;
+			pose.fwd = -8; // top edge tipped back toward you
 			assert.ok(step().lookY > 0, `${platform} ${grip}: tilt up looks up`);
-			pose.fwd = -8;
+			pose.fwd = 8; // top edge tipped away
 			assert.ok(step().lookY < 0, `${platform} ${grip}: tilt down looks down`);
 		}
 	}
