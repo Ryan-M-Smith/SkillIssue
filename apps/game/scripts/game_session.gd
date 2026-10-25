@@ -45,6 +45,11 @@ var min_players := 4
 ## The host's setting: phones a match needs (1-4). Saved; sent to the server with each
 ## lobby (hello) and when it changes. `-- --min-players=N` overrides it for one run.
 var players_needed := 4
+## The host's setting: match length in minutes (2-5, default 5). Saved.
+## `-- --match-minutes=N` overrides it for one run.
+var match_minutes := 5
+const MATCH_MINUTES_MIN := 2
+const MATCH_MINUTES_MAX := 5
 
 const SETTINGS_PATH := "user://game.cfg"
 
@@ -56,9 +61,12 @@ func _ready() -> void:
 	var config := ConfigFile.new()
 	if config.load(SETTINGS_PATH) == OK:
 		players_needed = clampi(int(config.get_value("match", "players_needed", 4)), 1, 4)
+		match_minutes = clampi(int(config.get_value("match", "minutes", 5)), MATCH_MINUTES_MIN, MATCH_MINUTES_MAX)
 	for arg in OS.get_cmdline_user_args():
 		if arg.begins_with("--min-players="):
 			players_needed = clampi(arg.get_slice("=", 1).to_int(), 1, 4)
+		elif arg.begins_with("--match-minutes="):
+			match_minutes = clampi(arg.get_slice("=", 1).to_int(), MATCH_MINUTES_MIN, MATCH_MINUTES_MAX)
 	NetworkClient.game_event_received.connect(_on_game_event)
 	NetworkClient.connection_changed.connect(_on_connection_changed)
 	NetworkClient.network_error.connect(func(message: String): server_error.emit(message))
@@ -114,6 +122,15 @@ func set_players_needed(count: int) -> Error:
 	var config := ConfigFile.new()
 	config.load(SETTINGS_PATH)
 	config.set_value("match", "players_needed", players_needed)
+	return config.save(SETTINGS_PATH)
+
+
+## Sets the match length (2-5 minutes) and saves it. Takes effect from the next match.
+func set_match_minutes(minutes: int) -> Error:
+	match_minutes = clampi(minutes, MATCH_MINUTES_MIN, MATCH_MINUTES_MAX)
+	var config := ConfigFile.new()
+	config.load(SETTINGS_PATH)
+	config.set_value("match", "minutes", match_minutes)
 	return config.save(SETTINGS_PATH)
 
 

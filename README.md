@@ -1,6 +1,6 @@
 # Skill Issue
 
-A 2v2 split-screen game where each team shares one character: one phone moves, the other aims and shoots. First to 10 kills wins, or the leading team after five minutes.
+A 2v2 split-screen game where each team shares one character: one phone moves, the other aims and shoots. First to 10 kills wins, or the leading team when the clock runs out (5 minutes by default; hosts can set 2 to 5).
 
 ## Play
 
@@ -68,7 +68,7 @@ The default window is **1920 × 1080**. Open **Graphics** from the main menu or 
 
 Render scales range from **50% to 200%**. Lower values render fewer 3D pixels and upscale the result; higher values supersample the scene. HUD text keeps its own scale. Fullscreen follows the display's desktop resolution. **Apply** saves settings between launches; **Defaults** selects 1080p at 100%.
 
-To play or test with fewer phones, set **Settings → Player Count** (1–4, default 4) on the main menu; `-- --min-players=1` overrides it for one run. To use the optional Node relay, run `npm run server:start`; Godot uses it when it already owns port 8080. An explicit game override is `-- --server=ws://host:port`.
+To play or test with fewer phones, set **Settings → Player Count** (1–4, default 4) on the main menu; `-- --min-players=1` overrides it for one run. **Settings → Match Length** sets the clock from 2 to 5 minutes (default 5, saved like Player Count; `-- --match-minutes=N` overrides it for one run). To use the optional Node relay, run `npm run server:start`; Godot uses it when it already owns port 8080. An explicit game override is `-- --server=ws://host:port`.
 
 ## Development and checks
 

@@ -49,7 +49,7 @@ extends Node
 @export var keyboard_controls := true
 @export_group("Match rules")
 @export var kill_target := 10
-@export var match_seconds := 300.0
+@export var match_seconds := 0.0   ## 0 = the host's Match Length setting (2-5 min, default 5)
 @export var results_scene := "res://ui/results.tscn"
 @export var end_banner_seconds := 2.5
 ## After you're killed, your team has this long to take revenge...
@@ -521,7 +521,7 @@ func _update_score() -> void:
 func _start_match() -> void:
 	scores = [0, 0]
 	bounty_left = [0.0, 0.0]
-	_time_left = match_seconds
+	_time_left = match_seconds if match_seconds > 0.0 else GameSession.match_minutes * 60.0
 	_running = true
 	_network_match = NetworkClient.is_connected_to_server() and GameSession.is_playing()
 	set_debug_view(false if _network_match else debug_view)
@@ -615,7 +615,7 @@ func _build_scoreboard() -> Control:
 	center.custom_minimum_size.x = 154
 	var col := VBoxContainer.new()
 	col.add_theme_constant_override("separation", -2)
-	_clock = UiKit.display("5:00", 32)
+	_clock = UiKit.display("%d:00" % GameSession.match_minutes if match_seconds <= 0.0 else "%d:%02d" % [int(match_seconds) / 60, int(match_seconds) % 60], 32)
 	_clock.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	col.add_child(_clock)
 	var target := UiKit.label("FIRST TO %d PTS" % kill_target, 13, UiKit.BODY_BOLD, UiKit.MUTED)
