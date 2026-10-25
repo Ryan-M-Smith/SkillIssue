@@ -14,7 +14,7 @@ A 2v2 split-screen game where each team shares one character: one phone moves, t
    ```
 
 4. Open the app on each phone using the Expo instructions printed in the terminal. Keep phones and the game computer on the same Wi-Fi. Choose **Join a Lobby**, enter the six-character code, pick a team and role, and tap **Ready**.
-5. If automatic host detection cannot reach the game, paste the complete **lobby ticket** shown in Godot, such as `192.168.1.20:8080/T6YYH9`. It carries both the address and code; entering a WebSocket URL separately is optional.
+5. The code alone is enough: the app looks for the lobby on the public relay the game uses (from `skillissue.vodka/api/connection`), then on the game computer over Wi-Fi. If neither has it, paste the complete **lobby ticket** shown in Godot, such as `192.168.1.20:8080/T6YYH9`, which carries both the address and the code.
 6. All four ready phones start a three-second countdown. After the match, choose **Play Again** on the game computer to keep the lobby, or return to the main menu.
 
 `npm run companion:start` uses an Expo tunnel when needed. That tunnel serves the app; the game connection still uses the local network and a lobby ticket. Host detection uses `EXPO_PUBLIC_GAME_SERVER` when set, otherwise the Expo LAN host or browser hostname. It never invents an IP address. Native builds also support `skillissue://join?server=<encoded-ws-url>&code=<CODE>` links.

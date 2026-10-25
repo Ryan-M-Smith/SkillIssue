@@ -185,3 +185,16 @@ test("pause keeps the match HUD and feedback while suppressing motion until resu
 	t.mock.timers.tick(40);
 	assert.equal(socket.sent.filter(m => m.type === "motion").length > 0, true);
 });
+
+test("a socket that errors again while closing doesn't recurse", () => {
+	const client = new LobbyClient("ws://localhost:8080", "ios");
+	clients.push(client);
+	client.join("ABC123", "Tester");
+	const socket = Socket.instances.at(-1)!;
+	let errors = 0;
+	// Like browsers and Node: close() on a connecting socket fires error, then close.
+	socket.close = () => { errors += 1; if (errors > 50) throw new Error("recursed"); socket.onerror?.(); socket.readyState = 3; socket.onclose?.(); };
+	socket.onerror?.();
+	assert.equal(errors, 1);
+	assert.equal(client.snapshot.stage, "connecting");
+});

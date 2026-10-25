@@ -41,7 +41,7 @@ export function EnterCode({ code, onCode, onJoin, onBack, busy, error }: {
 					style={styles.input}
 					onSubmitEditing={() => valid && !busy && onJoin()}
 				/>
-				<Body size={14} color={ui.muted}>Use the code with a configured public server, or paste the full ticket from the game lobby.</Body>
+				<Body size={14} color={ui.muted}>{"Type the code from the game screen. If it can't be found, paste the full lobby ticket instead."}</Body>
 			</View>
 			<View style={styles.foot}>
 				<Body size={14} color={error ? ui.red : ui.muted} style={{ flex: 1 }}>

@@ -9,6 +9,7 @@ import { LobbyClient, idleLobby, type ControllerRole, type LobbyView, type TeamI
 import { MotionTally, directionOf, zeroCounts, type Counts, type MovementState } from "@/lib/motion-summary";
 import { defaultDebugServerUrl } from "@/lib/net/server-url";
 import { parseJoinTicket } from "@/lib/net/join-ticket";
+import { joinFirstAvailable, publicGameServer } from "@/lib/net/find-lobby";
 import type { GameControls, Role } from "@/types/motion";
 
 import { AimHud } from "./phone/aim-hud";
@@ -49,6 +50,7 @@ export default function PhoneApp() {
 	const activeControls = screen === "match" && (view.stage === "lobby" || view.stage === "playing");
 
 	const clientRef = useRef<LobbyClient | null>(null);
+	const cancelSearchRef = useRef<(() => void) | null>(null);
 	const roleRef = useRef<Role>("movement");
 	const controllerRef = useRef(new MotionController("movement", Platform.OS));
 	const tallyRef = useRef(new MotionTally());
@@ -146,23 +148,58 @@ export default function PhoneApp() {
 		setView(next);
 	}
 
-	function join() {
+	async function join() {
+		cancelSearchRef.current?.();
+		clientRef.current?.leave();
+		clientRef.current = null;
+		const typed = code.trim().toUpperCase();
+		const bareCode = /^[A-Z0-9]{6}$/.test(typed);
+		let servers: string[];
 		try {
-			const target = parseJoinTicket(code, serverUrl);
-			setJoinError(null);
-			recenter();
-			setServerUrl(target.serverUrl);
-			clientRef.current?.leave();
-			const client = new LobbyClient(target.serverUrl, Platform.OS, onLobbyChange);
-			clientRef.current = client;
-			setScreen("match");
-			client.join(target.code, name || "Player");
+			if (bareCode) {
+				// A code alone doesn't say where the lobby is: the game hosts on the public
+				// relay by default, or on its own computer when that's unreachable. Try both.
+				setJoinError(null);
+				setScreen("match");
+				onLobbyChange({ ...idleLobby, stage: "connecting", code: typed });
+				const relay = await publicGameServer();
+				servers = [...new Set([relay, serverUrl].filter(Boolean).flatMap((url) => {
+					try {
+						return [parseJoinTicket(typed, url).serverUrl];
+					} catch {
+						return [];
+					}
+				}))];
+				if (servers.length === 0) {
+					throw new Error("Can't find the game's server. Paste the full lobby ticket shown on the game screen.");
+				}
+			} else {
+				const target = parseJoinTicket(code, serverUrl);
+				setServerUrl(target.serverUrl);
+				servers = [target.serverUrl];
+			}
 		} catch (e) {
+			onLobbyChange(idleLobby);
+			setScreen("code");
 			setJoinError(e instanceof Error ? e.message : "This lobby ticket is invalid.");
+			return;
 		}
+		setJoinError(null);
+		recenter();
+		setScreen("match");
+		cancelSearchRef.current = joinFirstAvailable(
+			servers,
+			bareCode ? typed : parseJoinTicket(code, serverUrl).code,
+			name || "Player",
+			Platform.OS,
+			(client) => { clientRef.current = client; },
+			onLobbyChange,
+		);
 	}
 
 	function leave() {
+		cancelSearchRef.current?.();
+		cancelSearchRef.current = null;
 		clientRef.current?.leave();
 		clientRef.current = null;
 		setView(idleLobby);
@@ -191,7 +228,7 @@ export default function PhoneApp() {
 			<EnterCode
 				code={code}
 				onCode={(value) => { setCode(value); setJoinError(null); }}
-				onJoin={join}
+				onJoin={() => void join()}
 				onBack={leave}
 				busy={screen === "match" && view.stage === "connecting"}
 				error={joinError ?? (screen === "match" ? view.error : null)}
