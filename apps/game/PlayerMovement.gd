@@ -1,5 +1,6 @@
 extends CharacterBody3D
 
+class_name PlayerMovement
 
 const SPEED = 5.0
 const JUMP_VELOCITY = 4.5
@@ -7,6 +8,7 @@ const MOUSE_SENSITIVITY = 0.003
 
 @onready var head = $head
 @onready var camera = $head/Camera3D
+@onready var health_system = $HealthSystem
 
 func _ready():
 	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
@@ -39,3 +41,12 @@ func _physics_process(delta: float) -> void:
 		velocity.z = move_toward(velocity.z, 0, SPEED)
 
 	move_and_slide()
+
+func modify_health(add: int) -> void:
+	
+	if health_system.has_method("addHealth"):
+		health_system.addHealth(add)
+
+func modify_armor(add: int) -> void:
+	if health_system.has_method("addArmor"):
+		health_system.addArmor(add)
