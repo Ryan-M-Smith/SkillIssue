@@ -19,8 +19,8 @@ Duo (CharacterBody3D)            duo.gd: wires components, nothing else
 ```
 
 **Try it:** open `res://modes/duo_sandbox.tscn` and press F6.
-Team A (left screen): WASD, Space jump, Ctrl crouch, mouse aim (click to capture), LMB fire, RMB scope, 1/2/3 guns.
-Team B (right screen): IJKL, Shift jump, N crouch, arrow keys aim, Enter fire, M scope, 8/9/0 guns.
+Team A (left screen): WASD, Space jump, Ctrl crouch, hold Q sprint, mouse aim (click to capture), LMB fire, RMB scope, 1/2/3 guns.
+Team B (right screen): IJKL, Shift jump, N crouch, hold U sprint, arrow keys aim, Enter fire, M scope, 8/9/0 guns.
 
 **Tune it:** numbers live in `data/` (`.tres` files, edit in the Inspector, re-run).
 

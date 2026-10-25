@@ -156,6 +156,8 @@ function GestureCard({ motion }: { motion: MotionDebuggerProps }) {
             <Text style={styles.action}>{motion.lastAction}</Text>
             <DataRow label="Jumps" value={String(motion.counts.jump)} />
             <DataRow label="Crouches" value={String(motion.counts.crouch)} />
+            <DataRow label="Stands" value={String(motion.counts.stand)} />
+            <DataRow label="Sprints" value={String(motion.counts.sprint)} />
             <DataRow label="Shots" value={String(motion.counts.shoot)} />
             <ControlButton title="Reset Counters" onPress={motion.resetCounts} />
         </View>

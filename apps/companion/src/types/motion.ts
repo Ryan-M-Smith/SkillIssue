@@ -21,7 +21,15 @@ export type MotionReading = {
 	accelerationIncludingGravity: MotionVector;
 };
 
-export type Action = "jump" | "crouch" | "shoot" | null;
+/**
+ * One-shot gesture recognised this sample.
+ * - jump:   quick flick back (top of the phone toward you)
+ * - crouch: quick flick forward; toggles crouch on/off
+ * - stand:  jump flick while crouched; stands up instead of jumping
+ * - sprint: quick side-to-side shake; toggles sprint on/off
+ * - shoot:  gunner forward jab
+ */
+export type Action = "jump" | "crouch" | "stand" | "sprint" | "shoot" | null;
 
 export type GameControls = {
 	ready: boolean;
@@ -40,7 +48,8 @@ export type MotionDebug = {
 	sidePressDeg: number;
 	pitchRate: number;
 	sidePressRate: number;
-	sprintPhase: "idle" | "ramping" | "active" | "cooldown";
+	sprintPhase: "off" | "shaking" | "on";
+	gesture: "armed" | "locked";
 	strafeMeters: number;
 	positionTracking: "missing" | "tracking";
 };

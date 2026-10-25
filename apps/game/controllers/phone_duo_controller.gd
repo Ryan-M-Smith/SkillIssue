@@ -10,6 +10,7 @@ extends DuoController
 
 var _move := Vector2.ZERO
 var _crouch := false
+var _sprint := false
 var _fire := false
 var _aim_accum := Vector2.ZERO
 var _jump_queued := false
@@ -61,6 +62,8 @@ func _on_phone_message(msg_team: int, role: String, msg: Dictionary) -> void:
 							_jump_queued = true
 					"crouch":
 						_crouch = held
+					"sprint":
+						_sprint = held
 	elif role == "gunner":
 		match t:
 			"aim":
@@ -83,6 +86,7 @@ func _on_phone_left(msg_team: int, role: String) -> void:
 	if role == "mover":
 		_move = Vector2.ZERO
 		_crouch = false
+		_sprint = false
 	else:
 		_fire = false
 		_aim_accum = Vector2.ZERO
@@ -91,6 +95,7 @@ func _on_phone_left(msg_team: int, role: String) -> void:
 func poll(input: DuoInput, _delta: float) -> void:
 	input.move += _move
 	input.crouch = input.crouch or _crouch
+	input.sprint = input.sprint or _sprint
 	input.fire = input.fire or _fire
 	input.aim_delta += _aim_accum
 	_aim_accum = Vector2.ZERO

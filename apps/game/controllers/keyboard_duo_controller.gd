@@ -1,7 +1,7 @@
 ## Desk-testing controller: lets one or two people play a full match on one laptop.
-##   Scheme 0 (Blue): WASD move, Space jump, Ctrl crouch, mouse aim (click to capture),
+##   Scheme 0 (Blue): WASD move, Space jump, Ctrl crouch, Q sprint, mouse aim (click to capture),
 ##                    LMB fire, RMB scope, 1/2/3 guns, Esc releases mouse.
-##   Scheme 1 (Red):  IJKL move, Shift jump, N crouch, arrow keys aim,
+##   Scheme 1 (Red):  IJKL move, Shift jump, N crouch, U sprint, arrow keys aim,
 ##                    Enter fire, M scope, 8/9/0 guns.
 class_name KeyboardDuoController
 extends DuoController
@@ -46,6 +46,7 @@ func poll(input: DuoInput, delta: float) -> void:
 	if scheme == 0:
 		mv = Vector2(float(_key(KEY_D)) - float(_key(KEY_A)), float(_key(KEY_W)) - float(_key(KEY_S)))
 		input.crouch = input.crouch or _key(KEY_CTRL)
+		input.sprint = input.sprint or _key(KEY_Q)
 		input.fire = input.fire or (captured and Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT))
 		input.aim_delta += _mouse_accum
 		_mouse_accum = Vector2.ZERO
@@ -58,6 +59,7 @@ func poll(input: DuoInput, delta: float) -> void:
 		var turn := Vector2(float(_key(KEY_RIGHT)) - float(_key(KEY_LEFT)), float(_key(KEY_UP)) - float(_key(KEY_DOWN)))
 		input.aim_delta += turn * key_turn_speed * delta
 		input.crouch = input.crouch or _key(KEY_N)
+		input.sprint = input.sprint or _key(KEY_U)
 		input.fire = input.fire or _key(KEY_ENTER)
 		if _pressed_once("jump", _key(KEY_SHIFT)): input.jump = true
 		if _pressed_once("scope", _key(KEY_M)): input.scope_toggle = true
