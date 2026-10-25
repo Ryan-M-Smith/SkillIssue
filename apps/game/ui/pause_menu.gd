@@ -32,7 +32,7 @@ func _ready() -> void:
 	root.add_child(menu)
 	_shade = ColorRect.new()
 	_shade.set_anchors_preset(Control.PRESET_FULL_RECT)
-	_shade.color = Color(0.01, 0.015, 0.035, 0.78)
+	_shade.color = Color(0.03, 0.03, 0.032, 0.78)
 	_shade.visible = false
 	root.add_child(_shade)
 	var center := CenterContainer.new()
@@ -40,7 +40,7 @@ func _ready() -> void:
 	_shade.add_child(center)
 	var panel := PanelContainer.new()
 	panel.custom_minimum_size.x = 560
-	panel.add_theme_stylebox_override("panel", UiKit.panel_box(UiKit.LINE, Color(0.035, 0.045, 0.085, 0.98)))
+	panel.add_theme_stylebox_override("panel", UiKit.panel_box(UiKit.LINE, Color(0.085, 0.085, 0.09, 0.98)))
 	center.add_child(panel)
 	var col := VBoxContainer.new()
 	col.add_theme_constant_override("separation", 16)
