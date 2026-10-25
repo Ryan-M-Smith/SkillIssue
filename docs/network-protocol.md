@@ -70,18 +70,20 @@ How Godot reads the server's messages:
 
 ## Movement phone gestures
 
-The companion (`apps/companion/src/service/motion-control-service.ts`) turns phone motion into these controls. The phone is held at about 45°; the pose it is held still in at start is neutral. Slow, held tilts move; fast tilts are gestures.
+The companion (`apps/companion/src/service/motion-control-service.ts`) turns phone motion into these controls. The phone is held at about 45°, screen toward the player; the pose it is held still in at start is neutral. Each control uses one of the phone's own axes. Slow, held tilts move; fast motions are gestures, recognised from the gyroscope by whichever axis dominates.
 
-| Phone motion | Game control | Message |
-| --- | --- | --- |
-| Slowly tilt the top away / toward you and hold | Walk forward / backward | `motion` (`moveY`) |
-| Slowly press the right / left side down and hold | Strafe right / left | `motion` (`moveX`) |
-| Back to neutral | Stop | `motion` (zero) |
-| Quick flick forward | Crouch on, flick again for off | `environment` `crouch`, `pressed` = new state |
-| Quick flick back | Jump. While crouched it only stands up | `environment` `jump`, `pressed: true` (or `crouch`, `pressed: false`) |
-| Quick side-to-side shake | Sprint on, shake again for off | `environment` `sprint`, `pressed` = new state |
+| Axis | Phone motion | Game control | Message |
+| --- | --- | --- | --- |
+| Pitch / X | Slowly tilt the top away / toward you and hold | Walk forward / backward | `motion` (`moveY`) |
+| Pitch / X | Quick flick forward | Crouch on, flick again for off | `environment` `crouch`, `pressed` = new state |
+| Pitch / X | Quick flick back | Jump. While crouched it only stands up | `environment` `jump`, `pressed: true` (or `crouch`, `pressed: false`) |
+| Yaw / Y | Slowly press the right / left side down and hold | Strafe right / left | `motion` (`moveX`) |
+| Roll / Z | Quick twist, like a steering wheel | Sprint on, twist again for off | `environment` `sprint`, `pressed` = new state |
+| | Back to neutral | Stop | `motion` (zero) |
 
-Only one gesture registers at a time. After one fires, gestures are locked for 1 s and until the phone settles again, and the gesture's own motion never becomes walking. Crouch and sprint are exclusive: starting one ends the other.
+Only one gesture registers per motion, then gestures are locked for 1 s, and a gesture's own motion never becomes walking. Crouch and sprint are exclusive: starting one ends the other.
+
+expo-sensors orders `DeviceMotion.rotationRate` differently per platform (iOS: alpha = z, beta = y, gamma = x; Android: alpha = x, beta = y, gamma = z). The companion maps it to the phone's X / Y / Z axes before using it.
 
 ### Proposed additions (not in the server yet)
 

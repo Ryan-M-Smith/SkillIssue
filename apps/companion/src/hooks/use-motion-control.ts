@@ -1,8 +1,9 @@
 import { useEffect, useRef, useState } from "react";
-import { Alert } from "react-native";
+import { Alert, Platform } from "react-native";
 import { DeviceMotion } from "expo-sensors";
 
 import { average } from "@/lib/math/sensors";
+import { deviceRotationRate } from "@/lib/math/motion";
 import { Vector3 } from "@/lib/math/vector3";
 import type {
     Action,
@@ -55,7 +56,7 @@ export function useMotionControl(initialRole: Role = "movement") {
         accel: Vector3.zero(),
     });
 
-    const controllerRef = useRef(new MotionController(initialRole));
+    const controllerRef = useRef(new MotionController(initialRole, Platform.OS));
     const subscriptionRef = useRef<ReturnType<typeof DeviceMotion.addListener> | null>(null);
     const lastDisplayRef = useRef(0);
     const gyroSamplesRef = useRef<Vector3[]>([]);
@@ -91,7 +92,7 @@ export function useMotionControl(initialRole: Role = "movement") {
                 throw new Error("Motion sensor permission is required.");
             }
 
-            controllerRef.current = new MotionController(role);
+            controllerRef.current = new MotionController(role, Platform.OS);
             resetSamples();
             setControls({ ...emptyControls });
             setLastAction("None");
@@ -145,12 +146,17 @@ export function useMotionControl(initialRole: Role = "movement") {
                     gyro: average(gyroSamplesRef.current),
                     accel: average(accelSamplesRef.current),
                 });
+                const rate = reading.rotationRate
+                    ? deviceRotationRate(reading.rotationRate, Platform.OS)
+                    : null;
+
                 setRaw({
                     alpha: reading.rotation.alpha * 180 / Math.PI,
                     beta: reading.rotation.beta * 180 / Math.PI,
                     gamma: reading.rotation.gamma * 180 / Math.PI,
-                    yawRate: reading.rotationRate?.gamma ?? 0,
-                    pitchRate: reading.rotationRate?.beta ?? 0,
+                    // Gyro about the phone's Y (left/right) and X (pitch) axes.
+                    yawRate: rate?.y ?? 0,
+                    pitchRate: rate?.x ?? 0,
                     accX: reading.acceleration?.x ?? 0,
                     accY: reading.acceleration?.y ?? 0,
                     accZ: reading.acceleration?.z ?? 0,
