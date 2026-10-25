@@ -2,6 +2,7 @@ import type {
 	Action,
 	GameControls,
 	MotionAngles,
+	MotionDebug,
 	MotionReading,
 	Role,
 } from "@/types/motion";
@@ -12,6 +13,8 @@ import {
 	magnitude,
 	radToDeg,
 } from "@/lib/math/motion";
+
+export type { GameControls, MotionDebug, Role } from "@/types/motion";
 
 // Adjustable settings
 const settings = {
@@ -81,6 +84,8 @@ export const emptyControls: GameControls = {
 	action: null,
 };
 
+export const EMPTY_CONTROLS = emptyControls;
+
 export class MotionController {
 	private calibrationSince: number | null = null;
 	private neutral: MotionAngles | null = null;
@@ -94,6 +99,16 @@ export class MotionController {
 
 	private crouchUntil = 0;
 	private aimFrozenUntil = 0;
+	private debug: MotionDebug = {
+		calibration: "calibrating",
+		pitchDeg: 0,
+		sidePressDeg: 0,
+		pitchRate: 0,
+		sidePressRate: 0,
+		sprintPhase: "idle",
+		strafeMeters: 0,
+		positionTracking: "missing",
+	};
 
 	constructor(private readonly role: Role) {}
 
@@ -108,6 +123,20 @@ export class MotionController {
 		this.sprinting = false;
 		this.crouchUntil = 0;
 		this.aimFrozenUntil = 0;
+		this.debug = {
+			calibration: "calibrating",
+			pitchDeg: 0,
+			sidePressDeg: 0,
+			pitchRate: 0,
+			sidePressRate: 0,
+			sprintPhase: "idle",
+			strafeMeters: 0,
+			positionTracking: "missing",
+		};
+	}
+
+	getDebug(): MotionDebug {
+		return { ...this.debug };
 	}
 
 	process(
@@ -124,6 +153,9 @@ export class MotionController {
 		const angularSpeed = gyro
 			? angularMagnitude(gyro)
 			: Infinity;
+
+		this.debug.pitchRate = gyro?.beta ?? 0;
+		this.debug.sidePressRate = gyro?.gamma ?? 0;
 
 		// STEP 1: AUTOMATIC CALIBRATION
 		// Phone must remain still before controls activate.
@@ -152,6 +184,8 @@ export class MotionController {
 				ready: this.neutral !== null,
 			};
 		}
+
+		this.debug.calibration = "ready";
 
 		let action: Action = null;
 
@@ -280,6 +314,8 @@ export class MotionController {
 
 			output.moveX = tiltToMovement(rightDeg);
 			output.moveY = tiltToMovement(forwardDeg);
+			this.debug.pitchDeg = forwardDeg;
+			this.debug.sidePressDeg = rightDeg;
 
 			// Timed crouch
 			output.crouch = now < this.crouchUntil;
@@ -306,6 +342,11 @@ export class MotionController {
 
 			output.sprint =
 				this.sprinting && !output.crouch;
+			this.debug.sprintPhase = this.sprinting
+				? "active"
+				: this.sprintSince === null
+					? "idle"
+					: "ramping";
 		}
 
 		// STEP 5: GUNNER CAMERA CONTROLS
