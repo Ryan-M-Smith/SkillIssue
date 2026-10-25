@@ -94,11 +94,13 @@ func _run() -> void:
 		return
 	if not _check(await _wait_for_scene(MENU), "main menu becomes active"):
 		return
-	var graphics_button := _find_button(current_scene, "GRAPHICS")
-	if not _check(graphics_button != null, "main menu exposes graphics"):
+	var graphics_button := _find_button(current_scene, "SETTINGS")
+	if not _check(graphics_button != null, "main menu exposes settings"):
 		return
 	await _click(graphics_button)
-	if not _check(current_scene._graphics.is_open(), "main-menu graphics modal opens"):
+	if not _check(current_scene._graphics.is_open(), "main-menu settings modal opens"):
+		return
+	if not _check(current_scene._graphics._players != null and current_scene._graphics._players.item_count == 4, "settings offer players needed (1-4)"):
 		return
 	await _click(_find_button(current_scene._graphics, "BACK"))
 	if not _check(not current_scene._graphics.is_open(), "mouse closes graphics modal"):

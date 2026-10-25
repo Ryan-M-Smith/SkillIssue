@@ -8,6 +8,7 @@ export const ui = {
 	line: "rgba(255, 255, 255, 0.14)",
 	ink: "#F2F5FF",
 	muted: "#8E97B2",
+	soft: "#B6BED4",  // secondary text on dark panels (easier to read than muted)
 	blue: "#3B8CFF",
 	red: "#FF4A4A",
 	gold: "#FFCB52",
@@ -37,3 +38,14 @@ export const teamName = (team: TeamId | null | undefined) => (team === 2 ? "RED"
 /** A team color at low strength, for panel fills. */
 export const teamTint = (team: TeamId | null | undefined, alpha = 0.16) =>
 	team === 2 ? `rgba(255, 74, 74, ${alpha})` : `rgba(59, 140, 255, ${alpha})`;
+
+/**
+ * A team color blended into the background, fully opaque: for panels that sit on the
+ * split backdrop, so its seam and stripes never show through text.
+ */
+export const teamSolid = (team: TeamId | null | undefined, strength = 0.16) => {
+	const color = team === 2 ? [255, 74, 74] : [59, 140, 255];
+	const base = [7, 10, 18]; // ui.bg
+	const mix = color.map((c, i) => Math.round(base[i] + (c - base[i]) * strength));
+	return `rgb(${mix.join(", ")})`;
+};

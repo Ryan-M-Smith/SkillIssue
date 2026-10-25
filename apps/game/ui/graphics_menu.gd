@@ -1,9 +1,14 @@
 extends CanvasLayer
-## One modal shared by the main menu and the in-match menu.
+## One modal shared by the main menu and the in-match menu. From the main menu it also
+## holds the match setting (players needed); in a match only graphics can change.
 
 signal closed()
 
+## Show the "Players needed" row (main menu). Set before the node enters the tree.
+var match_settings := false
+
 var _shade: ColorRect
+var _players: OptionButton
 var _resolution: OptionButton
 var _scale: OptionButton
 var _mode: OptionButton
@@ -30,8 +35,13 @@ func _ready() -> void:
 	var col := VBoxContainer.new()
 	col.add_theme_constant_override("separation", 18)
 	panel.add_child(col)
-	col.add_child(UiKit.eyebrow("DISPLAY / QUALITY", UiKit.GOLD))
-	col.add_child(UiKit.display("GRAPHICS", 56))
+	col.add_child(UiKit.eyebrow("MATCH / DISPLAY / QUALITY" if match_settings else "DISPLAY / QUALITY", UiKit.GOLD))
+	col.add_child(UiKit.display("SETTINGS" if match_settings else "GRAPHICS", 56))
+	if match_settings:
+		_players = OptionButton.new()
+		for text in ["1 phone (testing)", "2 phones", "3 phones", "4 phones (full match)"]:
+			_players.add_item(text)
+		_add_row(col, "Players needed", _players)
 	_resolution = OptionButton.new()
 	for size_value in GraphicsSettings.RESOLUTIONS:
 		var suffix := " / 4K" if size_value == Vector2i(3840, 2160) else (" / QHD" if size_value == Vector2i(2560, 1440) else (" / 3:2" if size_value == Vector2i(2160, 1440) else ""))
@@ -67,6 +77,8 @@ func _ready() -> void:
 		_scale.select(3)
 		_mode.select(0)
 		_vsync.button_pressed = true
+		if _players:
+			_players.select(3)
 		_status.text = "Default settings selected. Apply to save.")
 	buttons.add_child(reset)
 	var apply := UiKit.button("APPLY", true)
@@ -96,9 +108,11 @@ func open_menu() -> void:
 	_scale.select(GraphicsSettings.SCALES.find(GraphicsSettings.render_scale))
 	_mode.select(GraphicsSettings.window_mode)
 	_vsync.button_pressed = GraphicsSettings.vsync
+	if _players:
+		_players.select(GameSession.players_needed - 1)
 	_status.text = ""
 	_shade.visible = true
-	_resolution.grab_focus()
+	(_players if _players else _resolution).grab_focus()
 
 
 func is_open() -> bool:
@@ -112,6 +126,10 @@ func close_menu() -> void:
 
 func _apply() -> void:
 	var error := GraphicsSettings.apply_settings(GraphicsSettings.RESOLUTIONS[_resolution.selected], GraphicsSettings.SCALES[_scale.selected], _mode.selected, _vsync.button_pressed)
+	if _players:
+		var saved := GameSession.set_players_needed(_players.selected + 1)
+		if error == OK:
+			error = saved
 	_status.text = "Settings applied and saved." if error == OK else "Applied, but settings could not be saved (%s)." % error_string(error)
 	_status.add_theme_color_override("font_color", UiKit.READY if error == OK else UiKit.GOLD)
 

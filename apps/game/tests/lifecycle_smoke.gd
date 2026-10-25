@@ -87,6 +87,9 @@ func _run() -> void:
 	var stats := root.get_node("MatchStats")
 	server.port = 20000 + randi() % 30000
 	server.min_players = 1
+	# Host locally (development mode): no control plane, and the host asks for 1 phone.
+	ProjectSettings.set_setting("network/control_plane_url", "")
+	session.players_needed = 1
 	if not _check(change_scene_to_file(LOBBY) == OK and await _wait_scene(LOBBY), "lobby scene opens"):
 		return
 	var first_code := await _wait_code()

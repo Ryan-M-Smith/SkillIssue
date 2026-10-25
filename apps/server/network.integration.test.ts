@@ -164,6 +164,38 @@ test("relay preserves authenticated lobby, match, reset and disconnect lifecycle
     }
 });
 
+test("relay uses the host's player count per lobby", async () => {
+    const { child, url } = await startRelay();
+    const peers: Peer[] = [];
+    const connect = async () => { const peer = new Peer(url); peers.push(peer); return peer.open(); };
+    try {
+        const host = await connect();
+        host.send({ type: "hello", protocolVersion: 1, clientType: "game", minPlayers: 2 });
+        const { pairingCode } = await host.next("game_registered");
+        assert.equal((await host.next("lobby_state")).minPlayers, 2);
+        for (const [teamId, role] of [[1, "movement"], [2, "aim"]] as const) {
+            const phone = await connect();
+            phone.send(join(pairingCode, role));
+            await phone.next("lobby_joined");
+            phone.send({ type: "select_slot", teamId, role });
+            await phone.next("controller_assigned");
+            phone.send({ type: "set_ready", ready: true });
+        }
+        await host.next("lobby_state", (message) => message.state === "ready" && message.minPlayers === 2);
+        host.send({ type: "set_min_players", minPlayers: 3 });
+        await host.next("lobby_state", (message) => message.minPlayers === 3 && message.state === "waiting");
+        peers[1]!.send({ type: "set_min_players", minPlayers: 1 });
+        assert.equal((await peers[1]!.next("join_rejected")).code, "invalid_message");
+        host.send({ type: "set_min_players", minPlayers: 5 });
+        assert.equal((await host.next("join_rejected")).code, "invalid_message");
+        host.send({ type: "set_min_players", minPlayers: 2 });
+        await host.next("lobby_state", (message) => message.minPlayers === 2 && message.state === "ready");
+    } finally {
+        peers.forEach((peer) => peer.close());
+        child.kill();
+    }
+});
+
 test("relay rejects binary and oversized packets", async () => {
     const { child, url } = await startRelay();
     const peers: Peer[] = [];

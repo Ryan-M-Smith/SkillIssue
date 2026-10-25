@@ -37,8 +37,8 @@ const AIM_ACTIONS := ["shoot", "scope", "weapon", "reload"]
 const SHARED_ACTIONS := ["ready", "interact", "none"]
 
 @export var port := 8080
-## Phones a match needs before it can start. 4 = a full match; lower it to test alone.
-## Also settable with the command-line argument `-- --min-players=1`.
+## Phones a match needs when the host doesn't say (the host sends its own in hello: see
+## GameSession.players_needed). Also settable with `-- --min-players=1`.
 @export var min_players := 4
 
 var state := "idle"
@@ -158,7 +158,15 @@ func host_message(msg: Dictionary) -> void:
 			if not _valid_version(msg) or typeof(msg.get("clientType")) != TYPE_STRING or msg.clientType != "game":
 				_to_host(_rejection("invalid_message", "Only protocol version 1 game hello messages are supported."))
 				return
-			_register_game()
+			_register_game(_player_count(msg.get("minPlayers")))
+		"set_min_players":
+			var count := _player_count(msg.get("minPlayers"))
+			if _session == null or count == 0:
+				_to_host(_rejection("invalid_message", "Only the game host can set the player count (1-4)."))
+				return
+			if _session.state == "waiting" or _session.state == "ready":
+				_session.minPlayers = count
+				_send_lobby_state()
 		"start_game":
 			_start_game()
 		"match_status":
@@ -323,7 +331,14 @@ func _disconnect(id: int) -> void:
 
 # --- Lobby ---
 
-func _register_game() -> void:
+## A host's player count (1-4), or 0 if the value isn't one.
+func _player_count(value: Variant) -> int:
+	if typeof(value) not in [TYPE_INT, TYPE_FLOAT] or float(value) != floorf(float(value)):
+		return 0
+	return int(value) if int(value) >= 1 and int(value) <= SLOTS.size() else 0
+
+
+func _register_game(count := 0) -> void:
 	_close_lobby()   # a second hello replaces the lobby
 	var code := ""
 	for i in CODE_LENGTH:
@@ -332,6 +347,7 @@ func _register_game() -> void:
 		"gameId": "game_%s" % _token(),
 		"pairingCode": code,
 		"state": "waiting",
+		"minPlayers": count if count > 0 else min_players,   # ready phones it takes to start
 		"controllers": {},   # peer id -> controller, in join order
 	}
 	_to_host({"type": "game_registered", "protocolVersion": PROTOCOL_VERSION,
@@ -358,8 +374,9 @@ func _is_ready() -> bool:
 	var in_slots := _slotted()
 	if in_slots.is_empty() or not in_slots.all(func(c): return c.ready):
 		return false
-	if min_players < SLOTS.size():
-		return in_slots.size() >= min_players
+	var need: int = _session.minPlayers
+	if need < SLOTS.size():
+		return in_slots.size() >= need
 	return SLOTS.all(func(s): return _slot_holder(s.teamId, s.role) != null)
 
 
@@ -376,7 +393,7 @@ func _send_lobby_state() -> void:
 		players.append({"controllerId": c.controllerId, "name": c.name, "teamId": c.teamId,
 			"role": c.role, "ready": c.ready, "connected": true})
 	_broadcast({"type": "lobby_state", "state": _session.state, "assignments": assignments,
-		"players": players, "minPlayers": min_players})
+		"players": players, "minPlayers": _session.minPlayers})
 
 
 func _broadcast(msg: Dictionary) -> void:
@@ -531,7 +548,7 @@ func _start_game() -> void:
 		return
 	if not _is_ready():
 		_to_host(_rejection("game_unavailable",
-			"At least %d controller(s) must pick a spot and ready up first." % min_players if min_players < SLOTS.size()
+			"At least %d controller(s) must pick a spot and ready up first." % _session.minPlayers if _session.minPlayers < SLOTS.size()
 			else "All four spots must be taken and ready first."))
 		return
 	_session.state = "playing"

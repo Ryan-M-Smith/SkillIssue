@@ -45,6 +45,14 @@ export type HelloMessage = {
     type: "hello";
     protocolVersion: typeof protocolVersion;
     clientType: ClientType;
+    /** Game host: phones this lobby needs to start (1-4). Defaults to the server's setting. */
+    minPlayers?: number;
+};
+
+/** Game host: change how many ready phones the lobby needs to start (1-4). */
+export type SetMinPlayersMessage = {
+    type: "set_min_players";
+    minPlayers: number;
 };
 
 /**
@@ -164,6 +172,7 @@ export type ClientMessage =
     | MatchStatusMessage
     | EndGameMessage
     | ResetLobbyMessage
+    | SetMinPlayersMessage
     | ToControllerMessage
     | MotionInputMessage
     | EnvironmentInputMessage;
