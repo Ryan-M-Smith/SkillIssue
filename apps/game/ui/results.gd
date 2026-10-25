@@ -16,6 +16,7 @@ var _shown: Control
 
 func _ready() -> void:
 	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
+	Music.play("results")
 	theme = UiKit.make_theme()
 	set_anchors_preset(Control.PRESET_FULL_RECT)
 	var r: Dictionary = MatchStats.result
@@ -195,7 +196,7 @@ func show_mvp(pick: Dictionary) -> void:
 func _reason_text(reason: String) -> String:
 	match reason:
 		"kills":
-			return "first to the kill target"
+			return "first to the point target"
 		"time":
 			return "time's up"
 		"host":

@@ -13,6 +13,8 @@ signal server_message(message: String)
 signal server_error(error: String)
 ## The lobby roster or its state changed (names, spots, ready flags). Read `players`.
 signal lobby_changed()
+## The server swapped a team's two phones (Runner <-> Gunner) mid-match. Game team (0/1).
+signal roles_swapped(team: int)
 
 const STATES: PackedStringArray = ["waiting", "ready", "playing", "paused", "ended"]
 const ROLES: PackedStringArray = ["mover", "gunner"]   ## game-side role names (PhoneDuoController)
@@ -92,6 +94,16 @@ func is_playing() -> bool:
 ## filled, then broadcasts state "playing"; otherwise it replies with join_rejected.
 func request_start() -> bool:
 	return NetworkClient.send_message("start_game")
+
+
+## Swap on death: asks the server to swap a team's Runner and Gunner phones mid-match.
+## The server swaps them, tells both phones (their screens switch) and re-sends the lobby
+## state, which re-routes their input here; then `roles_swapped` fires. Only while playing
+## with both of the team's phones in; returns false (and sends nothing) otherwise.
+func request_role_swap(team: int) -> bool:
+	if not is_playing() or controller_at(team, "mover").is_empty() or controller_at(team, "gunner").is_empty():
+		return false
+	return NetworkClient.send_message("swap_roles", {"teamId": team + server_team_offset})
 
 
 ## Sets how many phones a match needs (1-4), saves it, and tells an open lobby.
@@ -228,6 +240,10 @@ func _on_game_event(event: Dictionary) -> void:
 				_assign(id, _controllers[id].team + server_team_offset, str(p.get("role", "")))
 		"controller_disconnected":
 			_remove(str(p.get("controllerId", "")))
+		"roles_swapped":
+			var swapped_team: Variant = p.get("teamId")
+			if typeof(swapped_team) in [TYPE_INT, TYPE_FLOAT]:
+				roles_swapped.emit(int(swapped_team) - server_team_offset)
 		"broadcast":
 			if p.has("state"):
 				_set_state(str(p.state))

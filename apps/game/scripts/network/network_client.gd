@@ -21,7 +21,7 @@ const CONTROL_PLANE_ARG := "--control-plane="
 const KNOWN_TYPES: PackedStringArray = [
 	"game_registered", "lobby_state", "controller_assigned", "controller_disconnected",
 	"join_rejected", "broadcast", "role", "motion", "environment",
-	"match_status", "match_ended",
+	"match_status", "match_ended", "roles_swapped",
 ]
 const CONNECTION_TIMEOUT_MS := 6000
 const MAX_PACKETS_PER_FRAME := 128

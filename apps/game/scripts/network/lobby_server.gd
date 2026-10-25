@@ -177,6 +177,8 @@ func host_message(msg: Dictionary) -> void:
 			_reset_lobby()
 		"to_controller":
 			_forward_feedback(msg)
+		"swap_roles":
+			_swap_roles(msg.get("teamId"))
 		_:
 			_to_host(_rejection("invalid_message", "Unknown message type."))
 
@@ -310,7 +312,7 @@ func _handle(id: int, msg: Dictionary) -> void:
 			_set_ready(id, msg.get("ready"))
 		"motion", "environment":
 			_forward_input(id, msg)
-		"start_game", "match_status", "end_game", "reset_lobby":
+		"start_game", "match_status", "end_game", "reset_lobby", "swap_roles":
 			_send(id, _rejection("invalid_message", "Only the game host can do that."))
 		_:
 			_send(id, _rejection("invalid_message", "Unknown message type."))
@@ -538,6 +540,27 @@ func _forward_feedback(msg: Dictionary) -> void:
 		if _session.controllers[id].controllerId == msg.controllerId:
 			_send(id, {"type": "controller_feedback", "message": feedback})
 			return
+
+
+## Swap on death: the team's movement and aim phones trade roles mid-match. Each phone gets its
+## new assignment (its screen switches), the host gets the new lobby state (input re-routes),
+## then roles_swapped. Ignored unless playing with both of the team's phones in.
+func _swap_roles(team_v: Variant) -> void:
+	if _session == null or _session.state != "playing" or not (typeof(team_v) in [TYPE_INT, TYPE_FLOAT]):
+		return
+	var team := int(team_v)
+	var runner: Variant = _slot_holder(team, "movement")
+	var gunner: Variant = _slot_holder(team, "aim")
+	if runner == null or gunner == null:
+		return
+	runner.role = "aim"
+	gunner.role = "movement"
+	for id in _session.controllers:
+		var c: Dictionary = _session.controllers[id]
+		if c == runner or c == gunner:
+			_send_assigned(id, c)
+	_send_lobby_state()
+	_to_host({"type": "roles_swapped", "teamId": team})
 
 
 func _start_game() -> void:

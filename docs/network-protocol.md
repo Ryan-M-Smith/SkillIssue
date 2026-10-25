@@ -36,11 +36,13 @@ Each phone joins, selects an exclusive team/role slot and readies up:
 
 `waiting` becomes `ready` when all required slots are taken and every slotted phone is ready. The host decides how many phones are required (1-4, **Settings → Player Count**, default 4): the game sends it as `minPlayers` in `hello` and with `set_min_players` when it changes, and every `lobby_state` reports it. The Node relay's `MIN_CONTROLLERS` is only the default for a host that doesn't send one. The lobby counts down three seconds, then the host sends `start_game`. The server checks readiness again and broadcasts `playing`. Repeated starts and team changes during a match are rejected.
 
-The host sends `match_status` about once per second: two team scores, `timeLeft` and `killTarget`. At ten kills or five minutes, it sends `end_game` with `winningTeam` (or null), scores and team statistics. Phones receive `match_ended`; `lobby_state` becomes `ended`.
+The host sends `match_status` about once per second: two team scores, `timeLeft` and `killTarget`. Scores are **points**: a kill is 1, and a bounty (revenge) kill within 30 seconds of being killed is 2. Kill counts stay in the team statistics. At ten points or five minutes, it sends `end_game` with `winningTeam` (or null), scores and team statistics. Phones receive `match_ended`; `lobby_state` becomes `ended`.
 
 `end_game` and `match_ended` optionally carry `reason`: `kills`, `time`, or `host`. **End Match** uses `host` and the current score, including a draw for tied scores. Host-ended results show Main Menu rather than Play Again on both screens. When the host closes that completed lobby, phones return to their menu without a connection-error screen.
 
 **Play Again** on the game sends `reset_lobby`: the same code and slots return to `waiting`, with ready flags cleared. Resetting a live match is rejected. A disconnected phone loses its slot and triggers `controller_disconnected`; a live match stays `playing`. Host disconnect closes the lobby and its phone sockets. Rejoining a closed lobby requires the current code; there is no automatic mid-match seat restoration.
+
+**Swap on death:** while `playing`, the host may send `{"type":"swap_roles","teamId":1}` (the game does it for 20% of deaths). If that team holds both slots, the server swaps their roles, sends each phone its new `controller_assigned` (the phone switches HUD and motion mode), sends `lobby_state` (the game re-routes their input), then replies to the host `{"type":"roles_swapped","teamId":1}`. Otherwise it is ignored. Phones may not send it.
 
 If the game loses its host/server session while its arena is running, it stops the abandoned match and clears partial statistics, unpauses, and returns to the lobby. A newly registered code and the usual ready countdown start a fresh match. Keyboard practice is independent of this recovery path.
 

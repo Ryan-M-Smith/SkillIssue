@@ -22,6 +22,7 @@ var _loading := false
 
 func _ready() -> void:
 	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
+	Music.play("menu")
 	theme = UiKit.make_theme()
 	set_anchors_preset(Control.PRESET_FULL_RECT)
 	add_child(UiKit.background(0.5, 0.8))

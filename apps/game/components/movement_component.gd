@@ -16,6 +16,8 @@ enum ForwardMode {
 @export var jump_buffer_time := 0.15     ## a JUMP tap just before landing still counts
 
 var crouching := false
+## Power-ups scale walking / sprinting / crouching speed (1 = normal). Set by the Duo.
+var speed_scale := 1.0
 var _crouch_amount := 0.0                ## 0 = standing, 1 = fully crouched
 var _jump_buffer := 0.0
 var _gravity: float = ProjectSettings.get_setting("physics/3d/default_gravity", 9.8)
@@ -54,7 +56,7 @@ func tick(input: DuoInput, delta: float) -> void:
 	var sprinting := input.sprint and not crouching and input.move.y > 0.1
 	var base_speed: float = stats.sprint_speed if sprinting else stats.walk_speed
 	var speed := lerpf(base_speed, stats.crouch_speed, _crouch_amount)
-	var target := dir * speed
+	var target := dir * speed * speed_scale
 	var accel := stats.ground_accel if body.is_on_floor() else stats.air_accel
 	var h := Vector3(body.velocity.x, 0.0, body.velocity.z).move_toward(target, accel * delta)
 	body.velocity.x = h.x

@@ -23,6 +23,8 @@ signal weapon_dropped(index: int, data: WeaponData)
 ## Optional: lets spread react to walking / jumping / crouching.
 @export var movement: MovementComponent
 
+## Optional: buffs that change your shots (set by the Duo).
+var powerups: PowerupComponent
 var owned: Array[bool] = []
 var current := 0
 var scoped := false
@@ -234,6 +236,8 @@ func _shoot(data: WeaponData) -> void:
 	var spread := tan(deg_to_rad(current_spread_degrees()))
 	_bloom = minf(_bloom + data.bloom_per_shot, data.max_bloom)
 	var source: Node = owner if owner else body
+	var damage := data.damage * (powerups.damage_multiplier() if powerups else 1.0)
+	var lethal := powerups != null and powerups.take_one_shot()   # every pellet of this shot
 	for off in pellet_offsets(data):
 		var dir := (-basis.z + basis.x * off.x * spread + basis.y * off.y * spread).normalized()
 		var to := origin + dir * data.max_range
@@ -245,8 +249,10 @@ func _shoot(data: WeaponData) -> void:
 			end = hit.position
 			var col = hit.collider
 			if col is Hurtbox:
-				var dealt: float = col.take_hit(data.damage, data.headshot_multiplier, source)
+				var dealt: float = col.take_hit(damage, data.headshot_multiplier, source, lethal)
 				if dealt > 0.0:
+					if powerups:
+						powerups.on_hit_dealt(col.health.owner)
 					hit_confirmed.emit(col.health.owner, dealt, col.zone == Hurtbox.Zone.HEAD)
 			if data.show_impacts:
 				Tracer.spawn_impact(body.get_parent(), end, data.tracer_color, data.impact_size, data.impact_lifetime)
