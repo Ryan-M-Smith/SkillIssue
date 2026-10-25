@@ -44,6 +44,10 @@ The host sends `match_status` about once per second: two team scores, `timeLeft`
 
 If the game loses its host/server session while its arena is running, it stops the abandoned match and clears partial statistics, unpauses, and returns to the lobby. A newly registered code and the usual ready countdown start a fresh match. Keyboard practice is independent of this recovery path.
 
+## Match MVP
+
+After a match, the game posts its final numbers to the control plane, `POST /api/mvp` (not the relay): `winner` (`blue`, `red` or `draw`), `scores`, `endReason`, `durationSeconds`, and four `players` (`id` such as `red-runner`, `team`, `role` `gunner`/`runner`, `name`, numeric `stats`). Gunner stats are kills, KDR, accuracy, damage dealt, headshots, shots and best streak; Runner stats are distance, sprint time, jumps, crouches, plus the enemy's kills, accuracy and damage against that body. The route asks Gemini (`GEMINI_API_KEY`, `GEMINI_MODEL`) for structured JSON and replies `{"mvp": "<id>" | "", "headline", "reason", "model"}`; `""` (no MVP) is allowed only for a draw. It validates the report (8 KiB max) and limits each address to ten requests a minute. Any error status makes the game use its local rule.
+
 ## Input and safety
 
 Phones send `motion` at 30 Hz and gesture events as `environment` messages. The server derives `sender` from the socket, overwrites any claimed identity, and forwards input only during `playing`. Role ownership is checked at the server and in Godot's `InputRouter`.

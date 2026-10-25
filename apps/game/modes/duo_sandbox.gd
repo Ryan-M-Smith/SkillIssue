@@ -606,7 +606,7 @@ func _update_details() -> void:
 		(_detail_rows[i] as StyleBoxFlat).bg_color = Color(UiKit.GOLD, 0.12) if lead else Color(1, 1, 1, 0.04)
 
 
-func _show_banner(winner: int) -> void:
+func _show_banner(_winner: int) -> void:
 	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 	_details.visible = false
 	var hud := get_node_or_null(hud_path)
@@ -625,8 +625,8 @@ func _show_banner(winner: int) -> void:
 	var top := UiKit.eyebrow("Match over", UiKit.INK)
 	top.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	box.add_child(top)
-	var text := "DRAW" if winner < 0 else "%s WINS" % UiKit.team_name(winner)
-	var big := UiKit.display(text, 140, UiKit.INK if winner < 0 else UiKit.team_color(winner))
+	# The winner is revealed on the results screen ("and the winner is…"), not here.
+	var big := UiKit.display("FINAL WHISTLE", 140, UiKit.INK)
 	big.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	box.add_child(big)
 	var line := UiKit.display("%d — %d" % [scores[0], scores[1]], 48)
