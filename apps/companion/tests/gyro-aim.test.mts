@@ -3,8 +3,8 @@ import { test } from "node:test";
 import { gyroAim } from "../src/lib/math/gyro-aim.ts";
 
 test("mouse aiming keeps slow corrections precise and makes wrist sweeps useful", () => {
-	assert.equal(gyroAim(10, 0).x, 15);
-	assert.equal(gyroAim(90, 0).x / 3, 90); // 30-degree wrist turn in 1/3 s => 90-degree view turn
+	assert.equal(gyroAim(10, 0).x, 10);
+	assert.ok(gyroAim(90, 0).x > 90 && gyroAim(90, 0).x < 140);
 	assert.deepEqual(gyroAim(0.5, -0.5), { x: 0, y: 0 });
 	assert.ok(gyroAim(1.01, 0).x < 0.001, "no sudden jump at the noise threshold");
 });

@@ -9,6 +9,6 @@ export function gyroAim(yaw: number, pitch: number): { x: number; y: number } {
 	const precision = clamp((speed - 1.2) / 3.3, 0, 1);
 	const acceleration = clamp((speed - 50) / 180, 0, 1);
 	const smooth = (x: number) => x * x * (3 - 2 * x);
-	const gain = 0.75 + 0.55 * smooth(acceleration) * smooth(precision);
+	const gain = 1 + 0.5 * smooth(acceleration) * smooth(precision);
 	return { x: yaw * gain, y: pitch * gain };
 }

@@ -104,9 +104,8 @@ const settings = {
 	twistCenterMs: 150,
 	twistSlackDeg: 4, // twist may exceed what gravity shows by this much (noise)
 
-	// Gunner: 10 ms filters sensor chatter without noticeably trailing a phone turn.
+	// Gunner.
 	aimMaxRate: 130,
-	aimFilterTau: 0.010,
 };
 
 // Flip a sign here if a direction comes out reversed on a real phone.
@@ -224,7 +223,6 @@ export class MotionController {
 	private lastSampleAt: number | null = null;
 	private lastClockSource: "sensor" | "receipt" | null = null;
 	private gyroBias: MotionVector = { x: 0, y: 0, z: 0 };
-	private aimRateFiltered: MotionVector = { x: 0, y: 0, z: 0 };
 	private awaySince: number | null = null;
 
 	// Runner
@@ -265,7 +263,6 @@ export class MotionController {
 		this.lastSampleAt = null;
 		this.lastClockSource = null;
 		this.gyroBias = { x: 0, y: 0, z: 0 };
-		this.aimRateFiltered = { x: 0, y: 0, z: 0 };
 		this.awaySince = null;
 		this.crouching = false;
 		this.sprinting = false;
@@ -625,12 +622,12 @@ export class MotionController {
 			// Turning right / tipping the back of the phone up = looking right / up.
 			const level = normalize(cross(frame.up, scale(gravity, -1)));
 			const right = magnitude(level) > 0.5 ? level : frame.right;
-			const response = 1 - Math.exp(-dt / settings.aimFilterTau);
-			const targetYaw = axes.gunnerYawSign * dot(gyro, scale(gravity, -1));
-			const targetPitch = axes.gunnerPitchSign * dot(gyro, right);
-			this.aimRateFiltered.x += response * (targetYaw - this.aimRateFiltered.x);
-			this.aimRateFiltered.y += response * (targetPitch - this.aimRateFiltered.y);
-			const aim = gyroAim(this.aimRateFiltered.x, this.aimRateFiltered.y);
+			// Integrate each real gyro sample directly so full phone turns aren't lost
+			// to a phone-side low-pass tail. Godot smooths the accumulated deltas.
+			const aim = gyroAim(
+				axes.gunnerYawSign * dot(gyro, scale(gravity, -1)),
+				axes.gunnerPitchSign * dot(gyro, right),
+			);
 			const yaw = aim.x;
 			const pitch = aim.y;
 			output.lookX = clamp(yaw / settings.aimMaxRate);

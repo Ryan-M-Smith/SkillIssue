@@ -299,7 +299,7 @@ test("gunner wrist turns sweep the view with mouse-style sensitivity", () => {
 			const out = model.process(rig.step(pose, 16).reading as never, (now += 16));
 			dx += out.lookDX ?? 0; dy += out.lookDY ?? 0;
 		}
-		assert.ok(dx > 70 && dx < 80, `${grip} ${platform}: turned ${dx.toFixed(1)}° for 30°`);
+		assert.ok(dx > 28 && dx < 34, `${grip} ${platform}: turned ${dx.toFixed(1)}° for 30°`);
 		assert.ok(Math.abs(dy) < 2);
 		// A flick faster than the old 130°/s cap still turns all the way.
 		dx = 0;
@@ -307,7 +307,7 @@ test("gunner wrist turns sweep the view with mouse-style sensitivity", () => {
 			pose.yaw = -30 - i * 10; // 600°/s
 			dx += model.process(rig.step(pose, 16).reading as never, (now += 16)).lookDX ?? 0;
 		}
-		assert.ok(Math.abs(dx - 180) < 8, `${grip} ${platform}: a fast flick turned ${dx.toFixed(1)}° for 60°`);
+		assert.ok(Math.abs(dx - 90) < 8, `${grip} ${platform}: a fast flick turned ${dx.toFixed(1)}° for 60°`);
 	}
 });
 
@@ -343,5 +343,23 @@ test("sprint requires a centered pause before another deliberate toggle", () => 
 		hold(run, 200);
 		assert.equal(run.out.sprint, false);
 		assert.deepEqual(run.actions, ["sprint", "sprint"]);
+	}
+});
+
+
+test("a full physical phone rotation remains a continuous full camera turn", () => {
+	for (const [grip, platform] of grips) {
+		const rig = new PhoneRig(grip, platform);
+		rig.tremor = false;
+		const model = new MotionController("gunner", platform);
+		let now = 0;
+		const pose = neutral();
+		for (let i = 0; i < 40; i++) model.process(rig.step(pose, 16).reading as never, (now += 16));
+		let cameraTurn = 0;
+		for (let i = 1; i <= 180; i++) {
+			pose.yaw = -i * 2;
+			cameraTurn += model.process(rig.step(pose, 16).reading as never, (now += 16)).lookDX ?? 0;
+		}
+		assert.ok(cameraTurn >= 400 && cameraTurn <= 470, `${platform}/${grip}: full turn mapped to ${cameraTurn.toFixed(1)} degrees`);
 	}
 });
